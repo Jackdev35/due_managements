@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <title>Dashboard | Elias Computer</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Custom Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#009688',
+                        'primary-dark': '#00796b',
+                        danger: '#ef4444',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        info: '#3b82f6',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        /* Fast transitions */
+        * { transition: background-color 0.15s ease, border-color 0.15s ease; }
+        
+        /* Compact Card Hover */
+        .stat-card-hover {
+            transition: all 0.2s ease;
+        }
+        .stat-card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* Chart container */
+        canvas { max-height: 220px; width: 100%; }
+        
+        /* Skeleton loader for smooth appearance */
+        .skeleton { background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%); background-size: 200% 100%; animation: shimmer 0.8s ease-in-out infinite; }
+        .dark .skeleton { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        
+        /* Number counter animation */
+        .counter-value { transition: all 0.1s ease; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    
+    <!-- App Container -->
+    <div class="flex min-h-screen">
+        
+        <!-- Sidebar -->
+        <aside class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300" id="sidebar">
+            <div class="flex flex-col h-full">
+                <div class="flex items-center gap-3 px-5 py-5 border-b border-white/10">
+                    <i class="fas fa-laptop-code text-primary text-xl"></i>
+                    <span class="text-white font-semibold text-lg">Elias Computer</span>
+                </div>
+                <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 bg-white/10">
+                        <i class="fas fa-tachometer-alt w-5"></i>
+                        <span class="text-sm font-medium">Dashboard</span>
+                    </a>
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-users w-5"></i>
+                        <span class="text-sm font-medium">Customers</span>
+                    </a>
+                    <a href="due-entry.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-plus-circle w-5"></i>
+                        <span class="text-sm font-medium">Due Entry</span>
+                    </a>
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-hand-holding-usd w-5"></i>
+                        <span class="text-sm font-medium">Collection</span>
+                    </a>
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-book w-5"></i>
+                        <span class="text-sm font-medium">Customer Ledger</span>
+                    </a>
+                </nav>
+                <div class="px-3 py-4 border-t border-white/10">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-red-500/20">
+                        <i class="fas fa-sign-out-alt w-5"></i>
+                        <span class="text-sm font-medium">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 min-h-screen">
+            
+            <!-- Top Header -->
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+                <div class="px-4 py-2.5 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h2 class="text-base font-semibold text-gray-800 dark:text-white">Dashboard Overview</h2>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-sync-alt text-sm"></i>
+                        </button>
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-moon dark:hidden text-sm"></i>
+                            <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Page Content -->
+            <div class="p-3 md:p-4">
+                
+                <!-- Stats Cards Grid - Compact 5 Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-5">
+                    
+                    <!-- Card 1: Total Customers -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700 stat-card-hover">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="bg-blue-100 dark:bg-blue-900/30 w-7 h-7 rounded-md flex items-center justify-center">
+                                <i class="fas fa-users text-blue-600 dark:text-blue-400 text-xs"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total Customer</h3>
+                            <p class="text-lg font-bold text-gray-800 dark:text-white mt-0.5" id="totalCustomers">0</p>
+                            <p class="text-gray-400 dark:text-gray-500 text-[9px] mt-1 flex items-center gap-0.5">
+                                <i class="fas fa-user-check text-[8px]"></i> active
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Card 2: Total Due Amount -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700 stat-card-hover">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="bg-red-100 dark:bg-red-900/30 w-7 h-7 rounded-md flex items-center justify-center">
+                                <i class="fas fa-dollar-sign text-red-600 dark:text-red-400 text-xs"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total Due</h3>
+                            <p class="text-lg font-bold text-gray-800 dark:text-white mt-0.5" id="totalDue">৳0</p>
+                            <p class="text-gray-400 dark:text-gray-500 text-[9px] mt-1 flex items-center gap-0.5">
+                                <i class="fas fa-chart-line text-[8px]"></i> outstanding
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Card 3: Total Collections -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700 stat-card-hover">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="bg-green-100 dark:bg-green-900/30 w-7 h-7 rounded-md flex items-center justify-center">
+                                <i class="fas fa-wallet text-green-600 dark:text-green-400 text-xs"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Collections</h3>
+                            <p class="text-lg font-bold text-gray-800 dark:text-white mt-0.5" id="totalCollections">৳0</p>
+                            <p class="text-gray-400 dark:text-gray-500 text-[9px] mt-1 flex items-center gap-0.5">
+                                <i class="fas fa-arrow-up text-[8px] text-green-500"></i> revenue
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Card 4: Today's Collection -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700 stat-card-hover">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="bg-orange-100 dark:bg-orange-900/30 w-7 h-7 rounded-md flex items-center justify-center">
+                                <i class="fas fa-calendar-day text-orange-600 dark:text-orange-400 text-xs"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Today's Coll.</h3>
+                            <p class="text-lg font-bold text-gray-800 dark:text-white mt-0.5" id="todayCollection">৳0</p>
+                            <p class="text-gray-400 dark:text-gray-500 text-[9px] mt-1 flex items-center gap-0.5">
+                                <i class="fas fa-clock text-[8px]"></i> last 24h
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Card 5: Total Invoice Value (NEW) -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700 stat-card-hover">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="bg-purple-100 dark:bg-purple-900/30 w-7 h-7 rounded-md flex items-center justify-center">
+                                <i class="fas fa-file-invoice text-purple-600 dark:text-purple-400 text-xs"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Invoice Value</h3>
+                            <p class="text-lg font-bold text-gray-800 dark:text-white mt-0.5" id="totalInvoiceValue">৳0</p>
+                            <p class="text-gray-400 dark:text-gray-500 text-[9px] mt-1 flex items-center gap-0.5">
+                                <i class="fas fa-chart-simple text-[8px]"></i> total sales
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Section - Compact -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+                    
+                    <!-- Due Chart -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                        <div class="flex justify-between items-center mb-2 pb-1 border-b border-gray-200 dark:border-gray-700">
+                            <h3 class="text-xs font-semibold text-gray-800 dark:text-white flex items-center gap-1.5">
+                                <i class="fas fa-chart-line text-primary text-xs"></i> Monthly Due Report
+                            </h3>
+                            <span class="text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">This Year</span>
+                        </div>
+                        <canvas id="dueChart" style="max-height: 200px;"></canvas>
+                    </div>
+                    
+                    <!-- Collection Chart -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                        <div class="flex justify-between items-center mb-2 pb-1 border-b border-gray-200 dark:border-gray-700">
+                            <h3 class="text-xs font-semibold text-gray-800 dark:text-white flex items-center gap-1.5">
+                                <i class="fas fa-chart-bar text-primary text-xs"></i> Monthly Collection Report
+                            </h3>
+                            <span class="text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">This Year</span>
+                        </div>
+                        <canvas id="collectionChart" style="max-height: 200px;"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Recent Transactions - Compact -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="flex justify-between items-center px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-xs font-semibold text-gray-800 dark:text-white flex items-center gap-1.5">
+                            <i class="fas fa-history text-primary text-xs"></i> Recent Transactions
+                        </h3>
+                        <button id="viewAllBtn" class="text-[10px] text-primary hover:text-primary-dark transition-colors flex items-center gap-1">
+                            View All <i class="fas fa-arrow-right text-[8px]"></i>
+                        </button>
+                    </div>
+                    <div id="recentTransactionsList" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[320px] overflow-y-auto">
+                        <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-inbox text-2xl mb-1 opacity-50"></i>
+                            <p class="text-xs">No transactions yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-lg max-w-sm w-full mx-4 p-5 text-center">
+            <div class="text-danger text-4xl mb-3">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <h3 class="text-base font-semibold text-gray-800 dark:text-white mb-1">Logout Confirmation</h3>
+            <p class="text-gray-600 dark:text-gray-400 text-xs mb-5">Are you sure you want to logout?</p>
+            <div class="flex gap-2 justify-center">
+                <button id="cancelLogoutBtn" class="px-3 py-1.5 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs hover:bg-gray-200">Cancel</button>
+                <button id="confirmLogoutBtn" class="px-3 py-1.5 rounded-md bg-danger text-white text-xs hover:bg-red-600">Yes, Logout</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { checkAuthState, logout } from './js/auth.js';
+        import { db, collection, getDocs, query, orderBy, limit, where, getDoc, doc } from './js/firebase.js';
+        
+        checkAuthState();
+        
+        let dueChart, collectionChart;
+        let isLoading = false;
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-4 right-4 z-50 px-3 py-1.5 rounded-md shadow-md text-xs font-medium ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-1.5 text-[10px]"></i>${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+        
+        // Super Fast Data Load - No Spinner
+        async function loadDashboardData() {
+            if (isLoading) return;
+            isLoading = true;
+            
+            try {
+                // Parallel queries for speed
+                const [customersSnap, transactionsSnap] = await Promise.all([
+                    getDocs(collection(db, 'customers')),
+                    getDocs(collection(db, 'transactions'))
+                ]);
+                
+                // Process customers
+                const totalCustomers = customersSnap.size;
+                let totalDue = 0;
+                customersSnap.forEach(doc => { totalDue += (doc.data().totalDue || 0); });
+                
+                // Process transactions
+                const today = new Date().toISOString().split('T')[0];
+                let todayCollection = 0;
+                let totalCollections = 0;
+                let totalInvoiceValue = 0;
+                
+                transactionsSnap.forEach(doc => {
+                    const trans = doc.data();
+                    if (trans.type === 'collection') {
+                        totalCollections += (trans.collectionAmount || 0);
+                        if (trans.date === today) todayCollection += (trans.collectionAmount || 0);
+                    }
+                    if (trans.type === 'due') {
+                        totalInvoiceValue += (trans.totalAmount || 0);
+                    }
+                });
+                
+                // Update DOM instantly
+                document.getElementById('totalCustomers').textContent = totalCustomers;
+                document.getElementById('totalDue').textContent = '৳' + totalDue.toFixed(2);
+                document.getElementById('totalCollections').textContent = '৳' + totalCollections.toFixed(2);
+                document.getElementById('todayCollection').textContent = '৳' + todayCollection.toFixed(2);
+                document.getElementById('totalInvoiceValue').textContent = '৳' + totalInvoiceValue.toFixed(2);
+                
+                await loadCharts(transactionsSnap);
+                await loadRecentTransactions();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error loading data', 'error');
+            } finally {
+                isLoading = false;
+            }
+        }
+        
+        async function loadCharts(transactionsSnap) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const dueData = new Array(12).fill(0);
+            const collectionData = new Array(12).fill(0);
+            
+            transactionsSnap.forEach(doc => {
+                const trans = doc.data();
+                if (trans.date) {
+                    const month = new Date(trans.date).getMonth();
+                    if (trans.type === 'due') dueData[month] += (trans.dueAmount || 0);
+                    else if (trans.type === 'collection') collectionData[month] += (trans.collectionAmount || 0);
+                }
+            });
+            
+            if (dueChart) dueChart.destroy();
+            if (collectionChart) collectionChart.destroy();
+            
+            const dueCtx = document.getElementById('dueChart').getContext('2d');
+            dueChart = new Chart(dueCtx, {
+                type: 'line',
+                data: { labels: months, datasets: [{ label: 'Due (৳)', data: dueData, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.05)', fill: true, tension: 0.3, pointRadius: 2 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top', labels: { font: { size: 9 } } }, tooltip: { callbacks: { label: (ctx) => `৳${ctx.raw.toFixed(0)}` } } } }
+            });
+            
+            const collectionCtx = document.getElementById('collectionChart').getContext('2d');
+            collectionChart = new Chart(collectionCtx, {
+                type: 'bar',
+                data: { labels: months, datasets: [{ label: 'Collection (৳)', data: collectionData, backgroundColor: '#10b981', borderRadius: 4, barPercentage: 0.6 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top', labels: { font: { size: 9 } } }, tooltip: { callbacks: { label: (ctx) => `৳${ctx.raw.toFixed(0)}` } } } }
+            });
+        }
+        
+        async function loadRecentTransactions() {
+            try {
+                const q = query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(8));
+                const querySnapshot = await getDocs(q);
+                const container = document.getElementById('recentTransactionsList');
+                
+                if (querySnapshot.empty) {
+                    container.innerHTML = `<div class="text-center py-6 text-gray-500 dark:text-gray-400"><i class="fas fa-inbox text-2xl mb-1 opacity-50"></i><p class="text-xs">No transactions yet</p></div>`;
+                    return;
+                }
+                
+                let html = '';
+                for (const docSnap of querySnapshot.docs) {
+                    const trans = docSnap.data();
+                    let customerName = 'Unknown';
+                    if (trans.customerId) {
+                        const customerDoc = await getDoc(doc(db, 'customers', trans.customerId));
+                        if (customerDoc.exists()) customerName = customerDoc.data().name;
+                    }
+                    const isDue = trans.type === 'due';
+                    const amount = isDue ? (trans.dueAmount || 0) : (trans.collectionAmount || 0);
+                    const badgeClass = isDue ? 'bg-red-100 dark:bg-red-900/30 text-red-600' : 'bg-green-100 dark:bg-green-900/30 text-green-600';
+                    const iconClass = isDue ? 'fa-plus-circle' : 'fa-hand-holding-usd';
+                    const prefix = isDue ? '+' : '-';
+                    
+                    html += `<div class="flex justify-between items-center p-2.5 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-6 h-6 rounded-md ${badgeClass} flex items-center justify-center"><i class="fas ${iconClass} text-[10px]"></i></div>
+                            <div><p class="font-medium text-gray-800 dark:text-white text-xs">${escapeHtml(customerName)}</p><p class="text-[10px] text-gray-500">${trans.date || 'N/A'}</p></div>
+                        </div>
+                        <p class="font-semibold text-xs ${isDue ? 'text-red-600' : 'text-green-600'}">${prefix} ৳${amount.toFixed(2)}</p>
+                    </div>`;
+                }
+                container.innerHTML = html;
+            } catch (error) { console.error(error); }
+        }
+        
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+        
+        // Event Listeners
+        document.getElementById('darkModeToggle').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); setTimeout(() => loadDashboardData(), 50); });
+        document.getElementById('menuToggle').addEventListener('click', () => { document.getElementById('sidebar').classList.toggle('-translate-x-full'); });
+        document.getElementById('refreshBtn').addEventListener('click', () => { loadDashboardData(); showToast('Refreshed!', 'success'); });
+        document.getElementById('viewAllBtn').addEventListener('click', () => { window.location.href = 'ledger.html'; });
+        
+        // Logout Modal
+        const logoutModal = document.getElementById('logoutModal'), cancelBtn = document.getElementById('cancelLogoutBtn'), confirmBtn = document.getElementById('confirmLogoutBtn'), logoutLink = document.getElementById('logoutLink');
+        const showLogoutModal = () => logoutModal.classList.remove('hidden');
+        const closeLogoutModal = () => logoutModal.classList.add('hidden');
+        const executeLogout = async () => { closeLogoutModal(); try { await logout(); } catch (error) { showToast('Error logging out', 'error'); } };
+        if (logoutLink) logoutLink.addEventListener('click', (e) => { e.preventDefault(); showLogoutModal(); });
+        if (cancelBtn) cancelBtn.addEventListener('click', closeLogoutModal);
+        if (confirmBtn) confirmBtn.addEventListener('click', executeLogout);
+        window.addEventListener('click', (e) => { if (e.target === logoutModal) closeLogoutModal(); });
+        
+        // Initial load
+        loadDashboardData();
+        setInterval(() => loadDashboardData(), 25000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Login | Elias Computer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#009688',
+                        'primary-dark': '#00796b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-fade-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .shimmer-text {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+        
+        /* Custom input focus ring */
+        .focus-ring:focus {
+            outline: none;
+            ring: 2px solid #009688;
+        }
+        
+        /* Modal animation */
+        .modal-enter {
+            animation: fadeInUp 0.2s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+    
+    <div class="min-h-screen flex items-center justify-center px-4 py-8">
+        
+        <!-- Animated Background Elements -->
+        <div class="fixed inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-float"></div>
+            <div class="absolute bottom-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-float" style="animation-delay: -3s;"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent rotate-45"></div>
+        </div>
+        
+        <!-- Login Card -->
+        <div class="relative w-full max-w-md animate-fade-up">
+            
+            <!-- Brand Logo -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-primary-dark rounded-2xl shadow-2xl mb-4 animate-float">
+                    <i class="fas fa-laptop-code text-white text-3xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">Elias Computer</h1>
+                <p class="text-purple-200 text-sm">Due Management System</p>
+            </div>
+            
+            <!-- Login Card Body -->
+            <div class="bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 p-6 md:p-8">
+                
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-semibold text-white">Welcome Back</h2>
+                    <p class="text-purple-200 text-sm mt-1">Sign in to your account</p>
+                </div>
+                
+                <!-- Message Container -->
+                <div id="messageContainer" class="mb-4"></div>
+                
+                <!-- Login Form -->
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-purple-200 mb-2">
+                            <i class="fas fa-envelope mr-2 text-xs"></i>Email Address
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-purple-300 text-sm"></i>
+                            <input type="email" id="email" 
+                                   class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                   placeholder="you@example.com" required autocomplete="email">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-purple-200 mb-2">
+                            <i class="fas fa-lock mr-2 text-xs"></i>Password
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-purple-300 text-sm"></i>
+                            <input type="password" id="password" 
+                                   class="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                                   placeholder="Enter your password" required autocomplete="current-password">
+                            <button type="button" id="togglePassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-purple-300 hover:text-white transition-colors">
+                                <i class="fas fa-eye text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-6">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="remember" class="w-4 h-4 rounded border-white/20 bg-white/10 text-primary focus:ring-primary focus:ring-offset-0">
+                            <span class="ml-2 text-sm text-purple-200">Remember me</span>
+                        </label>
+                        <a href="#" id="forgotPasswordLink" class="text-sm text-primary hover:text-primary-light transition-colors">
+                            Forgot password?
+                        </a>
+                    </div>
+                    
+                    <button type="submit" id="loginBtn" 
+                            class="w-full bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white font-semibold py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg">
+                        <i class="fas fa-arrow-right-to-bracket mr-2"></i>Sign In
+                    </button>
+                </form>
+                
+                <!-- Footer -->
+                <div class="mt-6 text-center">
+                    <p class="text-xs text-purple-300">
+                        Secure login powered by Firebase Authentication
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Forgot Password Modal -->
+    <div id="forgotModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden transition-all duration-300 px-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl modal-enter overflow-hidden">
+            <div class="bg-gradient-to-r from-primary/10 to-transparent px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                        <i class="fas fa-key text-primary mr-2"></i>Reset Password
+                    </h3>
+                    <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <div id="resetMessageContainer" class="mb-4"></div>
+                
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    Enter your email address and we'll send you a password reset link.
+                </p>
+                
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-envelope text-primary mr-1 text-xs"></i>Email Address
+                    </label>
+                    <input type="email" id="resetEmail" 
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                           placeholder="your@email.com">
+                </div>
+                
+                <button id="sendResetBtn" 
+                        class="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 rounded-xl transition-all duration-200">
+                    <i class="fas fa-paper-plane mr-2"></i>Send Reset Email
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAceLr1Q3ivackOnYBozmNyXM87CAySHoM",
+            authDomain: "due-managements.firebaseapp.com",
+            projectId: "due-managements",
+            storageBucket: "due-managements.firebasestorage.app",
+            messagingSenderId: "288464910567",
+            appId: "1:288464910567:web:93421a45957983862f0a42"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        
+        // Check if user is already logged in
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+            window.location.href = 'dashboard.html';
+        }
+        
+        // Show message function
+        function showMessage(containerId, message, type = 'error') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const bgColor = type === 'success' ? 'bg-green-500/20 border-green-500 text-green-400' : 'bg-red-500/20 border-red-500 text-red-400';
+            container.innerHTML = `
+                <div class="p-3 rounded-xl border ${bgColor} text-sm flex items-center gap-2 animate-fade-up">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Toggle Password Visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                togglePassword.innerHTML = `<i class="fas fa-${type === 'password' ? 'eye' : 'eye-slash'} text-sm"></i>`;
+            });
+        }
+        
+        // Login Form Submit
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            
+            if (!email || !password) {
+                showMessage('messageContainer', 'Please enter email and password', 'error');
+                return;
+            }
+            
+            // Disable button and show loading state
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse mr-2"></i>Signing in...';
+            
+            // Set persistence based on remember me checkbox
+            const persistence = remember ? browserLocalPersistence : browserSessionPersistence;
+            await setPersistence(auth, persistence);
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showMessage('messageContainer', 'Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+            } catch (error) {
+                let errorMessage = '';
+                switch (error.code) {
+                    case 'auth/invalid-credential':
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = 'Invalid email or password. Please try again.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many failed attempts. Please try again later.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email format.';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                showMessage('messageContainer', errorMessage, 'error');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-arrow-right-to-bracket mr-2"></i>Sign In';
+            }
+        });
+        
+        // Forgot Password Modal
+        const forgotModal = document.getElementById('forgotModal');
+        const forgotLink = document.getElementById('forgotPasswordLink');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const sendResetBtn = document.getElementById('sendResetBtn');
+        
+        forgotLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            forgotModal.classList.remove('hidden');
+            document.getElementById('resetEmail').value = '';
+            document.getElementById('resetMessageContainer').innerHTML = '';
+        });
+        
+        function closeModal() {
+            forgotModal.classList.add('hidden');
+        }
+        
+        closeModalBtn.addEventListener('click', closeModal);
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === forgotModal) {
+                closeModal();
+            }
+        });
+        
+        // Send Password Reset Email
+        sendResetBtn.addEventListener('click', async () => {
+            const email = document.getElementById('resetEmail').value.trim();
+            
+            if (!email) {
+                showMessage('resetMessageContainer', 'Please enter your email address', 'error');
+                return;
+            }
+            
+            sendResetBtn.disabled = true;
+            sendResetBtn.innerHTML = '<i class="fas fa-spinner fa-pulse mr-2"></i>Sending...';
+            
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showMessage('resetMessageContainer', `Password reset email sent to ${email}. Check your inbox.`, 'success');
+                document.getElementById('resetEmail').value = '';
+                
+                setTimeout(() => {
+                    closeModal();
+                }, 3000);
+            } catch (error) {
+                let errorMessage = '';
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email address.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email format.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many requests. Please try again later.';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                showMessage('resetMessageContainer', errorMessage, 'error');
+            } finally {
+                sendResetBtn.disabled = false;
+                sendResetBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Reset Email';
+            }
+        });
+        
+        // Enter key support for reset email
+        const resetEmailInput = document.getElementById('resetEmail');
+        if (resetEmailInput) {
+            resetEmailInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendResetBtn.click();
+                }
+            });
+        }
+        
+        // Enter key support for login
+        const loginEmail = document.getElementById('email');
+        const loginPassword = document.getElementById('password');
+        
+        if (loginPassword) {
+            loginPassword.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    loginForm.dispatchEvent(new Event('submit'));
+                }
+            });
+        }
+    </script>
+</body>
+</html>

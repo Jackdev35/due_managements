@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Customers | Elias Computer</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#009688',
+                        'primary-dark': '#00796b',
+                        danger: '#ef4444',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        info: '#3b82f6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .stat-card-hover { transition: all 0.2s ease; }
+        .stat-card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.12); }
+        .customer-row:hover { background-color: rgba(0, 150, 136, 0.05); }
+        .unique-id-badge { 
+            font-family: 'Courier New', monospace; 
+            font-size: 11px; 
+            background: #e0f2fe; 
+            color: #0369a1;
+            padding: 3px 8px; 
+            border-radius: 20px; 
+            display: inline-block;
+            font-weight: 600;
+        }
+        .dark .unique-id-badge { background: #1e3a5f; color: #7ab7e0; }
+        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-enter { animation: modalFadeIn 0.2s ease-out; }
+        
+        /* Custom Button Styles */
+        .btn-custom {
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-custom::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+        .btn-custom:active::after {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Modal Input Focus Effect */
+        .modal-input:focus {
+            outline: none;
+            ring: 2px solid var(--primary);
+            border-color: #009688;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300" id="sidebar">
+            <div class="flex flex-col h-full">
+                <div class="flex items-center gap-3 px-5 py-5 border-b border-white/10">
+                    <i class="fas fa-laptop-code text-primary text-xl"></i>
+                    <span class="text-white font-semibold text-lg">Elias Computer</span>
+                </div>
+                <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-tachometer-alt w-5"></i><span class="text-sm font-medium">Dashboard</span>
+                    </a>
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-white/10">
+                        <i class="fas fa-users w-5"></i><span class="text-sm font-medium">Customers</span>
+                    </a>
+                    <a href="due-entry.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-plus-circle w-5"></i><span class="text-sm font-medium">Due Entry</span>
+                    </a>
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-hand-holding-usd w-5"></i><span class="text-sm font-medium">Collection</span>
+                    </a>
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-book w-5"></i><span class="text-sm font-medium">Customer Ledger</span>
+                    </a>
+                </nav>
+                <div class="px-3 py-4 border-t border-white/10">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-red-500/20">
+                        <i class="fas fa-sign-out-alt w-5"></i><span class="text-sm font-medium">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="flex-1 md:ml-64 min-h-screen">
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+                <div class="px-4 py-2.5 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h2 class="text-base font-semibold text-gray-800 dark:text-white">Customer Management</h2>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-sync-alt text-sm"></i>
+                        </button>
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-moon dark:hidden text-sm"></i>
+                            <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="p-3 md:p-4">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700 stat-card-hover">
+                        <div class="bg-blue-100 dark:bg-blue-900/30 w-7 h-7 rounded-md flex items-center justify-center mb-1.5">
+                            <i class="fas fa-users text-blue-600 dark:text-blue-400 text-xs"></i>
+                        </div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase">Total Customers</h3>
+                        <p class="text-lg font-bold text-gray-800 dark:text-white" id="totalCustomers">0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700 stat-card-hover">
+                        <div class="bg-red-100 dark:bg-red-900/30 w-7 h-7 rounded-md flex items-center justify-center mb-1.5">
+                            <i class="fas fa-dollar-sign text-red-600 dark:text-red-400 text-xs"></i>
+                        </div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase">Total Due</h3>
+                        <p class="text-lg font-bold text-gray-800 dark:text-white" id="totalDue">৳0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700 stat-card-hover">
+                        <div class="bg-purple-100 dark:bg-purple-900/30 w-7 h-7 rounded-md flex items-center justify-center mb-1.5">
+                            <i class="fas fa-file-invoice text-purple-600 dark:text-purple-400 text-xs"></i>
+                        </div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase">Invoice Value</h3>
+                        <p class="text-lg font-bold text-gray-800 dark:text-white" id="totalInvoiceValue">৳0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700 stat-card-hover">
+                        <div class="bg-green-100 dark:bg-green-900/30 w-7 h-7 rounded-md flex items-center justify-center mb-1.5">
+                            <i class="fas fa-wallet text-green-600 dark:text-green-400 text-xs"></i>
+                        </div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase">Collections</h3>
+                        <p class="text-lg font-bold text-gray-800 dark:text-white" id="totalCollections">৳0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700 stat-card-hover">
+                        <div class="bg-indigo-100 dark:bg-indigo-900/30 w-7 h-7 rounded-md flex items-center justify-center mb-1.5">
+                            <i class="fas fa-id-card text-indigo-600 dark:text-indigo-400 text-xs"></i>
+                        </div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase">Active</h3>
+                        <p class="text-lg font-bold text-gray-800 dark:text-white" id="totalCustomerCount">0</p>
+                    </div>
+                </div>
+                
+                <!-- Actions - Customized Button -->
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div class="flex gap-3">
+                        <!-- Add Customer Button - Larger Height -->
+                        <button id="addCustomerBtn" class="btn-custom bg-primary hover:bg-primary-dark text-white font-medium px-5 py-2.5 rounded-lg flex items-center gap-2 shadow-md hover:shadow-lg transition-all duration-200">
+                            <i class="fas fa-plus text-sm"></i>
+                            <span class="text-sm">Add New Customer</span>
+                        </button>
+                        <!-- Export Button -->
+                        <button id="exportBtn" class="btn-custom bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 font-medium px-5 py-2.5 rounded-lg flex items-center gap-2 shadow-sm hover:shadow-md transition-all duration-200">
+                            <i class="fas fa-download text-sm"></i>
+                            <span class="text-sm">Export Excel</span>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="text" id="searchInput" placeholder="Search by name, phone, ID..." class="pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white w-72 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all">
+                    </div>
+                </div>
+                
+                <!-- Customers Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer ID</th>
+                                    <th class="px-4 py-3 text-left text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Name</th>
+                                    <th class="px-4 py-3 text-left text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Phone</th>
+                                    <th class="px-4 py-3 text-left text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Address</th>
+                                    <th class="px-4 py-3 text-right text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Invoice Value</th>
+                                    <th class="px-4 py-3 text-right text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Total Due</th>
+                                    <th class="px-4 py-3 text-center text-[11px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTableBody" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr><td colspan="7" class="px-4 py-8 text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Customer Modal - Professional UI Design -->
+    <div id="customerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-all duration-300">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full mx-4 shadow-2xl modal-enter overflow-hidden">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white" id="modalTitle">
+                    <i class="fas fa-user-plus text-primary mr-2"></i> Add New Customer
+                </h3>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <input type="hidden" id="customerId">
+            
+            <!-- Modal Body -->
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        <i class="fas fa-user text-primary mr-1 text-xs"></i> Full Name <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" id="custName" placeholder="Enter customer full name" class="modal-input w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        <i class="fas fa-phone text-primary mr-1 text-xs"></i> Phone Number <span class="text-danger">*</span>
+                    </label>
+                    <input type="tel" id="custPhone" placeholder="Enter phone number" class="modal-input w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        <i class="fas fa-map-marker-alt text-primary mr-1 text-xs"></i> Address
+                    </label>
+                    <input type="text" id="custAddress" placeholder="Enter address" class="modal-input w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        <i class="fas fa-sticky-note text-primary mr-1 text-xs"></i> Notes
+                    </label>
+                    <textarea id="custNotes" rows="2" placeholder="Additional notes about customer..." class="modal-input w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none"></textarea>
+                </div>
+            </div>
+            
+            <!-- Modal Footer - Professional Buttons -->
+            <div class="flex justify-end gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
+                <button id="cancelModalBtn" class="btn-custom px-5 py-2 text-sm font-medium rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 hover:border-gray-400 transition-all duration-200 shadow-sm">
+                    <i class="fas fa-times mr-1"></i> Cancel
+                </button>
+                <button id="saveCustomerBtn" class="btn-custom px-5 py-2 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary-dark shadow-md hover:shadow-lg transition-all duration-200">
+                    <i class="fas fa-save mr-1"></i> Save Customer
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-all duration-300">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full mx-4 shadow-2xl modal-enter overflow-hidden">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-danger text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2" id="deleteModalTitle">Delete Customer</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-6" id="deleteModalMessage">Are you sure you want to delete this customer?</p>
+                <div class="flex gap-3 justify-center">
+                    <button id="cancelDeleteBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition-all">
+                        Cancel
+                    </button>
+                    <button id="confirmDeleteBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-danger text-white hover:bg-red-600 transition-all shadow-md">
+                        <i class="fas fa-trash-alt mr-1"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50"></div>
+    <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full mx-4 p-6 text-center shadow-2xl">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <i class="fas fa-sign-out-alt text-warning text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Logout Confirmation</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Are you sure you want to logout?</p>
+            <div class="flex gap-3 justify-center">
+                <button id="cancelLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 transition-all">Cancel</button>
+                <button id="confirmLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-danger text-white hover:bg-red-600 transition-all">Logout</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { checkAuthState, logout } from './js/auth.js';
+        import { db, collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, orderBy, where } from './js/firebase.js';
+        
+        checkAuthState();
+        
+        let currentDeleteId = null;
+        let currentDeleteHasTransactions = false;
+        let currentCustomerName = '';
+        let currentSearchTerm = '';
+        let allCustomers = [];
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `mb-2 px-4 py-2 rounded-lg shadow-lg text-sm font-medium transform transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        async function generateCustomerId() {
+            const customersSnap = await getDocs(collection(db, 'customers'));
+            let maxNumber = 0;
+            customersSnap.forEach(doc => {
+                const customer = doc.data();
+                if (customer.customerId && customer.customerId.startsWith('CUS-')) {
+                    const numPart = customer.customerId.replace('CUS-', '');
+                    const num = parseInt(numPart, 10);
+                    if (!isNaN(num) && num > maxNumber) maxNumber = num;
+                }
+            });
+            const nextNumber = maxNumber + 1;
+            return `CUS-${nextNumber.toString().padStart(5, '0')}`;
+        }
+        
+        async function loadStats() {
+            const customersSnap = await getDocs(collection(db, 'customers'));
+            let totalDue = 0;
+            customersSnap.forEach(doc => { totalDue += (doc.data().totalDue || 0); });
+            const transactionsSnap = await getDocs(collection(db, 'transactions'));
+            let totalCollections = 0, totalInvoiceValue = 0;
+            transactionsSnap.forEach(doc => {
+                const trans = doc.data();
+                if (trans.type === 'collection') totalCollections += (trans.collectionAmount || 0);
+                if (trans.type === 'due') totalInvoiceValue += (trans.totalAmount || 0);
+            });
+            document.getElementById('totalCustomers').textContent = customersSnap.size;
+            document.getElementById('totalCustomerCount').textContent = customersSnap.size;
+            document.getElementById('totalDue').textContent = '৳' + totalDue.toFixed(2);
+            document.getElementById('totalInvoiceValue').textContent = '৳' + totalInvoiceValue.toFixed(2);
+            document.getElementById('totalCollections').textContent = '৳' + totalCollections.toFixed(2);
+        }
+        
+        async function getCustomerInvoiceValue(customerId) {
+            const transactionsSnap = await getDocs(query(collection(db, 'transactions'), where('customerId', '==', customerId), where('type', '==', 'due')));
+            let total = 0;
+            transactionsSnap.forEach(doc => { total += (doc.data().totalAmount || 0); });
+            return total;
+        }
+        
+        async function loadCustomers(searchTerm = '') {
+            currentSearchTerm = searchTerm;
+            const tbody = document.getElementById('customersTableBody');
+            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-1">Loading customers...</p></td></tr>';
+            
+            const q = query(collection(db, 'customers'), orderBy('createdAt', 'desc'));
+            const querySnapshot = await getDocs(q);
+            
+            let customers = [];
+            for (const docSnap of querySnapshot.docs) {
+                const customer = { id: docSnap.id, ...docSnap.data() };
+                customer.invoiceValue = await getCustomerInvoiceValue(customer.id);
+                customers.push(customer);
+            }
+            allCustomers = customers;
+            
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                customers = customers.filter(c => 
+                    (c.customerId && c.customerId.toLowerCase().includes(term)) ||
+                    c.name.toLowerCase().includes(term) || c.phone.includes(term) || 
+                    (c.address && c.address.toLowerCase().includes(term))
+                );
+            }
+            
+            if (customers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-users text-3xl mb-2 opacity-50 block"></i>No customers found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            for (const customer of customers) {
+                const dueClass = (customer.totalDue || 0) >= 10000 ? 'text-red-600' : (customer.totalDue || 0) >= 5000 ? 'text-orange-500' : 'text-green-600';
+                const row = tbody.insertRow();
+                row.className = 'customer-row transition-colors cursor-pointer';
+                row.innerHTML = `
+                    <td class="px-4 py-2.5"><span class="unique-id-badge">${escapeHtml(customer.customerId || 'N/A')}</span></td>
+                    <td class="px-4 py-2.5"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">${(customer.name.charAt(0) || '?').toUpperCase()}</div><span class="font-medium">${escapeHtml(customer.name)}</span></div></td>
+                    <td class="px-4 py-2.5">${escapeHtml(customer.phone)}</td>
+                    <td class="px-4 py-2.5">${escapeHtml(customer.address) || '-'}</td>
+                    <td class="px-4 py-2.5 text-right text-purple-600 font-semibold">৳${(customer.invoiceValue || 0).toFixed(2)}</td>
+                    <td class="px-4 py-2.5 text-right ${dueClass} font-semibold">৳${(customer.totalDue || 0).toFixed(2)}</td>
+                    <td class="px-4 py-2.5 text-center"><div class="flex items-center justify-center gap-2"><button class="edit-customer text-blue-500 hover:text-blue-700 transition-colors p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20" data-id="${customer.id}" data-name="${escapeHtml(customer.name)}" data-phone="${escapeHtml(customer.phone)}" data-address="${escapeHtml(customer.address || '')}" data-notes="${escapeHtml(customer.notes || '')}"><i class="fas fa-edit"></i></button><button class="delete-customer text-red-500 hover:text-red-700 transition-colors p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20" data-id="${customer.id}" data-name="${escapeHtml(customer.name)}"><i class="fas fa-trash-alt"></i></button></div></td>
+                `;
+            }
+            
+            document.querySelectorAll('.edit-customer').forEach(btn => btn.addEventListener('click', () => openEditModal(btn.dataset)));
+            document.querySelectorAll('.delete-customer').forEach(btn => btn.addEventListener('click', async () => {
+                currentDeleteId = btn.dataset.id;
+                currentCustomerName = btn.dataset.name;
+                const transQuery = await getDocs(query(collection(db, 'transactions'), where('customerId', '==', currentDeleteId)));
+                currentDeleteHasTransactions = !transQuery.empty;
+                
+                const modalTitle = document.getElementById('deleteModalTitle');
+                const modalMessage = document.getElementById('deleteModalMessage');
+                
+                if (currentDeleteHasTransactions) {
+                    modalTitle.innerHTML = '⚠️ Warning!';
+                    modalMessage.innerHTML = `Customer "${currentCustomerName}" has ${transQuery.size} transaction(s).<br><br><strong class="text-danger">Deleting will remove ALL transactions permanently!</strong><br>This action CANNOT be undone.`;
+                    document.getElementById('confirmDeleteBtn').innerHTML = '<i class="fas fa-trash-alt mr-1"></i> Delete Everything';
+                } else {
+                    modalTitle.innerHTML = 'Delete Customer';
+                    modalMessage.innerHTML = `Are you sure you want to delete "${currentCustomerName}"?`;
+                    document.getElementById('confirmDeleteBtn').innerHTML = 'Delete';
+                }
+                document.getElementById('deleteModal').classList.remove('hidden');
+            }));
+        }
+        
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+        
+        function openEditModal(data) {
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-edit text-primary mr-2"></i> Edit Customer';
+            document.getElementById('customerId').value = data.id;
+            document.getElementById('custName').value = data.name;
+            document.getElementById('custPhone').value = data.phone;
+            document.getElementById('custAddress').value = data.address;
+            document.getElementById('custNotes').value = data.notes;
+            document.getElementById('customerModal').classList.remove('hidden');
+        }
+        
+        function closeModal() {
+            document.getElementById('customerModal').classList.add('hidden');
+            document.getElementById('customerId').value = '';
+            document.getElementById('custName').value = '';
+            document.getElementById('custPhone').value = '';
+            document.getElementById('custAddress').value = '';
+            document.getElementById('custNotes').value = '';
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus text-primary mr-2"></i> Add New Customer';
+        }
+        
+        async function saveCustomer() {
+            const customerId = document.getElementById('customerId').value;
+            const customerData = {
+                name: document.getElementById('custName').value.trim(),
+                phone: document.getElementById('custPhone').value.trim(),
+                address: document.getElementById('custAddress').value,
+                notes: document.getElementById('custNotes').value
+            };
+            if (!customerData.name || !customerData.phone) { showToast('Please fill name and phone number', 'error'); return; }
+            try {
+                if (customerId) {
+                    await updateDoc(doc(db, 'customers', customerId), customerData);
+                    showToast('Customer updated successfully', 'success');
+                } else {
+                    const newCustomerId = await generateCustomerId();
+                    await addDoc(collection(db, 'customers'), { ...customerData, customerId: newCustomerId, totalDue: 0, createdAt: new Date().toISOString() });
+                    showToast(`Customer added! ID: ${newCustomerId}`, 'success');
+                }
+                closeModal();
+                await loadCustomers(currentSearchTerm);
+                await loadStats();
+            } catch (error) { showToast('Error saving customer', 'error'); }
+        }
+        
+        async function deleteCustomer() {
+            if (!currentDeleteId) return;
+            try {
+                const transQuery = await getDocs(query(collection(db, 'transactions'), where('customerId', '==', currentDeleteId)));
+                for (const transDoc of transQuery.docs) await deleteDoc(doc(db, 'transactions', transDoc.id));
+                await deleteDoc(doc(db, 'customers', currentDeleteId));
+                showToast(`Customer "${currentCustomerName}" and ${transQuery.size} transaction(s) deleted`, 'success');
+                document.getElementById('deleteModal').classList.add('hidden');
+                await loadCustomers(currentSearchTerm);
+                await loadStats();
+            } catch (error) { showToast('Error deleting customer', 'error'); }
+        }
+        
+        function exportToExcel() {
+            if (allCustomers.length === 0) { showToast('No data to export', 'error'); return; }
+            let csvRows = ['\uFEFF"Customer ID","Name","Phone","Address","Invoice Value (৳)","Total Due (৳)"'];
+            for (const customer of allCustomers) {
+                csvRows.push(`"${customer.customerId || 'N/A'}","${customer.name}","${customer.phone}","${customer.address || ''}","${(customer.invoiceValue || 0).toFixed(2)}","${(customer.totalDue || 0).toFixed(2)}"`);
+            }
+            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Exported successfully', 'success');
+        }
+        
+        // Event Listeners
+        document.getElementById('addCustomerBtn').addEventListener('click', () => { closeModal(); document.getElementById('customerModal').classList.remove('hidden'); });
+        document.getElementById('saveCustomerBtn').addEventListener('click', saveCustomer);
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
+        document.getElementById('cancelDeleteBtn').addEventListener('click', () => document.getElementById('deleteModal').classList.add('hidden'));
+        document.getElementById('confirmDeleteBtn').addEventListener('click', deleteCustomer);
+        document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+        document.getElementById('refreshBtn').addEventListener('click', () => { document.getElementById('searchInput').value = ''; loadCustomers(''); loadStats(); showToast('Refreshed!', 'success'); });
+        document.getElementById('searchInput').addEventListener('input', (e) => loadCustomers(e.target.value));
+        document.getElementById('darkModeToggle').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
+        document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('-translate-x-full'));
+        
+        // Logout
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutLink = document.getElementById('logoutLink');
+        const cancelLogout = document.getElementById('cancelLogoutBtn');
+        const confirmLogout = document.getElementById('confirmLogoutBtn');
+        if (logoutLink) logoutLink.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
+        if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
+        if (confirmLogout) confirmLogout.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
+        
+        loadStats();
+        loadCustomers();
+    </script>
+</body>
+</html>

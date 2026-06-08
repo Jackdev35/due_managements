@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Collection - Elias Computer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .collection-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .form-card {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 0;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+        
+        .due-alert {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin: 1rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        body.dark .due-alert {
+            background: linear-gradient(135deg, #451a03 0%, #78350f 100%);
+        }
+        
+        .due-label {
+            font-size: 0.7rem;
+            color: #92400e;
+        }
+        
+        body.dark .due-label {
+            color: #fcd34d;
+        }
+        
+        .due-amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #dc2626;
+        }
+        
+        .btn-submit {
+            background: #10b981;
+            width: 100%;
+            padding: 0.625rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        
+        .btn-submit:hover {
+            background: #059669;
+        }
+        
+        .recent-card {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .collection-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .collection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.2s;
+        }
+        
+        .collection-item:hover {
+            background: var(--bg);
+        }
+        
+        .collection-info {
+            flex: 1;
+        }
+        
+        .collection-customer {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .collection-date {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        
+        .collection-amount {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #10b981;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+        
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.4;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-laptop-code"></i>
+                <span>Elias Computer</span>
+            </div>
+            <nav>
+                <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="customers.html"><i class="fas fa-users"></i> Customers</a>
+                <a href="due-entry.html"><i class="fas fa-plus-circle"></i> Due Entry</a>
+                <a href="collection.html" class="active"><i class="fas fa-hand-holding-usd"></i> Collection</a>
+                <a href="ledger.html"><i class="fas fa-book"></i> Customer Ledger</a>
+                <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-header">
+                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+                <h2><i class="fas fa-hand-holding-usd"></i> Collection</h2>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button id="refreshBtn" style="background: transparent;"><i class="fas fa-sync-alt"></i></button>
+                    <button id="darkModeToggle" style="background: transparent;"><i class="fas fa-moon"></i></button>
+                </div>
+            </div>
+            
+            <div class="collection-container">
+                <!-- Collection Form -->
+                <div class="form-card">
+                    <div class="form-title">
+                        <i class="fas fa-money-bill-wave"></i> Receive Payment
+                    </div>
+                    
+                    <form id="collectionForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Customer *</label>
+                                <select id="customerId" required>
+                                    <option value="">-- Select Customer --</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Date *</label>
+                                <input type="date" id="collectionDate" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-money-bill"></i> Amount *</label>
+                                <input type="number" id="collectionAmount" placeholder="Enter amount" step="0.01" min="0">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-sticky-note"></i> Remarks</label>
+                                <input type="text" id="remarks" placeholder="Payment reference">
+                            </div>
+                        </div>
+                        
+                        <div id="dueAlert" class="due-alert" style="display: none;">
+                            <div>
+                                <div class="due-label">Current Due Amount</div>
+                                <div class="due-amount" id="currentDueDisplay">৳0.00</div>
+                            </div>
+                            <i class="fas fa-info-circle" style="font-size: 1.25rem; opacity: 0.7;"></i>
+                        </div>
+                        
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-save"></i> Save Collection
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Recent Collections -->
+                <div class="recent-card">
+                    <div class="section-header">
+                        <h3><i class="fas fa-history"></i> Recent Collections</h3>
+                        <span style="font-size: 0.7rem;" id="collectionCount">0 records</span>
+                    </div>
+                    <div id="recentCollectionsList" class="collection-list">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No collections yet</p>
+                            <small>Add a collection to see history</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 9999;">
+        <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 1rem; text-align: center;">
+            <i class="fas fa-spinner fa-pulse" style="font-size: 2rem; color: var(--accent);"></i>
+            <p style="margin-top: 0.5rem;">Processing...</p>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { checkAuthState, logout } from './js/auth.js';
+        import { 
+            db, collection, addDoc, getDocs, query, orderBy, limit,
+            doc, getDoc, updateDoc, Timestamp, where
+        } from './js/firebase.js';
+        
+        checkAuthState();
+        
+        // Global variables
+        let isProcessing = false;
+        
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.style.display = show ? 'flex' : 'none';
+            }
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Load customers into dropdown
+        async function loadCustomers() {
+            try {
+                console.log("Loading customers...");
+                const querySnapshot = await getDocs(collection(db, 'customers'));
+                const select = document.getElementById('customerId');
+                
+                if (!select) return;
+                
+                select.innerHTML = '<option value="">-- Select Customer --</option>';
+                
+                if (querySnapshot.empty) {
+                    select.innerHTML = '<option value="">-- No customers found --</option>';
+                    return;
+                }
+                
+                querySnapshot.forEach(docSnap => {
+                    const customer = docSnap.data();
+                    const option = document.createElement('option');
+                    option.value = docSnap.id;
+                    const dueText = (customer.totalDue || 0) > 0 ? ` (Due: ৳${(customer.totalDue || 0).toFixed(2)})` : ' (No Due)';
+                    option.textContent = `${customer.name}${dueText}`;
+                    select.appendChild(option);
+                });
+                
+                console.log("Customers loaded:", querySnapshot.size);
+            } catch (error) {
+                console.error("Error loading customers:", error);
+                showToast('Error loading customers: ' + error.message, 'error');
+            }
+        }
+        
+        // Load customer due amount
+        async function loadCustomerDue(customerId) {
+            if (!customerId) {
+                document.getElementById('dueAlert').style.display = 'none';
+                return 0;
+            }
+            
+            try {
+                const customerRef = doc(db, 'customers', customerId);
+                const customerDoc = await getDoc(customerRef);
+                
+                if (!customerDoc.exists()) {
+                    document.getElementById('dueAlert').style.display = 'none';
+                    return 0;
+                }
+                
+                const due = customerDoc.data()?.totalDue || 0;
+                const dueDisplay = document.getElementById('currentDueDisplay');
+                const dueAlert = document.getElementById('dueAlert');
+                
+                if (dueDisplay) dueDisplay.innerHTML = `৳${due.toFixed(2)}`;
+                
+                if (due > 0) {
+                    dueAlert.style.display = 'flex';
+                } else {
+                    dueAlert.style.display = 'flex';
+                    if (dueDisplay) dueDisplay.innerHTML = '৳0.00 - No due';
+                }
+                return due;
+            } catch (error) {
+                console.error("Error loading due:", error);
+                document.getElementById('dueAlert').style.display = 'none';
+                return 0;
+            }
+        }
+        
+        // Load recent collections
+        async function loadRecentCollections() {
+            try {
+                console.log("Loading recent collections...");
+                
+                // Simple query without orderBy first to avoid index issues
+                const q = query(collection(db, 'transactions'));
+                const querySnapshot = await getDocs(q);
+                
+                const container = document.getElementById('recentCollectionsList');
+                const countSpan = document.getElementById('collectionCount');
+                
+                if (!container) return;
+                
+                // Filter collections in JavaScript (to avoid index requirement)
+                const collections = [];
+                for (const docSnap of querySnapshot.docs) {
+                    const data = docSnap.data();
+                    if (data.type === 'collection') {
+                        collections.push({
+                            id: docSnap.id,
+                            ...data
+                        });
+                    }
+                }
+                
+                // Sort by date descending
+                collections.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+                
+                // Take last 15
+                const recentCollections = collections.slice(0, 15);
+                
+                if (countSpan) countSpan.textContent = `${recentCollections.length} records`;
+                
+                if (recentCollections.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No collections yet</p>
+                            <small>Add a collection to see history</small>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                for (const collection of recentCollections) {
+                    // Get customer name
+                    let customerName = 'Unknown';
+                    if (collection.customerId) {
+                        try {
+                            const customerDoc = await getDoc(doc(db, 'customers', collection.customerId));
+                            if (customerDoc.exists()) {
+                                customerName = customerDoc.data().name;
+                            }
+                        } catch (err) {
+                            console.error("Error getting customer:", err);
+                        }
+                    }
+                    
+                    html += `
+                        <div class="collection-item">
+                            <div class="collection-info">
+                                <div class="collection-customer">${escapeHtml(customerName)}</div>
+                                <div class="collection-date">${collection.date || 'N/A'} ${collection.remarks ? '• ' + escapeHtml(collection.remarks) : ''}</div>
+                            </div>
+                            <div class="collection-amount">৳${(collection.collectionAmount || 0).toFixed(2)}</div>
+                        </div>
+                    `;
+                }
+                
+                container.innerHTML = html;
+                console.log("Collections loaded:", recentCollections.length);
+                
+            } catch (error) {
+                console.error("Error loading recent collections:", error);
+                const container = document.getElementById('recentCollectionsList');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Error loading collections</p>
+                            <small>${error.message}</small>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        // Submit collection
+        async function submitCollection(event) {
+            event.preventDefault();
+            
+            if (isProcessing) {
+                showToast('Please wait, processing...', 'warning');
+                return;
+            }
+            
+            const customerId = document.getElementById('customerId').value;
+            if (!customerId) {
+                showToast('Please select a customer', 'error');
+                return;
+            }
+            
+            const date = document.getElementById('collectionDate').value;
+            if (!date) {
+                showToast('Please select date', 'error');
+                return;
+            }
+            
+            const amount = parseFloat(document.getElementById('collectionAmount').value);
+            if (isNaN(amount) || amount <= 0) {
+                showToast('Please enter a valid amount greater than 0', 'error');
+                return;
+            }
+            
+            const remarks = document.getElementById('remarks').value;
+            
+            // Get current due
+            const customerRef = doc(db, 'customers', customerId);
+            const customerDoc = await getDoc(customerRef);
+            const currentDue = customerDoc.data()?.totalDue || 0;
+            
+            if (amount > currentDue) {
+                showToast(`Collection amount (৳${amount.toFixed(2)}) cannot exceed current due (৳${currentDue.toFixed(2)})`, 'error');
+                return;
+            }
+            
+            isProcessing = true;
+            showLoading(true);
+            
+            try {
+                // Create transaction
+                const transaction = {
+                    customerId: customerId,
+                    type: 'collection',
+                    date: date,
+                    collectionAmount: amount,
+                    remarks: remarks || '',
+                    createdAt: Timestamp.now()
+                };
+                
+                await addDoc(collection(db, 'transactions'), transaction);
+                
+                // Update customer's total due
+                const newDue = currentDue - amount;
+                await updateDoc(customerRef, {
+                    totalDue: newDue
+                });
+                
+                showToast(`Collection of ৳${amount.toFixed(2)} recorded successfully!`, 'success');
+                
+                // Reset form
+                document.getElementById('collectionAmount').value = '';
+                document.getElementById('remarks').value = '';
+                document.getElementById('collectionDate').valueAsDate = new Date();
+                document.getElementById('customerId').value = '';
+                document.getElementById('dueAlert').style.display = 'none';
+                
+                // Refresh data
+                await loadCustomers();
+                await loadRecentCollections();
+                
+            } catch (error) {
+                console.error('Error adding collection:', error);
+                showToast('Error: ' + error.message, 'error');
+            } finally {
+                isProcessing = false;
+                showLoading(false);
+            }
+        }
+        
+        // Event listeners
+        const customerSelect = document.getElementById('customerId');
+        if (customerSelect) {
+            customerSelect.addEventListener('change', (e) => loadCustomerDue(e.target.value));
+        }
+        
+        const collectionForm = document.getElementById('collectionForm');
+        if (collectionForm) {
+            collectionForm.addEventListener('submit', submitCollection);
+        }
+        
+        const refreshBtn = document.getElementById('refreshBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                loadCustomers();
+                loadRecentCollections();
+                showToast('Data refreshed!', 'success');
+            });
+        }
+        
+        // Set default date
+        const dateInput = document.getElementById('collectionDate');
+        if (dateInput) {
+            dateInput.valueAsDate = new Date();
+        }
+        
+        // Dark mode toggle
+        const darkToggle = document.getElementById('darkModeToggle');
+        if (darkToggle) {
+            darkToggle.addEventListener('click', () => document.body.classList.toggle('dark'));
+        }
+        
+        // Menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+        }
+        
+        // Logout
+        const logoutLink = document.getElementById('logoutLink');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                logout();
+            });
+        }
+        
+        // Initialize page
+        async function init() {
+            console.log("Initializing collection page...");
+            await loadCustomers();
+            await loadRecentCollections();
+            console.log("Initialization complete");
+        }
+        
+        init();
+    </script>
+</body>
+</html>
