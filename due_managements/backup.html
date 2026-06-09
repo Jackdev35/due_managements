@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#009688">
+    <title>Database Backup | JackDev Due Managements</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#009688',
+                        'primary-dark': '#00796b',
+                        danger: '#ef4444',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        info: '#3b82f6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        .btn-active:active {
+            transform: scale(0.97);
+        }
+        .backup-card {
+            transition: all 0.3s ease;
+        }
+        .backup-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    
+    <div class="flex min-h-screen">
+        
+        <!-- Sidebar -->
+        <aside class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 overflow-y-auto" id="sidebar">
+            <div class="flex flex-col h-full">
+                <div class="flex items-center gap-3 px-5 py-5 border-b border-white/10">
+                    <i class="fas fa-laptop-code text-primary text-xl"></i>
+                    <span class="text-white font-semibold text-lg">JackDev Due Managements</span>
+                </div>
+                <nav class="flex-1 px-3 py-4 space-y-1">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-tachometer-alt w-5"></i><span class="text-sm">Dashboard</span>
+                    </a>
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-users w-5"></i><span class="text-sm">Customers</span>
+                    </a>
+                    <a href="due-entry.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-plus-circle w-5"></i><span class="text-sm">Due Entry</span>
+                    </a>
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-hand-holding-usd w-5"></i><span class="text-sm">Collection</span>
+                    </a>
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-book w-5"></i><span class="text-sm">Customer Ledger</span>
+                    </a>
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-white/10">
+                        <i class="fas fa-database w-5"></i><span class="text-sm">Backup & Restore</span>
+                    </a>
+                </nav>
+                <div class="px-3 py-4 border-t border-white/10">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-red-500/20">
+                        <i class="fas fa-sign-out-alt w-5"></i><span class="text-sm">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 min-h-screen w-full">
+            
+            <!-- Top Header -->
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+                <div class="px-3 py-3 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-2 -ml-2 rounded-lg">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h2 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white">
+                            <i class="fas fa-database text-primary mr-2"></i>Database Backup & Restore
+                        </h2>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button id="darkModeToggle" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-moon dark:hidden text-sm"></i>
+                            <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Page Content -->
+            <div class="p-3 md:p-6">
+                
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 backup-card">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
+                                <i class="fas fa-users text-blue-600 dark:text-blue-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Total Customers</p>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalCustomers">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 backup-card">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
+                                <i class="fas fa-exchange-alt text-green-600 dark:text-green-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Total Transactions</p>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalTransactions">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 backup-card">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg">
+                                <i class="fas fa-clock text-purple-600 dark:text-purple-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Last Backup</p>
+                                <p class="text-lg font-bold text-gray-800 dark:text-white" id="lastBackup">Never</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Backup Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    
+                    <!-- Backup Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                        <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
+                            <h3 class="text-base font-semibold text-gray-800 dark:text-white">
+                                <i class="fas fa-download text-primary mr-2"></i>Export Backup
+                            </h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Download complete database backup in different formats</p>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <button id="backupJSONBtn" class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 rounded-xl transition-all btn-active flex items-center justify-center gap-2">
+                                <i class="fas fa-file-code text-lg"></i> Backup as JSON
+                            </button>
+                            <button id="backupCSVBtn" class="w-full bg-info hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition-all btn-active flex items-center justify-center gap-2">
+                                <i class="fas fa-file-csv text-lg"></i> Backup as CSV
+                            </button>
+                            <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-3 text-xs text-yellow-800 dark:text-yellow-300">
+                                <i class="fas fa-info-circle mr-1"></i> JSON backup includes complete data structure. CSV backup includes separate files for customers and transactions.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Restore Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                        <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
+                            <h3 class="text-base font-semibold text-gray-800 dark:text-white">
+                                <i class="fas fa-upload text-primary mr-2"></i>Restore Backup
+                            </h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Restore database from backup file</p>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center hover:border-primary transition-colors cursor-pointer" id="uploadArea">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Click or drag backup file here</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">Supported: .json files</p>
+                                <input type="file" id="restoreFileInput" accept=".json" class="hidden">
+                            </div>
+                            <div id="restorePreview" class="hidden bg-gray-100 dark:bg-gray-700 rounded-lg p-3 text-sm"></div>
+                            <button id="restoreBtn" class="w-full bg-warning hover:bg-orange-600 text-white font-medium py-3 rounded-xl transition-all btn-active flex items-center justify-center gap-2" disabled>
+                                <i class="fas fa-upload"></i> Restore Backup
+                            </button>
+                            <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 text-xs text-red-800 dark:text-red-300">
+                                <i class="fas fa-exclamation-triangle mr-1"></i> Warning: Restoring will REPLACE all existing data. This action cannot be undone.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Danger Zone - Updated to redirect to clear-data.html -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-red-200 dark:border-red-800 shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 bg-gradient-to-r from-red-50 to-transparent dark:from-red-900/20 border-b border-red-200 dark:border-red-800">
+                        <h3 class="text-base font-semibold text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>Danger Zone
+                        </h3>
+                        <p class="text-xs text-red-500 dark:text-red-400 mt-1">Destructive actions - Use with caution</p>
+                    </div>
+                    <div class="p-5">
+                        <a href="clear-data.html" id="clearDatabaseBtn" class="w-full bg-danger hover:bg-red-700 text-white font-medium py-3 rounded-xl transition-all btn-active flex items-center justify-center gap-2 text-center">
+                            <i class="fas fa-trash-alt"></i> Clear All Database
+                        </a>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
+                            This will open a separate page to clear ALL customers and transactions. Multiple confirmations required.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 text-center shadow-2xl">
+            <i class="fas fa-spinner fa-pulse text-primary text-3xl mb-2"></i>
+            <p class="text-gray-600 dark:text-gray-300">Processing...</p>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-2"></div>
+    
+    <script type="module">
+        import { checkAuthState, logout } from './js/auth.js';
+        import { db, collection, getDocs, addDoc, deleteDoc, doc, writeBatch } from './js/firebase.js';
+        
+        checkAuthState();
+        
+        let selectedBackupData = null;
+        let backupFileName = '';
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : type === 'error' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'
+            }`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2 text-xs"></i>${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
+        
+        // Load statistics
+        async function loadStats() {
+            try {
+                const customersSnap = await getDocs(collection(db, 'customers'));
+                const transactionsSnap = await getDocs(collection(db, 'transactions'));
+                document.getElementById('totalCustomers').textContent = customersSnap.size;
+                document.getElementById('totalTransactions').textContent = transactionsSnap.size;
+                
+                // Check localStorage for last backup time
+                const lastBackupTime = localStorage.getItem('lastBackupTime');
+                if (lastBackupTime) {
+                    const date = new Date(parseInt(lastBackupTime));
+                    document.getElementById('lastBackup').textContent = date.toLocaleString();
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        // Backup as JSON
+        async function backupAsJSON() {
+            showLoading(true);
+            try {
+                const customersSnap = await getDocs(collection(db, 'customers'));
+                const transactionsSnap = await getDocs(collection(db, 'transactions'));
+                
+                const customers = [];
+                customersSnap.forEach(doc => {
+                    customers.push({ id: doc.id, ...doc.data() });
+                });
+                
+                const transactions = [];
+                transactionsSnap.forEach(doc => {
+                    transactions.push({ id: doc.id, ...doc.data() });
+                });
+                
+                const backupData = {
+                    version: '1.0',
+                    exportedAt: new Date().toISOString(),
+                    customers: customers,
+                    transactions: transactions,
+                    summary: {
+                        totalCustomers: customers.length,
+                        totalTransactions: transactions.length
+                    }
+                };
+                
+                const jsonStr = JSON.stringify(backupData, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+                a.download = `elias_backup_${timestamp}.json`;
+                a.href = url;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                localStorage.setItem('lastBackupTime', Date.now().toString());
+                await loadStats();
+                
+                showToast(`Backup completed! ${customers.length} customers, ${transactions.length} transactions`, 'success');
+            } catch (error) {
+                console.error('Backup error:', error);
+                showToast('Backup failed: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Backup as CSV (separate files)
+        async function backupAsCSV() {
+            showLoading(true);
+            try {
+                const customersSnap = await getDocs(collection(db, 'customers'));
+                const transactionsSnap = await getDocs(collection(db, 'transactions'));
+                
+                // Customers CSV
+                let customersCSV = '"ID","Name","Phone","Address","Notes","Total Due","Created At"\n';
+                customersSnap.forEach(doc => {
+                    const data = doc.data();
+                    customersCSV += `"${doc.id}","${data.name || ''}","${data.phone || ''}","${data.address || ''}","${data.notes || ''}","${data.totalDue || 0}","${data.createdAt || ''}"\n`;
+                });
+                
+                // Transactions CSV
+                let transactionsCSV = '"ID","Customer ID","Type","Date","Product Name","Quantity","Unit Price","Total Amount","Paid Amount","Due Amount","Collection Amount","Remarks","Created At"\n';
+                transactionsSnap.forEach(doc => {
+                    const data = doc.data();
+                    transactionsCSV += `"${doc.id}","${data.customerId || ''}","${data.type || ''}","${data.date || ''}","${data.productName || ''}","${data.qty || 0}","${data.unitPrice || 0}","${data.totalAmount || 0}","${data.paidAmount || 0}","${data.dueAmount || 0}","${data.collectionAmount || 0}","${data.remarks || ''}","${data.createdAt || ''}"\n`;
+                });
+                
+                const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+                
+                // Download customers CSV
+                const customersBlob = new Blob(["\uFEFF" + customersCSV], { type: 'text/csv;charset=utf-8;' });
+                const customersUrl = URL.createObjectURL(customersBlob);
+                const customersA = document.createElement('a');
+                customersA.download = `elias_customers_${timestamp}.csv`;
+                customersA.href = customersUrl;
+                customersA.click();
+                URL.revokeObjectURL(customersUrl);
+                
+                // Download transactions CSV after a small delay
+                setTimeout(() => {
+                    const transactionsBlob = new Blob(["\uFEFF" + transactionsCSV], { type: 'text/csv;charset=utf-8;' });
+                    const transactionsUrl = URL.createObjectURL(transactionsBlob);
+                    const transactionsA = document.createElement('a');
+                    transactionsA.download = `elias_transactions_${timestamp}.csv`;
+                    transactionsA.href = transactionsUrl;
+                    transactionsA.click();
+                    URL.revokeObjectURL(transactionsUrl);
+                }, 500);
+                
+                localStorage.setItem('lastBackupTime', Date.now().toString());
+                await loadStats();
+                
+                showToast(`CSV backup created! Customers: ${customersSnap.size}, Transactions: ${transactionsSnap.size}`, 'success');
+            } catch (error) {
+                console.error('CSV Backup error:', error);
+                showToast('CSV Backup failed: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Restore backup
+        async function restoreBackup() {
+            if (!selectedBackupData) {
+                showToast('No backup file selected', 'error');
+                return;
+            }
+            
+            const confirmRestore = confirm('⚠️ WARNING: This will REPLACE all existing data!\n\nAre you absolutely sure you want to restore this backup?\n\nThis action CANNOT be undone.');
+            if (!confirmRestore) return;
+            
+            const confirmAgain = prompt('Type "RESTORE" to confirm:');
+            if (confirmAgain !== 'RESTORE') {
+                showToast('Restore cancelled', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // Clear existing data
+                const customersSnap = await getDocs(collection(db, 'customers'));
+                const transactionsSnap = await getDocs(collection(db, 'transactions'));
+                
+                const batch = writeBatch(db);
+                
+                // Delete all customers
+                for (const docSnap of customersSnap.docs) {
+                    batch.delete(doc(db, 'customers', docSnap.id));
+                }
+                
+                // Delete all transactions
+                for (const docSnap of transactionsSnap.docs) {
+                    batch.delete(doc(db, 'transactions', docSnap.id));
+                }
+                
+                await batch.commit();
+                
+                // Restore customers
+                for (const customer of selectedBackupData.customers) {
+                    const { id, ...customerData } = customer;
+                    await addDoc(collection(db, 'customers'), customerData);
+                }
+                
+                // Restore transactions
+                for (const transaction of selectedBackupData.transactions) {
+                    const { id, ...transactionData } = transaction;
+                    await addDoc(collection(db, 'transactions'), transactionData);
+                }
+                
+                showToast(`Restore completed! ${selectedBackupData.customers.length} customers, ${selectedBackupData.transactions.length} transactions`, 'success');
+                
+                // Reset and reload
+                selectedBackupData = null;
+                document.getElementById('restorePreview').classList.add('hidden');
+                document.getElementById('restoreBtn').disabled = true;
+                await loadStats();
+                
+            } catch (error) {
+                console.error('Restore error:', error);
+                showToast('Restore failed: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('restoreFileInput');
+        const restorePreview = document.getElementById('restorePreview');
+        const restoreBtn = document.getElementById('restoreBtn');
+        
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('border-primary');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('border-primary');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('border-primary');
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.json')) {
+                handleBackupFile(file);
+            } else {
+                showToast('Please upload a JSON backup file', 'error');
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleBackupFile(e.target.files[0]);
+            }
+        });
+        
+        function handleBackupFile(file) {
+            backupFileName = file.name;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.customers && data.transactions) {
+                        selectedBackupData = data;
+                        restorePreview.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                    <span class="font-medium">File: ${backupFileName}</span>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        📊 ${data.customers.length} customers | 📝 ${data.transactions.length} transactions
+                                        <br>📅 Exported: ${data.exportedAt ? new Date(data.exportedAt).toLocaleString() : 'Unknown'}
+                                    </div>
+                                </div>
+                                <button id="clearFileBtn" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        `;
+                        restorePreview.classList.remove('hidden');
+                        restoreBtn.disabled = false;
+                        
+                        document.getElementById('clearFileBtn')?.addEventListener('click', () => {
+                            selectedBackupData = null;
+                            restorePreview.classList.add('hidden');
+                            restoreBtn.disabled = true;
+                            fileInput.value = '';
+                        });
+                    } else {
+                        showToast('Invalid backup file format', 'error');
+                    }
+                } catch (error) {
+                    showToast('Error parsing backup file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Event listeners
+        document.getElementById('backupJSONBtn').addEventListener('click', backupAsJSON);
+        document.getElementById('backupCSVBtn').addEventListener('click', backupAsCSV);
+        document.getElementById('restoreBtn').addEventListener('click', restoreBackup);
+        
+        // Note: clearDatabaseBtn is now a link to clear-data.html, no event listener needed
+        
+        document.getElementById('darkModeToggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+        });
+        
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        });
+        
+        document.getElementById('logoutLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            logout();
+        });
+        
+        // Initialize
+        loadStats();
+    </script>
+</body>
+</html>
