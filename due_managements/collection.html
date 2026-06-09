@@ -2,317 +2,233 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Collection - Elias Computer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#009688">
+    <title>Collection | Elias Computer</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        .collection-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .form-card {
-            background: var(--card-bg);
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            border: 1px solid var(--border);
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-        
-        .form-group {
-            margin-bottom: 0;
-        }
-        
-        .form-group label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 0.25rem;
-            text-transform: uppercase;
-        }
-        
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            background: var(--card-bg);
-            color: var(--text-primary);
-            font-size: 0.85rem;
-        }
-        
-        .due-alert {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-radius: 0.5rem;
-            padding: 0.75rem;
-            margin: 1rem 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid #f59e0b;
-        }
-        
-        body.dark .due-alert {
-            background: linear-gradient(135deg, #451a03 0%, #78350f 100%);
-        }
-        
-        .due-label {
-            font-size: 0.7rem;
-            color: #92400e;
-        }
-        
-        body.dark .due-label {
-            color: #fcd34d;
-        }
-        
-        .due-amount {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #dc2626;
-        }
-        
-        .btn-submit {
-            background: #10b981;
-            width: 100%;
-            padding: 0.625rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
-        
-        .btn-submit:hover {
-            background: #059669;
-        }
-        
-        .recent-card {
-            background: var(--card-bg);
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            border: 1px solid var(--border);
-        }
-        
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .collection-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .collection-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border-light);
-            transition: background 0.2s;
-        }
-        
-        .collection-item:hover {
-            background: var(--bg);
-        }
-        
-        .collection-info {
-            flex: 1;
-        }
-        
-        .collection-customer {
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-        
-        .collection-date {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-        }
-        
-        .collection-amount {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #10b981;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-muted);
-        }
-        
-        .empty-state i {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            opacity: 0.4;
-        }
-        
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#009688',
+                        'primary-dark': '#00796b',
+                        danger: '#ef4444',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        info: '#3b82f6',
+                    }
+                }
             }
+        }
+    </script>
+    <style>
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        .btn-active:active {
+            transform: scale(0.97);
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            ring: 2px solid #009688;
         }
     </style>
 </head>
-<body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-laptop-code"></i>
-                <span>Elias Computer</span>
-            </div>
-            <nav>
-                <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                <a href="customers.html"><i class="fas fa-users"></i> Customers</a>
-                <a href="due-entry.html"><i class="fas fa-plus-circle"></i> Due Entry</a>
-                <a href="collection.html" class="active"><i class="fas fa-hand-holding-usd"></i> Collection</a>
-                <a href="ledger.html"><i class="fas fa-book"></i> Customer Ledger</a>
-                <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </nav>
-        </div>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    
+    <!-- App Container -->
+    <div class="flex min-h-screen">
         
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="top-header">
-                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
-                <h2><i class="fas fa-hand-holding-usd"></i> Collection</h2>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button id="refreshBtn" style="background: transparent;"><i class="fas fa-sync-alt"></i></button>
-                    <button id="darkModeToggle" style="background: transparent;"><i class="fas fa-moon"></i></button>
+        <!-- Sidebar -->
+        <aside class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 overflow-y-auto" id="sidebar">
+            <div class="flex flex-col h-full">
+                <div class="flex items-center gap-3 px-5 py-5 border-b border-white/10 sticky top-0 bg-inherit">
+                    <i class="fas fa-laptop-code text-primary text-xl"></i>
+                    <span class="text-white font-semibold text-lg">Elias Computer</span>
+                </div>
+                <nav class="flex-1 px-3 py-4 space-y-1">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all">
+                        <i class="fas fa-tachometer-alt w-5"></i><span class="text-sm">Dashboard</span>
+                    </a>
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-users w-5"></i><span class="text-sm">Customers</span>
+                    </a>
+                    <a href="due-entry.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-plus-circle w-5"></i><span class="text-sm">Due Entry</span>
+                    </a>
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-white/10">
+                        <i class="fas fa-hand-holding-usd w-5"></i><span class="text-sm">Collection</span>
+                    </a>
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
+                        <i class="fas fa-book w-5"></i><span class="text-sm">Customer Ledger</span>
+                    </a>
+                </nav>
+                <div class="px-3 py-4 border-t border-white/10">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-red-500/20 transition-all">
+                        <i class="fas fa-sign-out-alt w-5"></i><span class="text-sm">Logout</span>
+                    </a>
                 </div>
             </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 min-h-screen w-full">
             
-            <div class="collection-container">
-                <!-- Collection Form -->
-                <div class="form-card">
-                    <div class="form-title">
-                        <i class="fas fa-money-bill-wave"></i> Receive Payment
+            <!-- Top Header -->
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+                <div class="px-3 py-3 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-2 -ml-2 rounded-lg">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h2 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white">
+                            <i class="fas fa-hand-holding-usd text-primary mr-2"></i>Collection
+                        </h2>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button id="refreshBtn" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-sync-alt text-sm"></i>
+                        </button>
+                        <button id="darkModeToggle" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-moon dark:hidden text-sm"></i>
+                            <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Page Content -->
+            <div class="p-3 md:p-4">
+                
+                <!-- Collection Form Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-4">
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
+                            <i class="fas fa-money-bill-wave text-primary mr-2"></i>Receive Payment
+                        </h3>
                     </div>
                     
-                    <form id="collectionForm">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label><i class="fas fa-user"></i> Customer *</label>
-                                <select id="customerId" required>
+                    <form id="collectionForm" class="p-4 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    <i class="fas fa-user text-primary mr-1"></i>Customer <span class="text-danger">*</span>
+                                </label>
+                                <select id="customerId" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50 transition-all" required>
                                     <option value="">-- Select Customer --</option>
                                 </select>
                             </div>
-                            
-                            <div class="form-group">
-                                <label><i class="fas fa-calendar"></i> Date *</label>
-                                <input type="date" id="collectionDate" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label><i class="fas fa-money-bill"></i> Amount *</label>
-                                <input type="number" id="collectionAmount" placeholder="Enter amount" step="0.01" min="0">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label><i class="fas fa-sticky-note"></i> Remarks</label>
-                                <input type="text" id="remarks" placeholder="Payment reference">
-                            </div>
-                        </div>
-                        
-                        <div id="dueAlert" class="due-alert" style="display: none;">
                             <div>
-                                <div class="due-label">Current Due Amount</div>
-                                <div class="due-amount" id="currentDueDisplay">৳0.00</div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    <i class="fas fa-calendar text-primary mr-1"></i>Date <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" id="collectionDate" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50 transition-all" required>
                             </div>
-                            <i class="fas fa-info-circle" style="font-size: 1.25rem; opacity: 0.7;"></i>
                         </div>
                         
-                        <button type="submit" class="btn-submit">
-                            <i class="fas fa-save"></i> Save Collection
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <i class="fas fa-money-bill text-primary mr-1"></i>Collection Amount <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" id="collectionAmount" placeholder="Enter amount" step="0.01" min="0" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50 transition-all">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <i class="fas fa-sticky-note text-primary mr-1"></i>Remarks (Optional)
+                            </label>
+                            <input type="text" id="remarks" placeholder="Payment reference or notes" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50 transition-all">
+                        </div>
+                        
+                        <!-- Due Alert -->
+                        <div id="dueAlert" class="hidden bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950/30 dark:to-amber-900/30 rounded-lg p-3 border-l-4 border-warning animate-slide-in">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-xs text-amber-700 dark:text-amber-400">Current Due Amount</p>
+                                    <p class="text-xl font-bold text-danger" id="currentDueDisplay">৳0.00</p>
+                                </div>
+                                <i class="fas fa-info-circle text-amber-500 text-lg"></i>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" id="submitBtn" class="w-full bg-success hover:bg-green-600 text-white font-semibold py-3 rounded-xl transition-all duration-200 btn-active shadow-md">
+                            <i class="fas fa-save mr-2"></i>Save Collection
                         </button>
                     </form>
                 </div>
                 
-                <!-- Recent Collections -->
-                <div class="recent-card">
-                    <div class="section-header">
-                        <h3><i class="fas fa-history"></i> Recent Collections</h3>
-                        <span style="font-size: 0.7rem;" id="collectionCount">0 records</span>
+                <!-- Recent Collections Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
+                            <i class="fas fa-history text-primary mr-2"></i>Recent Collections
+                        </h3>
+                        <span class="text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full" id="collectionCount">0 records</span>
                     </div>
-                    <div id="recentCollectionsList" class="collection-list">
-                        <div class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <p>No collections yet</p>
-                            <small>Add a collection to see history</small>
+                    
+                    <div id="recentCollectionsList" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[400px] overflow-y-auto">
+                        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-inbox text-3xl mb-2 opacity-50 block"></i>
+                            <p class="text-sm">No collections yet</p>
+                            <p class="text-xs mt-1">Add a collection to see history</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
     
     <!-- Loading Overlay -->
-    <div id="loadingOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 9999;">
-        <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 1rem; text-align: center;">
-            <i class="fas fa-spinner fa-pulse" style="font-size: 2rem; color: var(--accent);"></i>
-            <p style="margin-top: 0.5rem;">Processing...</p>
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 text-center shadow-2xl">
+            <i class="fas fa-spinner fa-pulse text-primary text-2xl mb-2"></i>
+            <p class="text-sm text-gray-600 dark:text-gray-300">Processing...</p>
         </div>
     </div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-2"></div>
     
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
         import { 
-            db, collection, addDoc, getDocs, query, orderBy, limit,
-            doc, getDoc, updateDoc, Timestamp, where
+            db, collection, addDoc, getDocs, query,
+            doc, getDoc, updateDoc, Timestamp
         } from './js/firebase.js';
         
         checkAuthState();
         
-        // Global variables
         let isProcessing = false;
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
         
         function showLoading(show) {
             const overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                overlay.style.display = show ? 'flex' : 'none';
-            }
+            if (overlay) overlay.style.display = show ? 'flex' : 'none';
         }
         
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-        
-        // Load customers into dropdown
+        // Load customers
         async function loadCustomers() {
             try {
-                console.log("Loading customers...");
                 const querySnapshot = await getDocs(collection(db, 'customers'));
                 const select = document.getElementById('customerId');
-                
                 if (!select) return;
                 
                 select.innerHTML = '<option value="">-- Select Customer --</option>';
@@ -330,27 +246,23 @@
                     option.textContent = `${customer.name}${dueText}`;
                     select.appendChild(option);
                 });
-                
-                console.log("Customers loaded:", querySnapshot.size);
             } catch (error) {
-                console.error("Error loading customers:", error);
-                showToast('Error loading customers: ' + error.message, 'error');
+                console.error('Error loading customers:', error);
+                showToast('Error loading customers', 'error');
             }
         }
         
-        // Load customer due amount
+        // Load customer due
         async function loadCustomerDue(customerId) {
             if (!customerId) {
-                document.getElementById('dueAlert').style.display = 'none';
+                document.getElementById('dueAlert').classList.add('hidden');
                 return 0;
             }
             
             try {
-                const customerRef = doc(db, 'customers', customerId);
-                const customerDoc = await getDoc(customerRef);
-                
+                const customerDoc = await getDoc(doc(db, 'customers', customerId));
                 if (!customerDoc.exists()) {
-                    document.getElementById('dueAlert').style.display = 'none';
+                    document.getElementById('dueAlert').classList.add('hidden');
                     return 0;
                 }
                 
@@ -359,17 +271,11 @@
                 const dueAlert = document.getElementById('dueAlert');
                 
                 if (dueDisplay) dueDisplay.innerHTML = `৳${due.toFixed(2)}`;
-                
-                if (due > 0) {
-                    dueAlert.style.display = 'flex';
-                } else {
-                    dueAlert.style.display = 'flex';
-                    if (dueDisplay) dueDisplay.innerHTML = '৳0.00 - No due';
-                }
+                dueAlert.classList.remove('hidden');
                 return due;
             } catch (error) {
-                console.error("Error loading due:", error);
-                document.getElementById('dueAlert').style.display = 'none';
+                console.error('Error loading due:', error);
+                document.getElementById('dueAlert').classList.add('hidden');
                 return 0;
             }
         }
@@ -377,43 +283,33 @@
         // Load recent collections
         async function loadRecentCollections() {
             try {
-                console.log("Loading recent collections...");
-                
-                // Simple query without orderBy first to avoid index issues
-                const q = query(collection(db, 'transactions'));
-                const querySnapshot = await getDocs(q);
-                
+                const querySnapshot = await getDocs(collection(db, 'transactions'));
                 const container = document.getElementById('recentCollectionsList');
                 const countSpan = document.getElementById('collectionCount');
                 
                 if (!container) return;
                 
-                // Filter collections in JavaScript (to avoid index requirement)
+                // Filter collections
                 const collections = [];
                 for (const docSnap of querySnapshot.docs) {
                     const data = docSnap.data();
                     if (data.type === 'collection') {
-                        collections.push({
-                            id: docSnap.id,
-                            ...data
-                        });
+                        collections.push({ id: docSnap.id, ...data });
                     }
                 }
                 
                 // Sort by date descending
                 collections.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-                
-                // Take last 15
                 const recentCollections = collections.slice(0, 15);
                 
                 if (countSpan) countSpan.textContent = `${recentCollections.length} records`;
                 
                 if (recentCollections.length === 0) {
                     container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <p>No collections yet</p>
-                            <small>Add a collection to see history</small>
+                        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-inbox text-3xl mb-2 opacity-50 block"></i>
+                            <p class="text-sm">No collections yet</p>
+                            <p class="text-xs mt-1">Add a collection to see history</p>
                         </div>
                     `;
                     return;
@@ -421,7 +317,6 @@
                 
                 let html = '';
                 for (const collection of recentCollections) {
-                    // Get customer name
                     let customerName = 'Unknown';
                     if (collection.customerId) {
                         try {
@@ -430,47 +325,39 @@
                                 customerName = customerDoc.data().name;
                             }
                         } catch (err) {
-                            console.error("Error getting customer:", err);
+                            console.error('Error getting customer:', err);
                         }
                     }
                     
                     html += `
-                        <div class="collection-item">
-                            <div class="collection-info">
-                                <div class="collection-customer">${escapeHtml(customerName)}</div>
-                                <div class="collection-date">${collection.date || 'N/A'} ${collection.remarks ? '• ' + escapeHtml(collection.remarks) : ''}</div>
+                        <div class="flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                            <div class="flex-1">
+                                <p class="font-semibold text-sm text-gray-800 dark:text-white">${escapeHtml(customerName)}</p>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">${collection.date || 'N/A'}</span>
+                                    ${collection.remarks ? `<span class="text-xs text-gray-400 dark:text-gray-500">• ${escapeHtml(collection.remarks)}</span>` : ''}
+                                </div>
                             </div>
-                            <div class="collection-amount">৳${(collection.collectionAmount || 0).toFixed(2)}</div>
+                            <p class="font-bold text-sm text-green-600 dark:text-green-400">৳${(collection.collectionAmount || 0).toFixed(2)}</p>
                         </div>
                     `;
                 }
                 
                 container.innerHTML = html;
-                console.log("Collections loaded:", recentCollections.length);
-                
             } catch (error) {
-                console.error("Error loading recent collections:", error);
-                const container = document.getElementById('recentCollectionsList');
-                if (container) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <p>Error loading collections</p>
-                            <small>${error.message}</small>
-                        </div>
-                    `;
-                }
+                console.error('Error loading recent collections:', error);
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-exclamation-triangle text-3xl mb-2 opacity-50 block"></i>
+                        <p class="text-sm">Error loading collections</p>
+                    </div>
+                `;
             }
         }
         
         function escapeHtml(str) {
             if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
         
         // Submit collection
@@ -516,7 +403,6 @@
             showLoading(true);
             
             try {
-                // Create transaction
                 const transaction = {
                     customerId: customerId,
                     type: 'collection',
@@ -528,11 +414,8 @@
                 
                 await addDoc(collection(db, 'transactions'), transaction);
                 
-                // Update customer's total due
                 const newDue = currentDue - amount;
-                await updateDoc(customerRef, {
-                    totalDue: newDue
-                });
+                await updateDoc(customerRef, { totalDue: newDue });
                 
                 showToast(`Collection of ৳${amount.toFixed(2)} recorded successfully!`, 'success');
                 
@@ -541,14 +424,14 @@
                 document.getElementById('remarks').value = '';
                 document.getElementById('collectionDate').valueAsDate = new Date();
                 document.getElementById('customerId').value = '';
-                document.getElementById('dueAlert').style.display = 'none';
+                document.getElementById('dueAlert').classList.add('hidden');
                 
                 // Refresh data
                 await loadCustomers();
                 await loadRecentCollections();
                 
             } catch (error) {
-                console.error('Error adding collection:', error);
+                console.error('Error:', error);
                 showToast('Error: ' + error.message, 'error');
             } finally {
                 isProcessing = false;
@@ -557,61 +440,33 @@
         }
         
         // Event listeners
-        const customerSelect = document.getElementById('customerId');
-        if (customerSelect) {
-            customerSelect.addEventListener('change', (e) => loadCustomerDue(e.target.value));
-        }
+        document.getElementById('customerId')?.addEventListener('change', (e) => loadCustomerDue(e.target.value));
+        document.getElementById('collectionForm')?.addEventListener('submit', submitCollection);
+        document.getElementById('collectionDate').valueAsDate = new Date();
         
-        const collectionForm = document.getElementById('collectionForm');
-        if (collectionForm) {
-            collectionForm.addEventListener('submit', submitCollection);
-        }
+        document.getElementById('refreshBtn')?.addEventListener('click', () => {
+            loadCustomers();
+            loadRecentCollections();
+            showToast('Data refreshed!', 'success');
+        });
         
-        const refreshBtn = document.getElementById('refreshBtn');
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', () => {
-                loadCustomers();
-                loadRecentCollections();
-                showToast('Data refreshed!', 'success');
-            });
-        }
+        document.getElementById('darkModeToggle')?.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+        });
         
-        // Set default date
-        const dateInput = document.getElementById('collectionDate');
-        if (dateInput) {
-            dateInput.valueAsDate = new Date();
-        }
+        document.getElementById('menuToggle')?.addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        });
         
-        // Dark mode toggle
-        const darkToggle = document.getElementById('darkModeToggle');
-        if (darkToggle) {
-            darkToggle.addEventListener('click', () => document.body.classList.toggle('dark'));
-        }
+        document.getElementById('logoutLink')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            logout();
+        });
         
-        // Menu toggle
-        const menuToggle = document.getElementById('menuToggle');
-        if (menuToggle) {
-            menuToggle.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
-        }
-        
-        // Logout
-        const logoutLink = document.getElementById('logoutLink');
-        if (logoutLink) {
-            logoutLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                logout();
-            });
-        }
-        
-        // Initialize page
-        async function init() {
-            console.log("Initializing collection page...");
-            await loadCustomers();
-            await loadRecentCollections();
-            console.log("Initialization complete");
-        }
-        
-        init();
+        // Initialize
+        loadCustomers();
+        loadRecentCollections();
     </script>
 </body>
 </html>
