@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#009688">
-    <title>Due Entry | Jack Due Managements</title>
+    <meta name="theme-color" content="#0f3b3a">
+    <title>Due Entry | Nexus Due Managements</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,93 +14,271 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#009688',
-                        'primary-dark': '#00796b',
-                        danger: '#ef4444',
-                        success: '#10b981',
-                        warning: '#f59e0b',
-                        info: '#3b82f6',
-                    }
+                        primary: '#0f3b3a',
+                        'primary-light': '#1e6b68',
+                        'primary-dark': '#092c2b',
+                        accent: '#d4af37',
+                        danger: '#e53e3e',
+                        success: '#2c7a4d',
+                        warning: '#dd6b20',
+                        info: '#3182ce',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+                    },
                 }
             }
         }
     </script>
     <style>
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+        
+        * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        .nav-active {
+            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
+            border-left: 3px solid #d4af37;
         }
-        .product-item {
-            animation: slideIn 0.2s ease-out;
+        .dark .nav-active {
+            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
         }
+        
+        .stat-card { transition: all 0.2s ease; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12); }
+        
+        .submenu-modern {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .submenu-modern.open { max-height: 280px; }
+        
+        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
+        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
+        
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
+        
+        .btn-active:active { transform: scale(0.97); }
+        
+        .product-item { animation: modalSlideUp 0.2s ease-out; }
+        
         .file-upload-area {
             border: 2px dashed #cbd5e1;
             transition: all 0.2s ease;
             cursor: pointer;
         }
         .file-upload-area:hover, .file-upload-area.drag-over {
-            border-color: #009688;
-            background: rgba(0, 150, 136, 0.05);
+            border-color: #0f3b3a;
+            background: rgba(15, 59, 58, 0.05);
         }
-        .dark .file-upload-area {
-            border-color: #475569;
+        .dark .file-upload-area { border-color: #475569; }
+        .dark .file-upload-area:hover { border-color: #0f3b3a; }
+        
+        .image-preview-container {
+            position: relative;
+            display: inline-block;
         }
-        .dark .file-upload-area:hover {
-            border-color: #009688;
+        .image-preview {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
         }
-        .remove-product {
-            transition: all 0.2s ease;
+        .remove-image-preview {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e53e3e;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .remove-product:active {
-            transform: scale(0.9);
+        .remove-image-preview:hover { background: #c53030; transform: scale(1.1); }
+        
+        #sidebarOverlay { animation: fadeIn 0.2s ease-out; }
+        .sidebar-open { overflow: hidden; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .table-row-hover:hover { background-color: rgba(15, 59, 58, 0.04); }
+        .dark .table-row-hover:hover { background-color: rgba(30, 107, 104, 0.1); }
+        
+        .table-scroll-hint { display: none; }
+        @media (max-width: 768px) {
+            .table-scroll-hint {
+                display: flex;
+                font-size: 9px;
+                padding: 4px 8px;
+                background: #f0fdf4;
+                color: #166534;
+                border-radius: 20px;
+                margin-bottom: 8px;
+                width: fit-content;
+            }
+            .dark .table-scroll-hint { background: #064e3b; color: #86efac; }
         }
-        .modal-overlay {
-            background-color: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(4px);
+        
+        .skeleton {
+            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
         }
-        .invoice-modal {
-            max-width: 90vw;
-            max-height: 90vh;
+        .dark .skeleton { background: linear-gradient(90deg, #2d3748 25%, #4a5568 50%, #2d3748 75%); }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
-        .invoice-modal img {
-            max-height: 80vh;
-            object-fit: contain;
+        
+        /* Fixed Sidebar Structure - No overlap issue */
+        .sidebar-fixed {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar-header-fixed {
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            background: inherit;
+            z-index: 10;
+        }
+        .sidebar-nav-fixed {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar {
+            width: 3px;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar-thumb {
+            background: rgba(212,175,55,0.5);
+            border-radius: 10px;
         }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     
     <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <aside class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 overflow-y-auto" id="sidebar">
-            <div class="flex flex-col h-full">
-                <div class="flex items-center gap-3 px-5 py-5 border-b border-white/10 sticky top-0 bg-inherit">
-                    <i class="fas fa-laptop-code text-primary text-xl"></i>
-                    <span class="text-white font-semibold text-lg">Jack Due Managements</span>
+        
+        <!-- Sidebar - Fixed Structure -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
+            <!-- Header - Fixed at top -->
+            <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
+                        </div>
+                        <div class="leading-tight">
+                            <h1 class="text-white font-bold text-sm tracking-wide">Nexus<span class="text-accent">Due</span></h1>
+                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Financial cockpit</p>
+                        </div>
+                    </div>
+                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
                 </div>
-                <nav class="flex-1 px-3 py-4 space-y-1">
-                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
-                        <i class="fas fa-tachometer-alt w-5"></i><span class="text-sm">Dashboard</span>
+            </div>
+            
+            <!-- Navigation - Scrollable area -->
+            <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
+                <nav class="space-y-1.5">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                        <span class="text-sm font-medium">Dashboard</span>
                     </a>
-                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
-                        <i class="fas fa-users w-5"></i><span class="text-sm">Customers</span>
+                    
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customers</span>
                     </a>
-                    <a href="due-entry.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-white/10">
-                        <i class="fas fa-plus-circle w-5"></i><span class="text-sm">Due Entry</span>
+                    
+                    <div class="has-submenu" id="dueSubmenu">
+                        <a href="#" class="nav-active flex items-center justify-between px-3 py-2.5 rounded-xl text-white transition-all duration-150">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 text-center"><i class="fas fa-plus-circle text-sm text-accent"></i></div>
+                                <span class="text-sm font-medium">Due Entry</span>
+                            </div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition">
+                                <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
+                            </a>
+                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span>
                     </a>
-                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
-                        <i class="fas fa-hand-holding-usd w-5"></i><span class="text-sm">Collection</span>
+                    
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
                     </a>
-                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
-                        <i class="fas fa-book w-5"></i><span class="text-sm">Customer Ledger</span>
+                    
+                    <div class="has-submenu" id="warrantySubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
+                            </a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
+                            </a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
+                            </a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
                     </a>
-                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white     hover:bg-white/10">
-                        <i class="fas fa-database w-5"></i><span class="text-sm">Backup & Restore</span>
+                    
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
                     </a>
                 </nav>
-                <div class="px-3 py-4 border-t border-white/10">
-                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-red-500/20">
-                        <i class="fas fa-sign-out-alt w-5"></i><span class="text-sm">Logout</span>
+                
+                <!-- Logout Button - Now scrolls with menu -->
+                <div class="pt-4 mt-2 border-t border-white/10">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
+                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                        <span class="text-sm font-medium">Logout</span>
                     </a>
                 </div>
             </div>
@@ -109,25 +287,15 @@
         <!-- Main Content -->
         <main class="flex-1 md:ml-64 min-h-screen w-full">
             
-            <!-- Top Header -->
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-                <div class="px-3 py-3 flex justify-between items-center">
+                <div class="px-3 py-2.5 flex justify-between items-center">
                     <div class="flex items-center gap-2">
-                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-2 -ml-2 rounded-lg">
-                            <i class="fas fa-bars text-xl"></i>
-                        </button>
-                        <h2 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white">
-                            <i class="fas fa-plus-circle text-primary mr-2"></i>Due Entry
-                        </h2>
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg"><i class="fas fa-bars text-lg"></i></button>
+                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-plus-circle text-primary mr-2"></i>Due Entry</h2>
                     </div>
                     <div class="flex items-center gap-1">
-                        <button id="refreshBtn" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-sync-alt text-sm"></i>
-                        </button>
-                        <button id="darkModeToggle" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-moon dark:hidden text-sm"></i>
-                            <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
-                        </button>
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt text-sm"></i></button>
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-moon dark:hidden text-sm"></i><i class="fas fa-sun hidden dark:inline-block text-sm"></i></button>
                     </div>
                 </div>
             </header>
@@ -135,117 +303,111 @@
             <div class="p-3 md:p-4">
                 
                 <!-- Due Entry Form -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-4">
-                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
-                        <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-5">
+                    <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-base font-semibold text-gray-800 dark:text-white">
                             <i class="fas fa-plus-circle text-primary mr-2"></i>New Due Entry
                         </h3>
+                        <p class="text-[10px] text-gray-500 mt-0.5">Create a new due entry for a customer</p>
                     </div>
                     
-                    <form id="dueEntryForm" class="p-4 space-y-4">
-                        <!-- Customer & Date Row -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <form id="dueEntryForm" class="p-5 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    <i class="fas fa-user text-primary mr-1"></i>Customer <span class="text-danger">*</span>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-user text-primary mr-1"></i> Customer <span class="text-red-500">*</span>
                                 </label>
-                                <select id="customerId" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50" required>
+                                <select id="customerId" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50" required>
                                     <option value="">-- Select Customer --</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    <i class="fas fa-calendar text-primary mr-1"></i>Date <span class="text-danger">*</span>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-calendar text-primary mr-1"></i> Date <span class="text-red-500">*</span>
                                 </label>
-                                <input type="date" id="dueDate" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50" required>
+                                <input type="date" id="dueDate" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50" required>
                             </div>
                         </div>
                         
-                        <!-- Products Section - OPTIONAL -->
+                        <!-- Products Section -->
                         <div>
                             <div class="flex justify-between items-center mb-2">
                                 <label class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    <i class="fas fa-boxes text-primary mr-1"></i>Products <span class="text-gray-400 text-[10px]">(Optional)</span>
+                                    <i class="fas fa-boxes text-primary mr-1"></i> Products <span class="text-gray-400 text-[10px]">(Optional)</span>
                                 </label>
                                 <button type="button" id="addProductBtn" class="text-primary text-xs flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-primary/10 transition-colors">
                                     <i class="fas fa-plus-circle"></i> Add Product
                                 </button>
                             </div>
-                            
-                            <div id="productsContainer" class="space-y-3">
-                                <div class="empty-placeholder text-center py-4 text-gray-400 text-xs border border-dashed rounded-lg">
-                                    <i class="fas fa-box-open mb-1 block"></i>
-                                    No products added. Click "Add Product" to add items or leave empty.
+                            <div id="productsContainer" class="space-y-2">
+                                <div class="empty-placeholder text-center py-6 text-gray-400 text-xs border border-dashed rounded-xl">
+                                    <i class="fas fa-box-open mb-1 block text-lg"></i>
+                                    No products added. Click "Add Product" to add items.
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Direct Due Amount Field -->
-                        <div id="directDueSection">
-                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fas fa-money-bill-wave text-primary mr-1"></i>Due Amount <span class="text-gray-400 text-[10px]">(If no products)</span>
-                            </label>
-                            <input type="number" id="directDueAmount" placeholder="Enter due amount directly" step="0.01" min="0" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
-                            <p class="text-[10px] text-gray-400 mt-1">Use this field when adding due without product details</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-money-bill-wave text-primary mr-1"></i> Direct Due Amount
+                                </label>
+                                <input type="number" id="directDueAmount" placeholder="Enter due amount directly" step="0.01" min="0" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                                <p class="text-[9px] text-gray-400 mt-1">Use if no products are added</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-calendar-week text-primary mr-1"></i> Expected Date
+                                </label>
+                                <input type="date" id="expectedDate" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                                <p class="text-[9px] text-gray-400 mt-1">For follow-up reminders</p>
+                            </div>
                         </div>
                         
-                        <!-- Invoice Image Upload -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fas fa-image text-primary mr-1"></i>Invoice Image (Optional)
-                            </label>
-                            <div id="imageUploadArea" class="file-upload-area rounded-lg p-4 text-center">
-                                <input type="file" id="invoiceImage" accept="image/*" class="hidden">
-                                <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-1"></i>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Click or drag to upload invoice image</p>
-                                <p class="text-[10px] text-gray-400 mt-1">JPG, PNG up to 2MB</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-money-bill text-primary mr-1"></i> Paid Amount
+                                </label>
+                                <input type="number" id="paidAmount" placeholder="0.00" value="0" step="0.01" min="0" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
                             </div>
-                            <div id="imagePreview" class="mt-2 hidden">
-                                <div class="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                                    <i class="fas fa-file-image text-primary"></i>
-                                    <span id="fileName" class="text-xs flex-1 truncate"></span>
-                                    <button type="button" id="removeImageBtn" class="text-danger text-xs p-1">
-                                        <i class="fas fa-times"></i>
-                                    </button>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-image text-primary mr-1"></i> Invoice Image
+                                </label>
+                                <div id="imageUploadArea" class="file-upload-area rounded-xl p-3 text-center">
+                                    <input type="file" id="invoiceImage" accept="image/*" class="hidden">
+                                    <i class="fas fa-cloud-upload-alt text-xl text-gray-400 mb-1"></i>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Click or drag to upload</p>
+                                    <p class="text-[9px] text-gray-400 mt-0.5">Max 5MB</p>
+                                </div>
+                                <div id="imagePreviewContainer" class="mt-2 hidden">
+                                    <div class="image-preview-container">
+                                        <img id="imagePreview" class="image-preview" src="" alt="Preview">
+                                        <button type="button" id="removeImageBtn" class="remove-image-preview"><i class="fas fa-times"></i></button>
+                                    </div>
+                                    <p id="fileNameDisplay" class="text-xs text-gray-500 mt-1"></p>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Paid Amount -->
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fas fa-money-bill text-primary mr-1"></i>Paid Amount
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                <i class="fas fa-sticky-note text-primary mr-1"></i> Remarks
                             </label>
-                            <input type="number" id="paidAmount" placeholder="0.00" value="0" step="0.01" min="0" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
-                        </div>
-                        
-                        <!-- Remarks -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fas fa-sticky-note text-primary mr-1"></i>Remarks
-                            </label>
-                            <textarea id="remarks" rows="2" placeholder="Additional notes..." class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
+                            <textarea id="remarks" rows="2" placeholder="Additional notes..." class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
                         </div>
                         
                         <!-- Summary Card -->
-                        <div class="bg-gradient-to-r from-primary/5 to-transparent rounded-lg p-3 border border-primary/20">
-                            <div class="flex flex-col sm:flex-row sm:justify-between gap-2">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Amount:</span>
-                                    <span id="totalAmountDisplay" class="text-sm font-semibold text-gray-800 dark:text-white">৳0.00</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Paid:</span>
-                                    <span id="totalPaid" class="text-sm font-semibold text-green-600 dark:text-green-400">৳0.00</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm font-medium text-danger">Due Amount:</span>
-                                    <span id="dueAmount" class="text-lg font-bold text-danger">৳0.00</span>
-                                </div>
+                        <div class="bg-gradient-to-r from-primary/5 to-transparent rounded-xl p-3 border border-primary/20">
+                            <div class="flex flex-col sm:flex-row sm:justify-between gap-3">
+                                <div class="flex justify-between items-center"><span class="text-sm font-medium text-gray-600 dark:text-gray-400">Total:</span><span id="totalAmountDisplay" class="text-sm font-semibold text-gray-800 dark:text-white">৳0.00</span></div>
+                                <div class="flex justify-between items-center"><span class="text-sm font-medium text-gray-600 dark:text-gray-400">Paid:</span><span id="totalPaid" class="text-sm font-semibold text-green-600 dark:text-green-400">৳0.00</span></div>
+                                <div class="flex justify-between items-center"><span class="text-sm font-medium text-red-500">Due:</span><span id="dueAmount" class="text-lg font-bold text-red-600">৳0.00</span></div>
                             </div>
                         </div>
                         
-                        <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all">
+                        <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 shadow-md btn-active transition-all">
                             <i class="fas fa-save"></i> Save Due Entry
                         </button>
                     </form>
@@ -253,29 +415,37 @@
                 
                 <!-- Recent Due Entries -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2">
-                        <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
-                            <i class="fas fa-history text-primary mr-2"></i>Recent Due Entries
-                        </h3>
-                        <button id="exportDueBtn" class="text-xs bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-lg transition-colors">
-                            <i class="fas fa-download mr-1"></i> Export CSV
+                    <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2">
+                        <div>
+                            <h3 class="text-base font-semibold text-gray-800 dark:text-white">
+                                <i class="fas fa-history text-primary mr-2"></i>Recent Due Entries
+                            </h3>
+                            <p class="text-[10px] text-gray-500 mt-0.5">Last 20 entries</p>
+                        </div>
+                        <button id="exportDueBtn" class="bg-success hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 btn-active transition-all">
+                            <i class="fas fa-download text-xs"></i> Export CSV
                         </button>
                     </div>
+                    
+                    <div class="table-scroll-hint px-3 pt-2">
+                        <i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns →
+                    </div>
+                    
                     <div class="overflow-x-auto">
-                        <table class="w-full min-w-[800px]">
-                            <thead class="bg-gray-50 dark:bg-gray-700/50">
+                        <table class="w-full min-w-[900px]">
+                            <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                 <tr>
-                                    <th class="px-3 py-2 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400">Date</th>
-                                    <th class="px-3 py-2 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400">Customer</th>
-                                    <th class="px-3 py-2 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400">Details</th>
-                                    <th class="px-3 py-2 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400">Total</th>
-                                    <th class="px-3 py-2 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400">Paid</th>
-                                    <th class="px-3 py-2 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400">Due</th>
-                                    <th class="px-3 py-2 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400">Actions</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Details</th>
+                                    <th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Total</th>
+                                    <th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Paid</th>
+                                    <th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Due</th>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Invoice</th>
                                 </tr>
                             </thead>
                             <tbody id="recentDueBody" class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400 text-sm">Loading...</td><ee
+                                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading due entries...</p></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -285,85 +455,113 @@
     </div>
     
     <!-- Invoice Image Modal -->
-    <div id="invoiceModal" class="fixed inset-0 z-[200] hidden items-center justify-center modal-overlay" onclick="closeModal()">
-        <div class="bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full mx-4 invoice-modal overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
+    <div id="invoiceModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/75 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-4xl w-full mx-4 overflow-hidden shadow-2xl modal-animate">
             <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="font-semibold text-gray-800 dark:text-white"><i class="fas fa-image text-primary mr-2"></i>Invoice Image</h3>
-                <button onclick="closeModal()" class="text-gray-500 hover:text-danger transition-colors">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+                <button onclick="closeInvoiceModal()" class="text-gray-500 hover:text-red-500 transition-colors"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <div class="p-4 flex justify-center bg-gray-100 dark:bg-gray-900">
-                <img id="modalImage" src="" alt="Invoice" class="max-w-full rounded-lg">
-            </div>
-            <div class="p-3 border-t border-gray-200 dark:border-gray-700 text-right">
-                <button onclick="closeModal()" class="px-4 py-2 bg-primary text-white rounded-lg text-sm">Close</button>
-            </div>
+            <div class="p-4 flex justify-center bg-gray-100 dark:bg-gray-900"><img id="modalImage" src="" alt="Invoice" class="max-w-full max-h-[70vh] rounded-lg"></div>
+            <div class="p-3 border-t border-gray-200 dark:border-gray-700 text-right"><button onclick="closeInvoiceModal()" class="px-4 py-2 bg-primary text-white rounded-lg text-sm">Close</button></div>
         </div>
     </div>
     
-    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 text-center">
-            <i class="fas fa-spinner fa-pulse text-primary text-2xl mb-2"></i>
-            <p class="text-sm text-gray-600 dark:text-gray-300">Processing...</p>
-        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 text-center"><i class="fas fa-spinner fa-pulse text-primary text-2xl mb-2"></i><p class="text-sm text-gray-600 dark:text-gray-300">Processing...</p></div>
     </div>
     
-    <!-- Toast Container -->
     <div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-2"></div>
     
+    <!-- Auth Check Script -->
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
-        import { db, collection, addDoc, getDocs, doc, updateDoc, getDoc, Timestamp } from './js/firebase.js';
+        checkAuthState(true);
+    </script>
+    
+    <script type="module">
+        import { 
+            db, collection, addDoc, getDocs, doc, updateDoc, getDoc, 
+            Timestamp, query, orderBy, limit 
+        } from './js/firebase.js';
         
-        checkAuthState();
+        // Sidebar submenu toggle
+        const warrantySubmenu = document.getElementById('warrantySubmenu');
+        const warrantyLink = warrantySubmenu?.querySelector('a');
+        if (warrantyLink) {
+            warrantyLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                warrantySubmenu.classList.toggle('open');
+                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        }
         
+        // Sidebar functions
+        const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.id = 'sidebarOverlay'; overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
+        function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); const overlay = document.getElementById('sidebarOverlay'); if (overlay) overlay.remove(); }
+        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+        window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); } });
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
+        
+        // Submenu toggle for Due Entry
+        const dueSubmenu = document.getElementById('dueSubmenu');
+        const dueSubmenuLink = dueSubmenu?.querySelector('a');
+        if (dueSubmenuLink) {
+            dueSubmenuLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                dueSubmenu.classList.toggle('open');
+                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        }
+        
+        // ==================== GLOBAL VARIABLES ====================
         let selectedImageFile = null;
         let allDueEntriesData = [];
+        let customerMap = new Map();
         
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
-            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+        // ==================== UTILITY FUNCTIONS ====================
+        function showToast(message, type = 'success') { 
+            const c = document.getElementById('toastContainer'); 
+            const t = document.createElement('div'); 
+            t.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`; 
+            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`; 
+            c.appendChild(t); 
+            setTimeout(() => t.remove(), 3000); 
         }
         
-        function showLoading(show) {
-            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none'; }
+        
+        window.closeInvoiceModal = function() { document.getElementById('invoiceModal').classList.add('hidden'); document.getElementById('invoiceModal').style.display = 'none'; };
+        
+        function showInvoiceModal(imageData) { 
+            const modal = document.getElementById('invoiceModal'), modalImg = document.getElementById('modalImage'); 
+            if (imageData && (imageData.startsWith('data:image') || imageData.startsWith('http'))) { 
+                modalImg.src = imageData; 
+                modal.classList.remove('hidden'); 
+                modal.style.display = 'flex'; 
+            } else { 
+                showToast('No invoice image available', 'error'); 
+            } 
         }
         
-        function closeModal() {
-            document.getElementById('invoiceModal').classList.add('hidden');
-            document.getElementById('invoiceModal').style.display = 'none';
-        }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
         
-        window.closeModal = closeModal;
-        
-        function showInvoiceModal(imageData) {
-            const modal = document.getElementById('invoiceModal');
-            const modalImg = document.getElementById('modalImage');
-            if (imageData && (imageData.startsWith('data:image') || imageData.startsWith('http'))) {
-                modalImg.src = imageData;
-                modal.classList.remove('hidden');
-                modal.style.display = 'flex';
-            } else {
-                showToast('No invoice image available', 'error');
-            }
-        }
-        
+        // ==================== LOAD CUSTOMERS ====================
         async function loadCustomers() {
             try {
                 const querySnapshot = await getDocs(collection(db, 'customers'));
                 const select = document.getElementById('customerId');
                 select.innerHTML = '<option value="">-- Select Customer --</option>';
+                customerMap.clear();
+                
                 querySnapshot.forEach(doc => {
                     const customer = doc.data();
+                    customerMap.set(doc.id, customer.name);
                     const option = document.createElement('option');
                     option.value = doc.id;
-                    option.textContent = `${customer.name} (Due: ৳${(customer.totalDue || 0).toFixed(2)})`;
+                    const dueText = (customer.totalDue || 0) > 0 ? ` (Due: ৳${(customer.totalDue || 0).toFixed(2)})` : '';
+                    option.textContent = `${customer.name}${dueText}`;
                     select.appendChild(option);
                 });
             } catch (error) {
@@ -372,6 +570,13 @@
             }
         }
         
+        // ==================== GET CUSTOMER NAME FROM MAP ====================
+        function getCustomerName(customerId) {
+            if (!customerId) return 'Unknown';
+            return customerMap.get(customerId) || 'Unknown';
+        }
+        
+        // ==================== CALCULATE TOTALS ====================
         function calculateTotals() {
             const products = document.querySelectorAll('.product-item');
             let subtotal = 0;
@@ -381,7 +586,6 @@
                 const price = parseFloat(product.querySelector('input[name="unitPrice"]')?.value) || 0;
                 const total = qty * price;
                 subtotal += total;
-                
                 const totalSpan = product.querySelector('.product-total');
                 if (totalSpan) totalSpan.textContent = `৳${total.toFixed(2)}`;
             });
@@ -398,53 +602,27 @@
             return { totalAmount, paid, due };
         }
         
+        // ==================== ADD PRODUCT ROW ====================
         function addProductRow() {
             const container = document.getElementById('productsContainer');
-            // Remove empty placeholder if exists
-            if (container.querySelector('.empty-placeholder')) {
-                container.innerHTML = '';
-            }
+            if (container.querySelector('.empty-placeholder')) container.innerHTML = '';
             
             const newRow = document.createElement('div');
-            newRow.className = 'product-item bg-gray-50 dark:bg-gray-700/30 rounded-lg p-3 border border-gray-200 dark:border-gray-600 mb-2';
+            newRow.className = 'product-item bg-gray-50 dark:bg-gray-700/30 rounded-xl p-3 border border-gray-200 dark:border-gray-600 mb-2';
             newRow.innerHTML = `
                 <div class="grid grid-cols-1 sm:grid-cols-6 gap-2">
-                    <div class="sm:col-span-2">
-                        <input type="text" name="productName" placeholder="Product Name" class="w-full px-2 py-1.5 text-xs border rounded-md bg-white dark:bg-gray-800">
-                    </div>
-                    <div class="flex gap-1">
-                        <input type="number" name="qty" placeholder="Qty" value="1" min="1" class="w-2/3 px-2 py-1.5 text-xs border rounded-md bg-white dark:bg-gray-800">
-                        <select name="unit" class="w-1/3 px-1 py-1.5 text-xs border rounded-md bg-white dark:bg-gray-800">
-                            <option value="Pcs">Pcs</option>
-                            <option value="Meter">Meter</option>
-                            <option value="Box">Box</option>
-                        </select>
-                    </div>
-                    <div>
-                        <input type="number" name="unitPrice" placeholder="Price" step="0.01" class="w-full px-2 py-1.5 text-xs border rounded-md bg-white dark:bg-gray-800">
-                    </div>
-                    <div class="flex items-center justify-between gap-1">
-                        <span class="text-xs font-semibold text-primary product-total">৳0</span>
-                        <button type="button" class="remove-product text-danger text-xs p-1">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
+                    <div class="sm:col-span-2"><input type="text" name="productName" placeholder="Product Name" class="w-full px-2 py-1.5 text-xs border rounded-lg bg-white dark:bg-gray-800"></div>
+                    <div class="flex gap-1"><input type="number" name="qty" placeholder="Qty" value="1" min="1" class="w-2/3 px-2 py-1.5 text-xs border rounded-lg bg-white dark:bg-gray-800"><select name="unit" class="w-1/3 px-1 py-1.5 text-xs border rounded-lg bg-white dark:bg-gray-800"><option value="Pcs">Pcs</option><option value="Meter">Meter</option><option value="Box">Box</option></select></div>
+                    <div><input type="number" name="unitPrice" placeholder="Price" step="0.01" class="w-full px-2 py-1.5 text-xs border rounded-lg bg-white dark:bg-gray-800"></div>
+                    <div class="flex items-center justify-between gap-1"><span class="text-xs font-semibold text-primary product-total">৳0</span><button type="button" class="remove-product text-red-500 text-xs p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"><i class="fas fa-trash-alt"></i></button></div>
                 </div>
             `;
             
             const inputs = newRow.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                input.addEventListener('input', () => calculateTotals());
-            });
+            inputs.forEach(input => { input.addEventListener('input', () => calculateTotals()); });
             
             const removeBtn = newRow.querySelector('.remove-product');
-            removeBtn.addEventListener('click', () => {
-                newRow.remove();
-                if (container.children.length === 0) {
-                    showEmptyPlaceholder();
-                }
-                calculateTotals();
-            });
+            removeBtn.addEventListener('click', () => { newRow.remove(); if (container.children.length === 0) showEmptyPlaceholder(); calculateTotals(); });
             
             container.appendChild(newRow);
             calculateTotals();
@@ -452,23 +630,19 @@
         
         function showEmptyPlaceholder() {
             const container = document.getElementById('productsContainer');
-            if (container.children.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-placeholder text-center py-4 text-gray-400 text-xs border border-dashed rounded-lg">
-                        <i class="fas fa-box-open mb-1 block"></i>
-                        No products added. Click "Add Product" to add items or leave empty.
-                    </div>
-                `;
+            if (container.children.length === 0) { 
+                container.innerHTML = `<div class="empty-placeholder text-center py-6 text-gray-400 text-xs border border-dashed rounded-xl"><i class="fas fa-box-open mb-1 block text-lg"></i>No products added. Click "Add Product" to add items.</div>`; 
             }
         }
         
+        // ==================== LOAD RECENT DUE ENTRIES ====================
         async function loadRecentDueEntries() {
             const tbody = document.getElementById('recentDueBody');
-            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400 text-sm">Loading...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading due entries...</p></td>';
             
             try {
-                // Get all transactions and filter client-side to avoid index issues
-                const querySnapshot = await getDocs(collection(db, 'transactions'));
+                const q = query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(100));
+                const querySnapshot = await getDocs(q);
                 const dueEntries = [];
                 
                 querySnapshot.forEach(docSnap => {
@@ -478,42 +652,26 @@
                     }
                 });
                 
-                // Sort by date descending
-                dueEntries.sort((a, b) => {
-                    const dateA = a.date || '';
-                    const dateB = b.date || '';
-                    return dateB.localeCompare(dateA);
-                });
-                
+                dueEntries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
                 const recentEntries = dueEntries.slice(0, 20);
                 allDueEntriesData = recentEntries;
                 
                 if (recentEntries.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400 text-sm">No due entries found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No due entries found</p><tr>';
                     return;
                 }
                 
                 tbody.innerHTML = '';
                 
                 for (const due of recentEntries) {
-                    let customerName = 'Unknown';
-                    try {
-                        if (due.customerId) {
-                            const customerDoc = await getDoc(doc(db, 'customers', due.customerId));
-                            if (customerDoc.exists()) {
-                                customerName = customerDoc.data().name;
-                            }
-                        }
-                    } catch (err) {
-                        console.warn('Customer fetch error:', err);
-                    }
+                    let customerName = due.customerName || getCustomerName(due.customerId);
                     
                     let detailsDisplay = '';
                     if (due.products && due.products.length > 0) {
                         detailsDisplay = due.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).slice(0, 2).join(', ');
                         if (due.products.length > 2) detailsDisplay += ` +${due.products.length - 2}`;
                     } else if (due.directDueAmount && due.directDueAmount > 0) {
-                        detailsDisplay = `Direct Due: ৳${due.directDueAmount.toFixed(2)}`;
+                        detailsDisplay = `Direct: ৳${due.directDueAmount.toFixed(2)}`;
                     } else if (due.productName) {
                         detailsDisplay = due.productName;
                     } else {
@@ -521,63 +679,42 @@
                     }
                     
                     const row = tbody.insertRow();
-                    row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors';
+                    row.className = 'table-row-hover transition-colors';
                     row.innerHTML = `
-                        <td class="px-3 py-2 text-xs whitespace-nowrap">${due.date || 'N/A'}</td>
-                        <td class="px-3 py-2 text-xs font-medium">${escapeHtml(customerName)}</td>
-                        <td class="px-3 py-2 text-xs truncate max-w-[180px]" title="${escapeHtml(detailsDisplay)}">${escapeHtml(detailsDisplay)}</td>
-                        <td class="px-3 py-2 text-right text-xs font-semibold">৳${(due.totalAmount || 0).toFixed(2)}</td>
-                        <td class="px-3 py-2 text-right text-xs text-green-600 font-semibold">৳${(due.paidAmount || 0).toFixed(2)}</td>
-                        <td class="px-3 py-2 text-right text-xs text-danger font-bold">৳${(due.dueAmount || 0).toFixed(2)}</td>
-                        <td class="px-3 py-2 text-center">
-                            <button class="view-invoice-btn text-info hover:text-blue-700 p-1 transition-colors" data-image="${due.invoiceImage || ''}" title="View Invoice">
-                                <i class="fas fa-eye text-sm"></i>
-                            </button>
-                        </td>
+                        <td class="px-3 py-2.5 text-sm whitespace-nowrap">${due.date || 'N/A'}</td>
+                        <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(customerName)}</td>
+                        <td class="px-3 py-2.5 text-sm text-gray-600 dark:text-gray-400 max-w-[250px] truncate" title="${escapeHtml(detailsDisplay)}">${escapeHtml(detailsDisplay)}</td>
+                        <td class="px-3 py-2.5 text-right text-sm font-semibold">৳${(due.totalAmount || 0).toFixed(2)}</td>
+                        <td class="px-3 py-2.5 text-right text-sm text-green-600 font-semibold">৳${(due.paidAmount || 0).toFixed(2)}</td>
+                        <td class="px-3 py-2.5 text-right text-sm text-red-600 font-bold">৳${(due.dueAmount || 0).toFixed(2)}</td>
+                        <td class="px-3 py-2.5 text-center"><button class="view-invoice-btn text-info hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-image="${due.invoiceImage || ''}" title="View Invoice"><i class="fas fa-eye text-sm"></i></button></td>
                     `;
                 }
                 
-                // Attach view invoice handlers
                 document.querySelectorAll('.view-invoice-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         const imageData = btn.getAttribute('data-image');
-                        if (imageData && imageData !== '' && imageData !== 'null') {
-                            showInvoiceModal(imageData);
-                        } else {
-                            showToast('No invoice image attached', 'error');
-                        }
+                        if (imageData && imageData !== '' && imageData !== 'null') showInvoiceModal(imageData);
+                        else showToast('No invoice image attached', 'error');
                     });
                 });
                 
             } catch (error) {
                 console.error('Error loading due entries:', error);
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-danger text-sm">Error loading data. Please refresh the page.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh. </td></td>';
             }
         }
         
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
-        }
-        
+        // ==================== EXPORT TO CSV ====================
         async function exportDueToCSV() {
-            if (allDueEntriesData.length === 0) {
-                showToast('No data to export', 'error');
-                return;
-            }
+            if (allDueEntriesData.length === 0) { showToast('No data to export', 'error'); return; }
             
             try {
-                const csvRows = [['Date', 'Customer Name', 'Details', 'Total Amount (৳)', 'Paid Amount (৳)', 'Due Amount (৳)', 'Remarks']];
+                const csvRows = [['Date', 'Customer Name', 'Details', 'Total Amount (৳)', 'Paid Amount (৳)', 'Due Amount (৳)', 'Remarks', 'Expected Date']];
                 
                 for (const due of allDueEntriesData) {
-                    let customerName = 'Unknown';
-                    try {
-                        if (due.customerId) {
-                            const customerDoc = await getDoc(doc(db, 'customers', due.customerId));
-                            if (customerDoc.exists()) customerName = customerDoc.data().name;
-                        }
-                    } catch (err) {}
+                    let customerName = due.customerName || getCustomerName(due.customerId);
                     
                     let detailsStr = '';
                     if (due.products && due.products.length > 0) {
@@ -595,7 +732,8 @@
                         (due.totalAmount || 0).toFixed(2),
                         (due.paidAmount || 0).toFixed(2),
                         (due.dueAmount || 0).toFixed(2),
-                        (due.remarks || '')
+                        (due.remarks || ''),
+                        (due.expectedDate || '')
                     ]);
                 }
                 
@@ -603,50 +741,44 @@
                 const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = url;
                 a.download = `due_entries_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 showToast('Export successful!', 'success');
-            } catch (error) {
-                showToast('Export failed', 'error');
+            } catch (error) { 
+                console.error('Export error:', error);
+                showToast('Export failed: ' + error.message, 'error'); 
             }
         }
         
+        // ==================== IMAGE UPLOAD ====================
         function setupImageUpload() {
-            const uploadArea = document.getElementById('imageUploadArea');
-            const fileInput = document.getElementById('invoiceImage');
-            const imagePreview = document.getElementById('imagePreview');
-            const fileNameSpan = document.getElementById('fileName');
-            const removeImageBtn = document.getElementById('removeImageBtn');
+            const uploadArea = document.getElementById('imageUploadArea'), fileInput = document.getElementById('invoiceImage'), previewContainer = document.getElementById('imagePreviewContainer'), previewImg = document.getElementById('imagePreview'), fileNameDisplay = document.getElementById('fileNameDisplay'), removeImageBtn = document.getElementById('removeImageBtn');
             
             uploadArea.addEventListener('click', () => fileInput.click());
             uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
-            uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('drag-over');
-                if (e.dataTransfer.files[0]?.type.startsWith('image/')) handleImageFile(e.dataTransfer.files[0]);
-            });
+            uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('drag-over'); });
+            uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('drag-over'); if (e.dataTransfer.files[0]?.type.startsWith('image/')) handleImageFile(e.dataTransfer.files[0]); });
             fileInput.addEventListener('change', (e) => { if (e.target.files[0]) handleImageFile(e.target.files[0]); });
-            removeImageBtn.addEventListener('click', () => {
-                selectedImageFile = null;
-                fileInput.value = '';
-                imagePreview.classList.add('hidden');
-                uploadArea.classList.remove('hidden');
-            });
+            removeImageBtn.addEventListener('click', () => { selectedImageFile = null; fileInput.value = ''; previewContainer.classList.add('hidden'); uploadArea.classList.remove('hidden'); });
             
-            function handleImageFile(file) {
-                if (file.size > 2 * 1024 * 1024) { showToast('File size must be less than 2MB', 'error'); return; }
-                selectedImageFile = file;
-                fileNameSpan.textContent = file.name;
-                uploadArea.classList.add('hidden');
-                imagePreview.classList.remove('hidden');
+            function handleImageFile(file) { 
+                if (file.size > 5 * 1024 * 1024) { showToast('File size must be less than 5MB', 'error'); return; } 
+                selectedImageFile = file; 
+                fileNameDisplay.textContent = file.name; 
+                const reader = new FileReader(); 
+                reader.onload = (e) => { 
+                    previewImg.src = e.target.result; 
+                    previewContainer.classList.remove('hidden'); 
+                    uploadArea.classList.add('hidden'); 
+                }; 
+                reader.readAsDataURL(file); 
             }
         }
         
+        // ==================== SUBMIT DUE ENTRY ====================
         async function submitDueEntry(event) {
             event.preventDefault();
             
@@ -656,16 +788,15 @@
             const date = document.getElementById('dueDate').value;
             if (!date) { showToast('Please select date', 'error'); return; }
             
+            const expectedDate = document.getElementById('expectedDate').value;
             const products = [];
             const productRows = document.querySelectorAll('.product-item');
-            productRows.forEach(row => {
-                const name = row.querySelector('input[name="productName"]')?.value.trim();
-                const qty = parseFloat(row.querySelector('input[name="qty"]')?.value) || 0;
-                const unit = row.querySelector('select[name="unit"]')?.value || 'Pcs';
-                const price = parseFloat(row.querySelector('input[name="unitPrice"]')?.value) || 0;
-                if (name && qty > 0 && price > 0) {
-                    products.push({ name, qty, unit, price, total: qty * price });
-                }
+            productRows.forEach(row => { 
+                const name = row.querySelector('input[name="productName"]')?.value.trim(); 
+                const qty = parseFloat(row.querySelector('input[name="qty"]')?.value) || 0; 
+                const unit = row.querySelector('select[name="unit"]')?.value || 'Pcs'; 
+                const price = parseFloat(row.querySelector('input[name="unitPrice"]')?.value) || 0; 
+                if (name && qty > 0 && price > 0) products.push({ name, qty, unit, price, total: qty * price }); 
             });
             
             const directDueAmount = parseFloat(document.getElementById('directDueAmount').value) || 0;
@@ -675,39 +806,37 @@
             const dueAmount = totalAmount - paidAmount;
             const remarks = document.getElementById('remarks').value;
             
-            if (totalAmount === 0) {
-                showToast('Please add either products or a due amount', 'error');
-                return;
-            }
-            if (dueAmount <= 0) {
-                showToast('Due amount must be greater than 0', 'error');
-                return;
-            }
+            if (totalAmount === 0) { showToast('Please add either products or a due amount', 'error'); return; }
+            if (dueAmount <= 0) { showToast('Due amount must be greater than 0', 'error'); return; }
             
             showLoading(true);
             try {
                 let imageData = null;
-                if (selectedImageFile) {
-                    imageData = await new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result);
-                        reader.readAsDataURL(selectedImageFile);
-                    });
+                if (selectedImageFile) { 
+                    imageData = await new Promise((resolve) => { 
+                        const reader = new FileReader(); 
+                        reader.onloadend = () => resolve(reader.result); 
+                        reader.readAsDataURL(selectedImageFile); 
+                    }); 
                 }
                 
-                const transaction = {
-                    customerId,
-                    type: 'due',
-                    date,
-                    products: products.length ? products : null,
-                    directDueAmount: directDueAmount > 0 ? directDueAmount : null,
-                    productName: products.map(p => p.name).join(', ') || (directDueAmount > 0 ? 'Direct Due' : ''),
-                    totalAmount,
-                    paidAmount,
-                    dueAmount,
-                    remarks,
-                    invoiceImage: imageData,
-                    createdAt: Timestamp.now()
+                const customerName = getCustomerName(customerId);
+                
+                const transaction = { 
+                    customerId, 
+                    customerName,
+                    type: 'due', 
+                    date, 
+                    products: products.length ? products : null, 
+                    directDueAmount: directDueAmount > 0 ? directDueAmount : null, 
+                    productName: products.map(p => p.name).join(', ') || (directDueAmount > 0 ? 'Direct Due' : ''), 
+                    totalAmount, 
+                    paidAmount, 
+                    dueAmount, 
+                    remarks, 
+                    expectedDate: expectedDate || null, 
+                    invoiceImage: imageData, 
+                    createdAt: Timestamp.now() 
                 };
                 
                 await addDoc(collection(db, 'transactions'), transaction);
@@ -719,13 +848,13 @@
                 
                 showToast('Due entry added successfully!', 'success');
                 
-                // Reset form
                 document.getElementById('dueEntryForm').reset();
                 document.getElementById('dueDate').valueAsDate = new Date();
                 document.getElementById('paidAmount').value = '0';
                 document.getElementById('directDueAmount').value = '';
+                document.getElementById('expectedDate').value = '';
                 selectedImageFile = null;
-                document.getElementById('imagePreview').classList.add('hidden');
+                document.getElementById('imagePreviewContainer').classList.add('hidden');
                 document.getElementById('imageUploadArea').classList.remove('hidden');
                 document.getElementById('productsContainer').innerHTML = '';
                 showEmptyPlaceholder();
@@ -733,36 +862,34 @@
                 await loadRecentDueEntries();
                 await loadCustomers();
                 
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('Error: ' + error.message, 'error');
-            } finally {
-                showLoading(false);
+            } catch (error) { 
+                console.error('Error:', error); 
+                showToast('Error: ' + error.message, 'error'); 
+            } finally { 
+                showLoading(false); 
             }
         }
         
-        // Event Listeners
+        // ==================== EVENT LISTENERS ====================
         document.getElementById('dueEntryForm').addEventListener('submit', submitDueEntry);
         document.getElementById('addProductBtn').addEventListener('click', addProductRow);
         document.getElementById('paidAmount').addEventListener('input', calculateTotals);
         document.getElementById('directDueAmount').addEventListener('input', calculateTotals);
         document.getElementById('dueDate').valueAsDate = new Date();
         document.getElementById('exportDueBtn').addEventListener('click', exportDueToCSV);
-        document.getElementById('refreshBtn').addEventListener('click', () => {
-            loadRecentDueEntries();
-            loadCustomers();
-            showToast('Refreshed!', 'success');
-        });
+        document.getElementById('refreshBtn').addEventListener('click', () => { loadRecentDueEntries(); loadCustomers(); showToast('Refreshed!', 'success'); });
+        document.getElementById('darkModeToggle').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
         
-        document.getElementById('darkModeToggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            document.body.classList.toggle('dark');
-        });
-        document.getElementById('menuToggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-        });
-        document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); logout(); });
+        // Logout functionality
+        const logoutLink = document.getElementById('logoutLink');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await logout();
+            });
+        }
         
+        // ==================== INITIALIZE ====================
         setupImageUpload();
         loadCustomers();
         loadRecentDueEntries();

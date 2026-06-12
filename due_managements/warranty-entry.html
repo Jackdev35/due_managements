@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0f3b3a">
+    <title>Warranty Entry | Nexus Due Managements</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0f3b3a',
+                        'primary-light': '#1e6b68',
+                        'primary-dark': '#092c2b',
+                        accent: '#d4af37',
+                        danger: '#e53e3e',
+                        success: '#2c7a4d',
+                        warning: '#dd6b20',
+                        info: '#3182ce',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+        
+        * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        .nav-active {
+            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
+            border-left: 3px solid #d4af37;
+        }
+        .dark .nav-active {
+            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
+        }
+        
+        .stat-card {
+            transition: all 0.2s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12);
+        }
+        
+        .submenu-modern {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .submenu-modern.open {
+            max-height: 240px;
+        }
+        
+        .has-submenu > a .chevron-icon {
+            transition: transform 0.2s ease;
+        }
+        .has-submenu.open > a .chevron-icon {
+            transform: rotate(180deg);
+        }
+        
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-animate {
+            animation: modalSlideUp 0.2s ease-out forwards;
+        }
+        
+        .btn-active:active {
+            transform: scale(0.97);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .status-pending {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+        .dark .status-pending {
+            background: #7c2d12;
+            color: #fdba74;
+        }
+        .status-received {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .dark .status-received {
+            background: #064e3b;
+            color: #86efac;
+        }
+        
+        .table-row-hover:hover {
+            background-color: rgba(15, 59, 58, 0.04);
+        }
+        .dark .table-row-hover:hover {
+            background-color: rgba(30, 107, 104, 0.1);
+        }
+        
+        .table-scroll-hint {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .table-scroll-hint {
+                display: flex;
+                font-size: 9px;
+                padding: 4px 8px;
+                background: #f0fdf4;
+                color: #166534;
+                border-radius: 20px;
+                margin-bottom: 8px;
+                width: fit-content;
+            }
+            .dark .table-scroll-hint {
+                background: #064e3b;
+                color: #86efac;
+            }
+        }
+        
+        /* Sidebar overlay */
+        #sidebarOverlay {
+            animation: fadeIn 0.2s ease-out;
+        }
+        .sidebar-open {
+            overflow: hidden;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Invoice Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #invoiceModal, #invoiceModal * {
+                visibility: visible;
+            }
+            #invoiceModal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: auto;
+                background: white;
+                display: block !important;
+            }
+            .modal-animate {
+                animation: none;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    
+    <div class="flex min-h-screen">
+        
+        <!-- Sidebar - Professional Design -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-auto border-r border-white/5">
+            <div class="flex flex-col h-full">
+                <div class="px-5 py-5 border-b border-white/10 flex items-center justify-between sticky top-0 bg-inherit z-10">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
+                        </div>
+                        <div class="leading-tight">
+                            <h1 class="text-white font-bold text-sm tracking-wide">Nexus<span class="text-accent">Due</span></h1>
+                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Financial cockpit</p>
+                        </div>
+                    </div>
+                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+                
+                <nav class="flex-1 px-3 py-5 space-y-1.5">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                        <span class="text-sm font-medium">Dashboard</span>
+                    </a>
+                    
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customers</span>
+                    </a>
+                    
+                    <div class="has-submenu" id="dueSubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div>
+                                <span class="text-sm font-medium">Due Entry</span>
+                            </div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-file-invoice text-[10px] w-4"></i>
+                                <span>New Due Entry</span>
+                            </a>
+                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-bell text-[10px] w-4"></i>
+                                <span>Follow-ups</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div>
+                        <span class="text-sm font-medium">Collection</span>
+                    </a>
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div>
+                        <span class="text-sm font-medium">Ledger</span>
+                    </a>
+                    
+                    <div class="has-submenu open" id="warrantySubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-white bg-white/5 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 text-center"><i class="fas fa-shield-alt text-sm text-accent"></i></div>
+                                <span class="text-sm font-medium">Warranty</span>
+                            </div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern open pl-9 mt-1 space-y-1">
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-truck text-[10px] w-4"></i>
+                                <span>Suppliers</span>
+                            </a>
+                            <a href="warranty-entry.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition">
+                                <i class="fas fa-plus-circle text-[10px] w-4"></i>
+                                <span>Warranty Entry</span>
+                            </a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-shipping-fast text-[10px] w-4"></i>
+                                <span>Currier Dispatch</span>
+                            </a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-list text-[10px] w-4"></i>
+                                <span>Warranty List</span>
+                            </a>
+                            
+                        </div>
+                    </div>
+                    
+                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customer Warranty</span>
+                    </a>
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div>
+                        <span class="text-sm font-medium">Backup & Restore</span>
+                    </a>
+                </nav>
+                
+                <div class="px-3 py-4 border-t border-white/10 mt-auto">
+                    <div class="flex items-center justify-between mb-2 px-1">
+                        <span class="text-[9px] text-slate-500">v2.3.1 · secure</span>
+                        <div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center">
+                            <i class="fas fa-lock text-[8px] text-slate-400"></i>
+                        </div>
+                    </div>
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
+                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                        <span class="text-sm font-medium">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 min-h-screen w-full">
+            
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+                <div class="px-3 py-2.5 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
+                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
+                            <i class="fas fa-plus-circle text-primary mr-2"></i>Warranty Entry
+                        </h2>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-sync-alt text-sm"></i>
+                        </button>
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-moon dark:hidden text-sm"></i>
+                            <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="p-3 md:p-4">
+                
+                <!-- Navigation Tabs -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <a href="warranty.html" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">
+                        <i class="fas fa-truck mr-1"></i> Suppliers
+                    </a>
+                    <a href="warranty-entry.html" class="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-white shadow-md transition-all">
+                        <i class="fas fa-plus-circle mr-1"></i> Warranty Entry
+                    </a>
+                    <a href="currier-dispatch.html" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">
+                        <i class="fas fa-shipping-fast mr-1"></i> Courier Dispatch
+                    </a>
+                    <a href="warranty-list.html" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">
+                        <i class="fas fa-list mr-1"></i> Warranty List
+                    </a>
+                </div>
+                
+                <!-- Warranty Entry Form -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-6">
+                    <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-base font-semibold text-gray-800 dark:text-white">
+                            <i class="fas fa-plus-circle text-primary mr-2"></i>New Warranty Entry
+                        </h3>
+                        <p class="text-[10px] text-gray-500 mt-0.5">Register a new product warranty claim</p>
+                    </div>
+                    
+                    <div class="p-5">
+                        <form id="warrantyForm" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                        <i class="fas fa-truck text-primary mr-1"></i> Supplier <span class="text-red-500">*</span>
+                                    </label>
+                                    <select id="warrantySupplier" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50" required>
+                                        <option value="">-- Select Supplier --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                        <i class="fas fa-calendar text-primary mr-1"></i> Warranty Date <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="date" id="warrantyDate" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                        <i class="fas fa-box text-primary mr-1"></i> Product Name <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="warrantyProduct" placeholder="Enter product name" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                        <i class="fas fa-barcode text-primary mr-1"></i> Serial Number
+                                    </label>
+                                    <input type="text" id="warrantySerial" placeholder="Product serial number (if any)" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                        <i class="fas fa-user text-primary mr-1"></i> Customer Name
+                                    </label>
+                                    <input type="text" id="customerName" placeholder="Customer name (optional)" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                        <i class="fas fa-phone text-primary mr-1"></i> Customer Phone
+                                    </label>
+                                    <input type="tel" id="customerPhone" placeholder="Customer phone number" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-clipboard-list text-primary mr-1"></i> Problem Description
+                                </label>
+                                <textarea id="warrantyProblem" rows="2" placeholder="Describe the product issue in detail..." class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit" class="bg-primary hover:bg-primary-dark text-white font-medium px-6 py-2.5 rounded-xl text-sm shadow-md btn-active transition-all">
+                                    <i class="fas fa-save mr-1"></i> Submit Warranty
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Warranty Entries List Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2">
+                        <div>
+                            <h3 class="text-base font-semibold text-gray-800 dark:text-white">
+                                <i class="fas fa-list text-primary mr-2"></i>Warranty Entries List
+                            </h3>
+                            <p class="text-[10px] text-gray-500 mt-0.5">All registered warranty claims</p>
+                        </div>
+                        <button id="exportEntriesBtn" class="bg-success hover:bg-green-700 text-white font-medium px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 btn-active transition-all">
+                            <i class="fas fa-download text-xs"></i> Export CSV
+                        </button>
+                    </div>
+                    
+                    <div class="table-scroll-hint px-3 pt-2">
+                        <i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns → <span class="mx-2">|</span> <i class="fas fa-hand-pointer mr-1 text-[8px]"></i> Tap row for details
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[1000px]">
+                            <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                                <tr>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">ID</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Supplier</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Product</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Phone</th>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="warrantyEntriesBody" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading entries...</p></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Warranty Details Modal -->
+    <div id="detailsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[150] hidden transition-all duration-300 p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full shadow-2xl modal-animate overflow-hidden">
+            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-base font-semibold text-gray-800 dark:text-white">
+                    <i class="fas fa-file-alt text-primary mr-2"></i>Warranty Details
+                </h3>
+                <button id="closeDetailsModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-5 max-h-[60vh] overflow-y-auto" id="detailsContent"></div>
+            <div class="flex justify-end px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
+                <button id="closeDetailsModalFooterBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 btn-active">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-2"></div>
+    
+    <!-- Logout Modal -->
+    <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl modal-animate">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <i class="fas fa-sign-out-alt text-orange-500 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Are you sure you want to logout?</p>
+            <div class="flex gap-3 justify-center">
+                <button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-100 dark:bg-gray-700 btn-active">Cancel</button>
+                <button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-danger text-white btn-active">Logout</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Auth Check Script -->
+    <script type="module">
+        import { checkAuthState, logout } from './js/auth.js';
+        
+        // Check authentication - redirects to login.html if not authenticated
+        checkAuthState(true);
+    </script>
+    
+    <script type="module">
+        import { db, collection, addDoc, getDocs, query, orderBy, doc, getDoc } from './js/firebase.js';
+        
+        // Sidebar functionality
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            document.body.classList.add('sidebar-open');
+            if (!document.getElementById('sidebarOverlay')) {
+                const overlay = document.createElement('div');
+                overlay.id = 'sidebarOverlay';
+                overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
+                overlay.addEventListener('click', closeSidebar);
+                document.body.appendChild(overlay);
+            }
+        }
+        
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            document.body.classList.remove('sidebar-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+        
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('-translate-x-full');
+                document.getElementById('sidebarOverlay')?.remove();
+                document.body.classList.remove('sidebar-open');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
+        
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
+        else sidebar.classList.add('-translate-x-full');
+        
+        // Submenu for Warranty
+        const warrantySubmenu = document.getElementById('warrantySubmenu');
+        const warrantySubmenuLink = warrantySubmenu?.querySelector('a');
+        if (warrantySubmenuLink) {
+            warrantySubmenuLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                warrantySubmenu.classList.toggle('open');
+                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        }
+        
+        // Submenu for Due Entry
+        const dueSubmenu = document.getElementById('dueSubmenu');
+        const dueSubmenuLink = dueSubmenu?.querySelector('a');
+        if (dueSubmenuLink) {
+            dueSubmenuLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                dueSubmenu.classList.toggle('open');
+                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        }
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+        
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+        
+        let allEntries = [];
+        
+        // Generate Warranty ID
+        function generateWarrantyId() {
+            const now = new Date();
+            const year = now.getFullYear().toString().slice(-2);
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            return `WAR-${year}${month}${day}/${random}`;
+        }
+        
+        // Load Suppliers Dropdown
+        async function loadSuppliers() {
+            const select = document.getElementById('warrantySupplier');
+            if (!select) return;
+            select.innerHTML = '<option value="">-- Select Supplier --</option>';
+            try {
+                const snapshot = await getDocs(collection(db, 'suppliers'));
+                snapshot.forEach(doc => {
+                    const supplier = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = supplier.name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading suppliers:', error);
+            }
+        }
+        
+        // Load Warranty Entries
+        async function loadWarrantyEntries() {
+            const tbody = document.getElementById('warrantyEntriesBody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading entries...</p></td></tr>';
+            
+            try {
+                const snapshot = await getDocs(query(collection(db, 'warranties'), orderBy('createdAt', 'desc')));
+                const entries = [];
+                for (const docSnap of snapshot.docs) {
+                    const w = { id: docSnap.id, ...docSnap.data() };
+                    if (w.supplierId) {
+                        const supplierDoc = await getDoc(doc(db, 'suppliers', w.supplierId));
+                        w.supplierName = supplierDoc.exists() ? supplierDoc.data().name : 'Unknown';
+                    } else {
+                        w.supplierName = 'Unknown';
+                    }
+                    entries.push(w);
+                }
+                allEntries = entries;
+                renderEntriesTable(entries);
+            } catch (error) {
+                console.error('Error loading entries:', error);
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data</td></tr>';
+            }
+        }
+        
+        function renderEntriesTable(entries) {
+            const tbody = document.getElementById('warrantyEntriesBody');
+            if (entries.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No warranty entries found</p></td>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            entries.forEach(entry => {
+                const statusClass = entry.status === 'pending' ? 'status-pending' : 'status-received';
+                const statusText = entry.status === 'pending' ? 'Pending' : 'Received';
+                const statusIcon = entry.status === 'pending' ? 'fa-clock' : 'fa-check-circle';
+                
+                const row = tbody.insertRow();
+                row.className = 'table-row-hover transition-colors cursor-pointer';
+                row.setAttribute('data-entry', JSON.stringify(entry));
+                
+                row.innerHTML = `
+                    <td class="px-3 py-2.5 text-xs font-mono font-semibold">${entry.warrantyId || entry.id.slice(0, 12)}</td>
+                    <td class="px-3 py-2.5 text-sm whitespace-nowrap">${entry.warrantyDate || 'N/A'}</td>
+                    <td class="px-3 py-2.5 text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(entry.supplierName)}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.productName)}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.customerName || '-')}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.customerPhone || '-')}</td>
+                    <td class="px-3 py-2.5 text-center">
+                        <span class="status-badge ${statusClass}">
+                            <i class="fas ${statusIcon} text-[10px]"></i> ${statusText}
+                        </span>
+                    </td>
+                    <td class="px-3 py-2.5 text-center">
+                        <button class="view-details text-blue-500 hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-entry='${JSON.stringify(entry)}' title="View Details">
+                            <i class="fas fa-eye text-sm"></i>
+                        </button>
+                    </td>
+                `;
+            });
+            
+            // Row click for details
+            document.querySelectorAll('#warrantyEntriesBody tr').forEach(row => {
+                row.addEventListener('click', (e) => {
+                    if (e.target.closest('button')) return;
+                    const entryData = row.dataset.entry;
+                    if (entryData) {
+                        const entry = JSON.parse(entryData);
+                        showDetailsModal(entry);
+                    }
+                });
+            });
+            
+            // View details buttons
+            document.querySelectorAll('.view-details').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const entry = JSON.parse(btn.dataset.entry);
+                    showDetailsModal(entry);
+                });
+            });
+        }
+        
+        function showDetailsModal(entry) {
+            const detailsContent = document.getElementById('detailsContent');
+            const statusClass = entry.status === 'pending' ? 'status-pending' : 'status-received';
+            const statusText = entry.status === 'pending' ? 'Pending' : 'Received';
+            
+            detailsContent.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-xs text-gray-500">Warranty ID</span>
+                        <span class="font-mono text-sm font-semibold text-primary">${entry.warrantyId || entry.id.slice(0, 12)}</span>
+                    </div>
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-xs text-gray-500">Date</span>
+                        <span class="text-sm">${entry.warrantyDate || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-xs text-gray-500">Supplier</span>
+                        <span class="text-sm font-medium">${escapeHtml(entry.supplierName)}</span>
+                    </div>
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-xs text-gray-500">Product Name</span>
+                        <span class="text-sm font-semibold">${escapeHtml(entry.productName)}</span>
+                    </div>
+                    ${entry.serialNumber ? `
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-xs text-gray-500">Serial Number</span>
+                        <span class="text-xs font-mono">${escapeHtml(entry.serialNumber)}</span>
+                    </div>
+                    ` : ''}
+                    ${entry.customerName ? `
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-xs text-gray-500">Customer Name</span>
+                        <span class="text-sm">${escapeHtml(entry.customerName)}</span>
+                    </div>
+                    ` : ''}
+                    ${entry.customerPhone ? `
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-xs text-gray-500">Customer Phone</span>
+                        <span class="text-sm">${escapeHtml(entry.customerPhone)}</span>
+                    </div>
+                    ` : ''}
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-xs text-gray-500">Status</span>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    ${entry.problemDescription ? `
+                    <div class="flex flex-col gap-1">
+                        <span class="text-xs text-gray-500">Problem Description</span>
+                        <p class="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">${escapeHtml(entry.problemDescription)}</p>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            document.getElementById('detailsModal').classList.remove('hidden');
+        }
+        
+        // Submit Warranty
+        async function submitWarranty(e) {
+            e.preventDefault();
+            
+            const supplierId = document.getElementById('warrantySupplier').value;
+            const warrantyDate = document.getElementById('warrantyDate').value;
+            const productName = document.getElementById('warrantyProduct').value.trim();
+            const serialNumber = document.getElementById('warrantySerial').value.trim();
+            const customerName = document.getElementById('customerName').value.trim();
+            const customerPhone = document.getElementById('customerPhone').value.trim();
+            const problemDescription = document.getElementById('warrantyProblem').value;
+            
+            if (!supplierId) { showToast('Please select a supplier', 'error'); return; }
+            if (!warrantyDate) { showToast('Please select warranty date', 'error'); return; }
+            if (!productName) { showToast('Please enter product name', 'error'); return; }
+            
+            try {
+                const warrantyId = generateWarrantyId();
+                await addDoc(collection(db, 'warranties'), {
+                    supplierId: supplierId,
+                    warrantyDate: warrantyDate,
+                    productName: productName,
+                    serialNumber: serialNumber || null,
+                    customerName: customerName || null,
+                    customerPhone: customerPhone || null,
+                    problemDescription: problemDescription || null,
+                    status: 'pending',
+                    warrantyId: warrantyId,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                });
+                
+                showToast(`Warranty submitted! ID: ${warrantyId}`, 'success');
+                document.getElementById('warrantyForm').reset();
+                document.getElementById('warrantyDate').valueAsDate = new Date();
+                loadWarrantyEntries();
+                
+            } catch (error) {
+                console.error('Submit error:', error);
+                showToast('Error submitting warranty', 'error');
+            }
+        }
+        
+        // Export CSV
+        function exportToCSV() {
+            if (allEntries.length === 0) {
+                showToast('No data to export', 'error');
+                return;
+            }
+            
+            let csvRows = ['\uFEFF"ID","Date","Supplier","Product","Serial No","Customer Name","Customer Phone","Status","Problem Description"'];
+            
+            allEntries.forEach(entry => {
+                csvRows.push(`"${entry.warrantyId || entry.id.slice(0, 12)}","${entry.warrantyDate || 'N/A'}","${(entry.supplierName || 'N/A').replace(/"/g, '""')}","${entry.productName.replace(/"/g, '""')}","${(entry.serialNumber || '-').replace(/"/g, '""')}","${(entry.customerName || '-').replace(/"/g, '""')}","${(entry.customerPhone || '-').replace(/"/g, '""')}","${entry.status === 'pending' ? 'Pending' : 'Received'}","${(entry.problemDescription || '').replace(/"/g, '""')}"`);
+            });
+            
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `warranty_entries_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Exported successfully!', 'success');
+        }
+        
+        // Event Listeners
+        document.getElementById('warrantyForm')?.addEventListener('submit', submitWarranty);
+        document.getElementById('warrantyDate').valueAsDate = new Date();
+        document.getElementById('refreshBtn')?.addEventListener('click', () => {
+            loadSuppliers();
+            loadWarrantyEntries();
+            showToast('Refreshed!', 'success');
+        });
+        document.getElementById('darkModeToggle')?.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+        });
+        document.getElementById('exportEntriesBtn')?.addEventListener('click', exportToCSV);
+        
+        // Close details modal
+        document.getElementById('closeDetailsModalBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
+        document.getElementById('closeDetailsModalFooterBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
+        document.getElementById('detailsModal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('detailsModal')) document.getElementById('detailsModal').classList.add('hidden');
+        });
+        
+        // Logout functionality
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutLink = document.getElementById('logoutLink');
+        const cancelLogout = document.getElementById('cancelLogoutBtn');
+        const confirmLogout = document.getElementById('confirmLogoutBtn');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                logoutModal?.classList.remove('hidden');
+            });
+        }
+        if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal?.classList.add('hidden'));
+        if (confirmLogout) {
+            confirmLogout.addEventListener('click', async () => {
+                logoutModal?.classList.add('hidden');
+                const { logout } = await import('./js/auth.js');
+                await logout();
+            });
+        }
+        
+        // Initialize
+        loadSuppliers();
+        loadWarrantyEntries();
+    </script>
+</body>
+</html>

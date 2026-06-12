@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#009688">
-    <title>Collection | Jack Due Managements</title>
+    <meta name="theme-color" content="#0f3b3a">
+    <title>Collection | Nexus Due Managements</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,72 +14,261 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#009688',
-                        'primary-dark': '#00796b',
-                        danger: '#ef4444',
-                        success: '#10b981',
-                        warning: '#f59e0b',
-                        info: '#3b82f6',
-                    }
+                        primary: '#0f3b3a',
+                        'primary-light': '#1e6b68',
+                        'primary-dark': '#092c2b',
+                        accent: '#d4af37',
+                        danger: '#e53e3e',
+                        success: '#2c7a4d',
+                        warning: '#dd6b20',
+                        info: '#3182ce',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+                    },
                 }
             }
         }
     </script>
     <style>
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+        
+        * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        .nav-active {
+            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
+            border-left: 3px solid #d4af37;
         }
-        .animate-slide-in {
-            animation: slideIn 0.3s ease-out;
+        .dark .nav-active {
+            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
         }
-        .btn-active:active {
-            transform: scale(0.97);
+        
+        .stat-card { transition: all 0.2s ease; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12); }
+        
+        .submenu-modern {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            ring: 2px solid #009688;
+        .submenu-modern.open { max-height: 240px; }
+        
+        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
+        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
+        
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .expected-badge {
-            background: linear-gradient(135deg, #f59e0b20 0%, #f59e0b10 100%);
+        .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
+        
+        .btn-active:active { transform: scale(0.97); }
+        
+        .pagination-btn {
+            transition: all 0.2s ease;
+        }
+        .pagination-btn:hover:not(:disabled) {
+            background: #0f3b3a;
+            color: white;
+            transform: translateY(-1px);
+        }
+        .pagination-btn.active {
+            background: #0f3b3a;
+            color: white;
+        }
+        
+        .table-scroll-hint { display: none; }
+        @media (max-width: 768px) {
+            .table-scroll-hint {
+                display: flex;
+                font-size: 9px;
+                padding: 4px 8px;
+                background: #f0fdf4;
+                color: #166534;
+                border-radius: 20px;
+                margin-bottom: 8px;
+                width: fit-content;
+            }
+            .dark .table-scroll-hint { background: #064e3b; color: #86efac; }
+        }
+        
+        .table-row-hover:hover {
+            background-color: rgba(15, 59, 58, 0.04);
+        }
+        .dark .table-row-hover:hover {
+            background-color: rgba(30, 107, 104, 0.1);
+        }
+        
+        #sidebarOverlay {
+            animation: fadeIn 0.2s ease-out;
+        }
+        .sidebar-open {
+            overflow: hidden;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Fixed Sidebar Structure - No overlap issue */
+        .sidebar-fixed {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar-header-fixed {
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            background: inherit;
+            z-index: 10;
+        }
+        .sidebar-nav-fixed {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar {
+            width: 3px;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar-thumb {
+            background: rgba(212,175,55,0.5);
+            border-radius: 10px;
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+        .dark .skeleton {
+            background: linear-gradient(90deg, #2d3748 25%, #4a5568 50%, #2d3748 75%);
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     
-    <!-- App Container -->
     <div class="flex min-h-screen">
         
-        <!-- Sidebar -->
-        <aside class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 overflow-y-auto" id="sidebar">
-            <div class="flex flex-col h-full">
-                <div class="flex items-center gap-3 px-5 py-5 border-b border-white/10 sticky top-0 bg-inherit">
-                    <i class="fas fa-laptop-code text-primary text-xl"></i>
-                    <span class="text-white font-semibold text-lg">Jack Due Managements</span>
+        <!-- Sidebar - Fixed Structure (No overlap issue) -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
+            <!-- Header - Fixed at top (does not scroll) -->
+            <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
+                        </div>
+                        <div class="leading-tight">
+                            <h1 class="text-white font-bold text-sm tracking-wide">Nexus<span class="text-accent">Due</span></h1>
+                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Financial cockpit</p>
+                        </div>
+                    </div>
+                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
                 </div>
-                <nav class="flex-1 px-3 py-4 space-y-1">
-                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all">
-                        <i class="fas fa-tachometer-alt w-5"></i><span class="text-sm">Dashboard</span>
+            </div>
+            
+            <!-- Navigation - Scrollable area (scrolls independently) -->
+            <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
+                <nav class="space-y-1.5">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                        <span class="text-sm font-medium">Dashboard</span>
                     </a>
-                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
-                        <i class="fas fa-users w-5"></i><span class="text-sm">Customers</span>
+                    
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customers</span>
                     </a>
-                    <a href="due-entry.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
-                        <i class="fas fa-plus-circle w-5"></i><span class="text-sm">Due Entry</span>
+                    
+                    <div class="has-submenu" id="dueSubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div>
+                                <span class="text-sm font-medium">Due Entry</span>
+                            </div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
+                            </a>
+                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="collection.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm text-accent"></i></div>
+                        <span class="text-sm font-medium">Collection</span>
                     </a>
-                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-white/10">
-                        <i class="fas fa-hand-holding-usd w-5"></i><span class="text-sm">Collection</span>
+                    
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div>
+                        <span class="text-sm font-medium">Ledger</span>
                     </a>
-                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
-                        <i class="fas fa-book w-5"></i><span class="text-sm">Customer Ledger</span>
+                    
+                    <div class="has-submenu" id="warrantySubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div>
+                                <span class="text-sm font-medium">Warranty</span>
+                            </div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
+                            </a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
+                            </a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
+                            </a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div>
+                        <span class="text-sm font-medium">Customer Warranty</span>
                     </a>
-                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white     hover:bg-white/10">
-                        <i class="fas fa-database w-5"></i><span class="text-sm">Backup & Restore</span>
+                    
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div>
+                        <span class="text-sm font-medium">Backup & Restore</span>
                     </a>
                 </nav>
-                <div class="px-3 py-4 border-t border-white/10">
-                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-red-500/20 transition-all">
-                        <i class="fas fa-sign-out-alt w-5"></i><span class="text-sm">Logout</span>
+                
+                <!-- Logout Button - Now scrolls with menu -->
+                <div class="pt-4 mt-2 border-t border-white/10">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
+                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                        <span class="text-sm font-medium">Logout</span>
                     </a>
                 </div>
             </div>
@@ -88,176 +277,225 @@
         <!-- Main Content -->
         <main class="flex-1 md:ml-64 min-h-screen w-full">
             
-            <!-- Top Header -->
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-                <div class="px-3 py-3 flex justify-between items-center">
+                <div class="px-3 py-2.5 flex justify-between items-center">
                     <div class="flex items-center gap-2">
-                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-2 -ml-2 rounded-lg">
-                            <i class="fas fa-bars text-xl"></i>
-                        </button>
-                        <h2 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white">
-                            <i class="fas fa-hand-holding-usd text-primary mr-2"></i>Collection
-                        </h2>
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg"><i class="fas fa-bars text-lg"></i></button>
+                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-hand-holding-usd text-primary mr-2"></i>Collection</h2>
                     </div>
                     <div class="flex items-center gap-1">
-                        <button id="refreshBtn" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                            <i class="fas fa-sync-alt text-sm"></i>
-                        </button>
-                        <button id="darkModeToggle" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                            <i class="fas fa-moon dark:hidden text-sm"></i>
-                            <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
-                        </button>
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt text-sm"></i></button>
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-moon dark:hidden text-sm"></i><i class="fas fa-sun hidden dark:inline-block text-sm"></i></button>
                     </div>
                 </div>
             </header>
             
-            <!-- Page Content -->
             <div class="p-3 md:p-4">
                 
                 <!-- Collection Form Card -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-4">
-                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
-                        <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
-                            <i class="fas fa-money-bill-wave text-primary mr-2"></i>Receive Payment
-                        </h3>
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-5">
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                        <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-money-bill-wave text-primary mr-2"></i>Receive Payment</h3>
+                        <p class="text-[10px] text-gray-500 mt-0.5">Record a new collection from customer</p>
                     </div>
                     
                     <form id="collectionForm" class="p-4 space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    <i class="fas fa-user text-primary mr-1"></i>Customer <span class="text-danger">*</span>
-                                </label>
-                                <select id="customerId" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50 transition-all" required>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-user text-primary mr-1"></i>Customer <span class="text-red-500">*</span></label>
+                                <select id="customerId" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50" required>
                                     <option value="">-- Select Customer --</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    <i class="fas fa-calendar text-primary mr-1"></i>Payment Date <span class="text-danger">*</span>
-                                </label>
-                                <input type="date" id="collectionDate" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50 transition-all" required>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-calendar text-primary mr-1"></i>Payment Date <span class="text-red-500">*</span></label>
+                                <input type="date" id="collectionDate" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50" required>
                             </div>
                         </div>
                         
-                        <!-- New Expected Date Field -->
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fas fa-calendar-week text-primary mr-1"></i>Expected Date <span class="text-gray-400 text-[10px]">(Optional - For future reference)</span>
-                            </label>
-                            <input type="date" id="expectedDate" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50 transition-all">
-                            <p class="text-[10px] text-gray-400 mt-1"><i class="fas fa-info-circle mr-1"></i>Set expected future payment date for tracking</p>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-calendar-week text-primary mr-1"></i>Expected Date <span class="text-gray-400 text-[10px]">(Optional)</span></label>
+                            <input type="date" id="expectedDate" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                            <p class="text-[9px] text-gray-400 mt-1">Set expected payment date for future reference</p>
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fas fa-money-bill text-primary mr-1"></i>Collection Amount <span class="text-danger">*</span>
-                            </label>
-                            <input type="number" id="collectionAmount" placeholder="Enter amount" step="0.01" min="0" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50 transition-all">
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-money-bill text-primary mr-1"></i>Collection Amount <span class="text-red-500">*</span></label>
+                            <input type="number" id="collectionAmount" placeholder="Enter amount" step="0.01" min="0" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fas fa-sticky-note text-primary mr-1"></i>Remarks (Optional)
-                            </label>
-                            <input type="text" id="remarks" placeholder="Payment reference or notes" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50 transition-all">
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-sticky-note text-primary mr-1"></i>Remarks</label>
+                            <input type="text" id="remarks" placeholder="Payment reference or notes" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
                         </div>
                         
-                        <!-- Due Alert -->
-                        <div id="dueAlert" class="hidden bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950/30 dark:to-amber-900/30 rounded-lg p-3 border-l-4 border-warning animate-slide-in">
+                        <div id="dueAlert" class="hidden bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950/30 dark:to-amber-900/30 rounded-xl p-3 border-l-4 border-warning">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <p class="text-xs text-amber-700 dark:text-amber-400">Current Due Amount</p>
-                                    <p class="text-xl font-bold text-danger" id="currentDueDisplay">৳0.00</p>
+                                    <p class="text-xs text-amber-700 dark:text-amber-400 font-medium">Current Due Amount</p>
+                                    <p class="text-2xl font-bold text-red-600 dark:text-red-400" id="currentDueDisplay">৳0.00</p>
                                 </div>
-                                <i class="fas fa-info-circle text-amber-500 text-lg"></i>
+                                <i class="fas fa-info-circle text-amber-500 text-xl"></i>
                             </div>
                         </div>
                         
-                        <button type="submit" id="submitBtn" class="w-full bg-success hover:bg-green-600 text-white font-semibold py-3 rounded-xl transition-all duration-200 btn-active shadow-md">
+                        <button type="submit" id="submitBtn" class="w-full bg-success hover:bg-green-700 text-white font-semibold py-3 rounded-xl transition-all btn-active shadow-md">
                             <i class="fas fa-save mr-2"></i>Save Collection
                         </button>
                     </form>
                 </div>
                 
-                <!-- Recent Collections Card -->
+                <!-- Collections Table Section -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
-                            <i class="fas fa-history text-primary mr-2"></i>Recent Collections
-                        </h3>
-                        <span class="text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full" id="collectionCount">0 records</span>
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex justify-between items-center flex-wrap gap-2">
+                        <div>
+                            <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-table-list text-primary mr-2"></i>All Collections</h3>
+                            <p class="text-[9px] text-gray-500 mt-0.5">Payment history with expected dates</p>
+                        </div>
+                        <button id="exportTableBtn" class="bg-success hover:bg-green-700 text-white font-medium px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 btn-active">
+                            <i class="fas fa-download text-xs"></i> Export CSV
+                        </button>
                     </div>
                     
-                    <div id="recentCollectionsList" class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[400px] overflow-y-auto">
-                        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-inbox text-3xl mb-2 opacity-50 block"></i>
-                            <p class="text-sm">No collections yet</p>
-                            <p class="text-xs mt-1">Add a collection to see history</p>
+                    <div class="p-3 border-b flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Show</span>
+                            <select id="perPageSelect" class="px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
+                                <option value="20">20</option>
+                                <option value="50" selected>50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">entries</span>
+                        </div>
+                        <div class="relative w-full sm:w-64">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                            <input type="text" id="tableSearchInput" placeholder="Search by customer, remarks..." class="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
                         </div>
                     </div>
+                    
+                    <div class="table-scroll-hint px-3 pt-2">
+                        <i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns → <span class="mx-2">|</span> <i class="fas fa-hand-pointer mr-1 text-[8px]"></i> Tap row for details
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[800px]">
+                            <thead class="bg-gray-50 dark:bg-gray-700/50 border-b">
+                                <tr><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Date</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Customer</th><th class="px-3 py-3 text-right text-[10px] font-semibold uppercase">Amount</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Expected Date</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Remarks</th> </thead>
+                            <tbody id="collectionsTableBody" class="divide-y"><tr><td colspan="5" class="px-4 py-8 text-center"><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div></td></tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="paginationControls" class="flex justify-center items-center gap-1 py-3 border-t"></div>
                 </div>
             </div>
         </main>
     </div>
     
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 text-center shadow-2xl">
-            <i class="fas fa-spinner fa-pulse text-primary text-2xl mb-2"></i>
-            <p class="text-sm text-gray-600 dark:text-gray-300">Processing...</p>
+    <!-- Collection Details Modal -->
+    <div id="detailsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[150] hidden transition-all duration-300 p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full shadow-2xl modal-animate overflow-hidden">
+            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-base font-semibold"><i class="fas fa-hand-holding-usd text-primary mr-2"></i>Collection Details</h3><button id="closeDetailsModalBtn" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div>
+            <div class="p-5" id="detailsContent"></div>
+            <div class="flex justify-end px-5 py-4 border-t"><button id="closeDetailsModalFooterBtn" class="px-5 py-2.5 text-sm rounded-xl bg-gray-200 dark:bg-gray-600">Close</button></div>
         </div>
     </div>
     
-    <!-- Toast Container -->
-    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-2"></div>
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 text-center"><i class="fas fa-spinner fa-pulse text-primary text-2xl mb-2"></i><p class="text-sm">Processing...</p></div>
+    </div>
     
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+    
+    <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div><h3 class="text-lg font-semibold mb-2">Logout?</h3><p class="text-sm text-gray-500 mb-5">Are you sure you want to logout?</p><div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-gray-100">Cancel</button><button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-danger text-white">Logout</button></div></div>
+    </div>
+    
+    <!-- Auth Check Script -->
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
-        import { 
-            db, collection, addDoc, getDocs, query,
-            doc, getDoc, updateDoc, Timestamp
-        } from './js/firebase.js';
+        checkAuthState(true);
+    </script>
+    
+    <script type="module">
+        import { db, collection, getDocs, addDoc, doc, getDoc, updateDoc, Timestamp } from './js/firebase.js';
         
-        checkAuthState();
+        // Sidebar submenu toggle
+        const warrantySubmenu = document.getElementById('warrantySubmenu');
+        const warrantyLink = warrantySubmenu?.querySelector('a');
+        if (warrantyLink) {
+            warrantyLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                warrantySubmenu.classList.toggle('open');
+                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        }
+        
+        const dueSubmenu = document.getElementById('dueSubmenu');
+        const dueLink = dueSubmenu?.querySelector('a');
+        if (dueLink) {
+            dueLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                dueSubmenu.classList.toggle('open');
+                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        }
+        
+        // Sidebar toggle
+        const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.id = 'sidebarOverlay'; overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
+        function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); const overlay = document.getElementById('sidebarOverlay'); if (overlay) overlay.remove(); }
+        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+        window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); } });
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
         
         let isProcessing = false;
+        let allCollections = [];
+        let currentPage = 1;
+        let perPage = 50;
+        let currentSearchTerm = '';
+        let customerNameMap = new Map();
+        
+        function formatCreatedAt(createdAt) {
+            if (!createdAt) return 'N/A';
+            try {
+                if (typeof createdAt === 'object' && createdAt !== null && typeof createdAt.toDate === 'function') {
+                    return new Date(createdAt.toDate()).toLocaleString();
+                }
+                if (typeof createdAt === 'string') {
+                    const date = new Date(createdAt);
+                    if (!isNaN(date.getTime())) return date.toLocaleString();
+                }
+                if (createdAt instanceof Date) return createdAt.toLocaleString();
+                return 'N/A';
+            } catch (e) { return 'N/A'; }
+        }
         
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            toast.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${
-                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-            }`;
+            toast.className = `mb-2 px-4 py-2 rounded-xl shadow-lg text-sm font-medium ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
             toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 2500);
         }
         
-        function showLoading(show) {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) overlay.style.display = show ? 'flex' : 'none';
-        }
+        function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none'; }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
         
-        // Load customers
         async function loadCustomers() {
             try {
                 const querySnapshot = await getDocs(collection(db, 'customers'));
                 const select = document.getElementById('customerId');
                 if (!select) return;
-                
                 select.innerHTML = '<option value="">-- Select Customer --</option>';
-                
-                if (querySnapshot.empty) {
-                    select.innerHTML = '<option value="">-- No customers found --</option>';
-                    return;
-                }
-                
+                customerNameMap.clear();
                 querySnapshot.forEach(docSnap => {
                     const customer = docSnap.data();
+                    customerNameMap.set(docSnap.id, customer.name);
                     const option = document.createElement('option');
                     option.value = docSnap.id;
-                    const dueText = (customer.totalDue || 0) > 0 ? ` (Due: ৳${(customer.totalDue || 0).toFixed(2)})` : ' (No Due)';
+                    const dueText = (customer.totalDue || 0) > 0 ? ` (Due: ৳${(customer.totalDue || 0).toFixed(2)})` : '';
                     option.textContent = `${customer.name}${dueText}`;
                     select.appendChild(option);
                 });
@@ -267,162 +505,214 @@
             }
         }
         
-        // Load customer due
         async function loadCustomerDue(customerId) {
             if (!customerId) {
                 document.getElementById('dueAlert').classList.add('hidden');
                 return 0;
             }
-            
             try {
                 const customerDoc = await getDoc(doc(db, 'customers', customerId));
                 if (!customerDoc.exists()) {
                     document.getElementById('dueAlert').classList.add('hidden');
                     return 0;
                 }
-                
                 const due = customerDoc.data()?.totalDue || 0;
-                const dueDisplay = document.getElementById('currentDueDisplay');
-                const dueAlert = document.getElementById('dueAlert');
-                
-                if (dueDisplay) dueDisplay.innerHTML = `৳${due.toFixed(2)}`;
-                dueAlert.classList.remove('hidden');
+                document.getElementById('currentDueDisplay').innerHTML = `৳${due.toFixed(2)}`;
+                document.getElementById('dueAlert').classList.remove('hidden');
                 return due;
             } catch (error) {
-                console.error('Error loading due:', error);
                 document.getElementById('dueAlert').classList.add('hidden');
                 return 0;
             }
         }
         
-        // Load recent collections with expected date display
-        async function loadRecentCollections() {
+        async function loadAllCollections() {
+            const tbody = document.getElementById('collectionsTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center"><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div></td>';
+            
             try {
                 const querySnapshot = await getDocs(collection(db, 'transactions'));
-                const container = document.getElementById('recentCollectionsList');
-                const countSpan = document.getElementById('collectionCount');
-                
-                if (!container) return;
-                
-                // Filter collections
                 const collections = [];
+                
                 for (const docSnap of querySnapshot.docs) {
                     const data = docSnap.data();
                     if (data.type === 'collection') {
-                        collections.push({ id: docSnap.id, ...data });
-                    }
-                }
-                
-                // Sort by date descending
-                collections.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-                const recentCollections = collections.slice(0, 15);
-                
-                if (countSpan) countSpan.textContent = `${recentCollections.length} records`;
-                
-                if (recentCollections.length === 0) {
-                    container.innerHTML = `
-                        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-inbox text-3xl mb-2 opacity-50 block"></i>
-                            <p class="text-sm">No collections yet</p>
-                            <p class="text-xs mt-1">Add a collection to see history</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                let html = '';
-                for (const collectionItem of recentCollections) {
-                    let customerName = 'Unknown';
-                    if (collectionItem.customerId) {
-                        try {
-                            const customerDoc = await getDoc(doc(db, 'customers', collectionItem.customerId));
-                            if (customerDoc.exists()) {
-                                customerName = customerDoc.data().name;
-                            }
-                        } catch (err) {
-                            console.error('Error getting customer:', err);
+                        let customerName = data.customerName || customerNameMap.get(data.customerId);
+                        if (!customerName && data.customerId) {
+                            try {
+                                const custDoc = await getDoc(doc(db, 'customers', data.customerId));
+                                if (custDoc.exists()) {
+                                    customerName = custDoc.data().name;
+                                    customerNameMap.set(data.customerId, customerName);
+                                }
+                            } catch(err) {}
                         }
+                        customerName = customerName || 'Unknown';
+                        
+                        const createdAtStr = formatCreatedAt(data.createdAt);
+                        
+                        collections.push({
+                            id: docSnap.id,
+                            date: data.date || 'N/A',
+                            customerName: customerName,
+                            amount: data.collectionAmount || 0,
+                            expectedDate: data.expectedDate || null,
+                            remarks: data.remarks || '-',
+                            createdAt: createdAtStr
+                        });
                     }
-                    
-                    // Display expected date if exists
-                    const hasExpectedDate = collectionItem.expectedDate;
-                    const expectedDateHtml = hasExpectedDate ? `
-                        <div class="flex items-center gap-1 mt-1">
-                            <i class="fas fa-calendar-week text-[10px] text-warning"></i>
-                            <span class="text-[10px] text-amber-600 dark:text-amber-400">Expected: ${collectionItem.expectedDate}</span>
-                        </div>
-                    ` : '';
-                    
-                    html += `
-                        <div class="flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                            <div class="flex-1">
-                                <p class="font-semibold text-sm text-gray-800 dark:text-white">${escapeHtml(customerName)}</p>
-                                <div class="flex items-center gap-2 mt-0.5 flex-wrap">
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">${collectionItem.date || 'N/A'}</span>
-                                    ${collectionItem.remarks ? `<span class="text-xs text-gray-400 dark:text-gray-500">• ${escapeHtml(collectionItem.remarks)}</span>` : ''}
-                                </div>
-                                ${expectedDateHtml}
-                            </div>
-                            <p class="font-bold text-sm text-green-600 dark:text-green-400">৳${(collectionItem.collectionAmount || 0).toFixed(2)}</p>
-                        </div>
-                    `;
                 }
                 
-                container.innerHTML = html;
+                collections.sort((a, b) => {
+                    if (a.date === 'N/A') return 1;
+                    if (b.date === 'N/A') return -1;
+                    return b.date.localeCompare(a.date);
+                });
+                
+                allCollections = collections;
+                renderTable();
+                
             } catch (error) {
-                console.error('Error loading recent collections:', error);
-                container.innerHTML = `
-                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                        <i class="fas fa-exclamation-triangle text-3xl mb-2 opacity-50 block"></i>
-                        <p class="text-sm">Error loading collections</p>
-                    </div>
+                console.error('Error loading collections:', error);
+                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-red-500">Error loading data: ' + error.message + '</td>';
+                showToast('Error loading data: ' + error.message, 'error');
+            }
+        }
+        
+        function renderTable() {
+            const tbody = document.getElementById('collectionsTableBody');
+            
+            let filteredData = [...allCollections];
+            if (currentSearchTerm) {
+                const term = currentSearchTerm.toLowerCase();
+                filteredData = filteredData.filter(c => 
+                    c.customerName.toLowerCase().includes(term) || 
+                    (c.remarks && c.remarks.toLowerCase().includes(term))
+                );
+            }
+            
+            const start = (currentPage - 1) * perPage;
+            const end = start + perPage;
+            const paginatedData = filteredData.slice(start, end);
+            const totalPages = Math.ceil(filteredData.length / perPage);
+            
+            if (paginatedData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No collections found</p></td>';
+                updatePaginationControls(totalPages);
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            for (const col of paginatedData) {
+                const row = tbody.insertRow();
+                row.className = 'table-row-hover transition-colors cursor-pointer';
+                row.setAttribute('data-collection-id', col.id);
+                row.setAttribute('data-collection-date', col.date);
+                row.setAttribute('data-collection-customer', col.customerName);
+                row.setAttribute('data-collection-amount', col.amount.toFixed(2));
+                row.setAttribute('data-collection-expected', col.expectedDate || 'Not set');
+                row.setAttribute('data-collection-remarks', col.remarks);
+                row.setAttribute('data-collection-created', col.createdAt);
+                
+                row.innerHTML = `
+                    <td class="px-3 py-2.5 text-xs whitespace-nowrap">${col.date}</td>
+                    <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(col.customerName)}</td>
+                    <td class="px-3 py-2.5 text-right text-sm font-bold text-green-600">৳${col.amount.toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-xs">${col.expectedDate ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px]"><i class="fas fa-calendar-week text-[8px]"></i> ${col.expectedDate}</span>` : '<span class="text-gray-400 text-xs">—</span>'}</td>
+                    <td class="px-3 py-2.5 text-xs text-gray-500 max-w-[200px] truncate" title="${escapeHtml(col.remarks)}">${escapeHtml(col.remarks)}</td>
                 `;
             }
+            
+            document.querySelectorAll('#collectionsTableBody tr').forEach(row => {
+                row.addEventListener('click', (e) => {
+                    if (e.target.closest('button')) return;
+                    const data = row.dataset;
+                    const detailsContent = document.getElementById('detailsContent');
+                    detailsContent.innerHTML = `
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Date</span><span class="font-semibold text-sm">${data.collectionDate}</span></div>
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Customer</span><span class="font-semibold text-sm">${escapeHtml(data.collectionCustomer)}</span></div>
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Amount</span><span class="font-semibold text-green-600 text-lg">৳${data.collectionAmount}</span></div>
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Expected Date</span><span class="text-sm">${data.collectionExpected}</span></div>
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Remarks</span><span class="text-sm text-right max-w-[200px]">${escapeHtml(data.collectionRemarks)}</span></div>
+                            <div class="flex justify-between items-center"><span class="text-xs text-gray-500">Recorded At</span><span class="text-xs">${data.collectionCreated}</span></div>
+                        </div>
+                    `;
+                    document.getElementById('detailsModal').classList.remove('hidden');
+                });
+            });
+            
+            updatePaginationControls(totalPages);
         }
         
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+        function updatePaginationControls(totalPages) {
+            const paginationDiv = document.getElementById('paginationControls');
+            if (totalPages <= 1) {
+                paginationDiv.innerHTML = '';
+                return;
+            }
+            
+            let html = `<button class="pagination-btn px-2 py-1 rounded-lg text-xs border ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-white'}" id="prevPageBtn" ${currentPage === 1 ? 'disabled' : ''}>« Prev</button>`;
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+            if (startPage > 1) {
+                html += `<button class="pagination-btn px-2 py-1 rounded-lg text-xs border hover:bg-primary hover:text-white" data-page="1">1</button>`;
+                if (startPage > 2) html += `<span class="px-1 text-xs">...</span>`;
+            }
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="pagination-btn px-2 py-1 rounded-lg text-xs border ${currentPage === i ? 'bg-primary text-white border-primary' : 'hover:bg-primary hover:text-white'}" data-page="${i}">${i}</button>`;
+            }
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) html += `<span class="px-1 text-xs">...</span>`;
+                html += `<button class="pagination-btn px-2 py-1 rounded-lg text-xs border hover:bg-primary hover:text-white" data-page="${totalPages}">${totalPages}</button>`;
+            }
+            html += `<button class="pagination-btn px-2 py-1 rounded-lg text-xs border ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-white'}" id="nextPageBtn" ${currentPage === totalPages ? 'disabled' : ''}>Next »</button>`;
+            paginationDiv.innerHTML = html;
+            
+            document.getElementById('prevPageBtn')?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTable(); } });
+            document.getElementById('nextPageBtn')?.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; renderTable(); } });
+            document.querySelectorAll('[data-page]').forEach(btn => { btn.addEventListener('click', () => { currentPage = parseInt(btn.dataset.page); renderTable(); }); });
         }
         
-        // Submit collection with expected date
+        function exportToCSV() {
+            if (allCollections.length === 0) { showToast('No data to export', 'error'); return; }
+            let exportData = [...allCollections];
+            if (currentSearchTerm) {
+                const term = currentSearchTerm.toLowerCase();
+                exportData = exportData.filter(c => c.customerName.toLowerCase().includes(term) || (c.remarks && c.remarks.toLowerCase().includes(term)));
+            }
+            let csv = ['\uFEFF"Date","Customer","Amount (৳)","Expected Date","Remarks"'];
+            exportData.forEach(c => { csv.push(`"${c.date}","${c.customerName.replace(/"/g, '""')}","${c.amount.toFixed(2)}","${c.expectedDate || ''}","${c.remarks.replace(/"/g, '""')}"`); });
+            const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = `collections_${new Date().toISOString().split('T')[0]}.csv`;
+            a.href = url;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Collections exported!', 'success');
+        }
+        
         async function submitCollection(event) {
             event.preventDefault();
-            
-            if (isProcessing) {
-                showToast('Please wait, processing...', 'warning');
-                return;
-            }
+            if (isProcessing) return;
             
             const customerId = document.getElementById('customerId').value;
-            if (!customerId) {
-                showToast('Please select a customer', 'error');
-                return;
-            }
+            if (!customerId) { showToast('Please select a customer', 'error'); return; }
             
             const date = document.getElementById('collectionDate').value;
-            if (!date) {
-                showToast('Please select payment date', 'error');
-                return;
-            }
-            
-            const expectedDate = document.getElementById('expectedDate').value;
+            if (!date) { showToast('Please select payment date', 'error'); return; }
             
             const amount = parseFloat(document.getElementById('collectionAmount').value);
-            if (isNaN(amount) || amount <= 0) {
-                showToast('Please enter a valid amount greater than 0', 'error');
-                return;
-            }
+            if (isNaN(amount) || amount <= 0) { showToast('Please enter a valid amount', 'error'); return; }
             
-            const remarks = document.getElementById('remarks').value;
-            
-            // Get current due
             const customerRef = doc(db, 'customers', customerId);
             const customerDoc = await getDoc(customerRef);
             const currentDue = customerDoc.data()?.totalDue || 0;
+            const customerName = customerNameMap.get(customerId) || 'Unknown';
             
             if (amount > currentDue) {
-                showToast(`Collection amount (৳${amount.toFixed(2)}) cannot exceed current due (৳${currentDue.toFixed(2)})`, 'error');
+                showToast(`Amount cannot exceed current due (৳${currentDue.toFixed(2)})`, 'error');
                 return;
             }
             
@@ -430,43 +720,34 @@
             showLoading(true);
             
             try {
-                // Prepare transaction object with optional expectedDate
                 const transaction = {
                     customerId: customerId,
+                    customerName: customerName,
                     type: 'collection',
                     date: date,
                     collectionAmount: amount,
-                    remarks: remarks || '',
+                    remarks: document.getElementById('remarks').value || '',
+                    expectedDate: document.getElementById('expectedDate').value || null,
                     createdAt: Timestamp.now()
                 };
                 
-                // Add expectedDate only if provided
-                if (expectedDate) {
-                    transaction.expectedDate = expectedDate;
-                }
-                
                 await addDoc(collection(db, 'transactions'), transaction);
+                await updateDoc(customerRef, { totalDue: currentDue - amount });
                 
-                const newDue = currentDue - amount;
-                await updateDoc(customerRef, { totalDue: newDue });
+                showToast(`Collection of ৳${amount.toFixed(2)} recorded!`, 'success');
                 
-                const expectedMsg = expectedDate ? ` Expected date: ${expectedDate}` : '';
-                showToast(`Collection of ৳${amount.toFixed(2)} recorded successfully!${expectedMsg}`, 'success');
-                
-                // Reset form - keep expected date optional, clear it on success
                 document.getElementById('collectionAmount').value = '';
                 document.getElementById('remarks').value = '';
                 document.getElementById('collectionDate').valueAsDate = new Date();
-                document.getElementById('expectedDate').value = ''; // Clear expected date field
+                document.getElementById('expectedDate').value = '';
                 document.getElementById('customerId').value = '';
                 document.getElementById('dueAlert').classList.add('hidden');
                 
-                // Refresh data
                 await loadCustomers();
-                await loadRecentCollections();
+                await loadAllCollections();
                 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Submit error:', error);
                 showToast('Error: ' + error.message, 'error');
             } finally {
                 isProcessing = false;
@@ -474,40 +755,32 @@
             }
         }
         
-        // Event listeners
         document.getElementById('customerId')?.addEventListener('change', (e) => loadCustomerDue(e.target.value));
         document.getElementById('collectionForm')?.addEventListener('submit', submitCollection);
         document.getElementById('collectionDate').valueAsDate = new Date();
+        document.getElementById('refreshBtn')?.addEventListener('click', () => { loadCustomers(); loadAllCollections(); showToast('Refreshed!'); });
+        document.getElementById('darkModeToggle')?.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
+        document.getElementById('perPageSelect')?.addEventListener('change', (e) => { perPage = parseInt(e.target.value); currentPage = 1; renderTable(); });
+        document.getElementById('tableSearchInput')?.addEventListener('input', (e) => { currentSearchTerm = e.target.value; currentPage = 1; renderTable(); });
+        document.getElementById('exportTableBtn')?.addEventListener('click', exportToCSV);
         
-        // Set default expected date to next month (optional helpful default)
-        const nextMonth = new Date();
-        nextMonth.setMonth(nextMonth.getMonth() + 1);
-        // Uncomment if you want a default expected date:
-        // document.getElementById('expectedDate').value = nextMonth.toISOString().split('T')[0];
+        document.getElementById('closeDetailsModalBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
+        document.getElementById('closeDetailsModalFooterBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
+        document.getElementById('detailsModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('detailsModal')) document.getElementById('detailsModal').classList.add('hidden'); });
         
-        document.getElementById('refreshBtn')?.addEventListener('click', () => {
-            loadCustomers();
-            loadRecentCollections();
-            showToast('Data refreshed!', 'success');
-        });
+        // Logout
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutLink = document.getElementById('logoutLink');
+        const cancelLogout = document.getElementById('cancelLogoutBtn');
+        const confirmLogout = document.getElementById('confirmLogoutBtn');
+        const { logout } = await import('./js/auth.js');
         
-        document.getElementById('darkModeToggle')?.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            document.body.classList.toggle('dark');
-        });
+        if (logoutLink) logoutLink.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
+        if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
+        if (confirmLogout) confirmLogout.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
         
-        document.getElementById('menuToggle')?.addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-        });
-        
-        document.getElementById('logoutLink')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            logout();
-        });
-        
-        // Initialize
         loadCustomers();
-        loadRecentCollections();
+        loadAllCollections();
     </script>
 </body>
 </html>

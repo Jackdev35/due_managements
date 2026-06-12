@@ -2,16 +2,106 @@ import {
     auth, 
     signInWithEmailAndPassword, 
     signOut, 
-    onAuthStateChanged 
+    onAuthStateChanged
 } from './firebase.js';
 
-// Check auth state
+// ============ INACTIVITY TIMER (20 MINUTES) ============
+let inactivityTimer = null;
+const INACTIVITY_TIMEOUT = 20 * 60 * 1000; // 20 minutes
+
+function resetInactivityTimer() {
+    if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+    }
+    
+    if (auth.currentUser) {
+        inactivityTimer = setTimeout(async () => {
+            console.log("User inactive for 20 minutes, auto logging out...");
+            try {
+                await signOut(auth);
+                showToast('Logged out due to 20 minutes of inactivity', 'warning');
+                redirectToLogin();
+            } catch (error) {
+                console.error("Auto logout error:", error);
+            }
+        }, INACTIVITY_TIMEOUT);
+    }
+}
+
+function setupActivityListeners() {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'keydown'];
+    
+    events.forEach(event => {
+        window.addEventListener(event, () => {
+            if (auth.currentUser) {
+                resetInactivityTimer();
+            }
+        });
+    });
+    
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && auth.currentUser) {
+            resetInactivityTimer();
+        }
+    });
+}
+
+// Helper function to check if current page is login or index
+function isAuthPage() {
+    const path = window.location.pathname;
+    return path.includes('login.html') || path === '/' || path.includes('index.html');
+}
+
+// Helper function to redirect to login
+function redirectToLogin() {
+    if (!isAuthPage()) {
+        window.location.href = 'login.html';
+    }
+}
+
+// Helper function to redirect to dashboard
+function redirectToDashboard() {
+    if (isAuthPage()) {
+        window.location.href = 'dashboard.html';
+    }
+}
+
+// ============ INACTIVITY TIMER END ============
+
+// Check auth state - FIXED: No infinite redirect loop
 export function checkAuthState(redirectToLogin = true) {
+    let isRedirecting = false;
+    
     onAuthStateChanged(auth, (user) => {
-        if (!user && redirectToLogin && !window.location.pathname.includes('login.html')) {
-            window.location.href = 'login.html';
-        } else if (user && window.location.pathname.includes('login.html')) {
-            window.location.href = 'dashboard.html';
+        // Prevent multiple redirects
+        if (isRedirecting) return;
+        
+        if (user) {
+            // User is logged in
+            resetInactivityTimer();
+            
+            if (!window._activityListenersSetup) {
+                setupActivityListeners();
+                window._activityListenersSetup = true;
+            }
+            
+            // Only redirect if on login page
+            if (isAuthPage()) {
+                isRedirecting = true;
+                window.location.href = 'dashboard.html';
+            }
+        } else {
+            // User is NOT logged in
+            if (inactivityTimer) {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = null;
+            }
+            
+            // Only redirect if not on auth page and redirectToLogin is true
+            if (redirectToLogin && !isAuthPage() && !window.location.pathname.includes('clear-data.html')) {
+                isRedirecting = true;
+                window.location.href = 'login.html';
+            }
         }
     });
 }
@@ -20,19 +110,33 @@ export function checkAuthState(redirectToLogin = true) {
 export async function login(email, password) {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        
+        // Start inactivity timer
+        resetInactivityTimer();
+        
+        if (!window._activityListenersSetup) {
+            setupActivityListeners();
+            window._activityListenersSetup = true;
+        }
+        
         showToast('Login successful!', 'success');
         return { success: true, user: userCredential.user };
     } catch (error) {
         let message = 'Login failed! ';
         switch (error.code) {
+            case 'auth/invalid-credential':
             case 'auth/user-not-found':
-                message += 'User not found.';
-                break;
             case 'auth/wrong-password':
-                message += 'Wrong password.';
+                message += 'Invalid email or password.';
                 break;
             case 'auth/invalid-email':
-                message += 'Invalid email.';
+                message += 'Invalid email format.';
+                break;
+            case 'auth/too-many-requests':
+                message += 'Too many failed attempts. Try again later.';
+                break;
+            case 'auth/user-disabled':
+                message += 'This account has been disabled. Contact administrator.';
                 break;
             default:
                 message += error.message;
@@ -42,57 +146,14 @@ export async function login(email, password) {
     }
 }
 
-// js/auth.js - এ নিচের কোড যোগ করুন
-import { createUserWithEmailAndPassword } from './firebase.js';
-
-// Super User Creation Function
-export async function createSuperUser() {
-    const adminEmail = "admin@info.com";
-    const adminPassword = "Admin@123456";
-    const adminName = "Super Admin";
-    
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, adminEmail, adminPassword);
-        
-        // Admin ইউজারের জন্য আলাদা collection এ সংরক্ষণ করুন
-        const adminData = {
-            uid: userCredential.user.uid,
-            email: adminEmail,
-            name: adminName,
-            role: "super_admin",
-            createdAt: new Date().toISOString()
-        };
-        
-        // Firestore এ admin ডকুমেন্ট তৈরি করুন
-        const adminRef = doc(db, 'admins', userCredential.user.uid);
-        await setDoc(adminRef, adminData);
-        
-        console.log("Super User Created Successfully!");
-        showToast("Super Admin Created! Email: " + adminEmail, "success");
-        return true;
-    } catch (error) {
-        if (error.code === 'auth/email-already-in-use') {
-            console.log("Super User already exists");
-            showToast("Super User already exists! Try login.", "info");
-        } else {
-            console.error("Error:", error);
-            showToast("Error creating super user", "error");
-        }
-        return false;
-    }
-}
-
-// Auto-create super user on first load (development only)
-export async function initSuperUser() {
-    // শুধুমাত্র development এ ব্যবহার করুন
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        await createSuperUser();
-    }
-}
-
 // Logout function
 export async function logout() {
     try {
+        if (inactivityTimer) {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = null;
+        }
+        
         await signOut(auth);
         showToast('Logged out successfully', 'success');
         window.location.href = 'login.html';
@@ -101,16 +162,82 @@ export async function logout() {
     }
 }
 
-// Show toast notification
+// Show toast notification with styles
 function showToast(message, type = 'info') {
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => toast.remove());
+    
+    // Add toast styles if not exists
+    if (!document.querySelector('#toast-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'toast-styles';
+        styles.textContent = `
+            .toast {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: white;
+                color: #333;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+            }
+            .toast.success {
+                background: #4caf50;
+                color: white;
+            }
+            .toast.error {
+                background: #f44336;
+                color: white;
+            }
+            .toast.warning {
+                background: #ff9800;
+                color: white;
+            }
+            .toast.info {
+                background: #2196f3;
+                color: white;
+            }
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+    
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i> ${message}`;
+    
+    let icon = 'fa-info-circle';
+    if (type === 'success') icon = 'fa-check-circle';
+    else if (type === 'error') icon = 'fa-exclamation-circle';
+    else if (type === 'warning') icon = 'fa-exclamation-triangle';
+    
+    toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    
+    setTimeout(() => {
+        if (toast.parentNode) toast.remove();
+    }, 3000);
 }
 
 // Get current user
 export function getCurrentUser() {
     return auth.currentUser;
+}
+
+// Check if user is logged in (synchronous)
+export function isLoggedIn() {
+    return auth.currentUser !== null;
 }

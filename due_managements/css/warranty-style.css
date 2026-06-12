@@ -1,0 +1,49 @@
+/* Custom animations and print styles - Mostly Tailwind handles this */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    body {
+        padding: 20px;
+        background: white;
+    }
+    .invoice-print {
+        margin: 0;
+        padding: 0;
+    }
+}
+
+/* Custom scrollbar for tables */
+.overflow-x-auto::-webkit-scrollbar {
+    height: 4px;
+}
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+.dark .overflow-x-auto::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+.dark .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+/* Modal animations */
+.modal-enter {
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

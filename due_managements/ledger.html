@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#009688">
-    <title>Customer Ledger | JackDev Due Managements</title>
+    <meta name="theme-color" content="#0f3b3a">
+    <title>Customer Ledger | Nexus Due Managements</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,44 +14,119 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#009688',
-                        'primary-dark': '#00796b',
-                        danger: '#ef4444',
-                        success: '#10b981',
-                        warning: '#f59e0b',
-                        info: '#3b82f6',
-                    }
+                        primary: '#0f3b3a',
+                        'primary-light': '#1e6b68',
+                        'primary-dark': '#092c2b',
+                        accent: '#d4af37',
+                        danger: '#e53e3e',
+                        success: '#2c7a4d',
+                        warning: '#dd6b20',
+                        info: '#3182ce',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+                    },
                 }
             }
         }
     </script>
     <style>
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+        
+        * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        .nav-active {
+            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
+            border-left: 3px solid #d4af37;
         }
-        .animate-slide-in {
-            animation: slideIn 0.3s ease-out;
+        .dark .nav-active {
+            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
         }
+        
+        .stat-card { transition: all 0.2s ease; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12); }
+        
+        .submenu-modern {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .submenu-modern.open { max-height: 280px; }
+        
+        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
+        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
+        
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
+        
+        .btn-active:active { transform: scale(0.97); }
+        
+        #sidebarOverlay { animation: fadeIn 0.2s ease-out; }
+        .sidebar-open { overflow: hidden; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Fixed Sidebar Structure - No overlap issue */
+        .sidebar-fixed {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar-header-fixed {
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            background: inherit;
+            z-index: 10;
+        }
+        .sidebar-nav-fixed {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar {
+            width: 3px;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar-thumb {
+            background: rgba(212,175,55,0.5);
+            border-radius: 10px;
+        }
+        
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            #ledgerCard, #ledgerCard * {
-                visibility: visible;
-            }
-            #ledgerCard {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                margin: 0;
-                padding: 1rem;
-                box-shadow: none;
-            }
-            .no-print, .no-print * {
-                display: none !important;
-            }
+            body * { visibility: hidden; }
+            #ledgerCard, #ledgerCard * { visibility: visible; }
+            #ledgerCard { position: absolute; top: 0; left: 0; width: 100%; margin: 0; padding: 1rem; box-shadow: none; }
+            .no-print, .no-print * { display: none !important; }
+        }
+        
+        .table-row-hover:hover { background-color: rgba(15, 59, 58, 0.04); }
+        .dark .table-row-hover:hover { background-color: rgba(30, 107, 104, 0.1); }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+        .dark .skeleton { background: linear-gradient(90deg, #2d3748 25%, #4a5568 50%, #2d3748 75%); }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
     </style>
 </head>
@@ -59,36 +134,101 @@
     
     <div class="flex min-h-screen">
         
-        <!-- Sidebar -->
-        <aside class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 overflow-y-auto" id="sidebar">
-            <div class="flex flex-col h-full">
-                <div class="flex items-center gap-3 px-5 py-5 border-b border-white/10">
-                    <i class="fas fa-laptop-code text-primary text-xl"></i>
-                    <span class="text-white font-semibold text-lg">JackDev Due Managements</span>
+        <!-- Sidebar - Fixed Structure -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
+            <!-- Header - Fixed at top -->
+            <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
+                        </div>
+                        <div class="leading-tight">
+                            <h1 class="text-white font-bold text-sm tracking-wide">Nexus<span class="text-accent">Due</span></h1>
+                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Financial cockpit</p>
+                        </div>
+                    </div>
+                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
                 </div>
-                <nav class="flex-1 px-3 py-4 space-y-1">
-                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
-                        <i class="fas fa-tachometer-alt w-5"></i><span class="text-sm">Dashboard</span>
+            </div>
+            
+            <!-- Navigation - Scrollable area -->
+            <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
+                <nav class="space-y-1.5">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                        <span class="text-sm font-medium">Dashboard</span>
                     </a>
-                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
-                        <i class="fas fa-users w-5"></i><span class="text-sm">Customers</span>
+                    
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customers</span>
                     </a>
-                    <a href="due-entry.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
-                        <i class="fas fa-plus-circle w-5"></i><span class="text-sm">Due Entry</span>
+                    
+                    <div class="has-submenu" id="dueSubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div>
+                                <span class="text-sm font-medium">Due Entry</span>
+                            </div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
+                            </a>
+                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span>
                     </a>
-                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10">
-                        <i class="fas fa-hand-holding-usd w-5"></i><span class="text-sm">Collection</span>
+                    
+                    <a href="ledger.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm text-accent"></i></div>
+                        <span class="text-sm font-medium">Ledger</span>
                     </a>
-                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-white/10">
-                        <i class="fas fa-book w-5"></i><span class="text-sm">Customer Ledger</span>
+                    
+                    <div class="has-submenu" id="warrantySubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
+                            </a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
+                            </a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
+                            </a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
                     </a>
-                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white     hover:bg-white/10">
-                        <i class="fas fa-database w-5"></i><span class="text-sm">Backup & Restore</span>
+                    
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
                     </a>
                 </nav>
-                <div class="px-3 py-4 border-t border-white/10">
-                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-red-500/20">
-                        <i class="fas fa-sign-out-alt w-5"></i><span class="text-sm">Logout</span>
+                
+                <!-- Logout Button - Now scrolls with menu -->
+                <div class="pt-4 mt-2 border-t border-white/10">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
+                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                        <span class="text-sm font-medium">Logout</span>
                     </a>
                 </div>
             </div>
@@ -97,64 +237,46 @@
         <!-- Main Content -->
         <main class="flex-1 md:ml-64 min-h-screen w-full">
             
-            <!-- Top Header -->
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40 no-print">
-                <div class="px-3 py-3 flex justify-between items-center">
+                <div class="px-3 py-2.5 flex justify-between items-center">
                     <div class="flex items-center gap-2">
-                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-2 -ml-2 rounded-lg">
-                            <i class="fas fa-bars text-xl"></i>
-                        </button>
-                        <h2 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white">
-                            <i class="fas fa-book text-primary mr-2"></i>Customer Ledger
-                        </h2>
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg"><i class="fas fa-bars text-lg"></i></button>
+                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-book text-primary mr-2"></i>Customer Ledger</h2>
                     </div>
                     <div class="flex items-center gap-1">
-                        <button id="refreshBtn" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-sync-alt text-sm"></i>
-                        </button>
-                        <button id="darkModeToggle" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <i class="fas fa-moon dark:hidden text-sm"></i>
-                            <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
-                        </button>
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt text-sm"></i></button>
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-moon dark:hidden text-sm"></i><i class="fas fa-sun hidden dark:inline-block text-sm"></i></button>
                     </div>
                 </div>
             </header>
             
-            <!-- Page Content -->
             <div class="p-3 md:p-4">
                 
                 <!-- Filter Section -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-4 no-print">
-                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
-                        <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
-                            <i class="fas fa-filter text-primary mr-2"></i>Filter Ledger
-                        </h3>
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                        <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-filter text-primary mr-2"></i>Filter Ledger</h3>
+                        <p class="text-[10px] text-gray-500 mt-0.5">Select customer and date range to view transaction history</p>
                     </div>
                     
                     <div class="p-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    <i class="fas fa-user text-primary mr-1"></i>Select Customer <span class="text-danger">*</span>
-                                </label>
-                                <select id="customerSelect" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-user text-primary mr-1"></i>Select Customer <span class="text-red-500">*</span></label>
+                                <select id="customerSelect" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
                                     <option value="">-- Select Customer --</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    <i class="fas fa-calendar text-primary mr-1"></i>Start Date
-                                </label>
-                                <input type="date" id="startDate" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-calendar text-primary mr-1"></i>Start Date</label>
+                                <input type="date" id="startDate" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    <i class="fas fa-calendar text-primary mr-1"></i>End Date
-                                </label>
-                                <input type="date" id="endDate" class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-calendar text-primary mr-1"></i>End Date</label>
+                                <input type="date" id="endDate" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
                             </div>
                             <div class="flex items-end">
-                                <button id="viewLedgerBtn" class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2 rounded-lg transition-all flex items-center justify-center gap-2">
+                                <button id="viewLedgerBtn" class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 btn-active shadow-md">
                                     <i class="fas fa-eye text-sm"></i> View Ledger
                                 </button>
                             </div>
@@ -163,50 +285,40 @@
                 </div>
                 
                 <!-- Customer Info Card -->
-                <div id="customerInfoCard" class="hidden bg-gradient-to-r from-primary to-primary-dark rounded-xl p-4 mb-4 text-white shadow-lg animate-slide-in no-print">
-                    <div class="flex items-start justify-between flex-wrap gap-3">
+                <div id="customerInfoCard" class="hidden bg-gradient-to-r from-primary to-primary-dark rounded-xl p-4 mb-4 text-white shadow-lg no-print">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
-                            <h3 class="text-sm font-semibold flex items-center gap-2">
-                                <i class="fas fa-user-circle text-lg"></i> <span id="customerName"></span>
-                            </h3>
-                            <div class="flex flex-wrap gap-4 mt-2 text-sm">
+                            <h3 class="text-sm font-semibold flex items-center gap-2"><i class="fas fa-user-circle text-lg"></i> <span id="customerName"></span></h3>
+                            <div class="flex flex-wrap gap-4 mt-2 text-xs opacity-90">
                                 <div><i class="fas fa-phone-alt text-xs mr-1"></i> <span id="customerPhone">-</span></div>
                                 <div><i class="fas fa-map-marker-alt text-xs mr-1"></i> <span id="customerAddress">-</span></div>
                             </div>
                         </div>
-                        <div class="bg-white/20 rounded-lg px-4 py-2 text-center">
-                            <p class="text-[10px] opacity-80">Current Due</p>
-                            <p class="text-xl font-bold" id="customerCurrentDue">৳0</p>
+                        <div class="bg-white/20 rounded-xl px-4 py-2 text-center">
+                            <p class="text-[10px] opacity-80 tracking-wide">CURRENT DUE</p>
+                            <p class="text-2xl font-bold" id="customerCurrentDue">৳0</p>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Ledger Card -->
-                <div id="ledgerCard" class="hidden bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden animate-slide-in">
-                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2 no-print">
-                        <h3 class="text-sm font-semibold text-gray-800 dark:text-white">
-                            <i class="fas fa-history text-primary mr-2"></i>Transaction History
-                        </h3>
+                <div id="ledgerCard" class="hidden bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex justify-between items-center flex-wrap gap-2 no-print">
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-800 dark:text-white"><i class="fas fa-history text-primary mr-2"></i>Transaction History</h3>
+                            <p class="text-[9px] text-gray-500 mt-0.5">Complete statement of all transactions</p>
+                        </div>
                         <div class="flex gap-2">
-                            <button id="exportBtn" class="text-xs bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition"><i class="fas fa-download mr-1"></i>CSV</button>
-                            <button id="printBtn" class="text-xs bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition"><i class="fas fa-print mr-1"></i>Print</button>
+                            <button id="exportBtn" class="text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg transition-all btn-active"><i class="fas fa-download mr-1"></i> CSV</button>
+                            <button id="printBtn" class="text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg transition-all btn-active"><i class="fas fa-print mr-1"></i> Print</button>
                         </div>
                     </div>
                     
-                    <div class="overflow-x-auto max-h-[450px] overflow-y-auto">
-                        <table class="w-full min-w-[650px]" id="ledgerTable">
-                            <thead class="bg-gray-50 dark:bg-gray-700/50 sticky top-0">
-                                <tr>
-                                    <th class="px-3 py-2 text-left text-[10px] font-semibold">Date</th>
-                                    <th class="px-3 py-2 text-left text-[10px] font-semibold">Type</th>
-                                    <th class="px-3 py-2 text-left text-[10px] font-semibold">Description</th>
-                                    <th class="px-3 py-2 text-right text-[10px] font-semibold">Amount (৳)</th>
-                                    <th class="px-3 py-2 text-right text-[10px] font-semibold">Balance (৳)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ledgerTableBody" class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr><td colspan="5" class="text-center py-8 text-gray-500">Select a customer and click View Ledger</td<tr>
-                            </tbody>
+                    <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                        <table class="w-full min-w-[700px]" id="ledgerTable">
+                            <thead class="bg-gray-50 dark:bg-gray-700/50 sticky top-0 z-10">
+                                <tr><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Date</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Type</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Description</th><th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Amount</th><th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Balance</th> </thead>
+                            <tbody id="ledgerTableBody" class="divide-y"><tr><td colspan="5" class="text-center py-8 text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading customers...</p></td></tbody>
                         </table>
                     </div>
                 </div>
@@ -214,75 +326,110 @@
         </main>
     </div>
     
-    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 text-center">
-            <i class="fas fa-spinner fa-pulse text-primary text-2xl mb-2"></i>
-            <p>Loading...</p>
-        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 text-center"><i class="fas fa-spinner fa-pulse text-primary text-2xl mb-2"></i><p class="text-sm">Loading ledger...</p></div>
     </div>
     
-    <!-- Toast Container -->
-    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 no-print"></div>
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 no-print"></div>
     
+    <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div><h3 class="text-lg font-semibold mb-2">Logout?</h3><p class="text-sm text-gray-500 mb-5">Are you sure you want to logout?</p><div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-gray-100">Cancel</button><button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-danger text-white">Logout</button></div></div>
+    </div>
+    
+    <!-- Auth Check Script -->
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
+        checkAuthState(true);
+    </script>
+    
+    <script type="module">
         import { db, collection, getDocs, getDoc, doc } from './js/firebase.js';
         
-        checkAuthState();
+        // Sidebar submenu toggle
+        const warrantySubmenu = document.getElementById('warrantySubmenu');
+        const warrantyLink = warrantySubmenu?.querySelector('a');
+        if (warrantyLink) {
+            warrantyLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                warrantySubmenu.classList.toggle('open');
+                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        }
+        
+        // Sidebar functions
+        const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.id = 'sidebarOverlay'; overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
+        function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); const overlay = document.getElementById('sidebarOverlay'); if (overlay) overlay.remove(); }
+        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+        window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); } });
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
+        
+        // Submenu toggle for Due Entry
+        const dueSubmenu = document.getElementById('dueSubmenu');
+        const dueSubmenuLink = dueSubmenu?.querySelector('a');
+        if (dueSubmenuLink) {
+            dueSubmenuLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                dueSubmenu.classList.toggle('open');
+                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        }
         
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            toast.className = `mb-2 px-4 py-2 rounded-lg shadow-lg text-sm font-medium ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
-            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>${message}`;
+            toast.className = `mb-2 px-4 py-2 rounded-xl shadow-lg text-sm font-medium ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`;
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            setTimeout(() => toast.remove(), 2500);
         }
         
-        function showLoading(show) {
-            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
-        }
+        function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none'; }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+        
+        let customerMap = new Map();
+        let allTransactions = [];
         
         async function loadCustomers() {
             try {
                 const customersSnap = await getDocs(collection(db, 'customers'));
                 const select = document.getElementById('customerSelect');
                 select.innerHTML = '<option value="">-- Select Customer --</option>';
+                customerMap.clear();
                 
-                if (customersSnap.empty) {
-                    select.innerHTML = '<option value="">-- No customers found --</option>';
-                } else {
-                    customersSnap.forEach(docSnap => {
-                        const customer = docSnap.data();
-                        const option = document.createElement('option');
-                        option.value = docSnap.id;
-                        option.textContent = `${customer.name} - Due: ৳${(customer.totalDue || 0).toFixed(2)}`;
-                        select.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                console.error("Error loading customers:", error);
-                showToast('Error loading customers', 'error');
+                customersSnap.forEach(docSnap => {
+                    const customer = docSnap.data();
+                    customerMap.set(docSnap.id, customer);
+                    const option = document.createElement('option');
+                    option.value = docSnap.id;
+                    const dueText = (customer.totalDue || 0) > 0 ? ` (Due: ৳${(customer.totalDue || 0).toFixed(2)})` : '';
+                    option.textContent = `${customer.name}${dueText}`;
+                    select.appendChild(option);
+                });
+            } catch (error) { console.error("Error loading customers:", error); showToast('Error loading customers', 'error'); }
+        }
+        
+        async function loadAllTransactions() {
+            if (allTransactions.length === 0) {
+                const snapshot = await getDocs(collection(db, 'transactions'));
+                allTransactions = [];
+                snapshot.forEach(doc => {
+                    allTransactions.push({ id: doc.id, ...doc.data() });
+                });
             }
+            return allTransactions;
         }
         
         function getTransactionAmount(trans) {
             if (trans.type === 'due') {
-                if (trans.dueAmount !== undefined && trans.dueAmount !== null) {
-                    return trans.dueAmount;
-                }
-                if (trans.totalAmount !== undefined && trans.paidAmount !== undefined) {
-                    return trans.totalAmount - trans.paidAmount;
-                }
-                return trans.totalAmount || 0;
+                return trans.dueAmount !== undefined ? trans.dueAmount : (trans.totalAmount - (trans.paidAmount || 0)) || trans.totalAmount || 0;
             } else if (trans.type === 'collection') {
                 return trans.collectionAmount || 0;
             }
             return 0;
         }
         
-        // Global variable to store closing balance for export
         let currentClosingBalance = 0;
         let currentCustomerName = '';
         
@@ -299,16 +446,13 @@
             showLoading(true);
             
             try {
-                const customerRef = doc(db, 'customers', customerId);
-                const customerDoc = await getDoc(customerRef);
-                
-                if (!customerDoc.exists()) {
+                const customer = customerMap.get(customerId);
+                if (!customer) {
                     showToast('Customer not found', 'error');
                     showLoading(false);
                     return;
                 }
                 
-                const customer = customerDoc.data();
                 currentCustomerName = customer.name;
                 
                 document.getElementById('customerName').textContent = customer.name || 'N/A';
@@ -317,30 +461,22 @@
                 document.getElementById('customerCurrentDue').innerHTML = `৳${(customer.totalDue || 0).toFixed(2)}`;
                 document.getElementById('customerInfoCard').classList.remove('hidden');
                 
-                const allTransSnap = await getDocs(collection(db, 'transactions'));
-                let transactions = [];
-                
-                allTransSnap.forEach(docSnap => {
-                    const trans = docSnap.data();
-                    if (trans.customerId === customerId) {
-                        transactions.push({ id: docSnap.id, ...trans });
-                    }
-                });
+                const transactions = await loadAllTransactions();
+                let customerTransactions = transactions.filter(trans => trans.customerId === customerId);
                 
                 const tbody = document.getElementById('ledgerTableBody');
-                tbody.innerHTML = '';
                 
-                if (transactions.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500">No transactions found</td</tr>`;
+                if (customerTransactions.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No transactions found for this customer</p></td>`;
                     document.getElementById('ledgerCard').classList.remove('hidden');
                     currentClosingBalance = 0;
                     showLoading(false);
                     return;
                 }
                 
-                transactions.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+                customerTransactions.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
                 
-                let filteredTransactions = transactions;
+                let filteredTransactions = customerTransactions;
                 if (startDate) {
                     filteredTransactions = filteredTransactions.filter(t => t.date >= startDate);
                 }
@@ -349,13 +485,14 @@
                 }
                 
                 if (filteredTransactions.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500">No transactions in selected date range</td</tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500"><i class="fas fa-calendar-times text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No transactions in selected date range</p></td>`;
                     document.getElementById('ledgerCard').classList.remove('hidden');
                     currentClosingBalance = 0;
                     showLoading(false);
                     return;
                 }
                 
+                tbody.innerHTML = '';
                 let runningBalance = 0;
                 let totalDueAdded = 0;
                 let totalCollected = 0;
@@ -379,14 +516,19 @@
                         typeText = 'Due Added';
                         displayAmount = `+ ৳${amount.toFixed(2)}`;
                         
-                        if (trans.productName) {
-                            description = `${trans.productName} (Qty: ${trans.qty || 1})`;
+                        if (trans.products && trans.products.length > 0) {
+                            description = trans.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).join(', ');
                             if (trans.paidAmount && trans.paidAmount > 0) {
                                 description += ` | Paid: ৳${trans.paidAmount.toFixed(2)}`;
                             }
+                        } else if (trans.directDueAmount) {
+                            description = `Direct Due: ৳${trans.directDueAmount.toFixed(2)}`;
+                        } else if (trans.productName) {
+                            description = trans.productName;
                         } else {
                             description = `Due Entry - Amount: ৳${amount.toFixed(2)}`;
                         }
+                        if (trans.remarks) description += ` (${trans.remarks})`;
                         
                     } else if (trans.type === 'collection') {
                         amount = getTransactionAmount(trans);
@@ -398,39 +540,34 @@
                         typeText = 'Collection';
                         displayAmount = `- ৳${amount.toFixed(2)}`;
                         description = `Payment received${trans.remarks ? ' - ' + trans.remarks : ''}`;
+                        if (trans.expectedDate) description += ` | Expected: ${trans.expectedDate}`;
                     }
                     
                     const balanceClass = runningBalance > 0 ? 'text-red-600 dark:text-red-400 font-bold' : '';
                     
                     const row = tbody.insertRow();
-                    row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700/50';
+                    row.className = 'table-row-hover transition-colors';
                     row.innerHTML = `
-                        <td class="px-3 py-2 text-xs whitespace-nowrap">${trans.date || 'N/A'}</td>
-                        <td class="px-3 py-2">
-                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${typeClass}">
-                                <i class="fas ${typeIcon} text-[10px]"></i> ${typeText}
-                            </span>
-                        </td>
-                        <td class="px-3 py-2 text-xs text-gray-600 dark:text-gray-400 break-words">${escapeHtml(description)}</td>
-                        <td class="px-3 py-2 text-right text-xs font-semibold ${amountClass} whitespace-nowrap">${displayAmount}</td>
-                        <td class="px-3 py-2 text-right text-xs font-semibold ${balanceClass} whitespace-nowrap">৳${runningBalance.toFixed(2)}</td>
+                        <td class="px-3 py-2.5 text-xs whitespace-nowrap">${trans.date || 'N/A'}</td>
+                        <td class="px-3 py-2.5"><span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${typeClass}"><i class="fas ${typeIcon} text-[10px]"></i> ${typeText}</span></td>
+                        <td class="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400 break-words max-w-[300px]">${escapeHtml(description)}</td>
+                        <td class="px-3 py-2.5 text-right text-xs font-semibold ${amountClass} whitespace-nowrap">${displayAmount}</td>
+                        <td class="px-3 py-2.5 text-right text-xs font-semibold ${balanceClass} whitespace-nowrap">৳${runningBalance.toFixed(2)}</td>
                     `;
                 }
                 
-                // Store closing balance for export
                 currentClosingBalance = runningBalance;
                 
-                // Add summary row
                 const summaryRow = tbody.insertRow();
-                summaryRow.className = 'bg-gray-100 dark:bg-gray-700/50 font-bold';
+                summaryRow.className = 'bg-gray-100 dark:bg-gray-700/50 font-bold border-t-2';
                 summaryRow.innerHTML = `
-                    <td colspan="3" class="px-3 py-2 text-right text-xs">Total Due: ৳${totalDueAdded.toFixed(2)} | Total Collected: ৳${totalCollected.toFixed(2)}</td>
-                    <td class="px-3 py-2 text-right"></td>
-                    <td class="px-3 py-2 text-right text-sm font-bold ${runningBalance > 0 ? 'text-red-600' : 'text-green-600'} whitespace-nowrap">Closing: ৳${runningBalance.toFixed(2)}</td>
+                    <td colspan="3" class="px-3 py-3 text-right text-xs">Total Due Added: ৳${totalDueAdded.toFixed(2)} | Total Collection: ৳${totalCollected.toFixed(2)}</td>
+                    <td class="px-3 py-3 text-right"></td>
+                    <td class="px-3 py-3 text-right text-sm font-bold ${runningBalance > 0 ? 'text-red-600' : 'text-green-600'} whitespace-nowrap">Closing: ৳${runningBalance.toFixed(2)}</td>
                 `;
                 
                 document.getElementById('ledgerCard').classList.remove('hidden');
-                showToast(`✅ Balance: ৳${runningBalance.toFixed(2)} | ${filteredTransactions.length} transactions`, 'success');
+                showToast(`Ledger loaded | Balance: ৳${runningBalance.toFixed(2)} | ${filteredTransactions.length} transactions`, 'success');
                 
             } catch (error) {
                 console.error("Ledger Error:", error);
@@ -440,25 +577,17 @@
             }
         }
         
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
-        }
-        
         function exportToCSV() {
             const rows = document.querySelectorAll('#ledgerTableBody tr');
-            if (rows.length <= 1) {
+            if (rows.length === 0 || (rows.length === 1 && rows[0].cells.length === 1)) {
                 showToast('No data to export', 'error');
                 return;
             }
             
             const currentDate = new Date().toISOString().slice(0,19).replace(/:/g, '-');
             let csvRows = [];
-            
-            // Header
             csvRows.push('"Date","Transaction Type","Description","Amount (TK)","Balance (TK)"');
             
-            // Get all transaction rows (excluding the last summary row)
             for (let i = 0; i < rows.length - 1; i++) {
                 const row = rows[i];
                 const cells = row.querySelectorAll('td');
@@ -472,55 +601,55 @@
                     
                     let amountMatch = amountRaw.match(/([\d.]+)/);
                     let amount = amountMatch ? amountMatch[0] : '0';
-                    
                     let balanceMatch = balanceRaw.match(/([\d.]+)/);
                     let balance = balanceMatch ? balanceMatch[0] : '0';
                     
-                    csvRows.push(`"${date}","${type}","${description}","${amount}","${balance}"`);
+                    csvRows.push(`"${date}","${type}","${description.replace(/"/g, '""')}","${amount}","${balance}"`);
                 }
             }
             
-            // Add closing balance row
             csvRows.push('"","","","",""');
             csvRows.push(`"Closing Balance","","","${currentClosingBalance.toFixed(2)}","${currentClosingBalance.toFixed(2)}"`);
             
             const blob = new Blob(["\uFEFF" + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
+            a.download = `ledger_${currentCustomerName.replace(/[^a-z0-9]/gi, '_')}_${currentDate}.csv`;
             a.href = url;
-            a.download = `ledger_${currentCustomerName}_${currentDate}.csv`;
             a.click();
             URL.revokeObjectURL(url);
-            showToast('CSV exported successfully with closing balance', 'success');
+            showToast('CSV exported successfully!', 'success');
         }
         
-        function printLedger() {
-            window.print();
-        }
+        function printLedger() { window.print(); }
         
-        // Event listeners
-        document.getElementById('viewLedgerBtn').addEventListener('click', viewLedger);
-        document.getElementById('exportBtn').addEventListener('click', exportToCSV);
-        document.getElementById('printBtn').addEventListener('click', printLedger);
-        document.getElementById('refreshBtn').addEventListener('click', () => location.reload());
-        document.getElementById('darkModeToggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            document.body.classList.toggle('dark');
-        });
-        document.getElementById('menuToggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-        });
-        document.getElementById('logoutLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            logout();
-        });
-        
-        // Set default dates
         const today = new Date();
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(today.getDate() - 30);
         document.getElementById('startDate').value = thirtyDaysAgo.toISOString().split('T')[0];
         document.getElementById('endDate').value = today.toISOString().split('T')[0];
+        
+        document.getElementById('viewLedgerBtn').addEventListener('click', viewLedger);
+        document.getElementById('exportBtn').addEventListener('click', exportToCSV);
+        document.getElementById('printBtn').addEventListener('click', printLedger);
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            document.getElementById('customerSelect').value = '';
+            document.getElementById('ledgerCard').classList.add('hidden');
+            document.getElementById('customerInfoCard').classList.add('hidden');
+            loadCustomers();
+            showToast('Refreshed!', 'success');
+        });
+        document.getElementById('darkModeToggle').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
+        
+        // Logout functionality
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutLink = document.getElementById('logoutLink');
+        const cancelLogout = document.getElementById('cancelLogoutBtn');
+        const confirmLogout = document.getElementById('confirmLogoutBtn');
+        const { logout } = await import('./js/auth.js');
+        if (logoutLink) logoutLink.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
+        if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
+        if (confirmLogout) confirmLogout.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
         
         loadCustomers();
     </script>

@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0f3b3a">
+    <title>Follow Up | Nexus Due Managements</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0f3b3a',
+                        'primary-light': '#1e6b68',
+                        'primary-dark': '#092c2b',
+                        accent: '#d4af37',
+                        danger: '#e53e3e',
+                        success: '#2c7a4d',
+                        warning: '#dd6b20',
+                        info: '#3182ce',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+        
+        * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        .nav-active {
+            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
+            border-left: 3px solid #d4af37;
+        }
+        .dark .nav-active {
+            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
+        }
+        
+        .stat-card { transition: all 0.2s ease; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12); }
+        
+        .submenu-modern {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .submenu-modern.open { max-height: 280px; }
+        
+        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
+        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
+        
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
+        
+        .btn-active:active { transform: scale(0.97); }
+        
+        .priority-high { background: #fee2e2; color: #dc2626; font-weight: 600; }
+        .priority-medium { background: #fed7aa; color: #ea580c; font-weight: 600; }
+        .priority-low { background: #d1fae5; color: #059669; font-weight: 600; }
+        .dark .priority-high { background: #7f1d1d; color: #fca5a5; }
+        .dark .priority-medium { background: #7c2d12; color: #fdba74; }
+        .dark .priority-low { background: #064e3b; color: #6ee7b7; }
+        
+        .quick-filter-btn { transition: all 0.2s ease; }
+        .quick-filter-btn.active { background: #0f3b3a; color: white; }
+        
+        .table-scroll-hint { display: none; }
+        @media (max-width: 768px) {
+            .table-scroll-hint {
+                display: flex;
+                font-size: 9px;
+                padding: 4px 8px;
+                background: #f0fdf4;
+                color: #166534;
+                border-radius: 20px;
+                margin-bottom: 8px;
+                width: fit-content;
+            }
+            .dark .table-scroll-hint { background: #064e3b; color: #86efac; }
+        }
+        
+        .table-row-hover:hover { background-color: rgba(15, 59, 58, 0.04); }
+        .dark .table-row-hover:hover { background-color: rgba(30, 107, 104, 0.1); }
+        
+        .center-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+        .center-modal.open { visibility: visible; opacity: 1; }
+        .center-modal-content {
+            background: white;
+            border-radius: 1rem;
+            max-width: 380px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+        }
+        .dark .center-modal-content { background: #1e293b; }
+        .center-modal.open .center-modal-content { transform: scale(1); }
+        
+        #sidebarOverlay { animation: fadeIn 0.2s ease-out; }
+        .sidebar-open { overflow: hidden; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Fixed Sidebar Structure - No overlap issue */
+        .sidebar-fixed {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar-header-fixed {
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            background: inherit;
+            z-index: 10;
+        }
+        .sidebar-nav-fixed {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar {
+            width: 3px;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar-thumb {
+            background: rgba(212,175,55,0.5);
+            border-radius: 10px;
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+        .dark .skeleton { background: linear-gradient(90deg, #2d3748 25%, #4a5568 50%, #2d3748 75%); }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    
+    <div class="flex min-h-screen">
+        
+        <!-- Sidebar - Fixed Structure -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
+            <!-- Header - Fixed at top -->
+            <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
+                        </div>
+                        <div class="leading-tight">
+                            <h1 class="text-white font-bold text-sm tracking-wide">Nexus<span class="text-accent">Due</span></h1>
+                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Financial cockpit</p>
+                        </div>
+                    </div>
+                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Navigation - Scrollable area -->
+            <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
+                <nav class="space-y-1.5">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                        <span class="text-sm font-medium">Dashboard</span>
+                    </a>
+                    
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customers</span>
+                    </a>
+                    
+                    <div class="has-submenu" id="dueSubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div>
+                                <span class="text-sm font-medium">Due Entry</span>
+                            </div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
+                            </a>
+                            <a href="follow-up.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition">
+                                <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span>
+                    </a>
+                    
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
+                    </a>
+                    
+                    <div class="has-submenu" id="warrantySubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
+                            </a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
+                            </a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
+                            </a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
+                            </a>
+                            
+                        </div>
+                    </div>
+                    
+                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
+                    </a>
+                    
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
+                    </a>
+                </nav>
+                
+                <!-- Logout Button - Now scrolls with menu -->
+                <div class="pt-4 mt-2 border-t border-white/10">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
+                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                        <span class="text-sm font-medium">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 min-h-screen w-full">
+            
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+                <div class="px-3 py-2.5 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg"><i class="fas fa-bars text-lg"></i></button>
+                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-bell text-primary mr-2"></i>Follow Up</h2>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt text-sm"></i></button>
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-moon dark:hidden text-sm"></i><i class="fas fa-sun hidden dark:inline-block text-sm"></i></button>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="p-3 md:p-4">
+                
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                        <div class="bg-purple-100 dark:bg-purple-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-tasks text-purple-600 dark:text-purple-400 text-sm"></i></div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total Tasks</h3>
+                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalTasks">0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                        <div class="bg-yellow-100 dark:bg-yellow-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-clock text-yellow-600 dark:text-yellow-400 text-sm"></i></div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Pending</h3>
+                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="pendingTasks">0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                        <div class="bg-red-100 dark:bg-red-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-sm"></i></div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Overdue</h3>
+                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="overdueTasks">0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                        <div class="bg-blue-100 dark:bg-blue-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-calendar text-blue-600 dark:text-blue-400 text-sm"></i></div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">This Month</h3>
+                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="monthlyTasks">0</p>
+                    </div>
+                </div>
+                
+                <!-- Quick Filters & Export -->
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div class="flex flex-wrap gap-2">
+                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="all"><i class="fas fa-list mr-1"></i> All</button>
+                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="today"><i class="fas fa-calendar-day mr-1"></i> Today</button>
+                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="week"><i class="fas fa-calendar-week mr-1"></i> This Week</button>
+                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="month"><i class="fas fa-calendar-alt mr-1"></i> This Month</button>
+                    </div>
+                    <button id="exportFollowUpBtn" class="bg-success hover:bg-green-700 text-white font-medium px-4 py-1.5 rounded-lg text-sm flex items-center gap-2 btn-active"><i class="fas fa-download text-xs"></i> Export CSV</button>
+                </div>
+                
+                <!-- Search -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-4">
+                    <div class="p-3"><div class="relative w-full"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i><input type="text" id="searchInput" placeholder="Search by customer name..." class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></div></div>
+                </div>
+                
+                <div class="table-scroll-hint mb-2"><i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns → <span class="mx-2">|</span> <i class="fas fa-hand-pointer mr-1 text-[8px]"></i> Tap row for details</div>
+                
+                <!-- Follow Up Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[900px]">
+                            <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                                <tr><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">SL</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Description</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Priority</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Follow Up Date</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Next Remarks</th><th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th> </thead>
+                            <tbody id="followUpTableBody" class="divide-y divide-gray-200 dark:divide-gray-700"><tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading follow ups...</p></tr></td></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Center Modal for Row Details -->
+    <div id="detailsCenterModal" class="center-modal">
+        <div class="center-modal-content">
+            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-info-circle text-primary mr-2"></i>Follow Up Details</h3><button id="closeCenterModalBtn" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div>
+            <div class="p-5" id="centerModalContent"></div>
+            <div class="flex justify-end px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t"><button id="closeCenterModalFooterBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-200 dark:bg-gray-600 btn-active">Close</button></div>
+        </div>
+    </div>
+    
+    <!-- Update Follow Up Modal -->
+    <div id="updateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[150] hidden transition-all duration-300 p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl modal-animate overflow-hidden">
+            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white"><i class="fas fa-edit text-primary mr-2"></i>Update Follow Up</h3><button id="closeUpdateModalBtn" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div>
+            <input type="hidden" id="updateTransactionId">
+            <div class="p-5 space-y-4">
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-user text-primary mr-1 text-xs"></i> Customer</label><p id="updateCustomerName" class="text-gray-800 dark:text-white font-semibold text-sm bg-gray-100 dark:bg-gray-700 p-2 rounded-lg"></p></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-calendar-week text-primary mr-1 text-xs"></i> New Expected Date <span class="text-red-500">*</span></label><input type="date" id="updateExpectedDate" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-sticky-note text-primary mr-1 text-xs"></i> Next Remarks</label><textarea id="updateRemarks" rows="3" placeholder="Enter next follow up remarks..." class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea><p class="text-[10px] text-gray-400 mt-1">This will be saved as next remarks for future reference</p></div>
+            </div>
+            <div class="flex justify-end gap-3 px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t"><button id="cancelUpdateBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 btn-active">Cancel</button><button id="saveUpdateBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-primary text-white shadow-md btn-active"><i class="fas fa-save mr-1"></i> Update</button></div>
+        </div>
+    </div>
+    
+    <!-- Logout Modal -->
+    <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl modal-animate"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div><h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3><p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Are you sure you want to logout?</p><div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-100 dark:bg-gray-700 btn-active">Cancel</button><button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-danger text-white btn-active">Logout</button></div></div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-2"></div>
+    
+    <!-- Auth Check Script -->
+    <script type="module">
+        import { checkAuthState, logout } from './js/auth.js';
+        checkAuthState(true);
+    </script>
+    
+    <script type="module">
+        import { db, collection, getDocs, doc, updateDoc, getDoc } from './js/firebase.js';
+        
+        // Sidebar submenu toggle
+        const warrantySubmenu = document.getElementById('warrantySubmenu');
+        const warrantyLink = warrantySubmenu?.querySelector('a');
+        if (warrantyLink) {
+            warrantyLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                warrantySubmenu.classList.toggle('open');
+                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        }
+        
+        // Sidebar functions
+        const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.id = 'sidebarOverlay'; overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
+        function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); const overlay = document.getElementById('sidebarOverlay'); if (overlay) overlay.remove(); }
+        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+        window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); } });
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
+        
+        // Submenu toggle for Due Entry
+        const dueSubmenu = document.getElementById('dueSubmenu');
+        const dueSubmenuLink = dueSubmenu?.querySelector('a');
+        if (dueSubmenuLink) {
+            dueSubmenuLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                dueSubmenu.classList.toggle('open');
+                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        }
+        
+        let allFollowUps = [];
+        let currentQuickFilter = 'all';
+        let customerNameMap = new Map();
+        
+        function showToast(message, type = 'success') { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`; t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`; c.appendChild(t); setTimeout(() => t.remove(), 2500); }
+        function closeCenterModal() { document.getElementById('detailsCenterModal').classList.remove('open'); }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+        
+        async function loadCustomerNames() {
+            try {
+                const customersSnap = await getDocs(collection(db, 'customers'));
+                customerNameMap.clear();
+                customersSnap.forEach(doc => {
+                    customerNameMap.set(doc.id, doc.data().name);
+                });
+            } catch (error) {
+                console.error('Error loading customer names:', error);
+            }
+        }
+        
+        function getCustomerName(customerId) {
+            if (!customerId) return 'Unknown';
+            return customerNameMap.get(customerId) || 'Unknown';
+        }
+        
+        function calculatePriority(daysDifference) {
+            if (daysDifference <= 3) return { level: 'low', text: '🟢 Low', class: 'priority-low' };
+            else if (daysDifference <= 7) return { level: 'medium', text: '🟠 Medium', class: 'priority-medium' };
+            else return { level: 'high', text: '🔴 High', class: 'priority-high' };
+        }
+        
+        function getDaysDifference(dateStr) {
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const targetDate = new Date(dateStr); targetDate.setHours(0, 0, 0, 0);
+            const diffTime = targetDate - today;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+        
+        function getDateRangeFromFilter(filterType) {
+            const today = new Date();
+            let startDate = null, endDate = null;
+            switch(filterType) {
+                case 'today': startDate = today.toISOString().split('T')[0]; endDate = today.toISOString().split('T')[0]; break;
+                case 'week':
+                    const firstDayOfWeek = new Date(today);
+                    const dayOfWeek = today.getDay();
+                    const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                    firstDayOfWeek.setDate(today.getDate() - diff);
+                    startDate = firstDayOfWeek.toISOString().split('T')[0];
+                    const lastDayOfWeek = new Date(firstDayOfWeek);
+                    lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
+                    endDate = lastDayOfWeek.toISOString().split('T')[0];
+                    break;
+                case 'month':
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+                    endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
+                    break;
+                default: return null;
+            }
+            return { startDate, endDate };
+        }
+        
+        async function loadFollowUps() {
+            const tbody = document.getElementById('followUpTableBody');
+            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading follow ups...</p></td>';
+            
+            try {
+                if (customerNameMap.size === 0) await loadCustomerNames();
+                
+                const dueEntriesSnap = await getDocs(collection(db, 'transactions'));
+                const followUps = [];
+                
+                for (const docSnap of dueEntriesSnap.docs) {
+                    const due = docSnap.data();
+                    if (due.type === 'due') {
+                        let customerName = due.customerName || getCustomerName(due.customerId);
+                        
+                        let description = due.remarks || '';
+                        if (!description && due.products && due.products.length > 0) {
+                            description = due.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).join(', ');
+                            if (due.totalAmount) description += ` | ৳${due.totalAmount.toFixed(2)}`;
+                        } else if (due.directDueAmount) {
+                            description = `Direct Due: ৳${due.directDueAmount.toFixed(2)}`;
+                        } else if (due.productName) {
+                            description = due.productName;
+                        }
+                        if (!description) description = 'Due Entry';
+                        
+                        let followUpDate = due.expectedDate || due.date;
+                        if (!followUpDate && due.createdAt) {
+                            followUpDate = due.createdAt.toDate().toISOString().split('T')[0];
+                        }
+                        if (!followUpDate) followUpDate = new Date().toISOString().split('T')[0];
+                        
+                        const daysDiff = getDaysDifference(followUpDate);
+                        const priority = calculatePriority(daysDiff);
+                        const nextRemarks = due.nextRemarks || due.remarks || '';
+                        
+                        followUps.push({
+                            id: docSnap.id,
+                            transactionId: docSnap.id,
+                            customerName: customerName,
+                            description: description,
+                            expectedDate: followUpDate,
+                            priority: priority,
+                            daysDiff: daysDiff,
+                            currentRemarks: due.remarks || '',
+                            nextRemarks: nextRemarks,
+                            customerId: due.customerId
+                        });
+                    }
+                }
+                
+                followUps.sort((a, b) => a.expectedDate.localeCompare(b.expectedDate));
+                allFollowUps = followUps;
+                applyFilters();
+                
+            } catch (error) {
+                console.error('Error loading follow ups:', error);
+                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</span></td>';
+            }
+        }
+        
+        function applyFilters() {
+            let filtered = [...allFollowUps];
+            if (currentQuickFilter !== 'all') {
+                const dateRange = getDateRangeFromFilter(currentQuickFilter);
+                if (dateRange) {
+                    filtered = filtered.filter(f => f.expectedDate >= dateRange.startDate && f.expectedDate <= dateRange.endDate);
+                }
+            }
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(f => f.customerName.toLowerCase().includes(searchTerm));
+            }
+            renderTable(filtered);
+            updateStats(allFollowUps);
+        }
+        
+        function renderTable(followUps) {
+            const tbody = document.getElementById('followUpTableBody');
+            if (followUps.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No follow up records found</p></td>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            let sl = 1;
+            
+            for (const followUp of followUps) {
+                const priorityClass = followUp.priority.class;
+                const priorityText = followUp.priority.text;
+                const daysLeft = followUp.daysDiff;
+                const dateStatus = daysLeft < 0 ? 'text-red-500' : daysLeft === 0 ? 'text-orange-500' : 'text-green-600';
+                const dateStatusText = daysLeft < 0 ? `(${Math.abs(daysLeft)} days overdue)` : daysLeft === 0 ? '(Today)' : `(${daysLeft} days left)`;
+                
+                const row = tbody.insertRow();
+                row.className = 'table-row-hover transition-colors cursor-pointer';
+                row.setAttribute('data-id', followUp.id);
+                row.setAttribute('data-customer', followUp.customerName);
+                row.setAttribute('data-description', followUp.description);
+                row.setAttribute('data-priority', priorityText);
+                row.setAttribute('data-date', followUp.expectedDate);
+                row.setAttribute('data-days', daysLeft);
+                row.setAttribute('data-current-remarks', followUp.currentRemarks);
+                row.setAttribute('data-next-remarks', followUp.nextRemarks);
+                
+                const nextRemarksDisplay = followUp.nextRemarks && followUp.nextRemarks !== '' ? followUp.nextRemarks : '-';
+                
+                row.innerHTML = `
+                    <td class="px-3 py-2.5 text-xs text-center font-medium">${sl++}</td>
+                    <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(followUp.customerName)}</td>
+                    <td class="px-3 py-2.5 text-sm"><div class="text-xs text-gray-600 dark:text-gray-400 max-w-[250px] truncate" title="${escapeHtml(followUp.description)}">${escapeHtml(followUp.description)}</div></td>
+                    <td class="px-3 py-2.5"><span class="px-2 py-1 rounded-full text-xs font-medium ${priorityClass}">${priorityText}</span></td>
+                    <td class="px-3 py-2.5 text-sm ${dateStatus}">${followUp.expectedDate}<span class="text-xs ml-1">${dateStatusText}</span></td>
+                    <td class="px-3 py-2.5 text-sm text-primary font-medium max-w-[200px] truncate" title="${escapeHtml(nextRemarksDisplay)}">${escapeHtml(nextRemarksDisplay)}</td>
+                    <td class="px-3 py-2.5 text-center"><button class="update-followup text-primary hover:text-primary-dark p-1.5 rounded-lg transition-colors" data-id="${followUp.id}" data-customer="${escapeHtml(followUp.customerName)}" data-date="${followUp.expectedDate}" data-remarks="${escapeHtml(followUp.currentRemarks)}" data-next-remarks="${escapeHtml(followUp.nextRemarks)}" title="Update Follow Up"><i class="fas fa-edit text-sm"></i></button></td>
+                `;
+            }
+            
+            document.querySelectorAll('.update-followup').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.getElementById('updateTransactionId').value = btn.dataset.id;
+                    document.getElementById('updateCustomerName').textContent = btn.dataset.customer;
+                    document.getElementById('updateExpectedDate').value = btn.dataset.date;
+                    document.getElementById('updateRemarks').value = btn.dataset.nextRemarks || '';
+                    document.getElementById('updateModal').classList.remove('hidden');
+                });
+            });
+            
+            document.querySelectorAll('#followUpTableBody tr').forEach(row => {
+                row.addEventListener('click', (e) => {
+                    if (e.target.closest('button')) return;
+                    const data = row.dataset;
+                    const daysLeft = parseInt(data.days);
+                    const dateStatusText = daysLeft < 0 ? 'Overdue' : daysLeft === 0 ? 'Today' : 'Pending';
+                    const dateStatusColor = daysLeft < 0 ? 'text-red-500' : daysLeft === 0 ? 'text-orange-500' : 'text-green-600';
+                    document.getElementById('centerModalContent').innerHTML = `
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Customer</span><span class="font-semibold text-sm">${escapeHtml(data.customer)}</span></div>
+                            <div class="flex justify-between items-start pb-2 border-b"><span class="text-xs text-gray-500">Description</span><span class="text-sm text-right max-w-[220px]">${escapeHtml(data.description)}</span></div>
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Priority</span><span class="text-sm font-semibold">${escapeHtml(data.priority)}</span></div>
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Follow Up Date</span><div class="text-right"><span class="text-sm font-semibold">${data.date}</span><span class="text-xs ${dateStatusColor} ml-1">(${dateStatusText})</span></div></div>
+                            <div class="flex justify-between items-start pb-2 border-b"><span class="text-xs text-gray-500">Current Remarks</span><span class="text-sm text-right">${escapeHtml(data.currentRemarks) || '-'}</span></div>
+                            <div class="flex justify-between items-start"><span class="text-xs text-gray-500">Next Remarks</span><span class="text-sm text-right text-primary font-medium">${escapeHtml(data.nextRemarks) || '-'}</span></div>
+                        </div>
+                    `;
+                    document.getElementById('detailsCenterModal').classList.add('open');
+                });
+            });
+        }
+        
+        function updateStats(followUps) {
+            const total = followUps.length;
+            let pending = 0, overdue = 0, monthly = 0;
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            followUps.forEach(f => {
+                const daysDiff = getDaysDifference(f.expectedDate);
+                if (daysDiff < 0) overdue++;
+                else if (daysDiff >= 0) pending++;
+                const dateParts = f.expectedDate.split('-');
+                if (dateParts.length === 3) {
+                    const month = parseInt(dateParts[1]) - 1;
+                    const year = parseInt(dateParts[0]);
+                    if (year === currentYear && month === currentMonth) monthly++;
+                }
+            });
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('pendingTasks').textContent = pending;
+            document.getElementById('overdueTasks').textContent = overdue;
+            document.getElementById('monthlyTasks').textContent = monthly;
+        }
+        
+        async function updateFollowUp() {
+            const transactionId = document.getElementById('updateTransactionId').value;
+            const newExpectedDate = document.getElementById('updateExpectedDate').value;
+            const newRemarks = document.getElementById('updateRemarks').value;
+            if (!newExpectedDate) { showToast('Please select expected date', 'error'); return; }
+            try {
+                const transactionRef = doc(db, 'transactions', transactionId);
+                await updateDoc(transactionRef, {
+                    expectedDate: newExpectedDate,
+                    nextRemarks: newRemarks,
+                    updatedAt: new Date().toISOString()
+                });
+                showToast('Follow up updated successfully!', 'success');
+                document.getElementById('updateModal').classList.add('hidden');
+                await loadFollowUps();
+            } catch (error) { console.error('Update error:', error); showToast('Error updating follow up', 'error'); }
+        }
+        
+        function exportToCSV() {
+            let exportData = [...allFollowUps];
+            if (currentQuickFilter !== 'all') {
+                const dateRange = getDateRangeFromFilter(currentQuickFilter);
+                if (dateRange) exportData = exportData.filter(f => f.expectedDate >= dateRange.startDate && f.expectedDate <= dateRange.endDate);
+            }
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) exportData = exportData.filter(f => f.customerName.toLowerCase().includes(searchTerm));
+            if (exportData.length === 0) { showToast('No data to export', 'error'); return; }
+            
+            let csv = ['\uFEFF"SL","Customer","Description","Priority","Follow Up Date","Days Left","Status","Next Remarks"'];
+            let sl = 1;
+            exportData.forEach(f => {
+                const daysDiff = getDaysDifference(f.expectedDate);
+                const statusText = daysDiff < 0 ? 'Overdue' : daysDiff === 0 ? 'Today' : 'Pending';
+                const daysText = daysDiff < 0 ? `${Math.abs(daysDiff)} days overdue` : `${daysDiff} days left`;
+                csv.push(`"${sl++}","${f.customerName.replace(/"/g, '""')}","${f.description.replace(/"/g, '""')}","${f.priority.text}","${f.expectedDate}","${daysText}","${statusText}","${(f.nextRemarks || '').replace(/"/g, '""')}"`);
+            });
+            const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = `follow_up_${new Date().toISOString().split('T')[0]}.csv`;
+            a.href = url;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Follow up list exported!', 'success');
+        }
+        
+        // Event Listeners
+        document.getElementById('refreshBtn').addEventListener('click', () => { loadFollowUps(); showToast('Refreshed!', 'success'); });
+        document.getElementById('searchInput').addEventListener('input', () => applyFilters());
+        document.getElementById('exportFollowUpBtn').addEventListener('click', exportToCSV);
+        document.getElementById('darkModeToggle').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
+        
+        document.querySelectorAll('.quick-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.quick-filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentQuickFilter = btn.dataset.filter;
+                applyFilters();
+            });
+        });
+        
+        document.getElementById('closeUpdateModalBtn').addEventListener('click', () => document.getElementById('updateModal').classList.add('hidden'));
+        document.getElementById('cancelUpdateBtn').addEventListener('click', () => document.getElementById('updateModal').classList.add('hidden'));
+        document.getElementById('saveUpdateBtn').addEventListener('click', updateFollowUp);
+        document.getElementById('updateModal').addEventListener('click', (e) => { if (e.target === document.getElementById('updateModal')) document.getElementById('updateModal').classList.add('hidden'); });
+        
+        document.getElementById('closeCenterModalBtn').addEventListener('click', closeCenterModal);
+        document.getElementById('closeCenterModalFooterBtn').addEventListener('click', closeCenterModal);
+        document.getElementById('detailsCenterModal').addEventListener('click', (e) => { if (e.target === document.getElementById('detailsCenterModal')) closeCenterModal(); });
+        
+        // Logout functionality
+        const logoutModal = document.getElementById('logoutModal'), logoutLink = document.getElementById('logoutLink'), cancelLogout = document.getElementById('cancelLogoutBtn'), confirmLogout = document.getElementById('confirmLogoutBtn');
+        const { logout } = await import('./js/auth.js');
+        if (logoutLink) logoutLink.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
+        if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
+        if (confirmLogout) confirmLogout.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
+        
+        // Initial load
+        loadFollowUps();
+        document.querySelector('.quick-filter-btn[data-filter="all"]')?.classList.add('active');
+    </script>
+</body>
+</html>

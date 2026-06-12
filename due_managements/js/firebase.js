@@ -1,33 +1,39 @@
-// js/firebase.js - সম্পূর্ণ ফাইল এই কোড দিয়ে প্রতিস্থাপন করুন
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { 
-    getFirestore, 
-    collection, 
-    addDoc, 
-    updateDoc, 
-    deleteDoc, 
-    doc, 
-    getDocs, 
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    doc,
+    getDocs,
     getDoc,
-    query, 
-    orderBy, 
-    where, 
-    onSnapshot, 
-    Timestamp, 
+    query,
+    orderBy,
+    where,
+    onSnapshot,
+    Timestamp,
     writeBatch,
-    limit
+    limit,
+    startAfter,        // ✅ যোগ করুন
+    endAt,             // ✅ যোগ করুন (অপশনাল)
+    endBefore          // ✅ যোগ করুন (অপশনাল)
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { 
-    getAuth, 
-    signInWithEmailAndPassword, 
-    signOut, 
-    onAuthStateChanged, 
-    setPersistence, 
+
+import {
+    getAuth,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    setPersistence,
     browserLocalPersistence,
     createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// আপনার Firebase Config (আপনি যে config দিয়েছেন সেটি)
+/* =========================
+   🔥 Firebase Config
+========================= */
 const firebaseConfig = {
   apiKey: "AIzaSyAceLr1Q3ivackOnYBozmNyXM87CAySHoM",
   authDomain: "due-managements.firebaseapp.com",
@@ -38,38 +44,74 @@ const firebaseConfig = {
   measurementId: "G-BC63DR49N1"
 };
 
-// Initialize Firebase
+/* =========================
+   🚀 Initialize Firebase (SAFE INIT)
+========================= */
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Set persistence (লগইন মনে রাখার জন্য)
-setPersistence(auth, browserLocalPersistence);
+/* =========================
+   🔐 AUTH PERSISTENCE
+   (safe + error handled)
+========================= */
+setPersistence(auth, browserLocalPersistence)
+    .then(() => {
+        console.log("🔐 Auth persistence enabled");
+    })
+    .catch((err) => {
+        console.warn("Auth persistence error:", err);
+    });
 
-// সব কিছু export করুন
-export { 
-    db, 
-    auth, 
-    collection, 
-    addDoc, 
-    updateDoc, 
-    deleteDoc, 
-    doc, 
-    getDocs, 
+/* =========================
+   ⚡ OPTIONAL HELPERS (NEW)
+========================= */
+
+// Safe timestamp helper
+const now = () => Timestamp.now();
+
+// Batch helper (future scaling)
+const batchWrite = () => writeBatch(db);
+
+/* =========================
+   EXPORT EVERYTHING
+========================= */
+export {
+    db,
+    auth,
+
+    // Firestore
+    collection,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    doc,
+    getDocs,
     getDoc,
-    query, 
-    orderBy, 
-    where, 
-    onSnapshot, 
-    Timestamp, 
+    query,
+    orderBy,
+    where,
+    onSnapshot,
+    Timestamp,
     writeBatch,
     limit,
+    startAfter,      // ✅ এখন এক্সপোর্ট করা হবে
+
+    // Auth
     signInWithEmailAndPassword,
     signOut,
     onAuthStateChanged,
-    createUserWithEmailAndPassword
+    createUserWithEmailAndPassword,
+
+    // Helpers
+    now,
+    batchWrite
 };
 
-console.log("✅ Firebase initialized successfully with project:", firebaseConfig.projectId);
-
-
+/* =========================
+   INIT LOG (SAFE)
+========================= */
+console.log("🔥 Firebase initialized:", {
+    project: firebaseConfig.projectId,
+    status: "ready"
+});
