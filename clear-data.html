@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
+    <title>Clear Database - Admin Tool | Nexus Due</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 550px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #7258B4;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .warning {
+            background: #fee2e2;
+            border-left: 4px solid #dc2626;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .warning h3 {
+            color: #dc2626;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+        button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+        button:hover:not(:disabled) {
+            background: #b91c1c;
+            transform: scale(1.02);
+        }
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        button.secondary {
+            background: #0f3b3a;
+        }
+        button.secondary:hover {
+            background: #1e6b68;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+        .login-section {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .login-section label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #374151;
+        }
+        .login-section input {
+            margin-bottom: 15px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #0f3b3a;
+        }
+        .stats {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0;
+            display: none;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #dc2626;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-container {
+            background: white;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .modal-header .warning-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .modal-header h3 {
+            font-size: 20px;
+            color: #dc2626;
+        }
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        .modal-body p {
+            color: #374151;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .modal-body ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        .modal-body li {
+            font-size: 13px;
+            color: #6b7280;
+            margin: 5px 0;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: monospace;
+            text-align: center;
+        }
+        .modal-input:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .modal-buttons button {
+            margin-top: 0;
+            padding: 12px;
+        }
+        .btn-cancel {
+            background: #9ca3af;
+        }
+        .btn-cancel:hover {
+            background: #6b7280;
+        }
+        .btn-confirm {
+            background: #dc2626;
+        }
+        .btn-confirm:hover:not(:disabled) {
+            background: #b91c1c;
+        }
+        
+        /* Recycle Bin Animation */
+        .recycle-animation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .recycle-animation-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .recycle-bin {
+            text-align: center;
+            animation: bounce 0.5s ease infinite;
+        }
+        .recycle-bin i {
+            font-size: 100px;
+            color: #dc2626;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+        }
+        .recycle-text {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+        .recycle-subtext {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-top: 10px;
+        }
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .particle {
+            position: absolute;
+            background: #dc2626;
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatUp 1s ease-out forwards;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-200px) scale(0);
+                opacity: 0;
+            }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spin-icon {
+            animation: spin 0.5s linear infinite;
+        }
+        
+        /* Data items flying animation */
+        .data-item {
+            position: fixed;
+            font-size: 24px;
+            pointer-events: none;
+            z-index: 2001;
+            animation: flyToBin 0.8s ease-out forwards;
+        }
+        @keyframes flyToBin {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--target-x, 0), var(--target-y, 0)) scale(0.3);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Database Cleanup Tool</h1>
+        <p style="color: #6b7280; margin-bottom: 20px;">Remove ALL data from the database</p>
+        
+        <div class="warning">
+            <h3>⚠️ WARNING!</h3>
+            <p>This will delete ALL data permanently including:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li>Customers & Transactions</li>
+                <li>Warranty Items & Suppliers</li>
+                <li>Currier Dispatches</li>
+            </ul>
+            <small style="display: block; margin-top: 10px;">Database structure will remain intact. This action CANNOT be undone.</small>
+        </div>
+        
+        <!-- Login Section -->
+        <div class="login-section" id="loginSection">
+            <label>📧 Email Address</label>
+            <input type="email" id="loginEmail" placeholder="your-email@example.com" autocomplete="email">
+            <label>🔒 Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+            <button id="loginBtn" class="secondary">🔐 Login to Continue</button>
+        </div>
+        
+        <div id="statsPreview" class="stats"></div>
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div id="successMsg" class="success"></div>
+        <div id="errorMsg" class="error"></div>
+        <div class="stats" id="stats"></div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="warning-icon">⚠️</div>
+                <h3>Delete All Data?</h3>
+            </div>
+            <div class="modal-body">
+                <p>This action will permanently delete:</p>
+                <ul>
+                    <li>All Customers</li>
+                    <li>All Transactions (Due & Collection)</li>
+                    <li>All Warranty Items</li>
+                    <li>All Suppliers</li>
+                    <li>All Currier Dispatches</li>
+                </ul>
+                <p><strong>Type <span style="color:#dc2626;">"DELETE ALL"</span> to confirm:</strong></p>
+                <input type="text" id="modalConfirmInput" class="modal-input" placeholder='Type "DELETE ALL" here' autocomplete="off">
+            </div>
+            <div class="modal-buttons">
+                <button id="modalCancelBtn" class="btn-cancel">Cancel</button>
+                <button id="modalConfirmBtn" class="btn-confirm" disabled>Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recycle Bin Animation Overlay -->
+    <div id="recycleAnimation" class="recycle-animation-overlay">
+        <div class="recycle-bin">
+            <i class="fas fa-trash-alt" id="recycleIcon"></i>
+            <div class="recycle-text" id="recycleText">Cleaning Database...</div>
+            <div class="recycle-subtext" id="recycleSubtext">Please wait while we remove all data</div>
+        </div>
+        <div class="particles" id="particles"></div>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAceLr1Q3ivackOnYBozmNyXM87CAySHoM",
+            authDomain: "due-managements.firebaseapp.com",
+            projectId: "due-managements",
+            storageBucket: "due-managements.firebasestorage.app",
+            messagingSenderId: "288464910567",
+            appId: "1:288464910567:web:93421a45957983862f0a42"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        let isLoggedIn = false;
+        let currentUser = null;
+        let dataCounts = { customers: 0, transactions: 0, warranties: 0, suppliers: 0, dispatches: 0 };
+        
+        const collections = ['customers', 'transactions', 'warranties', 'suppliers', 'dispatches'];
+        
+        function getElement(id) {
+            return document.getElementById(id);
+        }
+        
+        async function fetchDataCounts() {
+            try {
+                const statsElem = getElement('statsPreview');
+                if (statsElem) statsElem.innerHTML = '📡 Fetching data statistics...';
+                
+                for (const coll of collections) {
+                    const snap = await getDocs(collection(db, coll));
+                    dataCounts[coll] = snap.size;
+                }
+                
+                const statsElem2 = getElement('statsPreview');
+                if (statsElem2) {
+                    statsElem2.innerHTML = `
+                        📊 Database Summary:<br>
+                        👥 Customers: ${dataCounts.customers} | 📝 Transactions: ${dataCounts.transactions}<br>
+                        🛡️ Warranty: ${dataCounts.warranties} | 🏭 Suppliers: ${dataCounts.suppliers} | 🚚 Dispatches: ${dataCounts.dispatches}
+                    `;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error fetching counts:', error);
+                const statsElem = getElement('statsPreview');
+                if (statsElem) statsElem.innerHTML = '⚠️ Unable to fetch data statistics.';
+                return false;
+            }
+        }
+        
+        async function login() {
+            const emailInput = getElement('loginEmail');
+            const passwordInput = getElement('loginPassword');
+            
+            if (!emailInput || !passwordInput) {
+                return false;
+            }
+            
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!email || !password) {
+                showError('Please enter email and password');
+                return false;
+            }
+            
+            const loginBtn = getElement('loginBtn');
+            const originalBtnText = loginBtn ? loginBtn.textContent : 'Login';
+            if (loginBtn) {
+                loginBtn.textContent = '⏳ Logging in...';
+                loginBtn.disabled = true;
+            }
+            
+            // Clear any previous error messages
+            hideError();
+            
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                isLoggedIn = true;
+                currentUser = userCredential.user;
+                
+                if (loginBtn) {
+                    loginBtn.textContent = '✅ Logged In!';
+                    setTimeout(() => {
+                        loginBtn.textContent = originalBtnText;
+                        loginBtn.disabled = false;
+                    }, 1500);
+                }
+                
+                showSuccess(`✅ Login successful! Welcome ${email}`);
+                await fetchDataCounts();
+                
+                setTimeout(() => {
+                    showConfirmModal();
+                }, 500);
+                
+                return true;
+            } catch (error) {
+                let errorMessage = '';
+                switch (error.code) {
+                    case 'auth/invalid-credential':
+                        errorMessage = 'Invalid email or password. Please check your credentials.';
+                        break;
+                    case 'auth/user-not-found':
+                        errorMessage = 'User not found. Please check your email.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Wrong password. Please try again.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many failed attempts. Please try again later.';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                showError('Login failed: ' + errorMessage);
+                isLoggedIn = false;
+                if (loginBtn) {
+                    loginBtn.textContent = originalBtnText;
+                    loginBtn.disabled = false;
+                }
+                return false;
+            }
+        }
+        
+        function hideError() {
+            const errorDiv = getElement('errorMsg');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+                errorDiv.innerHTML = '';
+            }
+        }
+        
+        function showConfirmModal() {
+            const modal = getElement('confirmModal');
+            const confirmInput = getElement('modalConfirmInput');
+            const confirmBtn = getElement('modalConfirmBtn');
+            
+            if (modal) {
+                modal.classList.add('active');
+                if (confirmInput) {
+                    confirmInput.value = '';
+                    confirmInput.focus();
+                }
+                if (confirmBtn) confirmBtn.disabled = true;
+            }
+        }
+        
+        function hideConfirmModal() {
+            const modal = getElement('confirmModal');
+            if (modal) modal.classList.remove('active');
+        }
+        
+        // Create flying data items animation
+        function createFlyingItems() {
+            const items = ['📁', '👥', '📝', '🛡️', '🏭', '🚚', '📊', '💰', '📦', '🔧', '💾', '🗄️'];
+            const recycleBin = getElement('recycleAnimation');
+            if (!recycleBin) return;
+            
+            const binRect = document.querySelector('.recycle-bin')?.getBoundingClientRect();
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            for (let i = 0; i < 40; i++) {
+                const item = document.createElement('div');
+                item.className = 'data-item';
+                item.textContent = items[Math.floor(Math.random() * items.length)];
+                item.style.left = Math.random() * window.innerWidth + 'px';
+                item.style.top = Math.random() * window.innerHeight + 'px';
+                item.style.fontSize = (20 + Math.random() * 25) + 'px';
+                item.style.setProperty('--target-x', (centerX - parseFloat(item.style.left)) + 'px');
+                item.style.setProperty('--target-y', (centerY - parseFloat(item.style.top)) + 'px');
+                document.body.appendChild(item);
+                
+                setTimeout(() => {
+                    item.remove();
+                }, 800);
+            }
+        }
+        
+        // Show recycle bin animation
+        function showRecycleAnimation() {
+            const recycleAnim = getElement('recycleAnimation');
+            const recycleIcon = getElement('recycleIcon');
+            const recycleText = getElement('recycleText');
+            const recycleSubtext = getElement('recycleSubtext');
+            const particles = getElement('particles');
+            
+            if (recycleAnim) {
+                recycleAnim.classList.add('active');
+                
+                // Create particles
+                if (particles) {
+                    particles.innerHTML = '';
+                    for (let i = 0; i < 60; i++) {
+                        const particle = document.createElement('div');
+                        particle.className = 'particle';
+                        particle.style.left = Math.random() * 100 + '%';
+                        particle.style.top = Math.random() * 100 + '%';
+                        particle.style.width = (2 + Math.random() * 8) + 'px';
+                        particle.style.height = particle.style.width;
+                        particle.style.animationDelay = Math.random() * 0.5 + 's';
+                        particles.appendChild(particle);
+                    }
+                }
+                
+                // Add spin effect to icon
+                if (recycleIcon) {
+                    recycleIcon.classList.add('spin-icon');
+                }
+                
+                createFlyingItems();
+                
+                // Update text animation
+                let steps = ['Cleaning Database...', 'Removing Customers...', 'Deleting Transactions...', 'Clearing Warranty Data...', 'Removing Suppliers...', 'Finalizing...'];
+                let step = 0;
+                const textInterval = setInterval(() => {
+                    step++;
+                    if (step < steps.length && recycleText) {
+                        recycleText.textContent = steps[step];
+                    }
+                    if (step === steps.length - 1 && recycleSubtext) {
+                        recycleSubtext.textContent = 'Almost done...';
+                    }
+                }, 800);
+                
+                return textInterval;
+            }
+            return null;
+        }
+        
+        function hideRecycleAnimation() {
+            const recycleAnim = getElement('recycleAnimation');
+            if (recycleAnim) {
+                recycleAnim.classList.remove('active');
+                const recycleIcon = getElement('recycleIcon');
+                if (recycleIcon) recycleIcon.classList.remove('spin-icon');
+            }
+        }
+        
+        async function deleteAllData() {
+            hideConfirmModal();
+            
+            if (!isLoggedIn) {
+                showError('Please login first');
+                return;
+            }
+            
+            // Show recycle bin animation
+            const textInterval = showRecycleAnimation();
+            
+            const progressBar = getElement('progressBar');
+            const progressFill = getElement('progressFill');
+            
+            if (progressBar) progressBar.style.display = 'block';
+            
+            let totalDeleted = 0;
+            let totalToDelete = Object.values(dataCounts).reduce((a, b) => a + b, 0);
+            
+            try {
+                for (const coll of collections) {
+                    const snap = await getDocs(collection(db, coll));
+                    const batch = writeBatch(db);
+                    let count = 0;
+                    
+                    const statsElem = getElement('stats');
+                    if (statsElem) statsElem.innerHTML = `🗑️ Deleting ${coll} (${snap.size} items)...`;
+                    
+                    // Update recycle subtext
+                    const recycleSubtext = getElement('recycleSubtext');
+                    if (recycleSubtext) recycleSubtext.textContent = `Deleting ${coll}... (${snap.size} items)`;
+                    
+                    for (const docSnap of snap.docs) {
+                        batch.delete(doc(db, coll, docSnap.id));
+                        count++;
+                        totalDeleted++;
+                        
+                        if (count % 10 === 0 && totalToDelete > 0) {
+                            const percent = (totalDeleted / totalToDelete) * 100;
+                            if (progressFill) progressFill.style.width = `${percent}%`;
+                            if (statsElem) statsElem.innerHTML = `📦 Deleting ${coll}: ${count}/${snap.size} | Overall: ${totalDeleted}/${totalToDelete}`;
+                            if (recycleSubtext) recycleSubtext.textContent = `Progress: ${Math.round(percent)}% - Deleting ${coll}`;
+                        }
+                        
+                        // Small delay for animation effect
+                        await new Promise(resolve => setTimeout(resolve, 3));
+                    }
+                    
+                    if (snap.size > 0) {
+                        await batch.commit();
+                    }
+                    
+                    if (statsElem) statsElem.innerHTML = `✅ ${coll} cleared (${snap.size} items deleted)`;
+                }
+                
+                if (progressFill) progressFill.style.width = '100%';
+                
+                // Update recycle bin text to success
+                const recycleText = getElement('recycleText');
+                const recycleSubtext = getElement('recycleSubtext');
+                const recycleIcon = getElement('recycleIcon');
+                
+                if (recycleText) recycleText.textContent = '✨ COMPLETE! ✨';
+                if (recycleSubtext) recycleSubtext.textContent = 'All data has been successfully cleared!';
+                if (recycleIcon) {
+                    recycleIcon.classList.remove('spin-icon');
+                    recycleIcon.style.color = '#10b981';
+                }
+                
+                // Reset data counts after deletion
+                dataCounts = { customers: 0, transactions: 0, warranties: 0, suppliers: 0, dispatches: 0 };
+                
+                const statsPreview = getElement('statsPreview');
+                if (statsPreview) {
+                    statsPreview.innerHTML = `
+                        📊 Database Summary:<br>
+                        👥 Customers: 0 | 📝 Transactions: 0<br>
+                        🛡️ Warranty: 0 | 🏭 Suppliers: 0 | 🚚 Dispatches: 0
+                    `;
+                }
+                
+                // Clear text interval
+                if (textInterval) clearInterval(textInterval);
+                
+                // Wait 1.5 seconds then redirect
+                setTimeout(() => {
+                    hideRecycleAnimation();
+                    
+                    const successMsg = getElement('successMsg');
+                    if (successMsg) {
+                        successMsg.style.display = 'block';
+                        successMsg.innerHTML = `
+                            <strong>✅ SUCCESS! Database Cleared!</strong><br><br>
+                            <strong>All data has been permanently deleted!</strong><br>
+                            Redirecting to dashboard in 2 seconds...
+                        `;
+                    }
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 2000);
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                if (textInterval) clearInterval(textInterval);
+                hideRecycleAnimation();
+                
+                showError('Error deleting data: ' + error.message);
+                if (progressBar) progressBar.style.display = 'none';
+                const statsElem = getElement('stats');
+                if (statsElem) statsElem.innerHTML = '';
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = getElement('errorMsg');
+            if (errorDiv) {
+                errorDiv.innerHTML = `<strong>❌ Error!</strong><br>${message}`;
+                errorDiv.style.display = 'block';
+            }
+            const successDiv = getElement('successMsg');
+            if (successDiv) successDiv.style.display = 'none';
+            setTimeout(() => {
+                if (errorDiv) errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showSuccess(message) {
+            const successDiv = getElement('successMsg');
+            if (successDiv) {
+                successDiv.innerHTML = `<strong>✅ Success!</strong><br>${message}`;
+                successDiv.style.display = 'block';
+            }
+            const errorDiv = getElement('errorMsg');
+            if (errorDiv) errorDiv.style.display = 'none';
+            setTimeout(() => {
+                if (successDiv) successDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Check auth state
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                isLoggedIn = true;
+                currentUser = user;
+                await fetchDataCounts();
+            } else {
+                isLoggedIn = false;
+                currentUser = null;
+                const successMsg = getElement('successMsg');
+                if (successMsg) successMsg.style.display = 'none';
+            }
+        });
+        
+        // Event Listeners
+        const loginBtn = getElement('loginBtn');
+        if (loginBtn) loginBtn.addEventListener('click', login);
+        
+        const modalCancelBtn = getElement('modalCancelBtn');
+        const modalConfirmBtn = getElement('modalConfirmBtn');
+        const modalConfirmInput = getElement('modalConfirmInput');
+        const modalOverlay = getElement('confirmModal');
+        
+        if (modalCancelBtn) {
+            modalCancelBtn.addEventListener('click', hideConfirmModal);
+        }
+        
+        if (modalConfirmBtn) {
+            modalConfirmBtn.addEventListener('click', deleteAllData);
+        }
+        
+        if (modalConfirmInput) {
+            modalConfirmInput.addEventListener('input', (e) => {
+                const confirmBtn = getElement('modalConfirmBtn');
+                if (confirmBtn) {
+                    confirmBtn.disabled = e.target.value !== 'DELETE ALL';
+                }
+            });
+            
+            modalConfirmInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const confirmBtn = getElement('modalConfirmBtn');
+                    if (confirmBtn && !confirmBtn.disabled) {
+                        deleteAllData();
+                    }
+                }
+            });
+        }
+        
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    hideConfirmModal();
+                }
+            });
+        }
+        
+        const loginPassword = getElement('loginPassword');
+        if (loginPassword) {
+            loginPassword.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') login();
+            });
+        }
+        
+        if (auth.currentUser) {
+            fetchDataCounts();
+        }
+    </script>
+</body>
+</html>

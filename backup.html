@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0f3b3a">
+    <title>Backup & Restore | JackDev Due Managements</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0f3b3a',
+                        'primary-light': '#1e6b68',
+                        'primary-dark': '#092c2b',
+                        accent: '#d4af37',
+                        danger: '#e53e3e',
+                        success: '#2c7a4d',
+                        warning: '#dd6b20',
+                        info: '#3182ce',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+        
+        * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        .nav-active {
+            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
+            border-left: 3px solid #d4af37;
+        }
+        .dark .nav-active {
+            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
+        }
+        
+        .submenu-modern {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .submenu-modern.open {
+            max-height: 280px;
+        }
+        
+        .has-submenu > a .chevron-icon {
+            transition: transform 0.2s ease;
+        }
+        .has-submenu.open > a .chevron-icon {
+            transform: rotate(180deg);
+        }
+        
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-animate {
+            animation: modalSlideUp 0.2s ease-out forwards;
+        }
+        
+        .btn-active:active { transform: scale(0.97); }
+        
+        .backup-card {
+            transition: all 0.3s ease;
+        }
+        .backup-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.15);
+        }
+        
+        #sidebarOverlay { animation: fadeIn 0.2s ease-out; }
+        .sidebar-open { overflow: hidden; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .file-upload-area {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .file-upload-area.drag-over {
+            border-color: #0f3b3a;
+            background: rgba(15, 59, 58, 0.05);
+        }
+        .dark .file-upload-area.drag-over {
+            background: rgba(30, 107, 104, 0.1);
+        }
+        
+        /* Fixed Sidebar Structure - No overlap issue */
+        .sidebar-fixed {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar-header-fixed {
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            background: inherit;
+            z-index: 10;
+        }
+        .sidebar-nav-fixed {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar {
+            width: 3px;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar-thumb {
+            background: rgba(212,175,55,0.5);
+            border-radius: 10px;
+        }
+        
+        .restore-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .restore-modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .restore-modal-container {
+            background: white;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .restore-modal-overlay.active .restore-modal-container {
+            transform: scale(1);
+        }
+        .restore-modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .restore-modal-header .warning-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .restore-modal-header h3 {
+            font-size: 20px;
+            color: #dc2626;
+        }
+        .restore-modal-body {
+            margin-bottom: 20px;
+        }
+        .restore-modal-body p {
+            color: #374151;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .restore-modal-body ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        .restore-modal-body li {
+            font-size: 13px;
+            color: #6b7280;
+            margin: 5px 0;
+        }
+        .restore-modal-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: monospace;
+            text-align: center;
+        }
+        .restore-modal-input:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+        .restore-modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .restore-modal-buttons button {
+            margin-top: 0;
+            padding: 12px;
+        }
+        .btn-cancel {
+            background: #9ca3af;
+        }
+        .btn-cancel:hover {
+            background: #6b7280;
+        }
+        .btn-confirm {
+            background: #11800b;
+            color: white;
+        }
+        .btn-confirm:hover:not(:disabled) {
+            background: #e8dd03;
+            color: rgb(0, 0, 0);
+        }
+        
+        .success-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .success-modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .success-modal-container {
+            background: white;
+            border-radius: 20px;
+            max-width: 350px;
+            width: 90%;
+            padding: 30px 25px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .success-modal-overlay.active .success-modal-container {
+            transform: scale(1);
+        }
+        .success-icon {
+            font-size: 60px;
+            color: #2c7a4d;
+            margin-bottom: 15px;
+        }
+        .success-modal-container h3 {
+            font-size: 22px;
+            color: #2c7a4d;
+            margin-bottom: 10px;
+        }
+        .success-modal-container p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .success-modal-container button {
+            background: #2c7a4d;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .success-modal-container button:hover {
+            background: #1e5a3a;
+            transform: scale(1.02);
+        }
+        
+        .flying-data {
+            position: fixed;
+            font-size: 28px;
+            pointer-events: none;
+            z-index: 2000;
+            animation: flyToDatabase 1.2s ease-out forwards;
+        }
+        @keyframes flyToDatabase {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: translate(var(--target-x, 200px), var(--target-y, -200px)) scale(1.3) rotate(180deg); opacity: 0.9; }
+            100% { transform: translate(var(--target-x, 400px), var(--target-y, -400px)) scale(0.2) rotate(360deg); opacity: 0; }
+        }
+        
+        .progress-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 350px;
+            background: rgba(0,0,0,0.85);
+            border-radius: 50px;
+            padding: 12px 20px;
+            z-index: 1500;
+            display: none;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        .progress-bar-custom {
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-fill-custom {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #2c7a4d, #d4af37);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            color: white;
+            font-size: 12px;
+            text-align: center;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    
+    <div class="flex min-h-screen">
+        
+        <!-- Sidebar - Fixed Structure (No overlap issue) -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
+            <!-- Header - Fixed at top (does not scroll) -->
+            <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
+                        </div>
+                        <div class="leading-tight">
+                            <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
+                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
+                        </div>
+                    </div>
+                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Navigation - Scrollable area (scrolls independently) -->
+            <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
+                <nav class="space-y-1.5">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                        <span class="text-sm font-medium">Dashboard</span>
+                    </a>
+                    
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customers</span>
+                    </a>
+                    
+                    <div class="has-submenu" id="dueSubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div>
+                                <span class="text-sm font-medium">Due Entry</span>
+                            </div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
+                            </a>
+                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span>
+                    </a>
+                    
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
+                    </a>
+                    
+                    <div class="has-submenu" id="warrantySubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div>
+                                <span class="text-sm font-medium">Warranty</span>
+                            </div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
+                            </a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
+                            </a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
+                            </a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
+                    </a>
+                    
+                    <a href="backup.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-database text-sm text-accent"></i></div>
+                        <span class="text-sm font-medium">Backup & Restore</span>
+                    </a>
+                </nav>
+                
+                <!-- Logout Button - Now scrolls with menu -->
+                <div class="pt-4 mt-2 border-t border-white/10">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
+                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                        <span class="text-sm font-medium">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 min-h-screen w-full">
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+                <div class="px-3 py-2.5 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
+                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
+                            <i class="fas fa-database text-primary mr-2"></i>Backup & Restore
+                        </h2>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-sync-alt text-sm"></i>
+                        </button>
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-moon dark:hidden text-sm"></i>
+                            <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="p-3 md:p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm stat-card"><div class="flex items-center gap-3"><div class="bg-blue-100 dark:bg-blue-900/30 w-10 h-10 rounded-xl flex items-center justify-center"><i class="fas fa-users text-blue-600 dark:text-blue-400 text-lg"></i></div><div><p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Total Customers</p><p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalCustomers">0</p></div></div></div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm stat-card"><div class="flex items-center gap-3"><div class="bg-green-100 dark:bg-green-900/30 w-10 h-10 rounded-xl flex items-center justify-center"><i class="fas fa-exchange-alt text-green-600 dark:text-green-400 text-lg"></i></div><div><p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Total Transactions</p><p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalTransactions">0</p></div></div></div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm stat-card"><div class="flex items-center gap-3"><div class="bg-purple-100 dark:bg-purple-900/30 w-10 h-10 rounded-xl flex items-center justify-center"><i class="fas fa-shield-alt text-purple-600 dark:text-purple-400 text-lg"></i></div><div><p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Warranty Items</p><p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalWarrantyItems">0</p></div></div></div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm stat-card"><div class="flex items-center gap-3"><div class="bg-amber-100 dark:bg-amber-900/30 w-10 h-10 rounded-xl flex items-center justify-center"><i class="fas fa-clock text-amber-600 dark:text-amber-400 text-lg"></i></div><div><p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Last Backup</p><p class="text-lg font-bold text-gray-800 dark:text-white" id="lastBackup">Never</p></div></div></div>
+                </div>
+                
+                <!-- Backup Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                        <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-base font-semibold"><i class="fas fa-download text-primary mr-2"></i>Export Backup</h3><p class="text-xs text-gray-500 mt-1">Download complete database backup in different formats</p></div>
+                        <div class="p-5 space-y-4">
+                            <button id="backupJSONBtn" class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 rounded-xl transition-all btn-active flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-file-code text-lg"></i> Backup as JSON</button>
+                            <button id="backupCSVBtn" class="w-full bg-info hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition-all btn-active flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-file-csv text-lg"></i> Backup as CSV</button>
+                            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 text-xs text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800"><i class="fas fa-info-circle mr-1"></i> JSON backup includes complete data structure with customer names in transactions.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                        <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-base font-semibold"><i class="fas fa-upload text-primary mr-2"></i>Restore Backup</h3><p class="text-xs text-gray-500 mt-1">Restore database from backup file</p></div>
+                        <div class="p-5 space-y-4">
+                            <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center file-upload-area transition-all" id="uploadArea"><i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i><p class="text-sm text-gray-600 dark:text-gray-400">Click or drag backup file here</p><p class="text-xs text-gray-500 dark:text-gray-500 mt-1">Supported: .json files</p><input type="file" id="restoreFileInput" accept=".json" class="hidden"></div>
+                            <div id="restorePreview" class="hidden bg-gray-100 dark:bg-gray-700/50 rounded-xl p-3 text-sm"></div>
+                            <button id="restoreBtn" class="w-full bg-warning hover:bg-orange-600 text-white font-medium py-3 rounded-xl transition-all btn-active flex items-center justify-center gap-2 shadow-sm" disabled><i class="fas fa-upload"></i> Restore Backup</button>
+                            <div class="bg-red-50 dark:bg-red-900/20 rounded-xl p-3 text-xs text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800"><i class="fas fa-exclamation-triangle mr-1"></i> Warning: Restoring will REPLACE all existing data. This action cannot be undone.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Danger Zone -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-red-200 dark:border-red-800 shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 bg-gradient-to-r from-red-50 to-transparent dark:from-red-900/20 border-b border-red-200 dark:border-red-800"><h3 class="text-base font-semibold text-red-600 dark:text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>Danger Zone</h3><p class="text-xs text-red-500 dark:text-red-400 mt-1">Destructive actions - Use with caution</p></div>
+                    <div class="p-5"><a href="clear-data.html" id="clearDatabaseLink" class="w-full bg-danger hover:bg-red-700 text-white font-medium py-3 rounded-xl transition-all btn-active flex items-center justify-center gap-2 text-center shadow-sm"><i class="fas fa-trash-alt"></i> Clear All Database</a><p class="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">⚠️ This will open a separate page to clear ALL data including Customers, Transactions, Warranty, Suppliers, and Dispatches. Multiple confirmations required.</p></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-2"></div>
+    
+    <!-- Restore Confirmation Modal -->
+    <div id="restoreConfirmModal" class="restore-modal-overlay">
+        <div class="restore-modal-container">
+            <div class="restore-modal-header"><div class="warning-icon">⚠️</div><h3>Restore Backup?</h3></div>
+            <div class="restore-modal-body">
+                <p>⚠️ WARNING: This will REPLACE all existing data!</p>
+                <p>This action will permanently delete:</p>
+                <ul><li>All Customers</li><li>All Transactions (Due & Collection)</li><li>All Warranty Items</li><li>All Suppliers</li><li>All Currier Dispatches</li></ul>
+                <p style="margin-top: 15px;"><strong>Type <span style="color:#dc2626;">"RESTORE"</span> to confirm:</strong></p>
+                <input type="text" id="restoreConfirmInput" class="restore-modal-input" placeholder='Type "RESTORE" here' autocomplete="off">
+            </div>
+            <div class="restore-modal-buttons"><button id="restoreCancelBtn" class="btn-cancel">Cancel</button><button id="restoreConfirmBtn" class="btn-confirm" disabled>Restore Backup</button></div>
+        </div>
+    </div>
+    
+    <!-- Success Modal -->
+    <div id="successModal" class="success-modal-overlay">
+        <div class="success-modal-container"><div class="success-icon"><i class="fas fa-check-circle"></i></div><h3>Restore Complete!</h3><p id="successMessage">Database has been successfully restored.</p><button id="closeSuccessModalBtn">OK</button></div>
+    </div>
+    
+    <!-- Progress Bar Container -->
+    <div id="progressContainer" class="progress-container"><div class="progress-text" id="progressText">Preparing to restore...</div><div class="progress-bar-custom"><div class="progress-fill-custom" id="progressFillCustom"></div></div></div>
+    
+    <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3"><div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl modal-animate"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div><h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3><p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Are you sure you want to logout?</p><div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-100 dark:bg-gray-700 btn-active">Cancel</button><button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-danger text-white btn-active">Logout</button></div></div></div>
+    
+    <script type="module">
+        import { checkAuthState, logout } from './js/auth.js';
+        import { db, collection, getDocs, addDoc, writeBatch, doc } from './js/firebase.js';
+        
+        checkAuthState();
+        
+        // Sidebar functionality
+        const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.id = 'sidebarOverlay'; overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
+        function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); const overlay = document.getElementById('sidebarOverlay'); if (overlay) overlay.remove(); }
+        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+        window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); } });
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
+        
+        const warrantySubmenu = document.getElementById('warrantySubmenu'), warrantyLink = warrantySubmenu?.querySelector('a');
+        if (warrantyLink) warrantyLink.addEventListener('click', (e) => { e.preventDefault(); warrantySubmenu.classList.toggle('open'); warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open'); });
+        const dueSubmenu = document.getElementById('dueSubmenu'), dueLink = dueSubmenu?.querySelector('a');
+        if (dueLink) dueLink.addEventListener('click', (e) => { e.preventDefault(); dueSubmenu.classList.toggle('open'); dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open'); });
+        
+        function showToast(message, type = 'success') { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`; t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`; c.appendChild(t); setTimeout(() => t.remove(), 2500); }
+        function showLoading(show) { const overlay = document.getElementById('loadingOverlay'); if (overlay) overlay.style.display = show ? 'flex' : 'none'; }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+        
+        // Flying data animation
+        let flyingAnimationInterval = null, flyingItemsCount = 0, maxFlyingItems = 300;
+        function startFlyingDataAnimation() { if (flyingAnimationInterval) clearInterval(flyingAnimationInterval); flyingItemsCount = 0; flyingAnimationInterval = setInterval(() => { const progressFill = document.getElementById('progressFillCustom'); if (progressFill && progressFill.style.width === '100%') { stopFlyingDataAnimation(); return; } if (flyingItemsCount >= maxFlyingItems) return; createSingleFlyingDataItem(); flyingItemsCount++; }, 60); }
+        function stopFlyingDataAnimation() { if (flyingAnimationInterval) { clearInterval(flyingAnimationInterval); flyingAnimationInterval = null; } document.querySelectorAll('.flying-data').forEach(item => item.remove()); }
+        function createSingleFlyingDataItem() { const items = ['📁', '👥', '📝', '🛡️', '🏭', '🚚', '📊', '💰', '📦', '🔧', '💾', '🗄️', '⭐', '✨', '📋', '🔐', '⚙️', '🖥️']; const item = document.createElement('div'); item.className = 'flying-data'; item.textContent = items[Math.floor(Math.random() * items.length)]; const startX = Math.random() * window.innerWidth; const startY = -50 - Math.random() * 200; const endX = (Math.random() - 0.5) * 400; const endY = window.innerHeight - 100; item.style.left = startX + 'px'; item.style.top = startY + 'px'; item.style.setProperty('--target-x', endX + 'px'); item.style.setProperty('--target-y', endY + 'px'); document.body.appendChild(item); setTimeout(() => { if (item.parentNode) item.remove(); }, 1200); }
+        function showProgressBar() { const progressBar = document.getElementById('progressContainer'); if (progressBar) progressBar.style.display = 'block'; startFlyingDataAnimation(); }
+        function hideProgressBar() { const progressBar = document.getElementById('progressContainer'); if (progressBar) progressBar.style.display = 'none'; stopFlyingDataAnimation(); }
+        function updateProgress(percent, text) { const progressFill = document.getElementById('progressFillCustom'); const progressText = document.getElementById('progressText'); if (progressFill) progressFill.style.width = percent + '%'; if (progressText) progressText.textContent = text; if (percent >= 100) { setTimeout(() => hideProgressBar(), 800); } }
+        function showSuccessModal(message) { const modal = document.getElementById('successModal'); const msgElement = document.getElementById('successMessage'); if (msgElement) msgElement.textContent = message; if (modal) modal.classList.add('active'); setTimeout(() => hideSuccessModal(), 4000); }
+        function hideSuccessModal() { const modal = document.getElementById('successModal'); if (modal) modal.classList.remove('active'); }
+        
+        let selectedBackupData = null, backupFileName = '';
+        
+        // Restore Confirmation Modal
+        const restoreModal = document.getElementById('restoreConfirmModal'), restoreConfirmInput = document.getElementById('restoreConfirmInput'), restoreConfirmBtn = document.getElementById('restoreConfirmBtn'), restoreCancelBtn = document.getElementById('restoreCancelBtn');
+        function showRestoreModal() { if (restoreModal) { restoreModal.classList.add('active'); if (restoreConfirmInput) { restoreConfirmInput.value = ''; restoreConfirmInput.focus(); } if (restoreConfirmBtn) restoreConfirmBtn.disabled = true; } }
+        function hideRestoreModal() { if (restoreModal) restoreModal.classList.remove('active'); }
+        if (restoreConfirmInput) { restoreConfirmInput.addEventListener('input', (e) => { if (restoreConfirmBtn) restoreConfirmBtn.disabled = e.target.value !== 'RESTORE'; }); restoreConfirmInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && restoreConfirmBtn && !restoreConfirmBtn.disabled) executeRestore(); }); }
+        if (restoreCancelBtn) restoreCancelBtn.addEventListener('click', () => hideRestoreModal());
+        if (restoreConfirmBtn) restoreConfirmBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); if (!restoreConfirmBtn.disabled) executeRestore(); });
+        if (restoreModal) restoreModal.addEventListener('click', (e) => { if (e.target === restoreModal) hideRestoreModal(); });
+        
+        const closeSuccessBtn = document.getElementById('closeSuccessModalBtn');
+        if (closeSuccessBtn) closeSuccessBtn.addEventListener('click', () => { hideSuccessModal(); window.location.reload(); });
+        
+        async function loadStats() {
+            try {
+                const customersSnap = await getDocs(collection(db, 'customers'));
+                const transactionsSnap = await getDocs(collection(db, 'transactions'));
+                const warrantiesSnap = await getDocs(collection(db, 'warranties'));
+                document.getElementById('totalCustomers').textContent = customersSnap.size;
+                document.getElementById('totalTransactions').textContent = transactionsSnap.size;
+                document.getElementById('totalWarrantyItems').textContent = warrantiesSnap.size;
+                const lastBackupTime = localStorage.getItem('lastBackupTime');
+                if (lastBackupTime) { const date = new Date(parseInt(lastBackupTime)); document.getElementById('lastBackup').textContent = date.toLocaleString(); }
+            } catch (error) { console.error('Error loading stats:', error); }
+        }
+        
+        // ==================== BACKUP FUNCTION ====================
+        async function backupAsJSON() { 
+            showLoading(true); 
+            try { 
+                const customersSnap = await getDocs(collection(db, 'customers')); 
+                const transactionsSnap = await getDocs(collection(db, 'transactions')); 
+                const warrantiesSnap = await getDocs(collection(db, 'warranties')); 
+                const suppliersSnap = await getDocs(collection(db, 'suppliers')); 
+                const dispatchesSnap = await getDocs(collection(db, 'dispatches')); 
+                
+                const customers = []; 
+                customersSnap.forEach(doc => customers.push({ id: doc.id, ...doc.data() }));
+                
+                const customerNameMap = new Map();
+                customers.forEach(c => customerNameMap.set(c.id, c.name));
+                
+                const transactions = []; 
+                transactionsSnap.forEach(doc => { 
+                    const data = doc.data();
+                    const transactionWithName = { 
+                        ...data, 
+                        customerName: customerNameMap.get(data.customerId) || 'Unknown' 
+                    };
+                    transactions.push({ id: doc.id, ...transactionWithName });
+                });
+                
+                const warranties = []; warrantiesSnap.forEach(doc => warranties.push({ id: doc.id, ...doc.data() }));
+                const suppliers = []; suppliersSnap.forEach(doc => suppliers.push({ id: doc.id, ...doc.data() }));
+                const dispatches = []; dispatchesSnap.forEach(doc => dispatches.push({ id: doc.id, ...doc.data() }));
+                
+                const backupData = { 
+                    version: '2.0', 
+                    exportedAt: new Date().toISOString(), 
+                    customers, 
+                    transactions, 
+                    warranties, 
+                    suppliers, 
+                    dispatches, 
+                    summary: { totalCustomers: customers.length, totalTransactions: transactions.length, totalWarranties: warranties.length, totalSuppliers: suppliers.length, totalDispatches: dispatches.length } 
+                };
+                
+                const jsonStr = JSON.stringify(backupData, null, 2); 
+                const blob = new Blob([jsonStr], { type: 'application/json' }); 
+                const url = URL.createObjectURL(blob); 
+                const a = document.createElement('a'); 
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-'); 
+                a.download = `jackdev_full_backup_${timestamp}.json`; 
+                a.href = url; 
+                a.click(); 
+                URL.revokeObjectURL(url); 
+                localStorage.setItem('lastBackupTime', Date.now().toString()); 
+                await loadStats(); 
+                showToast(`Backup completed with customer names!`, 'success'); 
+            } catch (error) { console.error('Backup error:', error); showToast('Backup failed: ' + error.message, 'error'); } 
+            finally { showLoading(false); } 
+        }
+        
+        async function backupAsCSV() { 
+            showLoading(true); 
+            try { 
+                const customersSnap = await getDocs(collection(db, 'customers')); 
+                const transactionsSnap = await getDocs(collection(db, 'transactions')); 
+                
+                let customersCSV = '\uFEFF"ID","Name","Phone","Address","Notes","Total Due","Created At"\n'; 
+                customersSnap.forEach(doc => { const data = doc.data(); customersCSV += `"${doc.id}","${(data.name || '').replace(/"/g, '""')}","${(data.phone || '').replace(/"/g, '""')}","${(data.address || '').replace(/"/g, '""')}","${(data.notes || '').replace(/"/g, '""')}","${data.totalDue || 0}","${data.createdAt || ''}"\n`; });
+                
+                let transactionsCSV = '\uFEFF"ID","Customer ID","Customer Name","Type","Date","Description","Total Amount","Paid Amount","Due Amount","Collection Amount","Remarks","Expected Date","Created At"\n'; 
+                transactionsSnap.forEach(doc => { 
+                    const data = doc.data(); 
+                    let description = ''; 
+                    if (data.products && data.products.length > 0) { description = data.products.map(p => `${p.name}(${p.qty} ${p.unit || 'Pcs'})`).join('; '); } 
+                    else if (data.productName) { description = data.productName; } 
+                    else if (data.directDueAmount) { description = `Direct Due: ${data.directDueAmount}`; } 
+                    transactionsCSV += `"${doc.id}","${data.customerId || ''}","${data.customerName || ''}","${data.type || ''}","${data.date || ''}","${description.replace(/"/g, '""')}","${data.totalAmount || 0}","${data.paidAmount || 0}","${data.dueAmount || 0}","${data.collectionAmount || 0}","${(data.remarks || '').replace(/"/g, '""')}","${data.expectedDate || ''}","${data.createdAt || ''}"\n`; 
+                });
+                
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-'); 
+                const customersBlob = new Blob([customersCSV], { type: 'text/csv;charset=utf-8;' }); 
+                const customersUrl = URL.createObjectURL(customersBlob); 
+                const customersA = document.createElement('a'); 
+                customersA.download = `jackdev_customers_${timestamp}.csv`; 
+                customersA.href = customersUrl; 
+                customersA.click(); 
+                URL.revokeObjectURL(customersUrl); 
+                
+                setTimeout(() => { 
+                    const transactionsBlob = new Blob([transactionsCSV], { type: 'text/csv;charset=utf-8;' }); 
+                    const transactionsUrl = URL.createObjectURL(transactionsBlob); 
+                    const transactionsA = document.createElement('a'); 
+                    transactionsA.download = `jackdev_transactions_${timestamp}.csv`; 
+                    transactionsA.href = transactionsUrl; 
+                    transactionsA.click(); 
+                    URL.revokeObjectURL(transactionsUrl); 
+                }, 500);
+                
+                localStorage.setItem('lastBackupTime', Date.now().toString()); 
+                await loadStats(); 
+                showToast(`CSV backup created with customer names!`, 'success'); 
+            } catch (error) { console.error('CSV Backup error:', error); showToast('CSV Backup failed: ' + error.message, 'error'); } 
+            finally { showLoading(false); } 
+        }
+        
+        // ==================== EXECUTE RESTORE FUNCTION ====================
+        async function executeRestore() {
+            hideRestoreModal();
+            
+            if (!selectedBackupData) { 
+                showToast('No backup file selected', 'error'); 
+                return; 
+            }
+            
+            showProgressBar();
+            
+            let totalItems = 0;
+            let restoredItems = 0;
+            
+            if (selectedBackupData.customers) totalItems += selectedBackupData.customers.length;
+            if (selectedBackupData.transactions) totalItems += selectedBackupData.transactions.length;
+            if (selectedBackupData.warranties) totalItems += selectedBackupData.warranties.length;
+            if (selectedBackupData.suppliers) totalItems += selectedBackupData.suppliers.length;
+            if (selectedBackupData.dispatches) totalItems += selectedBackupData.dispatches.length;
+            
+            updateProgress(0, `Starting restore of ${totalItems} items...`);
+            
+            try {
+                const collections = ['customers', 'transactions', 'warranties', 'suppliers', 'dispatches'];
+                updateProgress(3, 'Clearing existing data...');
+                
+                for (const coll of collections) {
+                    const snap = await getDocs(collection(db, coll));
+                    if (snap.size > 0) {
+                        const batch = writeBatch(db);
+                        for (const docSnap of snap.docs) { batch.delete(doc(db, coll, docSnap.id)); }
+                        await batch.commit();
+                    }
+                }
+                
+                const customerNameMap = new Map();
+                if (selectedBackupData.customers && selectedBackupData.customers.length > 0) {
+                    for (const customer of selectedBackupData.customers) {
+                        customerNameMap.set(customer.id, customer.name);
+                    }
+                }
+                
+                updateProgress(8, 'Restoring customers...');
+                
+                if (selectedBackupData.customers && selectedBackupData.customers.length > 0) {
+                    let count = 0;
+                    for (const customer of selectedBackupData.customers) {
+                        const { id, ...customerData } = customer;
+                        await addDoc(collection(db, 'customers'), customerData);
+                        count++;
+                        restoredItems++;
+                        const percent = 8 + (restoredItems / totalItems) * 92;
+                        updateProgress(Math.min(percent, 98), `Restoring customers... ${count}/${selectedBackupData.customers.length}`);
+                        await new Promise(resolve => setTimeout(resolve, 5));
+                    }
+                }
+                
+                updateProgress(30, 'Restoring transactions with customer names...');
+                
+                if (selectedBackupData.transactions && selectedBackupData.transactions.length > 0) {
+                    let count = 0;
+                    for (const transaction of selectedBackupData.transactions) {
+                        const { id, ...transactionData } = transaction;
+                        
+                        if (!transactionData.customerName && transactionData.customerId && customerNameMap.has(transactionData.customerId)) {
+                            transactionData.customerName = customerNameMap.get(transactionData.customerId);
+                        }
+                        
+                        await addDoc(collection(db, 'transactions'), transactionData);
+                        count++;
+                        restoredItems++;
+                        const percent = 30 + (restoredItems / totalItems) * 50;
+                        updateProgress(Math.min(percent, 95), `Restoring transactions... ${count}/${selectedBackupData.transactions.length}`);
+                        await new Promise(resolve => setTimeout(resolve, 5));
+                    }
+                }
+                
+                updateProgress(80, 'Restoring warranty data...');
+                
+                if (selectedBackupData.warranties && selectedBackupData.warranties.length > 0) {
+                    let count = 0;
+                    for (const warranty of selectedBackupData.warranties) {
+                        const { id, ...warrantyData } = warranty;
+                        await addDoc(collection(db, 'warranties'), warrantyData);
+                        count++;
+                        restoredItems++;
+                        const percent = 80 + (restoredItems / totalItems) * 15;
+                        updateProgress(Math.min(percent, 98), `Restoring warranties... ${count}/${selectedBackupData.warranties.length}`);
+                        await new Promise(resolve => setTimeout(resolve, 5));
+                    }
+                }
+                
+                if (selectedBackupData.suppliers && selectedBackupData.suppliers.length > 0) {
+                    let count = 0;
+                    for (const supplier of selectedBackupData.suppliers) {
+                        const { id, ...supplierData } = supplier;
+                        await addDoc(collection(db, 'suppliers'), supplierData);
+                        count++;
+                        restoredItems++;
+                        updateProgress(Math.min(95, 8 + (restoredItems / totalItems) * 92), `Restoring suppliers... ${count}/${selectedBackupData.suppliers.length}`);
+                        await new Promise(resolve => setTimeout(resolve, 5));
+                    }
+                }
+                
+                if (selectedBackupData.dispatches && selectedBackupData.dispatches.length > 0) {
+                    let count = 0;
+                    for (const dispatch of selectedBackupData.dispatches) {
+                        const { id, ...dispatchData } = dispatch;
+                        await addDoc(collection(db, 'dispatches'), dispatchData);
+                        count++;
+                        restoredItems++;
+                        updateProgress(Math.min(98, 8 + (restoredItems / totalItems) * 92), `Restoring dispatches... ${count}/${selectedBackupData.dispatches.length}`);
+                        await new Promise(resolve => setTimeout(resolve, 5));
+                    }
+                }
+                
+                updateProgress(100, 'Complete!');
+                
+                setTimeout(() => {
+                    const successMsg = `✅ ${selectedBackupData.customers.length} customers restored\n📝 ${selectedBackupData.transactions.length} transactions\n🛡️ ${selectedBackupData.warranties.length} warranties\n🏭 ${selectedBackupData.suppliers.length} suppliers\n🚚 ${selectedBackupData.dispatches.length} dispatches\n\nDatabase restored successfully!`;
+                    showSuccessModal(successMsg);
+                }, 500);
+                
+                selectedBackupData = null;
+                document.getElementById('restorePreview').classList.add('hidden');
+                document.getElementById('restoreBtn').disabled = true;
+                await loadStats();
+                
+            } catch (error) {
+                console.error('Restore error:', error);
+                hideProgressBar();
+                showToast('Restore failed: ' + error.message, 'error');
+            }
+        }
+        
+        // File upload handler
+        const uploadArea = document.getElementById('uploadArea'), fileInput = document.getElementById('restoreFileInput'), restorePreview = document.getElementById('restorePreview'), restoreBtn = document.getElementById('restoreBtn');
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+        uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('drag-over'); });
+        uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('drag-over'); const file = e.dataTransfer.files[0]; if (file && file.name.endsWith('.json')) { handleBackupFile(file); } else { showToast('Please upload a JSON backup file', 'error'); } });
+        fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) { handleBackupFile(e.target.files[0]); } });
+        
+        function handleBackupFile(file) {
+            backupFileName = file.name;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.customers && data.transactions) {
+                        selectedBackupData = JSON.parse(JSON.stringify(data));
+                        if (!data.warranties) selectedBackupData.warranties = [];
+                        if (!data.suppliers) selectedBackupData.suppliers = [];
+                        if (!data.dispatches) selectedBackupData.dispatches = [];
+                        
+                        const version = data.version || '1.0';
+                        selectedBackupData.version = version;
+                        
+                        restorePreview.innerHTML = `<div class="flex items-center justify-between"><div><i class="fas fa-check-circle text-green-500 mr-2"></i><span class="font-medium">${escapeHtml(backupFileName)}</span><div class="text-xs text-gray-500 dark:text-gray-400 mt-1">📊 ${data.customers.length} customers | 📝 ${data.transactions.length} transactions${data.warranties ? ` | 🛡️ ${data.warranties.length} warranties` : ''}${data.suppliers ? ` | 🏭 ${data.suppliers.length} suppliers` : ''}${data.dispatches ? ` | 🚚 ${data.dispatches.length} dispatches` : ''}<br>📅 Exported: ${data.exportedAt ? new Date(data.exportedAt).toLocaleString() : 'Unknown'}<br>📌 Version: ${version}</div></div><button id="clearFileBtn" class="text-red-500 hover:text-red-700 transition-colors p-1"><i class="fas fa-times"></i></button></div>`;
+                        restorePreview.classList.remove('hidden');
+                        restoreBtn.disabled = false;
+                        
+                        document.getElementById('clearFileBtn')?.addEventListener('click', () => { selectedBackupData = null; restorePreview.classList.add('hidden'); restoreBtn.disabled = true; fileInput.value = ''; });
+                    } else {
+                        showToast('Invalid backup file format. File must contain customers and transactions data.', 'error');
+                    }
+                } catch (error) {
+                    showToast('Error parsing backup file: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        restoreBtn.addEventListener('click', () => { if (selectedBackupData) { showRestoreModal(); } else { showToast('Please select a backup file first', 'error'); } });
+        
+        document.getElementById('backupJSONBtn').addEventListener('click', backupAsJSON);
+        document.getElementById('backupCSVBtn').addEventListener('click', backupAsCSV);
+        document.getElementById('refreshBtn').addEventListener('click', () => { loadStats(); showToast('Refreshed!', 'success'); });
+        document.getElementById('darkModeToggle').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
+        
+        // Logout
+        const logoutModal = document.getElementById('logoutModal'), logoutLink = document.getElementById('logoutLink'), cancelLogout = document.getElementById('cancelLogoutBtn'), confirmLogout = document.getElementById('confirmLogoutBtn');
+        if (logoutLink) { logoutLink.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); }); }
+        if (cancelLogout) { cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden')); }
+        if (confirmLogout) { confirmLogout.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); }); }
+        
+        loadStats();
+    </script>
+</body>
+</html>
