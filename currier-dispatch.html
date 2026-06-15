@@ -37,14 +37,12 @@
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; }
         
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .dark ::-webkit-scrollbar-track { background: #1e293b; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         
-        /* Navigation Active State */
         .nav-active {
             background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
             border-left: 3px solid #d4af37;
@@ -53,51 +51,22 @@
             background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
         }
         
-        /* Collapsible Submenu */
         .submenu-modern {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .submenu-modern.open {
-            max-height: 280px;
-        }
+        .submenu-modern.open { max-height: 280px; }
         
-        .has-submenu > a .chevron-icon {
-            transition: transform 0.2s ease;
-        }
-        .has-submenu.open > a .chevron-icon {
-            transform: rotate(180deg);
-        }
-        /* Invoice Header Centering */
-        .invoice-header {
-            text-align: center;
-            border-bottom: 2px solid #000;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-        .invoice-title {
-            font-size: 20px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-align: center;
-        }
-        .invoice-subtitle {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-            text-align: center;
-        }
-        /* Modal Animation */
+        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
+        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
+        
         @keyframes modalSlideUp {
             from { opacity: 0; transform: translateY(20px) scale(0.96); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .modal-animate {
-            animation: modalSlideUp 0.2s ease-out forwards;
-        }
+        .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
         
-        /* Status Badges */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -114,11 +83,9 @@
         .dark .status-dispatched { background: #1e3a5f; color: #93c5fd; }
         .dark .status-currier { background: #2e1065; color: #a78bfa; }
         
-        /* Table Row Hover */
         .table-row-hover:hover { background-color: rgba(15, 59, 58, 0.04); }
         .dark .table-row-hover:hover { background-color: rgba(30, 107, 104, 0.1); }
         
-        /* Mobile Responsive Cards */
         .mobile-card-view { display: none; }
         @media (max-width: 768px) {
             .desktop-table-view { display: none; }
@@ -126,7 +93,6 @@
             .stat-value { font-size: 1.25rem; }
         }
         
-        /* Warranty Selection Card */
         .warranty-card {
             background: white;
             border-radius: 16px;
@@ -143,7 +109,6 @@
             background: rgba(15, 59, 58, 0.05);
         }
         
-        /* Floating Action Button for Mobile */
         .floating-action-btn {
             position: fixed;
             bottom: 20px;
@@ -153,7 +118,6 @@
         }
         @media (max-width: 768px) { .floating-action-btn { display: block; } }
         
-        /* Print Styles for Invoice */
         @media print {
             body * { visibility: hidden; }
             #invoiceModal, #invoiceModal * { visibility: visible; }
@@ -161,7 +125,6 @@
             .no-print { display: none !important; }
         }
         
-        /* Invoice Container Styles */
         .invoice-container {
             font-family: 'Inter', monospace;
             max-width: 900px;
@@ -174,6 +137,9 @@
         .product-table th, .product-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
         .supplier-block { margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
         .supplier-header { background: #f0f0f0; padding: 10px 15px; font-weight: bold; }
+        .invoice-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
+        .invoice-title { font-size: 22px; font-weight: bold; letter-spacing: 2px; text-align: center; }
+        .invoice-subtitle { font-size: 14px; color: #555; margin-top: 5px; text-align: center; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -182,7 +148,6 @@
     <div class="flex min-h-screen">
         <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-auto border-r border-white/5">
             <div class="flex flex-col h-full">
-                <!-- Sidebar Header -->
                 <div class="px-5 py-5 border-b border-white/10 flex items-center justify-between sticky top-0 bg-inherit z-10">
                     <div class="flex items-center gap-2.5">
                         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
@@ -198,7 +163,6 @@
                     </button>
                 </div>
                 
-                <!-- Navigation Menu -->
                 <nav class="flex-1 px-3 py-5 space-y-1.5">
                     <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div><span class="text-sm font-medium">Dashboard</span>
@@ -207,7 +171,6 @@
                         <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div><span class="text-sm font-medium">Customers</span>
                     </a>
                     
-                    <!-- Due Entry Submenu -->
                     <div class="has-submenu" id="dueSubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                             <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
@@ -230,7 +193,6 @@
                         <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
                     </a>
                     
-                    <!-- Warranty Submenu (Active Section) -->
                     <div class="has-submenu open" id="warrantySubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-white bg-white/5 transition">
                             <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm text-accent"></i></div><span class="text-sm font-medium">Warranty</span></div>
@@ -260,7 +222,6 @@
                     </a>
                 </nav>
                 
-                <!-- Sidebar Footer / Logout -->
                 <div class="px-3 py-4 border-t border-white/10 mt-auto">
                     <div class="flex items-center justify-between mb-2 px-1">
                         <span class="text-[9px] text-slate-500">v2.5.0 · pro</span>
@@ -276,7 +237,6 @@
         <!-- ==================== MAIN CONTENT SECTION ==================== -->
         <main class="flex-1 md:ml-64 min-h-screen w-full pb-20 md:pb-4">
             
-            <!-- Top Navigation Bar -->
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
                 <div class="px-3 py-2.5 flex justify-between items-center">
                     <div class="flex items-center gap-2">
@@ -292,7 +252,6 @@
             
             <div class="p-3 md:p-4">
                 
-                <!-- Mobile Tab Navigation (Quick Links) -->
                 <div class="flex overflow-x-auto gap-2 mb-4 pb-1">
                     <a href="warranty.html" class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-200 dark:bg-gray-700 hover:bg-primary hover:text-white transition">📦 Suppliers</a>
                     <a href="warranty-entry.html" class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-200 dark:bg-gray-700 hover:bg-primary hover:text-white transition">➕ Warranty Entry</a>
@@ -300,7 +259,6 @@
                     <a href="warranty-list.html" class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-200 dark:bg-gray-700 hover:bg-primary hover:text-white transition">📋 Warranty List</a>
                 </div>
                 
-                <!-- Statistics Cards -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
                     <div class="bg-white dark:bg-gray-800 rounded-xl p-3 md:p-4 border shadow-sm">
                         <div class="bg-blue-100 dark:bg-blue-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-shipping-fast text-blue-600 dark:text-blue-400 text-sm"></i></div>
@@ -324,7 +282,6 @@
                     </div>
                 </div>
                 
-                <!-- Date Selector Section -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-5">
                     <div class="px-4 md:px-5 py-3 md:py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
                         <h3 class="text-sm md:text-base font-semibold"><i class="fas fa-calendar-alt text-primary mr-2"></i>Select Date</h3>
@@ -345,7 +302,6 @@
                     </div>
                 </div>
                 
-                <!-- Warranty Items Selection Section (Dynamic) -->
                 <div id="warrantyItemsSection" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-5 hidden">
                     <div class="px-4 md:px-5 py-3 md:py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
                         <h3 class="text-sm md:text-base font-semibold"><i class="fas fa-clipboard-list text-primary mr-2"></i>Select Items</h3>
@@ -362,7 +318,6 @@
                     </div>
                 </div>
                 
-                <!-- Currier Information Form -->
                 <div id="currierFormSection" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-5 hidden">
                     <div class="px-4 md:px-5 py-3 md:py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
                         <h3 class="text-sm md:text-base font-semibold"><i class="fas fa-truck text-primary mr-2"></i>Currier Details</h3>
@@ -383,7 +338,6 @@
                     </div>
                 </div>
                 
-                <!-- Dispatch Records List (Desktop Table + Mobile Cards) -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
                     <div class="px-4 md:px-5 py-3 md:py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -395,7 +349,6 @@
                         </div>
                     </div>
                     
-                    <!-- Desktop Table View -->
                     <div class="desktop-table-view overflow-x-auto hidden md:block">
                         <table class="w-full min-w-[900px]">
                             <thead class="bg-gray-50 dark:bg-gray-700/50 border-b">
@@ -405,21 +358,18 @@
                         </table>
                     </div>
                     
-                    <!-- Mobile Card View -->
                     <div id="dispatchMobileList" class="mobile-card-view p-3 space-y-3 md:hidden"></div>
                 </div>
             </div>
         </main>
     </div>
     
-    <!-- Floating Action Button for Mobile Scroll -->
     <div class="floating-action-btn">
         <button id="scrollTopBtn" class="bg-primary text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-primary-dark transition">
             <i class="fas fa-arrow-up text-lg"></i>
         </button>
     </div>
     
-    <!-- Invoice Modal -->
     <div id="invoiceModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3">
         <div class="bg-white dark:bg-gray-800 rounded-xl max-w-5xl w-full shadow-2xl modal-animate overflow-hidden max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b no-print">
@@ -433,10 +383,8 @@
         </div>
     </div>
     
-    <!-- Toast Notification Container -->
     <div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col gap-2"></div>
     
-    <!-- Logout Confirmation Modal -->
     <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3">
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center">
             <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 flex items-center justify-center"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div>
@@ -446,8 +394,7 @@
         </div>
     </div>
     
-    <!-- ==================== JAVASCRIPT MODULE (Business Logic) ==================== -->
-   <script type="module">
+    <script type="module">
         import { checkAuthState, logout } from '../js/auth.js';
         import { db, collection, addDoc, getDocs, query, orderBy, where, doc, getDoc, updateDoc, writeBatch } from '../js/firebase.js';
         
@@ -494,43 +441,33 @@
             return `DSP-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Math.floor(Math.random() * 900) + 100}`; 
         }
         
-        // ========== LOAD DISPATCHES - FIXED VERSION ==========
+        // ========== LOAD DISPATCHES ==========
         async function loadDispatches() {
             console.log('🔄 Loading dispatches...');
             const tbody = document.getElementById('dispatchTableBody');
             const mobileContainer = document.getElementById('dispatchMobileList');
             
-            // Show loading state
             if (tbody) tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading dispatches...</td></tr>';
             if (mobileContainer) mobileContainer.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading dispatches...</div>';
             
             try {
-                // Check if db is available
-                if (!db) {
-                    console.error('❌ Firebase db not initialized');
-                    throw new Error('Database connection failed');
-                }
-                
-                // Query dispatches collection
+                if (!db) throw new Error('Database connection failed');
                 const q = query(collection(db, 'dispatches'), orderBy('dispatchDate', 'desc'));
                 const querySnapshot = await getDocs(q);
                 
                 console.log('📦 Dispatches found:', querySnapshot.size);
                 
                 if (querySnapshot.empty) {
-                    console.log('⚠️ No dispatches found in database');
-                    if (tbody) tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500"><i class="fas fa-inbox mr-2"></i>No dispatch records found</td></tr>';
+                    if (tbody) tbody.innerHTML = '<td><td colspan="7" class="text-center py-8 text-gray-500"><i class="fas fa-inbox mr-2"></i>No dispatch records found</div></tr>';
                     if (mobileContainer) mobileContainer.innerHTML = '<div class="text-center py-8 text-gray-500"><i class="fas fa-inbox mr-2"></i>No dispatch records found</div>';
                     allDispatches = [];
                     updateStats();
                     return;
                 }
                 
-                // Process data
                 allDispatches = [];
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                    console.log('📄 Dispatch doc:', doc.id, data);
                     allDispatches.push({
                         id: doc.id,
                         dispatchId: data.dispatchId || `DSP-${doc.id.slice(0, 8)}`,
@@ -551,14 +488,13 @@
                 
             } catch (error) {
                 console.error('❌ Error loading dispatches:', error);
-                const errorMsg = `<tr><td colspan="7" class="text-center py-8 text-red-500"><i class="fas fa-exclamation-triangle mr-2"></i>Error loading dispatches: ${error.message}</td></tr>`;
+                const errorMsg = `<tr><td colspan="7" class="text-center py-8 text-red-500"><i class="fas fa-exclamation-triangle mr-2"></i>Error loading dispatches: ${error.message}</div></tr>`;
                 if (tbody) tbody.innerHTML = errorMsg;
                 if (mobileContainer) mobileContainer.innerHTML = `<div class="text-center py-8 text-red-500"><i class="fas fa-exclamation-triangle mr-2"></i>Error: ${error.message}</div>`;
                 showToast('Failed to load dispatches: ' + error.message, 'error');
             }
         }
         
-        // ========== Render Dispatches ==========
         function renderDispatches() {
             const searchTerm = dispatchSearch?.value.toLowerCase() || '';
             const filtered = allDispatches.filter(d => {
@@ -566,7 +502,6 @@
                        d.currierName?.toLowerCase().includes(searchTerm) ||
                        d.items?.some(item => item.supplierName?.toLowerCase().includes(searchTerm));
             });
-            
             renderDesktopTable(filtered);
             renderMobileCards(filtered);
         }
@@ -574,12 +509,10 @@
         function renderDesktopTable(dispatches) {
             const tbody = document.getElementById('dispatchTableBody');
             if (!tbody) return;
-            
             if (dispatches.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500"><i class="fas fa-search mr-2"></i>No matching dispatch records</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500"><i class="fas fa-search mr-2"></i>No matching dispatch records</div></tr>';
                 return;
             }
-            
             tbody.innerHTML = dispatches.map(d => {
                 const supplierName = d.items && d.items.length > 0 ? (d.items[0].supplierName || 'N/A') : 'N/A';
                 const productsList = d.items && d.items.length > 0 
@@ -587,105 +520,49 @@
                     : 'No products';
                 const statusClass = d.status === 'delivered' ? 'status-pending' : 'status-dispatched';
                 const statusText = d.status === 'delivered' ? 'Delivered' : 'Dispatched';
-                
                 return `<tr class="table-row-hover hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                    <td class="px-3 py-2.5 text-xs font-mono font-semibold text-primary">${escapeHtml(d.dispatchId)}</td>
-                    <td class="px-3 py-2.5 text-sm whitespace-nowrap">${escapeHtml(d.dispatchDate)}</td>
-                    <td class="px-3 py-2.5 text-sm">${escapeHtml(supplierName)}</td>
-                    <td class="px-3 py-2.5 text-sm">${escapeHtml(productsList)}</td>
-                    <td class="px-3 py-2.5 text-sm">
-                        <div>
-                            <p class="font-medium">${escapeHtml(d.currierName)}</p>
-                            ${d.trackingNumber ? `<p class="text-xs text-gray-500">Track: ${escapeHtml(d.trackingNumber)}</p>` : ''}
-                        </div>
-                    </td>
-                    <td class="px-3 py-2.5 text-center">
-                        <span class="status-badge ${statusClass}">${statusText}</span>
-                    </td>
-                    <td class="px-3 py-2.5 text-center">
-                        <button class="generate-invoice text-blue-500 hover:text-blue-700 p-1.5 rounded-lg transition" data-dispatch='${JSON.stringify(d)}'>
-                            <i class="fas fa-file-invoice"></i>
-                        </button>
-                    </td>
+                    <td class="px-3 py-2.5 text-xs font-mono font-semibold text-primary">${escapeHtml(d.dispatchId)}</div>
+                    <td class="px-3 py-2.5 text-sm whitespace-nowrap">${escapeHtml(d.dispatchDate)}</div>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(supplierName)}</div>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(productsList)}</div>
+                    <td class="px-3 py-2.5 text-sm"><div><p class="font-medium">${escapeHtml(d.currierName)}</p>${d.trackingNumber ? `<p class="text-xs text-gray-500">Track: ${escapeHtml(d.trackingNumber)}</p>` : ''}</div></div>
+                    <td class="px-3 py-2.5 text-center"><span class="status-badge ${statusClass}">${statusText}</span></div>
+                    <td class="px-3 py-2.5 text-center"><button class="generate-invoice text-blue-500 hover:text-blue-700 p-1.5 rounded-lg transition" data-dispatch='${JSON.stringify(d)}'><i class="fas fa-file-invoice"></i></button></div>
                 </tr>`;
             }).join('');
-            
             attachInvoiceButtons();
         }
         
         function renderMobileCards(dispatches) {
             const container = document.getElementById('dispatchMobileList');
             if (!container) return;
-            
             if (dispatches.length === 0) {
                 container.innerHTML = '<div class="text-center py-8 text-gray-500"><i class="fas fa-search mr-2"></i>No matching dispatch records</div>';
                 return;
             }
-            
             container.innerHTML = dispatches.map(d => {
                 const statusClass = d.status === 'delivered' ? 'status-pending' : 'status-dispatched';
                 const statusText = d.status === 'delivered' ? 'Delivered' : 'Dispatched';
                 const supplierName = d.items && d.items.length > 0 ? (d.items[0].supplierName || 'N/A') : 'N/A';
                 const productsHtml = d.items && d.items.length > 0 
-                    ? d.items.map(i => `<div class="flex justify-between text-xs py-1 border-b last:border-0">
-                        <span class="font-medium">${escapeHtml(i.productName)}</span>
-                        <span class="text-gray-500">${escapeHtml(i.serialNumber || '-')}</span>
-                    </div>`).join('')
+                    ? d.items.map(i => `<div class="flex justify-between text-xs py-1 border-b last:border-0"><span class="font-medium">${escapeHtml(i.productName)}</span><span class="text-gray-500">${escapeHtml(i.serialNumber || '-')}</span></div>`).join('')
                     : '<div class="text-xs text-gray-500">No products</div>';
-                
                 return `<div class="bg-white dark:bg-gray-800 rounded-xl p-4 mb-3 shadow-sm border border-gray-200 dark:border-gray-700">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-xs font-mono font-bold text-primary bg-primary/10 px-2 py-1 rounded">${escapeHtml(d.dispatchId)}</span>
-                        <span class="status-badge ${statusClass} text-xs">${statusText}</span>
-                    </div>
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Date:</span>
-                            <span>${escapeHtml(d.dispatchDate)}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Supplier:</span>
-                            <span class="font-medium">${escapeHtml(supplierName)}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Currier:</span>
-                            <span>${escapeHtml(d.currierName)}</span>
-                        </div>
-                        ${d.trackingNumber ? `<div class="flex justify-between">
-                            <span class="text-gray-500">Tracking:</span>
-                            <span class="text-xs">${escapeHtml(d.trackingNumber)}</span>
-                        </div>` : ''}
-                        <div class="mt-2">
-                            <div class="text-gray-500 text-xs mb-1">Products (${d.items?.length || 0}):</div>
-                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2">
-                                ${productsHtml}
-                            </div>
-                        </div>
-                        <button class="generate-invoice-mobile w-full mt-2 bg-primary/10 hover:bg-primary/20 text-primary py-2 rounded-lg text-sm font-medium transition" data-dispatch='${JSON.stringify(d)}'>
-                            <i class="fas fa-file-invoice mr-1"></i> View Invoice
-                        </button>
-                    </div>
+                    <div class="flex justify-between items-start mb-3"><span class="text-xs font-mono font-bold text-primary bg-primary/10 px-2 py-1 rounded">${escapeHtml(d.dispatchId)}</span><span class="status-badge ${statusClass} text-xs">${statusText}</span></div>
+                    <div class="space-y-2 text-sm"><div class="flex justify-between"><span class="text-gray-500">Date:</span><span>${escapeHtml(d.dispatchDate)}</span></div><div class="flex justify-between"><span class="text-gray-500">Supplier:</span><span class="font-medium">${escapeHtml(supplierName)}</span></div><div class="flex justify-between"><span class="text-gray-500">Currier:</span><span>${escapeHtml(d.currierName)}</span></div>${d.trackingNumber ? `<div class="flex justify-between"><span class="text-gray-500">Tracking:</span><span class="text-xs">${escapeHtml(d.trackingNumber)}</span></div>` : ''}<div class="mt-2"><div class="text-gray-500 text-xs mb-1">Products (${d.items?.length || 0}):</div><div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2">${productsHtml}</div></div><button class="generate-invoice-mobile w-full mt-2 bg-primary/10 hover:bg-primary/20 text-primary py-2 rounded-lg text-sm font-medium transition" data-dispatch='${JSON.stringify(d)}'><i class="fas fa-file-invoice mr-1"></i> View Invoice</button></div>
                 </div>`;
             }).join('');
-            
             document.querySelectorAll('.generate-invoice-mobile').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const dispatchData = JSON.parse(btn.dataset.dispatch);
-                    showInvoiceModal(dispatchData);
-                });
+                btn.addEventListener('click', () => { const dispatchData = JSON.parse(btn.dataset.dispatch); showInvoiceModal(dispatchData); });
             });
         }
         
         function attachInvoiceButtons() {
             document.querySelectorAll('.generate-invoice').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const dispatchData = JSON.parse(btn.dataset.dispatch);
-                    showInvoiceModal(dispatchData);
-                });
+                btn.addEventListener('click', () => { const dispatchData = JSON.parse(btn.dataset.dispatch); showInvoiceModal(dispatchData); });
             });
         }
         
-        // ========== Update Statistics ==========
         function updateStats() {
             document.getElementById('totalDispatched').textContent = allDispatches.length;
             const totalProducts = allDispatches.reduce((sum, d) => sum + (d.items?.length || 0), 0);
@@ -694,24 +571,16 @@
             document.getElementById('totalInTransit').textContent = allDispatches.filter(d => d.status === 'dispatched').length;
         }
         
-        // ========== Load Warranty By Date ==========
         async function loadWarrantyByDate() {
             const date = document.getElementById('dispatchDate').value;
-            if (!date) {
-                showToast('Please select a date', 'error');
-                return;
-            }
-            
+            if (!date) { showToast('Please select a date', 'error'); return; }
             document.getElementById('warrantyItemsSection').classList.remove('hidden');
             document.getElementById('currierFormSection').classList.add('hidden');
-            
             const container = document.getElementById('warrantyItemsList');
             container.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-pulse"></i> Loading warranty items...</div>';
-            
             try {
                 const q = query(collection(db, 'warranties'), where('warrantyDate', '==', date), where('status', 'in', ['pending', 'received']));
                 const querySnapshot = await getDocs(q);
-                
                 pendingWarrantyItems = [];
                 for (const doc of querySnapshot.docs) {
                     const w = { id: doc.id, ...doc.data() };
@@ -727,13 +596,8 @@
                     }
                     pendingWarrantyItems.push(w);
                 }
-                
                 renderWarrantyCards();
-            } catch (error) {
-                console.error('Error loading warranties:', error);
-                container.innerHTML = '<div class="text-center py-8 text-red-500">Error loading warranty items</div>';
-                showToast('Error loading warranty items', 'error');
-            }
+            } catch (error) { console.error(error); container.innerHTML = '<div class="text-center py-8 text-red-500">Error loading warranty items</div>'; showToast('Error loading warranty items', 'error'); }
         }
         
         function renderWarrantyCards() {
@@ -743,34 +607,17 @@
                 document.getElementById('currierFormSection').classList.add('hidden');
                 return;
             }
-            
             selectedWarrantyIds.clear();
             updateSelectedCount();
-            
             container.innerHTML = pendingWarrantyItems.map(w => {
                 const statusClass = w.status === 'pending' ? 'status-pending' : 'status-currier';
                 const statusText = w.status === 'pending' ? 'Pending' : 'Received';
                 return `<div class="warranty-card ${selectedWarrantyIds.has(w.id) ? 'selected' : ''}" data-id="${w.id}">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" class="warranty-checkbox mt-1" data-id="${w.id}" ${selectedWarrantyIds.has(w.id) ? 'checked' : ''}>
-                        <div class="flex-1">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-xs font-mono font-semibold text-primary">${w.warrantyId || w.id.slice(0, 8)}</span>
-                                <span class="status-badge ${statusClass} text-xs">${statusText}</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-xs">
-                                <div><span class="text-gray-500">Product:</span><br><span class="font-medium">${escapeHtml(w.productName)}</span></div>
-                                <div><span class="text-gray-500">Serial:</span><br><span>${escapeHtml(w.serialNumber || '-')}</span></div>
-                                <div class="col-span-2"><span class="text-gray-500">Problem:</span><br><span class="text-xs">${escapeHtml(w.problemDescription || '-')}</span></div>
-                                <div><span class="text-gray-500">Supplier:</span><br><span>${escapeHtml(w.supplierName)}</span></div>
-                                <div><span class="text-gray-500">Phone:</span><br><span>${escapeHtml(w.supplierPhone)}</span></div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="flex items-start gap-3"><input type="checkbox" class="warranty-checkbox mt-1" data-id="${w.id}" ${selectedWarrantyIds.has(w.id) ? 'checked' : ''}><div class="flex-1">
+                    <div class="flex justify-between items-start mb-2"><span class="text-xs font-mono font-semibold text-primary">${w.warrantyId || w.id.slice(0, 8)}</span><span class="status-badge ${statusClass} text-xs">${statusText}</span></div>
+                    <div class="grid grid-cols-2 gap-2 text-xs"><div><span class="text-gray-500">Product:</span><br><span class="font-medium">${escapeHtml(w.productName)}</span></div><div><span class="text-gray-500">Qty:</span><br><span class="font-medium">${w.quantity || 1} pcs</span></div><div><span class="text-gray-500">Serial:</span><br><span>${escapeHtml(w.serialNumber || '-')}</span></div><div class="col-span-2"><span class="text-gray-500">Problem:</span><br><span class="text-xs">${escapeHtml(w.problemDescription || '-')}</span></div><div><span class="text-gray-500">Supplier:</span><br><span>${escapeHtml(w.supplierName)}</span></div><div><span class="text-gray-500">Phone:</span><br><span>${escapeHtml(w.supplierPhone)}</span></div></div></div></div>
                 </div>`;
             }).join('');
-            
-            // Attach checkbox handlers
             document.querySelectorAll('.warranty-checkbox').forEach(cb => {
                 cb.addEventListener('change', (e) => {
                     e.stopPropagation();
@@ -783,110 +630,48 @@
                     document.getElementById('currierFormSection').classList.toggle('hidden', selectedWarrantyIds.size === 0);
                 });
             });
-            
             document.querySelectorAll('.warranty-card').forEach(card => {
-                card.addEventListener('click', (e) => {
-                    if (e.target.type !== 'checkbox') {
-                        const cb = card.querySelector('.warranty-checkbox');
-                        if (cb) cb.click();
-                    }
-                });
+                card.addEventListener('click', (e) => { if (e.target.type !== 'checkbox') { const cb = card.querySelector('.warranty-checkbox'); if (cb) cb.click(); } });
             });
-            
             document.getElementById('selectAllWarranty').onchange = (e) => {
-                document.querySelectorAll('.warranty-checkbox').forEach(cb => {
-                    cb.checked = e.target.checked;
-                    const id = cb.dataset.id;
-                    if (e.target.checked) selectedWarrantyIds.add(id);
-                    else selectedWarrantyIds.delete(id);
-                    const card = cb.closest('.warranty-card');
-                    if (card) card.classList.toggle('selected', e.target.checked);
-                });
+                document.querySelectorAll('.warranty-checkbox').forEach(cb => { cb.checked = e.target.checked; const id = cb.dataset.id; if (e.target.checked) selectedWarrantyIds.add(id); else selectedWarrantyIds.delete(id); const card = cb.closest('.warranty-card'); if (card) card.classList.toggle('selected', e.target.checked); });
                 updateSelectedCount();
                 document.getElementById('currierFormSection').classList.toggle('hidden', selectedWarrantyIds.size === 0);
             };
         }
         
-        function updateSelectedCount() {
-            document.getElementById('selectedCount').textContent = `${selectedWarrantyIds.size} selected`;
-        }
+        function updateSelectedCount() { document.getElementById('selectedCount').textContent = `${selectedWarrantyIds.size} selected`; }
         
-        // ========== Create Dispatch ==========
         async function createDispatch() {
-            if (selectedWarrantyIds.size === 0) {
-                showToast('Please select at least one warranty item', 'error');
-                return;
-            }
-            
+            if (selectedWarrantyIds.size === 0) { showToast('Please select at least one warranty item', 'error'); return; }
             const currierName = document.getElementById('currierName').value.trim();
-            if (!currierName) {
-                showToast('Please enter currier name', 'error');
-                return;
-            }
-            
+            if (!currierName) { showToast('Please enter currier name', 'error'); return; }
             const selectedItems = pendingWarrantyItems.filter(w => selectedWarrantyIds.has(w.id));
             const dispatchId = generateDispatchId();
             const dispatchDate = document.getElementById('dispatchDate').value;
-            
             try {
-                // Add to dispatches collection
                 await addDoc(collection(db, 'dispatches'), {
-                    dispatchId,
-                    dispatchDate,
-                    currierName,
+                    dispatchId, dispatchDate, currierName,
                     currierPhone: document.getElementById('currierPhone').value,
                     currierAddress: document.getElementById('currierAddress').value,
                     trackingNumber: document.getElementById('trackingNumber').value,
-                    items: selectedItems.map(i => ({
-                        id: i.id,
-                        warrantyId: i.warrantyId,
-                        productName: i.productName,
-                        serialNumber: i.serialNumber,
-                        problemDescription: i.problemDescription,
-                        supplierId: i.supplierId,
-                        supplierName: i.supplierName,
-                        supplierPhone: i.supplierPhone
-                    })),
-                    status: 'dispatched',
-                    createdAt: new Date().toISOString()
+                    items: selectedItems.map(i => ({ id: i.id, warrantyId: i.warrantyId, productName: i.productName, quantity: i.quantity || 1, serialNumber: i.serialNumber, problemDescription: i.problemDescription, supplierId: i.supplierId, supplierName: i.supplierName, supplierPhone: i.supplierPhone })),
+                    status: 'dispatched', createdAt: new Date().toISOString()
                 });
-                
-                // Update warranty statuses
                 const batch = writeBatch(db);
                 for (const item of selectedItems) {
                     const warrantyRef = doc(db, 'warranties', item.id);
-                    batch.update(warrantyRef, {
-                        status: 'currier',
-                        currierDispatched: true,
-                        dispatchDate: dispatchDate,
-                        currierName: currierName
-                    });
+                    batch.update(warrantyRef, { status: 'currier', currierDispatched: true, dispatchDate: dispatchDate, currierName: currierName });
                 }
                 await batch.commit();
-                
                 showToast(`Dispatch created successfully! ID: ${dispatchId}`, 'success');
-                
-                // Reset form
-                document.getElementById('currierName').value = '';
-                document.getElementById('currierPhone').value = '';
-                document.getElementById('currierAddress').value = '';
-                document.getElementById('trackingNumber').value = '';
-                selectedWarrantyIds.clear();
-                document.getElementById('warrantyItemsSection').classList.add('hidden');
-                document.getElementById('currierFormSection').classList.add('hidden');
-                
-                // Reload data
-                await loadDispatches();
-                await loadWarrantyByDate();
-                
-            } catch (error) {
-                console.error('Error creating dispatch:', error);
-                showToast('Error creating dispatch: ' + error.message, 'error');
-            }
+                document.getElementById('currierName').value = ''; document.getElementById('currierPhone').value = ''; document.getElementById('currierAddress').value = ''; document.getElementById('trackingNumber').value = '';
+                selectedWarrantyIds.clear(); document.getElementById('warrantyItemsSection').classList.add('hidden'); document.getElementById('currierFormSection').classList.add('hidden');
+                await loadDispatches(); await loadWarrantyByDate();
+            } catch (error) { console.error(error); showToast('Error creating dispatch: ' + error.message, 'error'); }
         }
         
-        // ========== Invoice Modal ==========
-        // ========== Invoice Modal ==========
+        // ========== INVOICE MODAL WITH QUANTITY DISPLAY ==========
         function showInvoiceModal(dispatch) {
             const items = dispatch.items || [];
             const grouped = new Map();
@@ -911,8 +696,9 @@
                         <thead>
                             <tr style="background: #e0e0e0;">
                                 <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Product</th>
-                                <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Problem</th>
+                                <th style="border: 1px solid #ccc; padding: 8px; text-align: center;">Quantity</th>
                                 <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Serial No</th>
+                                <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Problem</th>
                                 <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Warranty ID</th>
                             </tr>
                         </thead>
@@ -920,8 +706,9 @@
                             ${data.products.map(item => `
                                 <tr>
                                     <td style="border: 1px solid #ccc; padding: 8px;">${escapeHtml(item.productName)}</td>
-                                    <td style="border: 1px solid #ccc; padding: 8px;">${escapeHtml(item.problemDescription || '-')}</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px; text-align: center;">${item.quantity || 1} pcs</td>
                                     <td style="border: 1px solid #ccc; padding: 8px;">${escapeHtml(item.serialNumber || '-')}</td>
+                                    <td style="border: 1px solid #ccc; padding: 8px;">${escapeHtml(item.problemDescription || '-')}</td>
                                     <td style="border: 1px solid #ccc; padding: 8px;">${item.warrantyId || item.id?.slice(0, 8)}</td>
                                 </tr>
                             `).join('')}
@@ -929,6 +716,9 @@
                     </table>
                 </div>
             `).join('');
+            
+            // Calculate total quantity
+            const totalQuantity = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
             
             document.getElementById('invoiceContent').innerHTML = `
                 <div class="invoice-container" style="font-family: 'Inter', monospace; max-width: 900px; margin: 0 auto; background: white; padding: 30px; border: 1px solid #ddd;">
@@ -949,7 +739,7 @@
                         </div>
                     </div>
                     <div>
-                        <strong>PRODUCTS (${items.length} items)</strong><br>
+                        <strong>PRODUCTS (${items.length} items, Total Quantity: ${totalQuantity} pcs)</strong><br>
                         <div class="separator" style="border-top:1px dashed #999; margin:10px 0;"></div>
                         ${supplierHtml}
                     </div>
@@ -963,18 +753,14 @@
         }
         
         function exportToCSV() {
-            if (allDispatches.length === 0) {
-                showToast('No data to export', 'error');
-                return;
-            }
-            
-            const headers = ['Dispatch ID', 'Date', 'Supplier', 'Products', 'Currier Name', 'Tracking', 'Status'];
+            if (allDispatches.length === 0) { showToast('No data to export', 'error'); return; }
+            const headers = ['Dispatch ID', 'Date', 'Supplier', 'Products', 'Quantity', 'Currier Name', 'Tracking', 'Status'];
             const rows = allDispatches.map(d => {
                 const suppliers = [...new Set(d.items.map(i => i.supplierName))].join('; ');
                 const products = d.items.map(i => i.productName).join('; ');
-                return [d.dispatchId, d.dispatchDate, suppliers, products, d.currierName, d.trackingNumber || '', d.status];
+                const totalQuantity = d.items.reduce((sum, i) => sum + (i.quantity || 1), 0);
+                return [d.dispatchId, d.dispatchDate, suppliers, products, totalQuantity, d.currierName, d.trackingNumber || '', d.status];
             });
-            
             const csvContent = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
             const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8' });
             const link = document.createElement('a');
@@ -991,107 +777,38 @@
         // ========== Event Listeners ==========
         loadBtn?.addEventListener('click', loadWarrantyByDate);
         createDispatchBtn?.addEventListener('click', createDispatch);
-        refreshBtn?.addEventListener('click', () => {
-            loadDispatches();
-            showToast('Refreshed!', 'success');
-        });
-        darkModeToggle?.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            document.body.classList.toggle('dark');
-            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-        });
+        refreshBtn?.addEventListener('click', () => { loadDispatches(); showToast('Refreshed!', 'success'); });
+        darkModeToggle?.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); localStorage.setItem('darkMode', document.documentElement.classList.contains('dark')); });
         dispatchSearch?.addEventListener('input', renderDispatches);
         exportBtn?.addEventListener('click', exportToCSV);
         scrollTopBtn?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-        
-        // Modal close
-        document.getElementById('closeInvoiceModalBtn')?.addEventListener('click', () => {
-            document.getElementById('invoiceModal').classList.add('hidden');
-        });
+        document.getElementById('closeInvoiceModalBtn')?.addEventListener('click', () => { document.getElementById('invoiceModal').classList.add('hidden'); });
         document.getElementById('printInvoiceBtn')?.addEventListener('click', () => window.print());
         
-        // Set default date
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('dispatchDate').value = today;
         
-        // Sidebar functionality
-        function openSidebar() {
-            sidebar.classList.remove('-translate-x-full');
-            const overlay = document.createElement('div');
-            overlay.id = 'sidebarOverlay';
-            overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
-            overlay.addEventListener('click', closeSidebar);
-            document.body.appendChild(overlay);
-        }
-        
-        function closeSidebar() {
-            sidebar.classList.add('-translate-x-full');
-            document.getElementById('sidebarOverlay')?.remove();
-        }
-        
+        function openSidebar() { sidebar.classList.remove('-translate-x-full'); const overlay = document.createElement('div'); overlay.id = 'sidebarOverlay'; overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); }
+        function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); }
         menuToggle?.addEventListener('click', openSidebar);
         closeSidebarBtn?.addEventListener('click', closeSidebar);
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
+        window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); } else { sidebar.classList.add('-translate-x-full'); } });
         
-        if (window.innerWidth >= 768) {
-            sidebar.classList.remove('-translate-x-full');
-        } else {
-            sidebar.classList.add('-translate-x-full');
-        }
+        if (warrantySubmenu) { const warrantyLink = warrantySubmenu.querySelector('a'); warrantyLink?.addEventListener('click', (e) => { e.preventDefault(); warrantySubmenu.classList.toggle('open'); warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open'); }); }
+        if (dueSubmenu) { const dueLink = dueSubmenu.querySelector('a'); dueLink?.addEventListener('click', (e) => { e.preventDefault(); dueSubmenu.classList.toggle('open'); dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open'); }); }
         
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768) {
-                sidebar.classList.remove('-translate-x-full');
-                document.getElementById('sidebarOverlay')?.remove();
-            } else {
-                sidebar.classList.add('-translate-x-full');
-            }
-        });
-        
-        // Submenu toggles
-        if (warrantySubmenu) {
-            const warrantyLink = warrantySubmenu.querySelector('a');
-            warrantyLink?.addEventListener('click', (e) => {
-                e.preventDefault();
-                warrantySubmenu.classList.toggle('open');
-                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
-        }
-        
-        if (dueSubmenu) {
-            const dueLink = dueSubmenu.querySelector('a');
-            dueLink?.addEventListener('click', (e) => {
-                e.preventDefault();
-                dueSubmenu.classList.toggle('open');
-                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
-        }
-        
-        // Logout
         const logoutModal = document.getElementById('logoutModal');
         const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
         const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+        logoutLink?.addEventListener('click', (e) => { e.preventDefault(); logoutModal?.classList.remove('hidden'); });
+        cancelLogoutBtn?.addEventListener('click', () => { logoutModal?.classList.add('hidden'); });
+        confirmLogoutBtn?.addEventListener('click', async () => { logoutModal?.classList.add('hidden'); await logout(); });
         
-        logoutLink?.addEventListener('click', (e) => {
-            e.preventDefault();
-            logoutModal?.classList.remove('hidden');
-        });
-        
-        cancelLogoutBtn?.addEventListener('click', () => {
-            logoutModal?.classList.add('hidden');
-        });
-        
-        confirmLogoutBtn?.addEventListener('click', async () => {
-            logoutModal?.classList.add('hidden');
-            await logout();
-        });
-        
-        // Check dark mode preference
         if (localStorage.getItem('darkMode') === 'true' || (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            document.body.classList.add('dark');
+            document.documentElement.classList.add('dark'); document.body.classList.add('dark');
         }
         
-        // ========== Initialize Page ==========
         console.log('🚀 Initializing Currier Dispatch page...');
         loadDispatches();
     </script>
