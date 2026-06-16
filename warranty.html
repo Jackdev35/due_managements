@@ -42,7 +42,6 @@
             position: relative;
         }
         
-        /* Remove body scrollbar - prevent page level horizontal scroll */
         html, body {
             overflow-x: hidden !important;
             max-width: 100%;
@@ -109,11 +108,9 @@
         @media (max-width: 768px) {
             .two-column-layout { flex-direction: column; }
             .btn-modern { padding: 0.4rem 0.7rem; font-size: 0.7rem; }
-            .stat-value { font-size: 1.2rem; }
         }
         
-        /* ========== SCROLLABLE TABLES - Mobile friendly ========== */
-        /* Supplier Table Container - Horizontal & Vertical Scroll */
+        /* ========== SCROLLABLE TABLES - Mobile friendly (Same as Currier Dispatch) ========== */
         .supplier-table-container {
             max-height: 450px;
             overflow-y: auto;
@@ -122,7 +119,6 @@
             scrollbar-width: thin;
         }
         
-        /* Courier Table Container - Horizontal & Vertical Scroll */
         .courier-table-container {
             max-height: 420px;
             overflow-y: auto;
@@ -131,7 +127,6 @@
             scrollbar-width: thin;
         }
         
-        /* Ensure tables have minimum width for horizontal scroll */
         .supplier-table {
             width: 100%;
             min-width: 650px;
@@ -144,7 +139,6 @@
             border-collapse: collapse;
         }
         
-        /* Sticky headers */
         .supplier-table th {
             position: sticky;
             top: 0;
@@ -165,7 +159,6 @@
             background: #1e293b;
         }
         
-        /* Table cell styles */
         .supplier-table th, .supplier-table td {
             padding: 0.6rem 0.75rem;
             font-size: 0.75rem;
@@ -178,7 +171,6 @@
             white-space: nowrap;
         }
         
-        /* Action buttons don't wrap */
         .whitespace-nowrap {
             white-space: nowrap;
         }
@@ -217,13 +209,12 @@
             font-size: 0.75rem;
         }
         
-        /* Small Delete Modal */
         .small-modal {
             max-width: 320px;
             margin: 0 auto;
         }
         
-        /* Mobile specific - ensure main content doesn't overflow */
+        /* Scroll hint for mobile */
         @media (max-width: 640px) {
             .supplier-table th, .supplier-table td {
                 padding: 0.5rem 0.6rem;
@@ -233,14 +224,6 @@
                 padding: 0.5rem 0.6rem;
                 font-size: 0.7rem;
             }
-            main {
-                overflow-x: visible;
-                width: 100%;
-            }
-            .p-3, .p-4 {
-                overflow-x: visible;
-            }
-            /* Show scroll hint for mobile users */
             .scroll-hint {
                 display: block;
                 font-size: 9px;
@@ -261,9 +244,7 @@
             display: none;
         }
         
-        /* Ensure no horizontal scroll on page */
         .flex.min-h-screen {
-            
             max-width: 100%;
         }
         
@@ -271,7 +252,7 @@
             overflow-x: visible;
         }
         
-        /* Custom scrollbar styling for table containers */
+        /* Custom scrollbar styling */
         .supplier-table-container::-webkit-scrollbar,
         .courier-table-container::-webkit-scrollbar {
             height: 5px;
@@ -365,7 +346,7 @@
             </div>
         </aside>
         
-        <!-- Main Content - No horizontal scroll -->
+        <!-- Main Content -->
         <main class="flex-1 md:ml-64 min-h-screen w-full overflow-x-hidden">
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b sticky top-0 z-40">
                 <div class="px-3 py-2 flex justify-between items-center">
@@ -399,18 +380,14 @@
                 
                 <!-- Two Column Layout -->
                 <div class="two-column-layout">
-                    <!-- Suppliers Section with Horizontal Scroll -->
+                    <!-- Suppliers Section -->
                     <div class="suppliers-section">
                         <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
                             <div class="p-2.5 border-b flex flex-wrap justify-between items-center gap-2">
                                 <div class="relative w-full sm:w-56"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i><input type="text" id="supplierSearch" placeholder="Search supplier..." class="w-full pl-8 pr-3 py-1.5 text-xs border rounded-lg"></div>
                                 <div class="flex gap-2"><button id="exportSupplierBtn" class="bg-success text-white btn-modern"><i class="fas fa-download text-xs"></i> Export</button><button id="addSupplierBtn" class="bg-primary text-white btn-modern"><i class="fas fa-plus text-xs"></i> Add</button></div>
                             </div>
-                            <!-- Scroll Hint for Mobile -->
-                            <div class="scroll-hint text-right px-2 py-1 text-[9px] text-gray-400 bg-gray-50 dark:bg-gray-700/30">
-                                <i class="fas fa-arrows-alt-h mr-1"></i> Swipe left/right to see all columns
-                            </div>
-                            <!-- Scrollable Table Container -->
+                            <div class="scroll-hint"><i class="fas fa-arrows-alt-h mr-1"></i> Swipe left/right to see all columns</div>
                             <div class="supplier-table-container">
                                 <table class="supplier-table">
                                     <thead class="bg-gray-50 dark:bg-gray-700/50 border-b">
@@ -428,18 +405,14 @@
                         </div>
                     </div>
                     
-                    <!-- Courier Contacts Section with Horizontal Scroll -->
+                    <!-- Courier Contacts Section -->
                     <div class="courier-section">
                         <div class="courier-card">
                             <div class="courier-header">
                                 <h3 class="font-semibold text-sm"><i class="fas fa-truck-fast text-primary mr-1"></i> Courier Contacts</h3>
                                 <button id="addCourierBtn" class="bg-primary text-white btn-modern"><i class="fas fa-plus-circle text-xs"></i> Add</button>
                             </div>
-                            <!-- Scroll Hint for Mobile -->
-                            <div class="scroll-hint text-right px-2 py-1 text-[9px] text-gray-400 bg-gray-50 dark:bg-gray-700/30">
-                                <i class="fas fa-arrows-alt-h mr-1"></i> Swipe left/right
-                            </div>
-                            <!-- Scrollable Table Container -->
+                            <div class="scroll-hint"><i class="fas fa-arrows-alt-h mr-1"></i> Swipe left/right</div>
                             <div class="courier-table-container">
                                 <table class="courier-table">
                                     <thead>
@@ -451,7 +424,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="courierTableBody">
-                                        <tr><td colspan="4" class="empty-courier"><i class="fas fa-box-open text-xl mb-1 block opacity-40"></i>No courier contacts</td></tr>
+                                        <tr><td colspan="4" class="empty-courier"><i class="fas fa-box-open text-xl mb-1 block opacity-40"></i>No courier contacts</div></td>
                                     </tbody>
                                 </table>
                             </div>
@@ -482,7 +455,7 @@
         </div>
     </div>
     
-    <!-- Small Delete Confirmation Modal -->
+    <!-- Delete Confirmation Modal -->
     <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-3">
         <div class="bg-white dark:bg-gray-800 rounded-xl max-w-xs w-full p-5 text-center small-modal">
             <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-red-100 flex items-center justify-center"><i class="fas fa-trash-alt text-red-500 text-lg"></i></div>
@@ -524,15 +497,15 @@
         async function loadSuppliers() {
             const tbody = document.getElementById('suppliersTableBody');
             if(!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">Loading...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">Loading...</div></tr>';
             try {
                 const snap = await getDocs(collection(db,'suppliers'));
                 const suppliers = []; snap.forEach(d => suppliers.push({id:d.id, ...d.data()}));
                 document.getElementById('totalSuppliers') && (document.getElementById('totalSuppliers').textContent = suppliers.length);
-                if(suppliers.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">No suppliers</td></tr>'; return; }
-                tbody.innerHTML = suppliers.map(s => `<tr class="table-row-hover border-b"><td class="px-2 py-2 text-xs font-medium">${escapeHtml(s.name)}</td><td class="px-2 py-2 text-xs">${escapeHtml(s.contactPerson||'-')}</td><td class="px-2 py-2 text-xs">${escapeHtml(s.phone)}</td><td class="px-2 py-2 text-xs truncate max-w-[150px]">${escapeHtml(s.address||'-')}</td><td class="px-2 py-2 text-center whitespace-nowrap"><button class="edit-supplier text-blue-500 p-1" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-contact="${escapeHtml(s.contactPerson||'')}" data-phone="${escapeHtml(s.phone)}" data-address="${escapeHtml(s.address||'')}"><i class="fas fa-edit text-xs"></i></button><button class="delete-supplier text-red-500 p-1 ml-1" data-id="${s.id}" data-name="${escapeHtml(s.name)}"><i class="fas fa-trash-alt text-xs"></i></button></td></tr>`).join('');
+                if(suppliers.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">No suppliers</div></tr>'; return; }
+                tbody.innerHTML = suppliers.map(s => `<tr class="table-row-hover border-b"><td class="px-2 py-2 text-xs font-medium">${escapeHtml(s.name)}</div><td class="px-2 py-2 text-xs">${escapeHtml(s.contactPerson||'-')}</div><td class="px-2 py-2 text-xs">${escapeHtml(s.phone)}</div><td class="px-2 py-2 text-xs truncate max-w-[150px]" title="${escapeHtml(s.address||'-')}">${escapeHtml(s.address||'-')}</div><td class="px-2 py-2 text-center whitespace-nowrap"><button class="edit-supplier text-blue-500 p-1" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-contact="${escapeHtml(s.contactPerson||'')}" data-phone="${escapeHtml(s.phone)}" data-address="${escapeHtml(s.address||'')}"><i class="fas fa-edit text-xs"></i></button><button class="delete-supplier text-red-500 p-1 ml-1" data-id="${s.id}" data-name="${escapeHtml(s.name)}"><i class="fas fa-trash-alt text-xs"></i></button></div></tr>`).join('');
                 attachSupplierEvents();
-            } catch(e) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-red-400 text-xs">Error</td></tr>'; }
+            } catch(e) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-red-400 text-xs">Error</div></tr>'; }
         }
         
         function attachSupplierEvents() {
@@ -605,7 +578,7 @@
                 const couriers = []; snap.forEach(d => couriers.push({id:d.id, ...d.data()}));
                 couriers.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
                 if(couriers.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="empty-courier"><i class="fas fa-box-open text-xl mb-1 block opacity-40"></i>No courier contacts</div></tr>'; return; }
-                tbody.innerHTML = couriers.map(c => `<tr><td class="px-2 py-2 text-xs font-medium">${escapeHtml(c.courierName)}</div><td class="px-2 py-2 text-xs">${escapeHtml(c.phone)}</div><td class="px-2 py-2 text-xs truncate max-w-[150px]">${escapeHtml(c.address||'-')}</div><td class="px-2 py-2 text-center whitespace-nowrap"><button class="edit-courier text-blue-500 p-1" data-id="${c.id}" data-name="${escapeHtml(c.courierName)}" data-phone="${escapeHtml(c.phone)}" data-address="${escapeHtml(c.address||'')}"><i class="fas fa-edit text-xs"></i></button><button class="delete-courier text-red-500 p-1 ml-1" data-id="${c.id}" data-name="${escapeHtml(c.courierName)}"><i class="fas fa-trash-alt text-xs"></i></button></div></td>`).join('');
+                tbody.innerHTML = couriers.map(c => `<tr><td class="px-2 py-2 text-xs font-medium">${escapeHtml(c.courierName)}</div><td class="px-2 py-2 text-xs">${escapeHtml(c.phone)}</div><td class="px-2 py-2 text-xs truncate max-w-[150px]" title="${escapeHtml(c.address||'-')}">${escapeHtml(c.address||'-')}</div><td class="px-2 py-2 text-center whitespace-nowrap"><button class="edit-courier text-blue-500 p-1" data-id="${c.id}" data-name="${escapeHtml(c.courierName)}" data-phone="${escapeHtml(c.phone)}" data-address="${escapeHtml(c.address||'')}"><i class="fas fa-edit text-xs"></i></button><button class="delete-courier text-red-500 p-1 ml-1" data-id="${c.id}" data-name="${escapeHtml(c.courierName)}"><i class="fas fa-trash-alt text-xs"></i></button></div></tr>`).join('');
                 attachCourierEvents();
             } catch(e) { tbody.innerHTML = '<tr><td colspan="4" class="empty-courier text-red-400">Error</div></tr>'; }
         }
