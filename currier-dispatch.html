@@ -100,46 +100,169 @@
             background: rgba(15, 59, 58, 0.04);
         }
         
+        /* ==================== INVOICE STYLES ==================== */
+        .invoice-container {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px 30px;
+            color: #1a1a2e;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+        
+        .invoice-header {
+            text-align: center;
+            border-bottom: 3px solid #0f3b3a;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+        }
+        .invoice-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #0f3b3a;
+        }
+        .invoice-subtitle {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+            color: #4a5568;
+        }
+        
+        .currier-section {
+            border: 1px solid #2d3748;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            background: #f7fafc;
+            border-radius: 6px;
+        }
+        .dark .currier-section {
+            background: #1a202c;
+            border-color: #4a5568;
+        }
+        .currier-info-block, .dispatch-info-block {
+            font-size: 9.5px;
+            line-height: 1.6;
+        }
+        .currier-info-block strong, .dispatch-info-block strong {
+            color: #0f3b3a;
+        }
+        .dispatch-info-block { text-align: right; }
+        
+        .supplier-block {
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            break-inside: avoid;
+            border-radius: 6px;
+        }
+        .dark .supplier-block {
+            border-color: #4a5568;
+        }
+        .supplier-header {
+            background: #edf2f7;
+            padding: 8px 12px;
+            font-weight: 700;
+            font-size: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #0f3b3a;
+        }
+        .dark .supplier-header {
+            background: #2d3748;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+        
+        .product-table {
+            width: 100%;
+            font-size: 9px;
+            border-collapse: collapse;
+        }
+        .product-table th, .product-table td {
+            border: 1px solid #e2e8f0;
+            padding: 6px 8px;
+            text-align: left;
+        }
+        .dark .product-table th, .dark .product-table td {
+            border-color: #4a5568;
+        }
+        .product-table th {
+            background: #f7fafc;
+            text-align: center;
+            font-weight: 700;
+            color: #0f3b3a;
+        }
+        .dark .product-table th {
+            background: #2d3748;
+            color: #e2e8f0;
+        }
+        .product-table td {
+            color: #1a202c;
+        }
+        .dark .product-table td {
+            color: #e2e8f0;
+        }
+        .product-table tr:nth-child(even) {
+            background: #f7fafc;
+        }
+        .dark .product-table tr:nth-child(even) {
+            background: #1a202c;
+        }
+        
+        .footer-text {
+            text-align: center;
+            font-size: 8px;
+            margin-top: 16px;
+            padding-top: 8px;
+            border-top: 2px solid #e2e8f0;
+            color: #4a5568;
+        }
+        .dark .footer-text {
+            border-top-color: #4a5568;
+            color: #9ca3af;
+        }
+        .separator-dashed {
+            border-top: 1px dashed #cbd5e0;
+            margin: 10px 0;
+        }
+        .dark .separator-dashed {
+            border-top-color: #4a5568;
+        }
+        
+        @media (max-width: 640px) {
+            .invoice-container { padding: 12px 15px; font-size: 8.5px; }
+            .currier-section { flex-direction: column; gap: 8px; }
+            .dispatch-info-block { text-align: left; }
+            .invoice-title { font-size: 14px; }
+            .product-table th, .product-table td { padding: 4px 5px; font-size: 7.5px; }
+        }
+        
         /* Print Styles */
         @media print {
             body * { visibility: hidden !important; }
             #invoiceModal, #invoiceModal * { visibility: visible !important; }
-            #invoiceModal { position: fixed !important; top: 0; left: 0; width: 100%; height: 100%; background: white; display: block !important; z-index: 99999; margin: 0; padding: 0; overflow: visible !important; }
+            #invoiceModal { 
+                position: fixed !important; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+                height: 100%; 
+                background: white; 
+                display: block !important; 
+                z-index: 99999; 
+                margin: 0; 
+                padding: 0; 
+                overflow: visible !important; 
+            }
             #invoiceModal .no-print { display: none !important; }
             .invoice-container { margin: 0 auto !important; padding: 15px 20px !important; border: none !important; }
             .supplier-block { break-inside: avoid; page-break-inside: avoid; }
             .product-table th, .product-table td { border: 1px solid #000 !important; padding: 4px 6px !important; }
-        }
-        
-        .invoice-container {
-            font-family: 'Courier New', 'Inter', monospace;
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px 25px;
-            color: #1a1a2e;
-            font-size: 9px;
-            line-height: 1.4;
-        }
-        
-        .invoice-header { text-align: center; border-bottom: 2px solid #1a1a2e; padding-bottom: 10px; margin-bottom: 15px; }
-        .invoice-title { font-size: 14px; font-weight: 700; letter-spacing: 1.5px; color: #0f3b3a; }
-        .invoice-subtitle { font-size: 9px; font-weight: 600; margin-top: 3px; color: #4a5568; }
-        .currier-section { border: 1px solid #2d2d2d; padding: 10px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; flex-wrap: wrap; background: #fafafc; }
-        .currier-info-block, .dispatch-info-block { font-size: 8.5px; line-height: 1.5; }
-        .dispatch-info-block { text-align: right; }
-        .supplier-block { margin-bottom: 14px; border: 1px solid #cbd5e0; overflow: hidden; break-inside: avoid; }
-        .supplier-header { background: #edf2f7; padding: 6px 10px; font-weight: 700; font-size: 9px; border-bottom: 1px solid #cbd5e0; }
-        .product-table { width: 100%; font-size: 8px; border-collapse: collapse; }
-        .product-table th, .product-table td { border: 1px solid #cbd5e0; padding: 5px 6px; text-align: left; }
-        .product-table th { background: #f7fafc; text-align: center; font-weight: 700; }
-        .footer-text { text-align: center; font-size: 7px; margin-top: 14px; padding-top: 6px; border-top: 1px solid #a0aec0; }
-        .separator-dashed { border-top: 1px dashed #a0aec0; margin: 8px 0; }
-        
-        @media (max-width: 640px) {
-            .invoice-container { padding: 10px; }
-            .currier-section { flex-direction: column; gap: 6px; }
-            .dispatch-info-block { text-align: left; }
         }
     </style>
 </head>
@@ -147,7 +270,7 @@
     
     <!-- ==================== SIDEBAR SECTION ==================== -->
     <div class="flex min-h-screen">
-        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-auto border-r border-white/5">
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-hidden border-r border-white/5">
             <div class="flex flex-col h-full">
                 <div class="px-5 py-5 border-b border-white/10 flex items-center justify-between sticky top-0 bg-inherit z-10">
                     <div class="flex items-center gap-2.5">
@@ -290,18 +413,39 @@
     </div>
     
     <!-- Invoice Modal -->
-    <div id="invoiceModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] hidden p-3 overflow-auto">
-        <div class="bg-white rounded-lg max-w-4xl w-full shadow-xl overflow-hidden max-h-[95vh] flex flex-col">
-            <div class="flex justify-between items-center px-4 py-2 bg-gray-100 border-b no-print sticky top-0 z-10">
-                <h3 class="font-semibold text-sm">Dispatch Invoice</h3>
-                <div class="flex gap-2"><button id="printInvoiceBtn" class="px-3 py-1 text-xs bg-primary text-white rounded">Print</button><button id="closeInvoiceModalBtn" class="px-3 py-1 text-xs bg-gray-300 rounded">Close</button></div>
+    <div id="invoiceModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3 overflow-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full shadow-2xl overflow-hidden max-h-[95vh] flex flex-col modal-animate">
+            <div class="flex justify-between items-center px-5 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 no-print sticky top-0 z-10">
+                <h3 class="font-semibold text-sm text-gray-800 dark:text-white">
+                    <i class="fas fa-file-invoice text-primary mr-2"></i>Dispatch Invoice
+                </h3>
+                <div class="flex gap-2">
+                    <button id="printInvoiceBtn" class="px-4 py-1.5 text-xs font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition shadow-sm">
+                        <i class="fas fa-print mr-1"></i> Print
+                    </button>
+                    <button id="closeInvoiceModalBtn" class="px-4 py-1.5 text-xs font-medium bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition">
+                        <i class="fas fa-times mr-1"></i> Close
+                    </button>
+                </div>
             </div>
-            <div id="invoiceContent" class="overflow-y-auto flex-1 bg-white p-0"></div>
+            <div id="invoiceContent" class="overflow-y-auto flex-1 bg-white dark:bg-gray-900 p-0"></div>
         </div>
     </div>
     
     <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
-    <div id="logoutModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[200]"><div class="bg-white rounded-xl p-6 text-center"><h3 class="font-semibold mb-2">Logout?</h3><div class="flex gap-3 justify-center mt-4"><button id="cancelLogoutBtn" class="px-4 py-2 bg-gray-200 rounded">Cancel</button><button id="confirmLogoutBtn" class="px-4 py-2 bg-red-500 text-white rounded">Logout</button></div></div></div>
+    <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[200]">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center max-w-sm w-full modal-animate">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <i class="fas fa-sign-out-alt text-orange-500 text-xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Are you sure you want to logout?</p>
+            <div class="flex gap-3 justify-center">
+                <button id="cancelLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition">Cancel</button>
+                <button id="confirmLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-red-500 text-white hover:bg-red-600 transition shadow-sm">Logout</button>
+            </div>
+        </div>
+    </div>
     
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
@@ -324,6 +468,28 @@
         function showToast(msg, type='success') { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `px-4 py-2 rounded-lg shadow text-sm ${type==='success'?'bg-green-500 text-white':'bg-red-500 text-white'}`; t.innerText = msg; c.appendChild(t); setTimeout(()=>t.remove(),3000); }
         function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
         function generateDispatchId() { const now = new Date(); return `DSP-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${Math.floor(Math.random() * 900) + 100}`; }
+        
+        // Modal close on outside click
+        function setupModalCloseOnOutside(modalId, closeBtnId) {
+            const modal = document.getElementById(modalId);
+            const closeBtn = document.getElementById(closeBtnId);
+            
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                        document.body.classList.remove('modal-open');
+                    }
+                });
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    document.body.classList.remove('modal-open');
+                });
+            }
+        }
         
         async function loadCouriersForDropdown() {
             try {
@@ -386,7 +552,7 @@
                     <td class="px-3 py-2 text-sm">${escapeHtml(d.items?.[0]?.supplierName || 'N/A')}</td>
                     <td class="px-3 py-2 text-sm">${escapeHtml(d.items?.map(i=>i.productName).slice(0,2).join(', '))}${d.items?.length > 2 ? ` +${d.items.length-2}` : ''}</td>
                     <td class="px-3 py-2 text-sm">${escapeHtml(d.currierName)}</td>
-                    <td class="px-3 py-2 text-center"><button class="view-invoice-btn text-blue-500 hover:text-blue-700" data-dispatch='${JSON.stringify(d)}'><i class="fas fa-file-invoice"></i></button></td>
+                    <td class="px-3 py-2 text-center"><button class="view-invoice-btn text-blue-500 hover:text-blue-700 p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition" data-dispatch='${JSON.stringify(d)}'><i class="fas fa-file-invoice text-sm"></i></button></td>
                 </tr>
             `).join('');
             
@@ -578,6 +744,7 @@
             `;
             document.getElementById('invoiceContent').innerHTML = invoiceHtml;
             document.getElementById('invoiceModal').classList.remove('hidden');
+            document.body.classList.add('modal-open');
         }
         
         // Event Listeners
@@ -586,9 +753,16 @@
         document.getElementById('createDispatchBtn')?.addEventListener('click', createDispatch);
         document.getElementById('refreshBtn')?.addEventListener('click', () => { loadDispatches(); loadCouriersForDropdown(); showToast('Refreshed'); });
         document.getElementById('dispatchSearch')?.addEventListener('input', renderDispatches);
-        document.getElementById('closeInvoiceModalBtn')?.addEventListener('click', () => document.getElementById('invoiceModal').classList.add('hidden'));
+        document.getElementById('closeInvoiceModalBtn')?.addEventListener('click', () => {
+            document.getElementById('invoiceModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
         document.getElementById('darkModeToggle')?.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
         document.getElementById('dispatchDate').value = new Date().toISOString().split('T')[0];
+        
+        // Setup modal close on outside click
+        setupModalCloseOnOutside('invoiceModal', 'closeInvoiceModalBtn');
+        setupModalCloseOnOutside('logoutModal', 'cancelLogoutBtn');
         
         // Sidebar Logic
         const sidebar = document.getElementById('sidebar');
@@ -615,10 +789,15 @@
         document.getElementById('logoutLink')?.addEventListener('click', (e) => { 
             e.preventDefault(); 
             document.getElementById('logoutModal').classList.remove('hidden'); 
+            document.body.classList.add('modal-open');
         });
-        document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => document.getElementById('logoutModal').classList.add('hidden'));
+        document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => {
+            document.getElementById('logoutModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
         document.getElementById('confirmLogoutBtn')?.addEventListener('click', async () => { 
             document.getElementById('logoutModal').classList.add('hidden'); 
+            document.body.classList.remove('modal-open');
             await logout(); 
         });
         

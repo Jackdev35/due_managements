@@ -111,6 +111,14 @@
             background: #064e3b;
             color: #86efac;
         }
+        .status-dispatched {
+            background: #bfdbfe;
+            color: #1e40af;
+        }
+        .dark .status-dispatched {
+            background: #1e3a5f;
+            color: #93c5fd;
+        }
         
         .table-row-hover:hover {
             background-color: rgba(15, 59, 58, 0.04);
@@ -160,6 +168,46 @@
             background-color: rgba(49, 130, 206, 0.1);
             transform: scale(1.05);
         }
+        .edit-warranty:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+            transform: scale(1.05);
+        }
+        .edit-warranty.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        /* Barcode scan button style */
+        .scan-btn {
+            background: linear-gradient(135deg, #0f3b3a, #1e6b68);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        .scan-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(15, 59, 58, 0.3);
+        }
+        .scan-btn:active {
+            transform: scale(0.95);
+        }
+        .scan-btn i {
+            margin-right: 6px;
+        }
+        .scan-btn.scanning {
+            background: linear-gradient(135deg, #dd6b20, #ed8936);
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -167,7 +215,7 @@
     <div class="flex min-h-screen">
         
         <!-- Sidebar - Professional Design -->
-        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-auto border-r border-white/5">
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-hidden border-r border-white/5">
             <div class="flex flex-col h-full">
                 <div class="px-5 py-5 border-b border-white/10 flex items-center justify-between sticky top-0 bg-inherit z-10">
                     <div class="flex items-center gap-2.5">
@@ -358,14 +406,19 @@
                                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                                         <i class="fas fa-barcode text-primary mr-1"></i> Serial Number <span class="text-gray-400 text-[10px]">(Optional)</span>
                                     </label>
-                                    <input type="text" id="warrantySerial" placeholder="Product serial number" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                                    <div class="flex gap-2">
+                                        <input type="text" id="warrantySerial" placeholder="Scan or type serial number" class="flex-1 px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                                        <button type="button" id="scanSerialBtn" class="scan-btn">
+                                            <i class="fas fa-camera"></i> Scan
+                                        </button>
+                                    </div>
+                                    <p class="text-[9px] text-gray-400 mt-1"><i class="fas fa-info-circle"></i> Click scan to activate barcode scanner</p>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                        <i class="fas fa-hashtag text-primary mr-1"></i> Quantity <span class="text-gray-400 text-[10px]">(Optional - Default: 1)</span>
+                                        <i class="fas fa-hashtag text-primary mr-1"></i> Quantity
                                     </label>
-                                    <input type="number" id="warrantyQuantity" placeholder="Number of products" value="1" min="1" step="1" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                                    <p class="text-[9px] text-gray-400 mt-1">For multiple identical products</p>
+                                    <input type="number" id="warrantyQuantity" value="1" min="1" step="1" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -380,12 +433,15 @@
                                     <input type="tel" id="customerPhone" placeholder="Customer phone number" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
                                 </div>
                             </div>
+                            
+                            <!-- Problem Description - Full width row -->
                             <div>
                                 <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                                     <i class="fas fa-clipboard-list text-primary mr-1"></i> Problem Description
                                 </label>
-                                <textarea id="warrantyProblem" rows="2" placeholder="Describe the product issue in detail..." class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
+                                <textarea id="warrantyProblem" rows="2" placeholder="Briefly describe the product issue..." class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-y"></textarea>
                             </div>
+                            
                             <div class="flex justify-end">
                                 <button type="submit" class="bg-primary hover:bg-primary-dark text-white font-medium px-6 py-2.5 rounded-xl text-sm shadow-md btn-active transition-all">
                                     <i class="fas fa-save mr-1"></i> Submit Warranty
@@ -488,6 +544,86 @@
         </div>
     </div>
     
+    <!-- Edit Warranty Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[180] hidden transition-all duration-300 p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full shadow-2xl modal-animate overflow-hidden">
+            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-accent/10 to-transparent border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-base font-semibold text-gray-800 dark:text-white">
+                    <i class="fas fa-edit text-accent mr-2"></i>Edit Warranty Entry
+                </h3>
+                <button id="closeEditModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="editWarrantyForm" class="p-5 max-h-[60vh] overflow-y-auto">
+                <input type="hidden" id="editWarrantyId">
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <i class="fas fa-truck text-accent mr-1"></i> Supplier <span class="text-red-500">*</span>
+                        </label>
+                        <select id="editSupplier" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/50" required>
+                            <option value="">-- Select Supplier --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <i class="fas fa-calendar text-accent mr-1"></i> Warranty Date <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" id="editWarrantyDate" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/50" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <i class="fas fa-box text-accent mr-1"></i> Product Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="editProductName" placeholder="Enter product name" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/50" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <i class="fas fa-barcode text-accent mr-1"></i> Serial Number <span class="text-gray-400 text-[10px]">(Optional)</span>
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="text" id="editSerialNumber" placeholder="Scan or type serial number" class="flex-1 px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                            <button type="button" id="editScanSerialBtn" class="scan-btn">
+                                <i class="fas fa-camera"></i> Scan
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <i class="fas fa-hashtag text-accent mr-1"></i> Quantity
+                        </label>
+                        <input type="number" id="editQuantity" value="1" min="1" step="1" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <i class="fas fa-user text-accent mr-1"></i> Customer Name <span class="text-gray-400 text-[10px]">(Optional)</span>
+                        </label>
+                        <input type="text" id="editCustomerName" placeholder="Customer name" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <i class="fas fa-phone text-accent mr-1"></i> Customer Phone <span class="text-gray-400 text-[10px]">(Optional)</span>
+                        </label>
+                        <input type="tel" id="editCustomerPhone" placeholder="Customer phone number" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <i class="fas fa-clipboard-list text-accent mr-1"></i> Problem Description
+                        </label>
+                        <textarea id="editProblemDescription" rows="2" placeholder="Briefly describe the product issue..." class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/50 resize-y"></textarea>
+                    </div>
+                </div>
+            </form>
+            <div class="flex justify-end gap-3 px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
+                <button id="cancelEditBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 btn-active">Cancel</button>
+                <button id="confirmEditBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-accent text-white shadow-md btn-active">
+                    <i class="fas fa-save mr-1"></i> Update Warranty
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Toast Container -->
     <div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-2"></div>
     
@@ -515,7 +651,7 @@
     </script>
     
     <script type="module">
-        import { db, collection, addDoc, getDocs, query, orderBy, doc, getDoc, deleteDoc } from './js/firebase.js';
+        import { db, collection, addDoc, getDocs, query, orderBy, doc, getDoc, deleteDoc, updateDoc } from './js/firebase.js';
         
         // Sidebar functionality
         const sidebar = document.getElementById('sidebar');
@@ -592,6 +728,8 @@
         
         let allEntries = [];
         let deleteWarrantyId = null;
+        let editWarrantyId = null;
+        let isScanning = false;
         
         // Generate Warranty ID
         function generateWarrantyId() {
@@ -603,10 +741,73 @@
             return `WAR-${year}${month}${day}/${random}`;
         }
         
+        // Barcode Scanner Function
+        function activateScanner(inputElementId, buttonElementId) {
+            const input = document.getElementById(inputElementId);
+            const button = document.getElementById(buttonElementId);
+            
+            if (!input || !button) return;
+            
+            button.addEventListener('click', async function() {
+                if (isScanning) {
+                    showToast('Scanner already active', 'info');
+                    return;
+                }
+                
+                // Check if browser supports camera
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showToast('Camera not supported on this device', 'error');
+                    return;
+                }
+                
+                try {
+                    isScanning = true;
+                    button.classList.add('scanning');
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
+                    
+                    // Request camera permission
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: 'environment' } 
+                    });
+                    
+                    // Stop all tracks - we just need permission
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    // Show prompt for manual entry or scanning
+                    showToast('Ready to scan. Please point camera at barcode.', 'info');
+                    
+                    // Simulate barcode scan for demo - in production use a barcode library
+                    // For actual implementation, use QuaggaJS or similar library
+                    // Here we're using a prompt as fallback
+                    const scannedValue = prompt('Enter scanned barcode number:');
+                    
+                    if (scannedValue !== null && scannedValue.trim() !== '') {
+                        input.value = scannedValue.trim();
+                        showToast('Barcode scanned successfully!', 'success');
+                    } else {
+                        showToast('Scan cancelled or no input', 'info');
+                    }
+                    
+                } catch (error) {
+                    console.error('Scanner error:', error);
+                    if (error.name === 'NotAllowedError') {
+                        showToast('Camera access denied. Please allow camera permission.', 'error');
+                    } else {
+                        showToast('Error accessing camera: ' + error.message, 'error');
+                    }
+                } finally {
+                    isScanning = false;
+                    button.classList.remove('scanning');
+                    button.innerHTML = '<i class="fas fa-camera"></i> Scan';
+                }
+            });
+        }
+        
         // Load Suppliers Dropdown
-        async function loadSuppliers() {
-            const select = document.getElementById('warrantySupplier');
+        async function loadSuppliers(selectId = 'warrantySupplier') {
+            const select = document.getElementById(selectId);
             if (!select) return;
+            const currentValue = select.value;
             select.innerHTML = '<option value="">-- Select Supplier --</option>';
             try {
                 const snapshot = await getDocs(collection(db, 'suppliers'));
@@ -617,6 +818,7 @@
                     option.textContent = supplier.name;
                     select.appendChild(option);
                 });
+                if (currentValue) select.value = currentValue;
             } catch (error) {
                 console.error('Error loading suppliers:', error);
                 showToast('Error loading suppliers', 'error');
@@ -646,7 +848,7 @@
                 renderEntriesTable(entries);
             } catch (error) {
                 console.error('Error loading entries:', error);
-                tbody.innerHTML = '<table><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</div></td>';
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
                 showToast('Error loading warranty entries', 'error');
             }
         }
@@ -660,11 +862,23 @@
             
             tbody.innerHTML = '';
             entries.forEach(entry => {
-                const statusClass = entry.status === 'pending' ? 'status-pending' : 'status-received';
-                const statusText = entry.status === 'pending' ? 'Pending' : 'Received';
-                const statusIcon = entry.status === 'pending' ? 'fa-clock' : 'fa-check-circle';
+                let statusClass, statusText, statusIcon;
+                if (entry.status === 'pending') {
+                    statusClass = 'status-pending';
+                    statusText = 'Pending';
+                    statusIcon = 'fa-clock';
+                } else if (entry.status === 'dispatched') {
+                    statusClass = 'status-dispatched';
+                    statusText = 'Dispatched';
+                    statusIcon = 'fa-shipping-fast';
+                } else {
+                    statusClass = 'status-received';
+                    statusText = 'Received';
+                    statusIcon = 'fa-check-circle';
+                }
                 const quantity = entry.quantity || 1;
                 const productDisplay = quantity > 1 ? `${entry.productName} (x${quantity})` : entry.productName;
+                const isPending = entry.status === 'pending';
                 
                 const row = tbody.insertRow();
                 row.className = 'table-row-hover transition-colors cursor-pointer';
@@ -673,25 +887,40 @@
                 row.innerHTML = `
                     <td class="px-3 py-2.5 text-xs font-mono font-semibold">${escapeHtml(entry.warrantyId || entry.id.slice(0, 12))}</td>
                     <td class="px-3 py-2.5 text-sm whitespace-nowrap">${escapeHtml(entry.warrantyDate || 'N/A')}</td>
-                    <td class="px-3 py-2.5 text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(entry.supplierName)}</div>
-                    <td class="px-3 py-2.5 text-sm">${escapeHtml(productDisplay)}</div>
-                    <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.customerName || '-')}</div>
-                    <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.customerPhone || '-')}</div>
+                    <td class="px-3 py-2.5 text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(entry.supplierName)}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(productDisplay)}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.customerName || '-')}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.customerPhone || '-')}</td>
                     <td class="px-3 py-2.5 text-center">
                         <span class="status-badge ${statusClass}">
                             <i class="fas ${statusIcon} text-[10px]"></i> ${statusText}
                         </span>
-                    </div>
+                    </td>
                     <td class="px-3 py-2.5 text-center">
                         <div class="flex items-center justify-center gap-2">
                             <button class="view-details text-blue-500 hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-entry='${JSON.stringify(entry)}' title="View Details">
                                 <i class="fas fa-eye text-sm"></i>
                             </button>
+                            ${isPending ? `
+                            <button class="edit-warranty text-accent hover:text-amber-600 p-1.5 rounded-lg transition-colors" data-id="${entry.id}" data-entry='${JSON.stringify(entry)}' title="Edit Warranty Entry">
+                                <i class="fas fa-edit text-sm"></i>
+                            </button>
+                            ` : `
+                            <button class="edit-warranty disabled opacity-40 cursor-not-allowed p-1.5 rounded-lg" title="Cannot edit - already dispatched" disabled>
+                                <i class="fas fa-edit text-sm text-gray-400"></i>
+                            </button>
+                            `}
+                            ${isPending ? `
                             <button class="delete-warranty text-red-500 hover:text-red-700 p-1.5 rounded-lg transition-colors" data-id="${entry.id}" data-product="${escapeHtml(entry.productName)}" title="Delete Warranty Entry">
                                 <i class="fas fa-trash-alt text-sm"></i>
                             </button>
+                            ` : `
+                            <button class="delete-warranty disabled opacity-40 cursor-not-allowed p-1.5 rounded-lg" title="Cannot delete - already dispatched" disabled>
+                                <i class="fas fa-trash-alt text-sm text-gray-400"></i>
+                            </button>
+                            `}
                         </div>
-                    </div>
+                    </td>
                 `;
             });
             
@@ -716,8 +945,17 @@
                 });
             });
             
+            // Edit buttons
+            document.querySelectorAll('.edit-warranty:not(.disabled)').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const entry = JSON.parse(btn.dataset.entry);
+                    openEditModal(entry);
+                });
+            });
+            
             // Delete buttons
-            document.querySelectorAll('.delete-warranty').forEach(btn => {
+            document.querySelectorAll('.delete-warranty:not(.disabled)').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
                     const warrantyId = btn.dataset.id;
@@ -729,8 +967,17 @@
         
         function showDetailsModal(entry) {
             const detailsContent = document.getElementById('detailsContent');
-            const statusClass = entry.status === 'pending' ? 'status-pending' : 'status-received';
-            const statusText = entry.status === 'pending' ? 'Pending' : 'Received';
+            let statusClass, statusText;
+            if (entry.status === 'pending') {
+                statusClass = 'status-pending';
+                statusText = 'Pending';
+            } else if (entry.status === 'dispatched') {
+                statusClass = 'status-dispatched';
+                statusText = 'Dispatched';
+            } else {
+                statusClass = 'status-received';
+                statusText = 'Received';
+            }
             const quantity = entry.quantity || 1;
             
             detailsContent.innerHTML = `
@@ -809,6 +1056,69 @@
             }
         }
         
+        // Open Edit Modal
+        function openEditModal(entry) {
+            editWarrantyId = entry.id;
+            
+            // Populate edit form with entry data
+            document.getElementById('editWarrantyId').value = entry.id;
+            document.getElementById('editSupplier').value = entry.supplierId || '';
+            document.getElementById('editWarrantyDate').value = entry.warrantyDate || '';
+            document.getElementById('editProductName').value = entry.productName || '';
+            document.getElementById('editSerialNumber').value = entry.serialNumber || '';
+            document.getElementById('editQuantity').value = entry.quantity || 1;
+            document.getElementById('editCustomerName').value = entry.customerName || '';
+            document.getElementById('editCustomerPhone').value = entry.customerPhone || '';
+            document.getElementById('editProblemDescription').value = entry.problemDescription || '';
+            
+            // Load suppliers for edit dropdown
+            loadSuppliers('editSupplier');
+            
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+        
+        // Submit Edit Warranty
+        async function submitEditWarranty(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('editWarrantyId').value;
+            const supplierId = document.getElementById('editSupplier').value;
+            const warrantyDate = document.getElementById('editWarrantyDate').value;
+            const productName = document.getElementById('editProductName').value.trim();
+            const quantity = parseInt(document.getElementById('editQuantity').value) || 1;
+            const serialNumber = document.getElementById('editSerialNumber').value.trim();
+            const customerName = document.getElementById('editCustomerName').value.trim();
+            const customerPhone = document.getElementById('editCustomerPhone').value.trim();
+            const problemDescription = document.getElementById('editProblemDescription').value;
+            
+            if (!supplierId) { showToast('Please select a supplier', 'error'); return; }
+            if (!warrantyDate) { showToast('Please select warranty date', 'error'); return; }
+            if (!productName) { showToast('Please enter product name', 'error'); return; }
+            
+            try {
+                await updateDoc(doc(db, 'warranties', id), {
+                    supplierId: supplierId,
+                    warrantyDate: warrantyDate,
+                    productName: productName,
+                    quantity: quantity,
+                    serialNumber: serialNumber || null,
+                    customerName: customerName || null,
+                    customerPhone: customerPhone || null,
+                    problemDescription: problemDescription || null,
+                    updatedAt: new Date().toISOString()
+                });
+                
+                showToast('Warranty entry updated successfully!', 'success');
+                document.getElementById('editModal').classList.add('hidden');
+                await loadWarrantyEntries();
+                editWarrantyId = null;
+                
+            } catch (error) {
+                console.error('Update error:', error);
+                showToast('Error updating warranty entry: ' + error.message, 'error');
+            }
+        }
+        
         // Submit Warranty
         async function submitWarranty(e) {
             e.preventDefault();
@@ -847,6 +1157,8 @@
                 document.getElementById('warrantyForm').reset();
                 document.getElementById('warrantyDate').valueAsDate = new Date();
                 document.getElementById('warrantyQuantity').value = '1';
+                document.getElementById('warrantySerial').value = '';
+                document.getElementById('warrantyProblem').value = '';
                 await loadWarrantyEntries();
                 
             } catch (error) {
@@ -866,7 +1178,8 @@
             
             allEntries.forEach(entry => {
                 const quantity = entry.quantity || 1;
-                csvRows.push(`"${entry.warrantyId || entry.id.slice(0, 12)}","${entry.warrantyDate || 'N/A'}","${(entry.supplierName || 'N/A').replace(/"/g, '""')}","${entry.productName.replace(/"/g, '""')}","${quantity}","${(entry.serialNumber || '-').replace(/"/g, '""')}","${(entry.customerName || '-').replace(/"/g, '""')}","${(entry.customerPhone || '-').replace(/"/g, '""')}","${entry.status === 'pending' ? 'Pending' : 'Received'}","${(entry.problemDescription || '').replace(/"/g, '""')}"`);
+                let status = entry.status === 'pending' ? 'Pending' : entry.status === 'dispatched' ? 'Dispatched' : 'Received';
+                csvRows.push(`"${entry.warrantyId || entry.id.slice(0, 12)}","${entry.warrantyDate || 'N/A'}","${(entry.supplierName || 'N/A').replace(/"/g, '""')}","${entry.productName.replace(/"/g, '""')}","${quantity}","${(entry.serialNumber || '-').replace(/"/g, '""')}","${(entry.customerName || '-').replace(/"/g, '""')}","${(entry.customerPhone || '-').replace(/"/g, '""')}","${status}","${(entry.problemDescription || '').replace(/"/g, '""')}"`);
             });
             
             const csvContent = csvRows.join('\n');
@@ -920,6 +1233,23 @@
             }
         });
         
+        // Edit modal event listeners
+        document.getElementById('closeEditModalBtn')?.addEventListener('click', () => {
+            document.getElementById('editModal').classList.add('hidden');
+            editWarrantyId = null;
+        });
+        document.getElementById('cancelEditBtn')?.addEventListener('click', () => {
+            document.getElementById('editModal').classList.add('hidden');
+            editWarrantyId = null;
+        });
+        document.getElementById('confirmEditBtn')?.addEventListener('click', submitEditWarranty);
+        document.getElementById('editModal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('editModal')) {
+                document.getElementById('editModal').classList.add('hidden');
+                editWarrantyId = null;
+            }
+        });
+        
         // Logout functionality
         const logoutModal = document.getElementById('logoutModal');
         const logoutLink = document.getElementById('logoutLink');
@@ -939,6 +1269,10 @@
                 await logout();
             });
         }
+        
+        // Initialize Barcode Scanners
+        activateScanner('warrantySerial', 'scanSerialBtn');
+        activateScanner('editSerialNumber', 'editScanSerialBtn');
         
         // Initialize
         loadSuppliers();

@@ -37,14 +37,13 @@
         body { 
             font-family: 'Inter', system-ui, sans-serif; 
             background: #f5f7fb;
-            overflow-x: hidden !important;
-            width: 100%;
-            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
         
-        html, body {
-            overflow-x: hidden !important;
-            max-width: 100%;
+        html {
+            overflow-x: hidden;
+            overflow-y: auto;
         }
         
         ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -80,98 +79,181 @@
         .btn-active:active { transform: scale(0.97); }
         
         .btn-modern {
-            padding: 0.5rem 0.9rem;
-            font-size: 0.75rem;
+            padding: 8px 16px;
+            font-size: 13px;
             font-weight: 500;
-            border-radius: 0.5rem;
-            gap: 0.4rem;
-            transition: all 0.2s;
+            border-radius: 10px;
+            gap: 6px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-modern:active { transform: scale(0.95); }
+        .btn-modern i { font-size: 13px; }
+        
+        .btn-primary {
+            background: #0f3b3a;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #092c2b;
+            box-shadow: 0 4px 12px rgba(15, 59, 58, 0.3);
+        }
+        
+        .btn-success {
+            background: #2c7a4d;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #1e5f3a;
+            box-shadow: 0 4px 12px rgba(44, 122, 77, 0.3);
+        }
+        
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c53030;
+            box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #e5e7eb;
+            color: #6b7280;
+        }
+        .btn-outline:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+        .dark .btn-outline {
+            border-color: #374151;
+            color: #9ca3af;
+        }
+        .dark .btn-outline:hover {
+            background: #374151;
+        }
+        
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 220px;
+        }
+        .search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 13px;
+        }
+        .search-wrapper input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            font-size: 13px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .search-wrapper input:focus {
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.1);
+        }
+        .dark .search-wrapper input {
+            background: #1f2937;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+        .dark .search-wrapper input:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+        .dark .search-wrapper i {
+            color: #6b7280;
         }
         
         .table-row-hover:hover { background-color: rgba(15, 59, 58, 0.04); }
         .dark .table-row-hover:hover { background-color: rgba(30, 107, 104, 0.1); }
         
-        /* Responsive Layout */
-        .two-column-layout {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .suppliers-section {
-            flex: 2;
-            min-width: 240px;
-        }
-        .courier-section {
-            flex: 1;
-            min-width: 260px;
-        }
-        @media (max-width: 768px) {
-            .two-column-layout { flex-direction: column; }
-            .btn-modern { padding: 0.4rem 0.7rem; font-size: 0.7rem; }
+        /* Full width sections */
+        .full-width-section {
+            width: 100%;
         }
         
-        /* ========== SCROLLABLE TABLES - Mobile friendly (Same as Currier Dispatch) ========== */
-        .supplier-table-container {
-            max-height: 450px;
-            overflow-y: auto;
+        /* ========== TABLE CONTAINER - SAME AS WARRANTY-LIST ========== */
+        .table-container {
+            width: 100%;
             overflow-x: auto;
+            overflow-y: visible;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
+            display: block;
         }
         
-        .courier-table-container {
-            max-height: 420px;
-            overflow-y: auto;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
+        .table-container::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        .dark .table-container::-webkit-scrollbar-track {
+            background: #374151;
+        }
+        .dark .table-container::-webkit-scrollbar-thumb {
+            background: #6b7280;
+        }
+        .dark .table-container::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
         }
         
-        .supplier-table {
+        .table-container table {
             width: 100%;
             min-width: 650px;
             border-collapse: collapse;
         }
         
-        .courier-table {
-            width: 100%;
+        .table-container.courier-table-container table {
             min-width: 450px;
-            border-collapse: collapse;
         }
         
-        .supplier-table th {
+        .table-container th {
             position: sticky;
             top: 0;
             background: #f9fafb;
             z-index: 10;
+            border-bottom: 2px solid #e5e7eb;
+            font-weight: 600;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            padding: 0.6rem 0.75rem;
+            text-align: left;
         }
-        .dark .supplier-table th {
+        .dark .table-container th {
             background: #1f2937;
+            border-bottom-color: #374151;
+            color: #9ca3af;
         }
         
-        .courier-table th {
-            position: sticky;
-            top: 0;
-            background: #f3f4f6;
-            z-index: 10;
-        }
-        .dark .courier-table th {
-            background: #1e293b;
-        }
-        
-        .supplier-table th, .supplier-table td {
+        .table-container td {
             padding: 0.6rem 0.75rem;
             font-size: 0.75rem;
-            white-space: nowrap;
-        }
-        
-        .courier-table th, .courier-table td {
-            padding: 0.6rem 0.75rem;
-            font-size: 0.75rem;
-            white-space: nowrap;
-        }
-        
-        .whitespace-nowrap {
             white-space: nowrap;
         }
         
@@ -202,89 +284,57 @@
             border-color: #374151;
         }
         
-        .empty-courier {
+        .empty-state {
             padding: 2rem;
             text-align: center;
             color: #9ca3af;
             font-size: 0.75rem;
         }
         
-        .small-modal {
-            max-width: 320px;
-            margin: 0 auto;
+        .scroll-hint {
+            display: none;
+            font-size: 9px;
+            color: #6b7280;
+            padding: 4px 10px;
+            background: #f3f4f6;
+            margin: 4px 8px 0 8px;
+            text-align: right;
+            border-radius: 4px;
+        }
+        .dark .scroll-hint {
+            background: #1f2937;
+            color: #9ca3af;
         }
         
-        /* Scroll hint for mobile */
         @media (max-width: 640px) {
-            .supplier-table th, .supplier-table td {
-                padding: 0.5rem 0.6rem;
-                font-size: 0.7rem;
-            }
-            .courier-table th, .courier-table td {
+            .table-container th,
+            .table-container td {
                 padding: 0.5rem 0.6rem;
                 font-size: 0.7rem;
             }
             .scroll-hint {
                 display: block;
-                font-size: 9px;
-                color: #6b7280;
-                text-align: right;
-                padding: 4px 8px;
-                background: #f3f4f6;
-                border-radius: 4px;
-                margin-bottom: 6px;
             }
-            .dark .scroll-hint {
-                background: #1f2937;
-                color: #9ca3af;
+            .table-container table {
+                min-width: 600px;
+            }
+            .table-container.courier-table-container table {
+                min-width: 500px;
             }
         }
         
-        .scroll-hint {
-            display: none;
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
         }
         
-        .flex.min-h-screen {
-            max-width: 100%;
-        }
-        
-        main {
-            overflow-x: visible;
-        }
-        
-        /* Custom scrollbar styling */
-        .supplier-table-container::-webkit-scrollbar,
-        .courier-table-container::-webkit-scrollbar {
-            height: 5px;
-            width: 5px;
-        }
-        
-        .supplier-table-container::-webkit-scrollbar-track,
-        .courier-table-container::-webkit-scrollbar-track {
-            background: #e5e7eb;
-            border-radius: 10px;
-        }
-        
-        .supplier-table-container::-webkit-scrollbar-thumb,
-        .courier-table-container::-webkit-scrollbar-thumb {
-            background: #9ca3af;
-            border-radius: 10px;
-        }
-        
-        .dark .supplier-table-container::-webkit-scrollbar-track,
-        .dark .courier-table-container::-webkit-scrollbar-track {
-            background: #374151;
-        }
-        
-        .dark .supplier-table-container::-webkit-scrollbar-thumb,
-        .dark .courier-table-container::-webkit-scrollbar-thumb {
-            background: #6b7280;
+        .modal-open {
+            overflow: hidden !important;
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
+<body class="bg-gray-50 dark:bg-gray-900">
     
-    <div class="flex min-h-screen overflow-x-hidden w-full">
+    <div class="flex min-h-screen">
         
         <!-- Sidebar -->
         <aside id="sidebar" class="fixed left-0 top-0 h-full w-[260px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 flex flex-col overflow-y-auto">
@@ -305,7 +355,7 @@
                 </div>
             </div>
             
-            <nav class="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+            <nav class="flex-1 px-2 py-4 space-y-1">
                 <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 text-sm"><i class="fas fa-tachometer-alt w-5"></i>Dashboard</a>
                 <a href="customers.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 text-sm"><i class="fas fa-users w-5"></i>Customers</a>
                 
@@ -347,7 +397,7 @@
         </aside>
         
         <!-- Main Content -->
-        <main class="flex-1 md:ml-64 min-h-screen w-full overflow-x-hidden">
+        <main class="flex-1 md:ml-64 min-h-screen w-full overflow-x-hidden overflow-y-auto">
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b sticky top-0 z-40">
                 <div class="px-3 py-2 flex justify-between items-center">
                     <div class="flex items-center gap-2">
@@ -361,73 +411,127 @@
                 </div>
             </header>
             
-            <div class="p-3 md:p-4 overflow-x-hidden">
+            <div class="p-3 md:p-4">
                 <!-- Navigation Tabs -->
                 <div class="flex flex-wrap gap-2 mb-4">
-                    <a href="warranty.html" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-white">📦 Suppliers</a>
-                    <a href="warranty-entry.html" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-200 dark:bg-gray-700 hover:bg-primary hover:text-white transition">➕ Warranty Entry</a>
-                    <a href="currier-dispatch.html" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-200 dark:bg-gray-700 hover:bg-primary hover:text-white transition">🚚 Currier Dispatch</a>
-                    <a href="warranty-list.html" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-200 dark:bg-gray-700 hover:bg-primary hover:text-white transition">📋 Warranty List</a>
+                    <a href="warranty.html" class="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-white shadow-md transition-all">
+                        <i class="fas fa-truck mr-1"></i> Suppliers
+                    </a>
+                    <a href="warranty-entry.html" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">
+                        <i class="fas fa-plus-circle mr-1"></i> Warranty Entry
+                    </a>
+                    <a href="currier-dispatch.html" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">
+                        <i class="fas fa-shipping-fast mr-1"></i> Courier Dispatch
+                    </a>
+                    <a href="warranty-list.html" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">
+                        <i class="fas fa-list mr-1"></i> Warranty List
+                    </a>
                 </div>
                 
                 <!-- Stats Cards -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3 mb-4">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-2.5 border shadow-sm"><div class="bg-blue-100 dark:bg-blue-900/30 w-7 h-7 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-truck text-blue-600 text-xs"></i></div><h3 class="text-gray-500 text-[9px] font-semibold">Suppliers</h3><p class="text-lg font-bold" id="totalSuppliers">0</p></div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-2.5 border shadow-sm"><div class="bg-yellow-100 dark:bg-yellow-900/30 w-7 h-7 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-clock text-yellow-600 text-xs"></i></div><h3 class="text-gray-500 text-[9px] font-semibold">Pending</h3><p class="text-lg font-bold" id="pendingWarranty">0</p></div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-2.5 border shadow-sm"><div class="bg-green-100 dark:bg-green-900/30 w-7 h-7 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-check-circle text-green-600 text-xs"></i></div><h3 class="text-gray-500 text-[9px] font-semibold">Received</h3><p class="text-lg font-bold" id="receivedWarranty">0</p></div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-2.5 border shadow-sm"><div class="bg-purple-100 dark:bg-purple-900/30 w-7 h-7 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-file-invoice text-purple-600 text-xs"></i></div><h3 class="text-gray-500 text-[9px] font-semibold">Total Warranty</h3><p class="text-lg font-bold" id="totalWarranty">0</p></div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-2.5 border shadow-sm">
+                        <div class="bg-blue-100 dark:bg-blue-900/30 w-7 h-7 rounded-lg flex items-center justify-center mb-1">
+                            <i class="fas fa-truck text-blue-600 text-xs"></i>
+                        </div>
+                        <h3 class="text-gray-500 text-[9px] font-semibold">Suppliers</h3>
+                        <p class="text-lg font-bold" id="totalSuppliers">0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-2.5 border shadow-sm">
+                        <div class="bg-yellow-100 dark:bg-yellow-900/30 w-7 h-7 rounded-lg flex items-center justify-center mb-1">
+                            <i class="fas fa-clock text-yellow-600 text-xs"></i>
+                        </div>
+                        <h3 class="text-gray-500 text-[9px] font-semibold">Pending</h3>
+                        <p class="text-lg font-bold" id="pendingWarranty">0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-2.5 border shadow-sm">
+                        <div class="bg-green-100 dark:bg-green-900/30 w-7 h-7 rounded-lg flex items-center justify-center mb-1">
+                            <i class="fas fa-check-circle text-green-600 text-xs"></i>
+                        </div>
+                        <h3 class="text-gray-500 text-[9px] font-semibold">Received</h3>
+                        <p class="text-lg font-bold" id="receivedWarranty">0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-2.5 border shadow-sm">
+                        <div class="bg-purple-100 dark:bg-purple-900/30 w-7 h-7 rounded-lg flex items-center justify-center mb-1">
+                            <i class="fas fa-file-invoice text-purple-600 text-xs"></i>
+                        </div>
+                        <h3 class="text-gray-500 text-[9px] font-semibold">Total Warranty</h3>
+                        <p class="text-lg font-bold" id="totalWarranty">0</p>
+                    </div>
                 </div>
                 
-                <!-- Two Column Layout -->
-                <div class="two-column-layout">
-                    <!-- Suppliers Section -->
-                    <div class="suppliers-section">
-                        <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
-                            <div class="p-2.5 border-b flex flex-wrap justify-between items-center gap-2">
-                                <div class="relative w-full sm:w-56"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i><input type="text" id="supplierSearch" placeholder="Search supplier..." class="w-full pl-8 pr-3 py-1.5 text-xs border rounded-lg"></div>
-                                <div class="flex gap-2"><button id="exportSupplierBtn" class="bg-success text-white btn-modern"><i class="fas fa-download text-xs"></i> Export</button><button id="addSupplierBtn" class="bg-primary text-white btn-modern"><i class="fas fa-plus text-xs"></i> Add</button></div>
+                <!-- Supplier Section - Full Width -->
+                <div class="full-width-section mb-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                        <div class="p-3 border-b flex flex-wrap justify-between items-center gap-2">
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-800 dark:text-white">
+                                    <i class="fas fa-truck text-primary mr-2"></i>Supplier List
+                                </h3>
+                                <p class="text-[9px] text-gray-500 mt-0.5">Manage your product suppliers</p>
                             </div>
-                            <div class="scroll-hint"><i class="fas fa-arrows-alt-h mr-1"></i> Swipe left/right to see all columns</div>
-                            <div class="supplier-table-container">
-                                <table class="supplier-table">
-                                    <thead class="bg-gray-50 dark:bg-gray-700/50 border-b">
-                                        <tr>
-                                            <th class="px-2 py-2 text-left text-[10px] font-semibold">Name</th>
-                                            <th class="px-2 py-2 text-left text-[10px] font-semibold">Contact</th>
-                                            <th class="px-2 py-2 text-left text-[10px] font-semibold">Phone</th>
-                                            <th class="px-2 py-2 text-left text-[10px] font-semibold">Address</th>
-                                            <th class="px-2 py-2 text-center text-[10px] font-semibold">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="suppliersTableBody">...</tbody>
-                                </table>
+                            <div class="flex gap-2">
+                                <div class="search-wrapper">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" id="supplierSearch" placeholder="Search supplier...">
+                                </div>
+                                <button id="exportSupplierBtn" class="btn-modern btn-success">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                                <button id="addSupplierBtn" class="btn-modern btn-primary">
+                                    <i class="fas fa-plus"></i> Add Supplier
+                                </button>
                             </div>
                         </div>
+                        <div class="scroll-hint"><i class="fas fa-arrows-alt-h mr-1"></i> Swipe left/right to see all columns</div>
+                        <!-- TABLE CONTAINER - ONLY THIS SCROLLS -->
+                        <div class="table-container supplier-table-container">
+                            <table class="supplier-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Contact</th>
+                                        <th>Phone</th>
+                                        <th>Address</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="suppliersTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
-                    
-                    <!-- Courier Contacts Section -->
-                    <div class="courier-section">
-                        <div class="courier-card">
-                            <div class="courier-header">
-                                <h3 class="font-semibold text-sm"><i class="fas fa-truck-fast text-primary mr-1"></i> Courier Contacts</h3>
-                                <button id="addCourierBtn" class="bg-primary text-white btn-modern"><i class="fas fa-plus-circle text-xs"></i> Add</button>
+                </div>
+                
+                <!-- Courier Section - Full Width Below Supplier -->
+                <div class="full-width-section">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                        <div class="p-3 border-b flex flex-wrap justify-between items-center gap-2">
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-800 dark:text-white">
+                                    <i class="fas fa-truck-fast text-primary mr-2"></i>Courier Contacts
+                                </h3>
+                                <p class="text-[9px] text-gray-500 mt-0.5">Manage courier service providers</p>
                             </div>
-                            <div class="scroll-hint"><i class="fas fa-arrows-alt-h mr-1"></i> Swipe left/right</div>
-                            <div class="courier-table-container">
-                                <table class="courier-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Phone</th>
-                                            <th>Address</th>
-                                            <th style="width:80px">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="courierTableBody">
-                                        <tr><td colspan="4" class="empty-courier"><i class="fas fa-box-open text-xl mb-1 block opacity-40"></i>No courier contacts</div></td>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <button id="addCourierBtn" class="btn-modern btn-primary">
+                                <i class="fas fa-plus-circle"></i> Add Courier
+                            </button>
+                        </div>
+                        <div class="scroll-hint"><i class="fas fa-arrows-alt-h mr-1"></i> Swipe left/right</div>
+                        <!-- TABLE CONTAINER - ONLY THIS SCROLLS -->
+                        <div class="table-container courier-table-container">
+                            <table class="courier-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Phone</th>
+                                        <th>Address</th>
+                                        <th class="text-center" style="width:80px">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="courierTableBody">
+                                    <tr><td colspan="4" class="empty-state"><i class="fas fa-box-open text-xl mb-1 block opacity-40"></i>No courier contacts</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -436,107 +540,276 @@
     </div>
     
     <!-- Courier Modal -->
-    <div id="courierModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-3">
-        <div class="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full modal-animate">
-            <div class="flex justify-between items-center px-4 py-3 border-b">
-                <h3 class="text-base font-semibold" id="courierModalTitle"><i class="fas fa-truck text-primary mr-2"></i>Add Courier</h3>
-                <button id="closeCourierModalBtn" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+    <div id="courierModal" class="fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center z-[100] hidden p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full modal-animate overflow-hidden">
+            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                <h3 class="text-base font-semibold text-gray-800 dark:text-white" id="courierModalTitle">
+                    <i class="fas fa-truck text-primary mr-2"></i>Add Courier
+                </h3>
+                <button id="closeCourierModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
             <input type="hidden" id="editCourierId">
-            <div class="p-4 space-y-3">
-                <div><label class="block text-xs font-medium mb-1">Courier Name <span class="text-red-500">*</span></label><input type="text" id="courierNameInput" placeholder="e.g., Sundarban" class="w-full px-3 py-2 text-sm border rounded-lg"></div>
-                <div><label class="block text-xs font-medium mb-1">Phone Number <span class="text-red-500">*</span></label><input type="tel" id="courierPhoneInput" placeholder="Contact number" class="w-full px-3 py-2 text-sm border rounded-lg"></div>
-                <div><label class="block text-xs font-medium mb-1">Address</label><textarea id="courierAddressInput" rows="2" placeholder="Office address" class="w-full px-3 py-2 text-sm border rounded-lg resize-none"></textarea></div>
+            <div class="p-5 space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Courier Name <span class="text-red-500">*</span></label>
+                    <input type="text" id="courierNameInput" placeholder="e.g., Sundarban" class="w-full px-3 py-2.5 text-sm border rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Phone <span class="text-red-500">*</span></label>
+                    <input type="tel" id="courierPhoneInput" placeholder="Contact number" class="w-full px-3 py-2.5 text-sm border rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Address</label>
+                    <textarea id="courierAddressInput" rows="2" placeholder="Office address" class="w-full px-3 py-2.5 text-sm border rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
+                </div>
             </div>
-            <div class="flex justify-end gap-2 px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t">
-                <button id="cancelCourierBtn" class="px-3 py-1.5 text-sm rounded-lg border">Cancel</button>
-                <button id="saveCourierBtn" class="px-3 py-1.5 text-sm rounded-lg bg-primary text-white">Save Courier</button>
+            <div class="flex justify-end gap-3 px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t">
+                <button id="cancelCourierBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl btn-outline btn-active">Cancel</button>
+                <button id="saveCourierBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl btn-primary btn-active">Save</button>
             </div>
         </div>
     </div>
     
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-3">
-        <div class="bg-white dark:bg-gray-800 rounded-xl max-w-xs w-full p-5 text-center small-modal">
-            <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-red-100 flex items-center justify-center"><i class="fas fa-trash-alt text-red-500 text-lg"></i></div>
-            <h3 class="text-md font-semibold mb-2">Confirm Delete</h3>
-            <p id="deleteMessage" class="text-xs text-gray-600 dark:text-gray-400 mb-4">Are you sure?</p>
-            <div class="flex gap-2 justify-center"><button id="cancelDeleteBtn" class="px-4 py-1.5 text-sm rounded-lg bg-gray-200 dark:bg-gray-700">Cancel</button><button id="confirmDeleteBtn" class="px-4 py-1.5 text-sm rounded-lg bg-red-500 text-white">Delete</button></div>
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center z-[100] hidden p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full modal-animate overflow-hidden">
+            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-red-500/10 to-transparent border-b">
+                <h3 class="text-base font-semibold text-gray-800 dark:text-white">
+                    <i class="fas fa-trash-alt text-red-500 mr-2"></i>Confirm Delete
+                </h3>
+                <button id="closeDeleteModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-5">
+                <div class="text-center">
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
+                    </div>
+                    <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Are you sure?</h4>
+                    <p id="deleteMessage" class="text-sm text-gray-600 dark:text-gray-400">Delete this item?</p>
+                    <p class="text-xs text-red-500 mt-3">⚠️ This action cannot be undone!</p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t">
+                <button id="cancelDeleteBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl btn-outline btn-active">Cancel</button>
+                <button id="confirmDeleteBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl btn-danger btn-active">Delete</button>
+            </div>
         </div>
     </div>
     
     <!-- Supplier Modal -->
-    <div id="supplierModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-3">
-        <div class="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full modal-animate">
-            <div class="flex justify-between items-center px-4 py-3 border-b"><h3 id="supplierModalTitle" class="font-semibold">Add Supplier</h3><button id="closeSupplierModalBtn2" class="text-gray-400"><i class="fas fa-times"></i></button></div>
-            <input type="hidden" id="supplierId">
-            <div class="p-4 space-y-3">
-                <input type="text" id="supplierName" placeholder="Supplier Name *" class="w-full px-3 py-2 text-sm border rounded-lg">
-                <input type="text" id="supplierContact" placeholder="Contact Person" class="w-full px-3 py-2 text-sm border rounded-lg">
-                <input type="tel" id="supplierPhone" placeholder="Phone *" class="w-full px-3 py-2 text-sm border rounded-lg">
-                <textarea id="supplierAddress" rows="2" placeholder="Address" class="w-full px-3 py-2 text-sm border rounded-lg"></textarea>
+    <div id="supplierModal" class="fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center z-[100] hidden p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full modal-animate overflow-hidden">
+            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                <h3 id="supplierModalTitle" class="text-base font-semibold text-gray-800 dark:text-white">
+                    <i class="fas fa-truck text-primary mr-2"></i>Add Supplier
+                </h3>
+                <button id="closeSupplierModalBtn2" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <div class="flex justify-end gap-2 px-4 py-3 bg-gray-50 border-t"><button id="cancelSupplierBtn2" class="px-3 py-1.5 text-sm rounded-lg border">Cancel</button><button id="saveSupplierBtn2" class="px-3 py-1.5 text-sm rounded-lg bg-primary text-white">Save</button></div>
+            <input type="hidden" id="supplierId">
+            <div class="p-5 space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Supplier Name <span class="text-red-500">*</span></label>
+                    <input type="text" id="supplierName" placeholder="Supplier Name" class="w-full px-3 py-2.5 text-sm border rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Contact Person</label>
+                    <input type="text" id="supplierContact" placeholder="Contact Person" class="w-full px-3 py-2.5 text-sm border rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Phone <span class="text-red-500">*</span></label>
+                    <input type="tel" id="supplierPhone" placeholder="Phone Number" class="w-full px-3 py-2.5 text-sm border rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Address</label>
+                    <textarea id="supplierAddress" rows="2" placeholder="Address" class="w-full px-3 py-2.5 text-sm border rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t">
+                <button id="cancelSupplierBtn2" class="px-5 py-2.5 text-sm font-medium rounded-xl btn-outline btn-active">Cancel</button>
+                <button id="saveSupplierBtn2" class="px-5 py-2.5 text-sm font-medium rounded-xl btn-primary btn-active">Save</button>
+            </div>
         </div>
     </div>
     
     <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
-    <div id="logoutModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[200]"><div class="bg-white rounded-xl p-5 text-center max-w-xs"><i class="fas fa-sign-out-alt text-orange-500 text-2xl mb-2"></i><h3 class="font-semibold mb-3">Logout?</h3><div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-4 py-1.5 rounded-lg border">Cancel</button><button id="confirmLogoutBtn" class="px-4 py-1.5 rounded-lg bg-red-500 text-white">Logout</button></div></div></div>
+    <div id="logoutModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[200]">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 text-center max-w-xs">
+            <i class="fas fa-sign-out-alt text-orange-500 text-2xl mb-2"></i>
+            <h3 class="font-semibold mb-3">Logout?</h3>
+            <div class="flex gap-3 justify-center">
+                <button id="cancelLogoutBtn" class="px-4 py-1.5 rounded-lg border">Cancel</button>
+                <button id="confirmLogoutBtn" class="px-4 py-1.5 rounded-lg bg-red-500 text-white">Logout</button>
+            </div>
+        </div>
+    </div>
     
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
         import { db, collection, addDoc, updateDoc, deleteDoc, doc, getDocs } from './js/firebase.js';
         checkAuthState(true);
         
-        const showToast = (msg, type='success') => { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `px-3 py-2 rounded-lg shadow text-xs ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`; t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-1 text-xs"></i>${msg}`; c.appendChild(t); setTimeout(() => t.remove(), 2500); };
+        const showToast = (msg, type='success') => {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = `px-3 py-2 rounded-lg shadow text-xs ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-1 text-xs"></i>${msg}`;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        };
+        
         const escapeHtml = str => !str ? '' : str.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
         
         let currentDeleteId = null, currentDeleteType = 'supplier';
         
-        // Suppliers Logic
+        // Modal close on outside click
+        function setupModalCloseOnOutside(modalId, closeBtnId) {
+            const modal = document.getElementById(modalId);
+            const closeBtn = document.getElementById(closeBtnId);
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                        document.body.classList.remove('modal-open');
+                    }
+                });
+            }
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    document.body.classList.remove('modal-open');
+                });
+            }
+        }
+        
+        // Load Suppliers
         async function loadSuppliers() {
             const tbody = document.getElementById('suppliersTableBody');
             if(!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">Loading...</div></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">Loading...</td></tr>';
             try {
                 const snap = await getDocs(collection(db,'suppliers'));
-                const suppliers = []; snap.forEach(d => suppliers.push({id:d.id, ...d.data()}));
-                document.getElementById('totalSuppliers') && (document.getElementById('totalSuppliers').textContent = suppliers.length);
-                if(suppliers.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">No suppliers</div></tr>'; return; }
-                tbody.innerHTML = suppliers.map(s => `<tr class="table-row-hover border-b"><td class="px-2 py-2 text-xs font-medium">${escapeHtml(s.name)}</div><td class="px-2 py-2 text-xs">${escapeHtml(s.contactPerson||'-')}</div><td class="px-2 py-2 text-xs">${escapeHtml(s.phone)}</div><td class="px-2 py-2 text-xs truncate max-w-[150px]" title="${escapeHtml(s.address||'-')}">${escapeHtml(s.address||'-')}</div><td class="px-2 py-2 text-center whitespace-nowrap"><button class="edit-supplier text-blue-500 p-1" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-contact="${escapeHtml(s.contactPerson||'')}" data-phone="${escapeHtml(s.phone)}" data-address="${escapeHtml(s.address||'')}"><i class="fas fa-edit text-xs"></i></button><button class="delete-supplier text-red-500 p-1 ml-1" data-id="${s.id}" data-name="${escapeHtml(s.name)}"><i class="fas fa-trash-alt text-xs"></i></button></div></tr>`).join('');
-                attachSupplierEvents();
-            } catch(e) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-red-400 text-xs">Error</div></tr>'; }
+                const suppliers = [];
+                snap.forEach(d => suppliers.push({id:d.id, ...d.data()}));
+                document.getElementById('totalSuppliers').textContent = suppliers.length;
+                if(suppliers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">No suppliers found</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = suppliers.map(s => `
+                    <tr class="table-row-hover border-b">
+                        <td class="px-2 py-2 text-xs font-medium">${escapeHtml(s.name)}</td>
+                        <td class="px-2 py-2 text-xs">${escapeHtml(s.contactPerson||'-')}</td>
+                        <td class="px-2 py-2 text-xs">${escapeHtml(s.phone)}</td>
+                        <td class="px-2 py-2 text-xs truncate max-w-[120px]" title="${escapeHtml(s.address||'-')}">${escapeHtml(s.address||'-')}</td>
+                        <td class="px-2 py-2 text-center whitespace-nowrap">
+                            <button class="edit-supplier text-blue-500 p-1 hover:bg-blue-50 rounded-lg transition" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-contact="${escapeHtml(s.contactPerson||'')}" data-phone="${escapeHtml(s.phone)}" data-address="${escapeHtml(s.address||'')}"><i class="fas fa-edit text-xs"></i></button>
+                            <button class="delete-supplier text-red-500 p-1 ml-1 hover:bg-red-50 rounded-lg transition" data-id="${s.id}" data-name="${escapeHtml(s.name)}"><i class="fas fa-trash-alt text-xs"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                document.querySelectorAll('.edit-supplier').forEach(btn => btn.addEventListener('click', () => openSupplierModal(btn.dataset)));
+                document.querySelectorAll('.delete-supplier').forEach(btn => btn.addEventListener('click', () => {
+                    currentDeleteId = btn.dataset.id;
+                    currentDeleteType = 'supplier';
+                    document.getElementById('deleteMessage').innerHTML = `Delete "<strong>${btn.dataset.name}</strong>"?`;
+                    document.getElementById('deleteModal').classList.remove('hidden');
+                    document.body.classList.add('modal-open');
+                }));
+            } catch(e) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-red-400 text-xs">Error loading data</td></tr>';
+            }
         }
         
-        function attachSupplierEvents() {
-            document.querySelectorAll('.edit-supplier').forEach(btn => btn.addEventListener('click', () => openSupplierModal(btn.dataset)));
-            document.querySelectorAll('.delete-supplier').forEach(btn => btn.addEventListener('click', () => { currentDeleteId = btn.dataset.id; currentDeleteType = 'supplier'; document.getElementById('deleteMessage').innerHTML = `Delete "<strong>${btn.dataset.name}</strong>"?`; document.getElementById('deleteModal').classList.remove('hidden'); }));
+        // Load Couriers
+        async function loadCouriers() {
+            const tbody = document.getElementById('courierTableBody');
+            if(!tbody) return;
+            try {
+                const snap = await getDocs(collection(db, 'courierDetails'));
+                const couriers = [];
+                snap.forEach(d => couriers.push({id:d.id, ...d.data()}));
+                couriers.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+                if(couriers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-box-open text-xl mb-1 block opacity-40"></i>No courier contacts</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = couriers.map(c => `
+                    <tr>
+                        <td class="px-2 py-2 text-xs font-medium">${escapeHtml(c.courierName)}</td>
+                        <td class="px-2 py-2 text-xs">${escapeHtml(c.phone)}</td>
+                        <td class="px-2 py-2 text-xs truncate max-w-[120px]" title="${escapeHtml(c.address||'-')}">${escapeHtml(c.address||'-')}</td>
+                        <td class="px-2 py-2 text-center whitespace-nowrap">
+                            <button class="edit-courier text-blue-500 p-1 hover:bg-blue-50 rounded-lg transition" data-id="${c.id}" data-name="${escapeHtml(c.courierName)}" data-phone="${escapeHtml(c.phone)}" data-address="${escapeHtml(c.address||'')}"><i class="fas fa-edit text-xs"></i></button>
+                            <button class="delete-courier text-red-500 p-1 ml-1 hover:bg-red-50 rounded-lg transition" data-id="${c.id}" data-name="${escapeHtml(c.courierName)}"><i class="fas fa-trash-alt text-xs"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                document.querySelectorAll('.edit-courier').forEach(btn => btn.addEventListener('click', () => openCourierModal(btn.dataset)));
+                document.querySelectorAll('.delete-courier').forEach(btn => btn.addEventListener('click', () => {
+                    currentDeleteId = btn.dataset.id;
+                    currentDeleteType = 'courier';
+                    document.getElementById('deleteMessage').innerHTML = `Delete courier "<strong>${btn.dataset.name}</strong>"?`;
+                    document.getElementById('deleteModal').classList.remove('hidden');
+                    document.body.classList.add('modal-open');
+                }));
+            } catch(e) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state text-red-400">Error loading data</td></tr>';
+            }
         }
         
+        // Load Warranty Stats
+        async function loadWarrantyStats() {
+            try {
+                const snap = await getDocs(collection(db, 'warranties'));
+                let p = 0, r = 0;
+                snap.forEach(d => {
+                    if(d.data().status === 'pending') p++;
+                    else if(d.data().status === 'received') r++;
+                });
+                document.getElementById('pendingWarranty').textContent = p;
+                document.getElementById('receivedWarranty').textContent = r;
+                document.getElementById('totalWarranty').textContent = snap.size;
+            } catch(e) {}
+        }
+        
+        // Delete Item
         async function deleteItem() {
             if(!currentDeleteId) return;
             try {
                 if(currentDeleteType === 'supplier') await deleteDoc(doc(db, 'suppliers', currentDeleteId));
                 else if(currentDeleteType === 'courier') await deleteDoc(doc(db, 'courierDetails', currentDeleteId));
-                showToast(`${currentDeleteType === 'supplier' ? 'Supplier' : 'Courier'} deleted`);
+                showToast(`${currentDeleteType === 'supplier' ? 'Supplier' : 'Courier'} deleted successfully`);
                 document.getElementById('deleteModal').classList.add('hidden');
+                document.body.classList.remove('modal-open');
                 if(currentDeleteType === 'supplier') loadSuppliers();
                 else loadCouriers();
                 loadWarrantyStats();
-            } catch(e) { showToast('Delete failed', 'error'); }
+            } catch(e) {
+                showToast('Delete failed', 'error');
+            }
         }
         
+        // Open Supplier Modal
         function openSupplierModal(data = null) {
-            const modal = document.getElementById('supplierModal'), title = document.getElementById('supplierModalTitle');
+            const modal = document.getElementById('supplierModal');
+            const title = document.getElementById('supplierModalTitle');
             if(data && data.id) {
-                title.innerHTML = 'Edit Supplier';
+                title.innerHTML = '<i class="fas fa-edit text-primary mr-2"></i>Edit Supplier';
                 document.getElementById('supplierId').value = data.id;
                 document.getElementById('supplierName').value = data.name;
                 document.getElementById('supplierContact').value = data.contact || '';
                 document.getElementById('supplierPhone').value = data.phone;
                 document.getElementById('supplierAddress').value = data.address || '';
             } else {
-                title.innerHTML = 'Add Supplier';
+                title.innerHTML = '<i class="fas fa-plus-circle text-primary mr-2"></i>Add Supplier';
                 document.getElementById('supplierId').value = '';
                 document.getElementById('supplierName').value = '';
                 document.getElementById('supplierContact').value = '';
@@ -544,52 +817,40 @@
                 document.getElementById('supplierAddress').value = '';
             }
             modal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
         }
         
+        // Save Supplier
         async function saveSupplier() {
             const id = document.getElementById('supplierId').value;
-            const data = { name: document.getElementById('supplierName').value.trim(), contactPerson: document.getElementById('supplierContact').value.trim(), phone: document.getElementById('supplierPhone').value.trim(), address: document.getElementById('supplierAddress').value, updatedAt: new Date().toISOString() };
-            if(!data.name || !data.phone) { showToast('Name & Phone required', 'error'); return; }
-            if(id) await updateDoc(doc(db, 'suppliers', id), data);
-            else { data.createdAt = new Date().toISOString(); await addDoc(collection(db, 'suppliers'), data); }
-            showToast(id ? 'Updated' : 'Added');
+            const data = {
+                name: document.getElementById('supplierName').value.trim(),
+                contactPerson: document.getElementById('supplierContact').value.trim(),
+                phone: document.getElementById('supplierPhone').value.trim(),
+                address: document.getElementById('supplierAddress').value,
+                updatedAt: new Date().toISOString()
+            };
+            if(!data.name || !data.phone) {
+                showToast('Name & Phone are required', 'error');
+                return;
+            }
+            if(id) {
+                await updateDoc(doc(db, 'suppliers', id), data);
+            } else {
+                data.createdAt = new Date().toISOString();
+                await addDoc(collection(db, 'suppliers'), data);
+            }
+            showToast(id ? 'Supplier updated' : 'Supplier added');
             document.getElementById('supplierModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
             loadSuppliers();
             loadWarrantyStats();
         }
         
-        async function loadWarrantyStats() {
-            try {
-                const snap = await getDocs(collection(db, 'warranties'));
-                let p = 0, r = 0;
-                snap.forEach(d => { if(d.data().status === 'pending') p++; else if(d.data().status === 'received') r++; });
-                document.getElementById('pendingWarranty') && (document.getElementById('pendingWarranty').textContent = p);
-                document.getElementById('receivedWarranty') && (document.getElementById('receivedWarranty').textContent = r);
-                document.getElementById('totalWarranty') && (document.getElementById('totalWarranty').textContent = snap.size);
-            } catch(e) {}
-        }
-        
-        // Courier Logic
-        async function loadCouriers() {
-            const tbody = document.getElementById('courierTableBody');
-            if(!tbody) return;
-            try {
-                const snap = await getDocs(collection(db, 'courierDetails'));
-                const couriers = []; snap.forEach(d => couriers.push({id:d.id, ...d.data()}));
-                couriers.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
-                if(couriers.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="empty-courier"><i class="fas fa-box-open text-xl mb-1 block opacity-40"></i>No courier contacts</div></tr>'; return; }
-                tbody.innerHTML = couriers.map(c => `<tr><td class="px-2 py-2 text-xs font-medium">${escapeHtml(c.courierName)}</div><td class="px-2 py-2 text-xs">${escapeHtml(c.phone)}</div><td class="px-2 py-2 text-xs truncate max-w-[150px]" title="${escapeHtml(c.address||'-')}">${escapeHtml(c.address||'-')}</div><td class="px-2 py-2 text-center whitespace-nowrap"><button class="edit-courier text-blue-500 p-1" data-id="${c.id}" data-name="${escapeHtml(c.courierName)}" data-phone="${escapeHtml(c.phone)}" data-address="${escapeHtml(c.address||'')}"><i class="fas fa-edit text-xs"></i></button><button class="delete-courier text-red-500 p-1 ml-1" data-id="${c.id}" data-name="${escapeHtml(c.courierName)}"><i class="fas fa-trash-alt text-xs"></i></button></div></tr>`).join('');
-                attachCourierEvents();
-            } catch(e) { tbody.innerHTML = '<tr><td colspan="4" class="empty-courier text-red-400">Error</div></tr>'; }
-        }
-        
-        function attachCourierEvents() {
-            document.querySelectorAll('.edit-courier').forEach(btn => btn.addEventListener('click', () => openCourierModal(btn.dataset)));
-            document.querySelectorAll('.delete-courier').forEach(btn => btn.addEventListener('click', () => { currentDeleteId = btn.dataset.id; currentDeleteType = 'courier'; document.getElementById('deleteMessage').innerHTML = `Delete courier "<strong>${btn.dataset.name}</strong>"?`; document.getElementById('deleteModal').classList.remove('hidden'); }));
-        }
-        
+        // Open Courier Modal
         function openCourierModal(data = null) {
-            const modal = document.getElementById('courierModal'), title = document.getElementById('courierModalTitle');
+            const modal = document.getElementById('courierModal');
+            const title = document.getElementById('courierModalTitle');
             if(data && data.id) {
                 title.innerHTML = '<i class="fas fa-edit text-primary mr-2"></i>Edit Courier';
                 document.getElementById('editCourierId').value = data.id;
@@ -604,15 +865,24 @@
                 document.getElementById('courierAddressInput').value = '';
             }
             modal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
         }
         
+        // Save Courier
         async function saveCourierRecord() {
             const editId = document.getElementById('editCourierId').value;
             const name = document.getElementById('courierNameInput').value.trim();
             const phone = document.getElementById('courierPhoneInput').value.trim();
-            if(!name || !phone) { showToast('Name & Phone required', 'error'); return; }
-            const address = document.getElementById('courierAddressInput').value.trim();
-            const data = { courierName: name, phone, address, updatedAt: new Date().toISOString() };
+            if(!name || !phone) {
+                showToast('Name & Phone are required', 'error');
+                return;
+            }
+            const data = {
+                courierName: name,
+                phone: phone,
+                address: document.getElementById('courierAddressInput').value.trim(),
+                updatedAt: new Date().toISOString()
+            };
             try {
                 if(editId) {
                     await updateDoc(doc(db, 'courierDetails', editId), data);
@@ -623,49 +893,132 @@
                     showToast('Courier added');
                 }
                 document.getElementById('courierModal').classList.add('hidden');
-                document.getElementById('courierNameInput').value = '';
-                document.getElementById('courierPhoneInput').value = '';
-                document.getElementById('courierAddressInput').value = '';
-                document.getElementById('editCourierId').value = '';
+                document.body.classList.remove('modal-open');
                 loadCouriers();
-            } catch(err) { showToast('Error saving courier', 'error'); }
+            } catch(err) {
+                showToast('Error saving courier', 'error');
+            }
         }
         
-        // Event Bindings
+        // Event Listeners
         document.getElementById('addCourierBtn')?.addEventListener('click', () => openCourierModal());
-        document.getElementById('closeCourierModalBtn')?.addEventListener('click', () => document.getElementById('courierModal').classList.add('hidden'));
-        document.getElementById('cancelCourierBtn')?.addEventListener('click', () => document.getElementById('courierModal').classList.add('hidden'));
         document.getElementById('saveCourierBtn')?.addEventListener('click', saveCourierRecord);
-        document.getElementById('saveSupplierBtn2')?.addEventListener('click', saveSupplier);
-        document.getElementById('cancelSupplierBtn2')?.addEventListener('click', () => document.getElementById('supplierModal').classList.add('hidden'));
-        document.getElementById('closeSupplierModalBtn2')?.addEventListener('click', () => document.getElementById('supplierModal').classList.add('hidden'));
+        document.getElementById('cancelCourierBtn')?.addEventListener('click', () => {
+            document.getElementById('courierModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+        document.getElementById('closeCourierModalBtn')?.addEventListener('click', () => {
+            document.getElementById('courierModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+        
         document.getElementById('addSupplierBtn')?.addEventListener('click', () => openSupplierModal());
-        document.getElementById('exportSupplierBtn')?.addEventListener('click', () => showToast('Export CSV ready', 'success'));
+        document.getElementById('saveSupplierBtn2')?.addEventListener('click', saveSupplier);
+        document.getElementById('cancelSupplierBtn2')?.addEventListener('click', () => {
+            document.getElementById('supplierModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+        document.getElementById('closeSupplierModalBtn2')?.addEventListener('click', () => {
+            document.getElementById('supplierModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+        
         document.getElementById('confirmDeleteBtn')?.addEventListener('click', deleteItem);
-        document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => document.getElementById('deleteModal').classList.add('hidden'));
-        document.getElementById('supplierSearch')?.addEventListener('input', (e) => { const term = e.target.value.toLowerCase(); document.querySelectorAll('#suppliersTableBody tr').forEach(row => { if(row.querySelector('td[colspan]')) return; row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none'; }); });
-        document.getElementById('refreshBtn')?.addEventListener('click', () => { loadSuppliers(); loadCouriers(); loadWarrantyStats(); showToast('Refreshed'); });
+        document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+        document.getElementById('closeDeleteModalBtn')?.addEventListener('click', () => {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+        
+        document.getElementById('exportSupplierBtn')?.addEventListener('click', () => showToast('Export CSV ready', 'success'));
+        document.getElementById('refreshBtn')?.addEventListener('click', () => {
+            loadSuppliers();
+            loadCouriers();
+            loadWarrantyStats();
+            showToast('Refreshed!');
+        });
+        
+        document.getElementById('supplierSearch')?.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('#suppliersTableBody tr').forEach(row => {
+                if(row.querySelector('td[colspan]')) return;
+                row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+            });
+        });
+        
+        // Modal close on outside click
+        setupModalCloseOnOutside('supplierModal', 'closeSupplierModalBtn2');
+        setupModalCloseOnOutside('courierModal', 'closeCourierModalBtn');
+        setupModalCloseOnOutside('deleteModal', 'closeDeleteModalBtn');
         
         // Sidebar
-        const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
-        function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if(!document.getElementById('sidebarOverlay')) { const ov = document.createElement('div'); ov.id = 'sidebarOverlay'; ov.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; ov.addEventListener('click', closeSidebar); document.body.appendChild(ov); } }
-        function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); document.getElementById('sidebarOverlay')?.remove(); }
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            document.body.classList.add('sidebar-open');
+            if(!document.getElementById('sidebarOverlay')) {
+                const ov = document.createElement('div');
+                ov.id = 'sidebarOverlay';
+                ov.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
+                ov.addEventListener('click', closeSidebar);
+                document.body.appendChild(ov);
+            }
+        }
+        
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            document.body.classList.remove('sidebar-open');
+            document.getElementById('sidebarOverlay')?.remove();
+        }
+        
         menuToggle?.addEventListener('click', openSidebar);
         closeSidebarBtn?.addEventListener('click', closeSidebar);
-        window.addEventListener('resize', () => { if(window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full'); });
-        if(window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
         
-        document.getElementById('darkModeToggle')?.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
-        document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); document.getElementById('logoutModal')?.classList.remove('hidden'); });
-        document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => document.getElementById('logoutModal')?.classList.add('hidden'));
-        document.getElementById('confirmLogoutBtn')?.addEventListener('click', async () => { const { logout } = await import('./js/auth.js'); await logout(); });
+        window.addEventListener('resize', () => {
+            if(window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
+            else sidebar.classList.add('-translate-x-full');
+        });
+        if(window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
+        else sidebar.classList.add('-translate-x-full');
+        
+        document.getElementById('darkModeToggle')?.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+        });
+        
+        document.getElementById('logoutLink')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('logoutModal')?.classList.remove('hidden');
+            document.body.classList.add('modal-open');
+        });
+        document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => {
+            document.getElementById('logoutModal')?.classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+        document.getElementById('confirmLogoutBtn')?.addEventListener('click', async () => {
+            const { logout } = await import('./js/auth.js');
+            await logout();
+        });
         
         document.querySelectorAll('.has-submenu').forEach(menu => {
             const link = menu.querySelector('a');
-            link?.addEventListener('click', (e) => { e.preventDefault(); menu.classList.toggle('open'); menu.querySelector('.submenu-modern')?.classList.toggle('open'); });
+            link?.addEventListener('click', (e) => {
+                e.preventDefault();
+                menu.classList.toggle('open');
+                menu.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
         });
         
-        loadSuppliers(); loadWarrantyStats(); loadCouriers();
+        // Initialize
+        loadSuppliers();
+        loadCouriers();
+        loadWarrantyStats();
     </script>
 </body>
 </html>

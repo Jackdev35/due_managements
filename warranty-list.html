@@ -34,7 +34,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
         
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
-        body { font-family: 'Inter', system-ui, sans-serif; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; }
         
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
@@ -50,86 +50,32 @@
             background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
         }
         
-        .stat-card {
-            transition: all 0.2s ease;
-        }
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12);
-        }
-        
         .submenu-modern {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .submenu-modern.open {
-            max-height: 280px;
-        }
+        .submenu-modern.open { max-height: 280px; }
         
-        .has-submenu > a .chevron-icon {
-            transition: transform 0.2s ease;
-        }
-        .has-submenu.open > a .chevron-icon {
-            transform: rotate(180deg);
-        }
+        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
+        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
         
         @keyframes modalSlideUp {
             from { opacity: 0; transform: translateY(20px) scale(0.96); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .modal-animate {
-            animation: modalSlideUp 0.2s ease-out forwards;
-        }
+        .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
         
-        .btn-active:active {
-            transform: scale(0.97);
-        }
+        .btn-active:active { transform: scale(0.97); }
         
-        /* Status Badge Styles */
-        .status-pending {
-            background: #FEF3C7;
-            color: #D97706;
-            border: 1px solid #FDE68A;
-        }
-        .dark .status-pending {
-            background: #451A03;
-            color: #FBBF24;
-            border-color: #78350F;
-        }
-        
-        .status-currier {
-            background: #DBEAFE;
-            color: #2563EB;
-            border: 1px solid #BFDBFE;
-        }
-        .dark .status-currier {
-            background: #1E3A5F;
-            color: #60A5FA;
-            border-color: #1E40AF;
-        }
-        
-        .status-received {
-            background: #D1FAE5;
-            color: #059669;
-            border: 1px solid #A7F3D0;
-        }
-        .dark .status-received {
-            background: #064E3B;
-            color: #34D399;
-            border-color: #065F46;
-        }
-        
-        .status-delivered {
-            background: #E0E7FF;
-            color: #4338CA;
-            border: 1px solid #C7D2FE;
-        }
-        .dark .status-delivered {
-            background: #1E1B4B;
-            color: #818CF8;
-            border-color: #312E81;
-        }
+        .status-pending { background: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; }
+        .dark .status-pending { background: #451A03; color: #FBBF24; border-color: #78350F; }
+        .status-currier { background: #DBEAFE; color: #2563EB; border: 1px solid #BFDBFE; }
+        .dark .status-currier { background: #1E3A5F; color: #60A5FA; border-color: #1E40AF; }
+        .status-received { background: #D1FAE5; color: #059669; border: 1px solid #A7F3D0; }
+        .dark .status-received { background: #064E3B; color: #34D399; border-color: #065F46; }
+        .status-delivered { background: #E0E7FF; color: #4338CA; border: 1px solid #C7D2FE; }
+        .dark .status-delivered { background: #1E1B4B; color: #818CF8; border-color: #312E81; }
         
         .status-badge {
             display: inline-flex;
@@ -156,9 +102,6 @@
             transform: scale(1.05);
         }
         
-        .table-row-hover {
-            transition: all 0.2s ease;
-        }
         .table-row-hover:hover {
             background-color: rgba(15, 59, 58, 0.04);
         }
@@ -186,7 +129,6 @@
             }
         }
         
-        /* Sidebar overlay */
         #sidebarOverlay {
             animation: fadeIn 0.2s ease-out;
         }
@@ -197,14 +139,34 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        
+        /* Skeleton Loading */
+        .skeleton-row td {
+            padding: 8px 12px;
+        }
+        .skeleton-row .skeleton-text {
+            height: 14px;
+            background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+        .dark .skeleton-row .skeleton-text {
+            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+            background-size: 200% 100%;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     
     <div class="flex min-h-screen">
         
-        <!-- Sidebar - Professional Design -->
-        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-auto border-r border-white/5">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-hidden border-r border-white/5">
             <div class="flex flex-col h-full">
                 <div class="px-5 py-5 border-b border-white/10 flex items-center justify-between sticky top-0 bg-inherit z-10">
                     <div class="flex items-center gap-2.5">
@@ -226,12 +188,10 @@
                         <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
                         <span class="text-sm font-medium">Dashboard</span>
                     </a>
-                    
                     <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
                         <span class="text-sm font-medium">Customers</span>
                     </a>
-                    
                     <div class="has-submenu" id="dueSubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                             <div class="flex items-center gap-3">
@@ -251,7 +211,6 @@
                             </a>
                         </div>
                     </div>
-                    
                     <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div>
                         <span class="text-sm font-medium">Collection</span>
@@ -260,7 +219,6 @@
                         <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div>
                         <span class="text-sm font-medium">Ledger</span>
                     </a>
-                    
                     <div class="has-submenu open" id="warrantySubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-white bg-white/5 transition">
                             <div class="flex items-center gap-3">
@@ -288,7 +246,6 @@
                             </a>
                         </div>
                     </div>
-                    
                     <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
                         <span class="text-sm font-medium">Customer Warranty</span>
@@ -378,9 +335,10 @@
                     </div>
                     
                     <div class="table-scroll-hint px-3 pt-2">
-                        <i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns → <span class="mx-2">|</span> <i class="fas fa-hand-pointer mr-1 text-[8px]"></i> Tap row for details
+                        <i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns →
                     </div>
                     
+                    <!-- Optimized Table with Skeleton Loading -->
                     <div class="overflow-x-auto">
                         <table class="w-full min-w-[1000px]">
                             <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
@@ -397,7 +355,22 @@
                                 </tr>
                             </thead>
                             <tbody id="warrantyListBody" class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr><td colspan="9" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading warranty records...</p></td></tr>
+                                <!-- Skeleton loading rows -->
+                                <tr class="skeleton-row">
+                                    <td colspan="9" class="px-4 py-3">
+                                        <div class="skeleton-text" style="height:16px;width:80px;margin:0 auto;"></div>
+                                    </td>
+                                </tr>
+                                <tr class="skeleton-row">
+                                    <td colspan="9" class="px-4 py-3">
+                                        <div class="skeleton-text" style="height:16px;width:80px;margin:0 auto;"></div>
+                                    </td>
+                                </tr>
+                                <tr class="skeleton-row">
+                                    <td colspan="9" class="px-4 py-3">
+                                        <div class="skeleton-text" style="height:16px;width:80px;margin:0 auto;"></div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -427,11 +400,11 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Select New Status <span class="text-red-500">*</span></label>
                     <select id="updateStatus" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></select>
-                    <p class="text-[10px] text-gray-400 mt-1">Note: Status can only move forward (Pending → Currier → Received → Delivered)</p>
+                    <p class="text-[10px] text-gray-400 mt-1">Status can only move forward</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Remarks / Notes</label>
-                    <textarea id="statusRemarks" rows="2" placeholder="Add any remarks about this status update..." class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
+                    <textarea id="statusRemarks" rows="2" placeholder="Add any remarks..." class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
                 </div>
             </div>
             <div class="flex justify-end gap-3 px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
@@ -479,79 +452,39 @@
         </div>
     </div>
     
-    <!-- Auth Check Script -->
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
-        
-        // Check authentication - redirects to login.html if not authenticated
-        checkAuthState(true);
-    </script>
-    
-    <script type="module">
         import { db, collection, getDocs, query, orderBy, updateDoc, doc, getDoc } from './js/firebase.js';
         
-        // Sidebar functionality
+        // Check authentication
+        checkAuthState(true);
+        
+        // DOM Elements
         const sidebar = document.getElementById('sidebar');
         const menuToggle = document.getElementById('menuToggle');
         const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        const tbody = document.getElementById('warrantyListBody');
+        const searchInput = document.getElementById('warrantySearch');
+        const refreshBtn = document.getElementById('refreshBtn');
         
-        function openSidebar() {
-            sidebar.classList.remove('-translate-x-full');
-            document.body.classList.add('sidebar-open');
-            if (!document.getElementById('sidebarOverlay')) {
-                const overlay = document.createElement('div');
-                overlay.id = 'sidebarOverlay';
-                overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
-                overlay.addEventListener('click', closeSidebar);
-                document.body.appendChild(overlay);
-            }
-        }
+        // State
+        let allWarranties = [];
+        let currentUpdateId = null;
+        let isLoading = false;
         
-        function closeSidebar() {
-            sidebar.classList.add('-translate-x-full');
-            document.body.classList.remove('sidebar-open');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (overlay) overlay.remove();
-        }
+        // Supplier Cache
+        const supplierCache = new Map();
         
-        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
-        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+        // Status Configuration
+        const statusConfig = {
+            'pending': { class: 'status-pending', icon: 'fa-clock', text: 'Pending' },
+            'currier': { class: 'status-currier', icon: 'fa-truck', text: 'Currier' },
+            'received': { class: 'status-received', icon: 'fa-check-circle', text: 'Received' },
+            'delivered': { class: 'status-delivered', icon: 'fa-home', text: 'Delivered' }
+        };
+        const statusOrder = { 'pending': 1, 'currier': 2, 'received': 3, 'delivered': 4 };
         
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768) {
-                sidebar.classList.remove('-translate-x-full');
-                document.getElementById('sidebarOverlay')?.remove();
-                document.body.classList.remove('sidebar-open');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-            }
-        });
-        
-        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
-        else sidebar.classList.add('-translate-x-full');
-        
-        // Submenu for Warranty
-        const warrantySubmenu = document.getElementById('warrantySubmenu');
-        const warrantySubmenuLink = warrantySubmenu?.querySelector('a');
-        if (warrantySubmenuLink) {
-            warrantySubmenuLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                warrantySubmenu.classList.toggle('open');
-                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
-        }
-        
-        // Submenu for Due Entry
-        const dueSubmenu = document.getElementById('dueSubmenu');
-        const dueSubmenuLink = dueSubmenu?.querySelector('a');
-        if (dueSubmenuLink) {
-            dueSubmenuLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                dueSubmenu.classList.toggle('open');
-                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
-        }
-        
+        // Utility Functions
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -561,21 +494,12 @@
             setTimeout(() => toast.remove(), 2500);
         }
         
-        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
-        
-        let allWarranties = [];
-        let currentUpdateId = null;
-        
-        // Status order for validation
-        const statusOrder = { 'pending': 1, 'currier': 2, 'received': 3, 'delivered': 4 };
+        function escapeHtml(str) { 
+            if (!str) return ''; 
+            return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); 
+        }
         
         function getStatusBadge(status) {
-            const statusConfig = {
-                'pending': { class: 'status-pending', icon: 'fa-clock', text: 'Pending' },
-                'currier': { class: 'status-currier', icon: 'fa-truck', text: 'Currier' },
-                'received': { class: 'status-received', icon: 'fa-check-circle', text: 'Received' },
-                'delivered': { class: 'status-delivered', icon: 'fa-home', text: 'Delivered' }
-            };
             const config = statusConfig[status] || statusConfig['pending'];
             return `<span class="status-badge ${config.class}"><i class="fas ${config.icon} text-[10px]"></i> ${config.text}</span>`;
         }
@@ -584,45 +508,109 @@
             return statusOrder[newStatus] > statusOrder[currentStatus];
         }
         
-        async function loadWarrantyList() {
-            const tbody = document.getElementById('warrantyListBody');
-            if (!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading warranty records...</p></td>';
-            
+        // Show skeleton loading
+        function showSkeletonLoading() {
+            tbody.innerHTML = `
+                <tr class="skeleton-row">
+                    <td colspan="9" class="px-4 py-3">
+                        <div class="skeleton-text" style="height:16px;width:80px;margin:0 auto;"></div>
+                    </td>
+                </tr>
+                <tr class="skeleton-row">
+                    <td colspan="9" class="px-4 py-3">
+                        <div class="skeleton-text" style="height:16px;width:80px;margin:0 auto;"></div>
+                    </td>
+                </tr>
+                <tr class="skeleton-row">
+                    <td colspan="9" class="px-4 py-3">
+                        <div class="skeleton-text" style="height:16px;width:80px;margin:0 auto;"></div>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // Load supplier name with caching
+        async function getSupplierName(supplierId) {
+            if (!supplierId) return 'Unknown';
+            if (supplierCache.has(supplierId)) {
+                return supplierCache.get(supplierId);
+            }
             try {
-                const snapshot = await getDocs(query(collection(db, 'warranties'), orderBy('createdAt', 'desc')));
-                const warranties = [];
-                for (const docSnap of snapshot.docs) {
-                    const w = { id: docSnap.id, ...docSnap.data() };
-                    if (w.supplierId) {
-                        const supplierDoc = await getDoc(doc(db, 'suppliers', w.supplierId));
-                        w.supplierName = supplierDoc.exists() ? supplierDoc.data().name : 'Unknown';
-                    } else {
-                        w.supplierName = 'Unknown';
-                    }
-                    warranties.push(w);
-                }
-                allWarranties = warranties;
-                renderWarrantyTable(warranties);
-            } catch (error) {
-                console.error('Error loading warranties:', error);
-                tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
+                const docSnap = await getDoc(doc(db, 'suppliers', supplierId));
+                const name = docSnap.exists() ? docSnap.data().name : 'Unknown';
+                supplierCache.set(supplierId, name);
+                return name;
+            } catch {
+                return 'Unknown';
             }
         }
         
+        // Main load function - optimized
+        async function loadWarrantyList() {
+            if (isLoading) return;
+            isLoading = true;
+            
+            showSkeletonLoading();
+            
+            try {
+                // Single query - no ordering to reduce load time
+                const snapshot = await getDocs(collection(db, 'warranties'));
+                const warranties = [];
+                
+                // Process in parallel for speed
+                const promises = [];
+                const tempWarranties = [];
+                
+                snapshot.forEach(docSnap => {
+                    const w = { id: docSnap.id, ...docSnap.data() };
+                    tempWarranties.push(w);
+                    if (w.supplierId) {
+                        promises.push(getSupplierName(w.supplierId).then(name => {
+                            w.supplierName = name;
+                        }));
+                    } else {
+                        w.supplierName = 'Unknown';
+                    }
+                });
+                
+                // Wait for all supplier names to load
+                await Promise.all(promises);
+                
+                // Sort by createdAt (newest first)
+                tempWarranties.sort((a, b) => {
+                    const dateA = a.createdAt || '';
+                    const dateB = b.createdAt || '';
+                    return dateB.localeCompare(dateA);
+                });
+                
+                allWarranties = tempWarranties;
+                renderWarrantyTable(allWarranties);
+                
+            } catch (error) {
+                console.error('Error loading warranties:', error);
+                tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>`;
+                showToast('Error loading data', 'error');
+            } finally {
+                isLoading = false;
+            }
+        }
+        
+        // Render table - optimized with DocumentFragment
         function renderWarrantyTable(warranties) {
-            const tbody = document.getElementById('warrantyListBody');
-            if (warranties.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No warranty records found</p></td></tr>';
+            if (!warranties || warranties.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-gray-500">
+                    <i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i>
+                    <p class="text-xs">No warranty records found</p>
+                </td></tr>`;
                 return;
             }
             
-            tbody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            
             warranties.forEach(warranty => {
                 const statusBadge = getStatusBadge(warranty.status);
                 const isLocked = warranty.status === 'delivered';
-                
-                const row = tbody.insertRow();
+                const row = document.createElement('tr');
                 row.className = 'table-row-hover transition-colors cursor-pointer';
                 row.setAttribute('data-warranty', JSON.stringify(warranty));
                 
@@ -640,7 +628,7 @@
                             `<div class="action-icon update-status-icon inline-flex" data-id="${warranty.id}" data-status="${warranty.status}" title="Update Status">
                                 <i class="fas fa-edit text-primary text-sm"></i>
                             </div>` : 
-                            `<div class="action-icon inline-flex opacity-50 cursor-not-allowed" title="Completed - No action available">
+                            `<div class="action-icon inline-flex opacity-50 cursor-not-allowed" title="Completed">
                                 <i class="fas fa-lock text-gray-400 text-sm"></i>
                             </div>`
                         }
@@ -649,58 +637,84 @@
                         </div>
                     </td>
                 `;
+                
+                fragment.appendChild(row);
             });
             
-            // Row click for details
-            document.querySelectorAll('#warrantyListBody tr').forEach(row => {
-                row.addEventListener('click', (e) => {
-                    if (e.target.closest('.update-status-icon') || e.target.closest('.view-details-icon')) return;
-                    const warrantyData = row.dataset.warranty;
-                    if (warrantyData) {
-                        showDetailsModal(JSON.parse(warrantyData));
-                    }
-                });
+            // Clear and append once
+            tbody.innerHTML = '';
+            tbody.appendChild(fragment);
+            
+            // Attach event listeners (delegated)
+            attachEventListeners();
+        }
+        
+        // Attach event listeners using delegation
+        function attachEventListeners() {
+            // Row click for details (delegated)
+            tbody.querySelectorAll('tr').forEach(row => {
+                row.removeEventListener('click', handleRowClick);
+                row.addEventListener('click', handleRowClick);
             });
             
-            // Update status handlers
-            document.querySelectorAll('.update-status-icon').forEach(icon => {
-                icon.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const id = icon.dataset.id;
-                    const currentStatus = icon.dataset.status;
-                    const warranty = allWarranties.find(w => w.id === id);
-                    
-                    currentUpdateId = id;
-                    document.getElementById('statusWarrantyId').value = id;
-                    document.getElementById('currentStatus').value = currentStatus;
-                    document.getElementById('currentStatusDisplay').innerHTML = getStatusBadge(currentStatus);
-                    
-                    const statusSelect = document.getElementById('updateStatus');
-                    statusSelect.innerHTML = '';
-                    
-                    if (currentStatus === 'pending') {
-                        statusSelect.innerHTML = '<option value="currier">🚚 Sent to Currier</option>';
-                    } else if (currentStatus === 'currier') {
-                        statusSelect.innerHTML = '<option value="received">✅ Received from Supplier</option>';
-                    } else if (currentStatus === 'received') {
-                        statusSelect.innerHTML = '<option value="delivered">🏠 Delivered to Customer</option>';
-                    }
-                    
-                    document.getElementById('statusRemarks').value = warranty.statusRemarks || '';
-                    document.getElementById('statusModal').classList.remove('hidden');
-                });
+            // Update status buttons (delegated)
+            tbody.querySelectorAll('.update-status-icon').forEach(icon => {
+                icon.removeEventListener('click', handleStatusUpdate);
+                icon.addEventListener('click', handleStatusUpdate);
             });
             
-            // View details handlers
-            document.querySelectorAll('.view-details-icon').forEach(icon => {
-                icon.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const warranty = JSON.parse(icon.dataset.warranty);
-                    showDetailsModal(warranty);
-                });
+            // View details buttons (delegated)
+            tbody.querySelectorAll('.view-details-icon').forEach(icon => {
+                icon.removeEventListener('click', handleViewDetails);
+                icon.addEventListener('click', handleViewDetails);
             });
         }
         
+        // Event handlers
+        function handleRowClick(e) {
+            if (e.target.closest('.action-icon')) return;
+            const row = e.currentTarget;
+            const warrantyData = row.dataset.warranty;
+            if (warrantyData) {
+                showDetailsModal(JSON.parse(warrantyData));
+            }
+        }
+        
+        function handleStatusUpdate(e) {
+            e.stopPropagation();
+            const icon = e.currentTarget;
+            const id = icon.dataset.id;
+            const currentStatus = icon.dataset.status;
+            const warranty = allWarranties.find(w => w.id === id);
+            
+            currentUpdateId = id;
+            document.getElementById('statusWarrantyId').value = id;
+            document.getElementById('currentStatus').value = currentStatus;
+            document.getElementById('currentStatusDisplay').innerHTML = getStatusBadge(currentStatus);
+            
+            const statusSelect = document.getElementById('updateStatus');
+            statusSelect.innerHTML = '';
+            
+            if (currentStatus === 'pending') {
+                statusSelect.innerHTML = '<option value="currier">🚚 Sent to Currier</option>';
+            } else if (currentStatus === 'currier') {
+                statusSelect.innerHTML = '<option value="received">✅ Received from Supplier</option>';
+            } else if (currentStatus === 'received') {
+                statusSelect.innerHTML = '<option value="delivered">🏠 Delivered to Customer</option>';
+            }
+            
+            document.getElementById('statusRemarks').value = warranty.statusRemarks || '';
+            document.getElementById('statusModal').classList.remove('hidden');
+        }
+        
+        function handleViewDetails(e) {
+            e.stopPropagation();
+            const icon = e.currentTarget;
+            const warranty = JSON.parse(icon.dataset.warranty);
+            showDetailsModal(warranty);
+        }
+        
+        // Show details modal
         function showDetailsModal(warranty) {
             const statusBadge = getStatusBadge(warranty.status);
             const detailsContent = document.getElementById('detailsContent');
@@ -761,6 +775,7 @@
             document.getElementById('detailsModal').classList.remove('hidden');
         }
         
+        // Update warranty status
         async function updateWarrantyStatus() {
             const warrantyId = document.getElementById('statusWarrantyId').value;
             const currentStatus = document.getElementById('currentStatus').value;
@@ -780,30 +795,32 @@
                     ...(newStatus === 'received' ? { receivedDate: new Date().toISOString().split('T')[0] } : {}),
                     ...(newStatus === 'delivered' ? { deliveredDate: new Date().toISOString().split('T')[0] } : {})
                 });
-                showToast(`Status updated to ${newStatus.toUpperCase()} successfully!`, 'success');
+                showToast(`Status updated to ${newStatus.toUpperCase()}!`, 'success');
                 document.getElementById('statusModal').classList.add('hidden');
                 loadWarrantyList();
             } catch (error) {
-                console.error('Update error:', error);
                 showToast('Error updating status', 'error');
             }
         }
         
+        // Filter warranties
         function filterWarranties() {
-            const searchTerm = document.getElementById('warrantySearch').value.toLowerCase();
-            let filtered = [...allWarranties];
-            if (searchTerm) {
-                filtered = filtered.filter(w => 
-                    (w.warrantyId && w.warrantyId.toLowerCase().includes(searchTerm)) ||
-                    (w.productName && w.productName.toLowerCase().includes(searchTerm)) ||
-                    (w.customerName && w.customerName.toLowerCase().includes(searchTerm)) ||
-                    (w.serialNumber && w.serialNumber.toLowerCase().includes(searchTerm)) ||
-                    (w.supplierName && w.supplierName.toLowerCase().includes(searchTerm))
-                );
+            const searchTerm = searchInput.value.toLowerCase();
+            if (!searchTerm) {
+                renderWarrantyTable(allWarranties);
+                return;
             }
+            const filtered = allWarranties.filter(w => 
+                (w.warrantyId && w.warrantyId.toLowerCase().includes(searchTerm)) ||
+                (w.productName && w.productName.toLowerCase().includes(searchTerm)) ||
+                (w.customerName && w.customerName.toLowerCase().includes(searchTerm)) ||
+                (w.serialNumber && w.serialNumber.toLowerCase().includes(searchTerm)) ||
+                (w.supplierName && w.supplierName.toLowerCase().includes(searchTerm))
+            );
             renderWarrantyTable(filtered);
         }
         
+        // Export CSV
         function exportToCSV() {
             if (allWarranties.length === 0) {
                 showToast('No data to export', 'error');
@@ -826,54 +843,114 @@
             showToast('Exported successfully!', 'success');
         }
         
+        // Sidebar functions
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            document.body.classList.add('sidebar-open');
+            if (!document.getElementById('sidebarOverlay')) {
+                const overlay = document.createElement('div');
+                overlay.id = 'sidebarOverlay';
+                overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
+                overlay.addEventListener('click', closeSidebar);
+                document.body.appendChild(overlay);
+            }
+        }
+        
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            document.body.classList.remove('sidebar-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (overlay) overlay.remove();
+        }
+        
         // Event Listeners
-        document.getElementById('warrantySearch')?.addEventListener('input', filterWarranties);
-        document.getElementById('exportWarrantyBtn')?.addEventListener('click', exportToCSV);
-        document.getElementById('refreshBtn')?.addEventListener('click', () => {
-            loadWarrantyList();
-            showToast('Refreshed!', 'success');
+        menuToggle?.addEventListener('click', openSidebar);
+        closeSidebarBtn?.addEventListener('click', closeSidebar);
+        
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('-translate-x-full');
+                document.getElementById('sidebarOverlay')?.remove();
+                document.body.classList.remove('sidebar-open');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
         });
+        
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
+        else sidebar.classList.add('-translate-x-full');
+        
+        // Submenu toggles
+        document.querySelectorAll('.has-submenu').forEach(menu => {
+            const link = menu.querySelector('a');
+            if (link) {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    menu.classList.toggle('open');
+                    menu.querySelector('.submenu-modern')?.classList.toggle('open');
+                });
+            }
+        });
+        
+        // Dark mode toggle
         document.getElementById('darkModeToggle')?.addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
             document.body.classList.toggle('dark');
         });
         
+        // Search
+        searchInput?.addEventListener('input', filterWarranties);
+        
+        // Refresh
+        refreshBtn?.addEventListener('click', () => {
+            loadWarrantyList();
+            showToast('Refreshed!', 'success');
+        });
+        
+        // Export
+        document.getElementById('exportWarrantyBtn')?.addEventListener('click', exportToCSV);
+        
         // Status modal events
-        document.getElementById('closeStatusModalBtn')?.addEventListener('click', () => document.getElementById('statusModal').classList.add('hidden'));
-        document.getElementById('cancelStatusBtn')?.addEventListener('click', () => document.getElementById('statusModal').classList.add('hidden'));
+        document.getElementById('closeStatusModalBtn')?.addEventListener('click', () => {
+            document.getElementById('statusModal').classList.add('hidden');
+        });
+        document.getElementById('cancelStatusBtn')?.addEventListener('click', () => {
+            document.getElementById('statusModal').classList.add('hidden');
+        });
         document.getElementById('saveStatusBtn')?.addEventListener('click', updateWarrantyStatus);
         document.getElementById('statusModal')?.addEventListener('click', (e) => {
-            if (e.target === document.getElementById('statusModal')) document.getElementById('statusModal').classList.add('hidden');
+            if (e.target === document.getElementById('statusModal')) {
+                document.getElementById('statusModal').classList.add('hidden');
+            }
         });
         
         // Details modal events
-        document.getElementById('closeDetailsModalBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
-        document.getElementById('closeDetailsModalFooterBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
+        document.getElementById('closeDetailsModalBtn')?.addEventListener('click', () => {
+            document.getElementById('detailsModal').classList.add('hidden');
+        });
+        document.getElementById('closeDetailsModalFooterBtn')?.addEventListener('click', () => {
+            document.getElementById('detailsModal').classList.add('hidden');
+        });
         document.getElementById('detailsModal')?.addEventListener('click', (e) => {
-            if (e.target === document.getElementById('detailsModal')) document.getElementById('detailsModal').classList.add('hidden');
+            if (e.target === document.getElementById('detailsModal')) {
+                document.getElementById('detailsModal').classList.add('hidden');
+            }
         });
         
-        // Logout functionality
-        const logoutModal = document.getElementById('logoutModal');
-        const logoutLink = document.getElementById('logoutLink');
-        const cancelLogout = document.getElementById('cancelLogoutBtn');
-        const confirmLogout = document.getElementById('confirmLogoutBtn');
-        if (logoutLink) {
-            logoutLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                logoutModal?.classList.remove('hidden');
-            });
-        }
-        if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal?.classList.add('hidden'));
-        if (confirmLogout) {
-            confirmLogout.addEventListener('click', async () => {
-                logoutModal?.classList.add('hidden');
-                const { logout } = await import('./js/auth.js');
-                await logout();
-            });
-        }
+        // Logout
+        document.getElementById('logoutLink')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('logoutModal')?.classList.remove('hidden');
+        });
+        document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => {
+            document.getElementById('logoutModal')?.classList.add('hidden');
+        });
+        document.getElementById('confirmLogoutBtn')?.addEventListener('click', async () => {
+            document.getElementById('logoutModal')?.classList.add('hidden');
+            await logout();
+        });
         
-        // Initialize
+        // Initialize - load data immediately
         loadWarrantyList();
     </script>
 </body>
