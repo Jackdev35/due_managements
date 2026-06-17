@@ -208,6 +208,89 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.6; }
         }
+        /* camera preview overlay for barcode scanning */
+        #cameraPreview {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        #cameraPreview video {
+            width: 90%;
+            max-width: 400px;
+            border-radius: 24px;
+            border: 3px solid #d4af37;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        #cameraPreview .scan-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        #cameraPreview .scan-controls button {
+            background: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: 0.2s;
+        }
+        #cameraPreview .scan-controls button:active { transform: scale(0.94); }
+        #cameraPreview .scan-controls button.cancel-btn { background: #e53e3e; color: white; }
+        #cameraPreview .scan-controls button.scan-btn-confirm { background: #0f3b3a; color: white; }
+        #cameraPreview .scan-status {
+            color: #f1f5f9;
+            margin-bottom: 12px;
+            font-size: 18px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 24px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
+
+        /* pagination styles */
+        .pagination-btn {
+            min-width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .pagination-btn.active {
+            background: #0f3b3a;
+            color: white;
+            border-color: #0f3b3a;
+        }
+        .pagination-btn:not(.active):hover {
+            background: rgba(15,59,58,0.08);
+        }
+        .dark .pagination-btn:not(.active):hover {
+            background: rgba(255,255,255,0.08);
+        }
+        .pagination-btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        .pagination-btn.arrow {
+            background: transparent;
+            border-color: #e2e8f0;
+        }
+        .dark .pagination-btn.arrow {
+            border-color: #475569;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -451,7 +534,7 @@
                     </div>
                 </div>
                 
-                <!-- Warranty Entries List Table -->
+                <!-- Warranty Entries List Table with Pagination -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                     <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2">
                         <div>
@@ -460,9 +543,11 @@
                             </h3>
                             <p class="text-[10px] text-gray-500 mt-0.5">All registered warranty claims</p>
                         </div>
-                        <button id="exportEntriesBtn" class="bg-success hover:bg-green-700 text-white font-medium px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 btn-active transition-all">
-                            <i class="fas fa-download text-xs"></i> Export CSV
-                        </button>
+                        <div class="flex items-center gap-3">
+                            <button id="exportEntriesBtn" class="bg-success hover:bg-green-700 text-white font-medium px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 btn-active transition-all">
+                                <i class="fas fa-download text-xs"></i> Export CSV
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="table-scroll-hint px-3 pt-2">
@@ -487,6 +572,26 @@
                                 <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading entries...</p></td></tr>
                             </tbody>
                         </table>
+                    </div>
+                    
+                    <!-- Pagination Controls -->
+                    <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                            <span>Show</span>
+                            <select id="perPageSelect" class="border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-sm bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                                <option value="20">20</option>
+                                <option value="25" selected>25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="200">200</option>
+                            </select>
+                            <span>entries</span>
+                            <span class="hidden sm:inline mx-2">|</span>
+                            <span id="paginationInfo" class="text-xs">Showing 0 - 0 of 0</span>
+                        </div>
+                        <div class="flex items-center gap-1" id="paginationControls">
+                            <!-- pagination buttons will be rendered here -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -641,19 +746,27 @@
             </div>
         </div>
     </div>
+
+    <!-- Camera Preview Overlay for Barcode Scanning (mobile + desktop) -->
+    <div id="cameraPreview">
+        <div class="scan-status" id="scanStatus">📷 Position barcode in frame</div>
+        <video id="video" autoplay playsinline></video>
+        <div class="scan-controls">
+            <button class="cancel-btn" id="closeCameraBtn">Cancel</button>
+            <button class="scan-btn-confirm" id="captureBarcodeBtn">📸 Capture</button>
+        </div>
+    </div>
     
     <!-- Auth Check Script -->
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
-        
-        // Check authentication - redirects to login.html if not authenticated
         checkAuthState(true);
     </script>
     
     <script type="module">
         import { db, collection, addDoc, getDocs, query, orderBy, doc, getDoc, deleteDoc, updateDoc } from './js/firebase.js';
         
-        // Sidebar functionality
+        // ===== SIDEBAR & MENU =====
         const sidebar = document.getElementById('sidebar');
         const menuToggle = document.getElementById('menuToggle');
         const closeSidebarBtn = document.getElementById('closeSidebarBtn');
@@ -669,17 +782,13 @@
                 document.body.appendChild(overlay);
             }
         }
-        
         function closeSidebar() {
             sidebar.classList.add('-translate-x-full');
             document.body.classList.remove('sidebar-open');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (overlay) overlay.remove();
+            document.getElementById('sidebarOverlay')?.remove();
         }
-        
-        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
-        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
-        
+        menuToggle?.addEventListener('click', openSidebar);
+        closeSidebarBtn?.addEventListener('click', closeSidebar);
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 768) {
                 sidebar.classList.remove('-translate-x-full');
@@ -689,32 +798,20 @@
                 sidebar.classList.add('-translate-x-full');
             }
         });
-        
         if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
         else sidebar.classList.add('-translate-x-full');
         
-        // Submenu for Warranty
-        const warrantySubmenu = document.getElementById('warrantySubmenu');
-        const warrantySubmenuLink = warrantySubmenu?.querySelector('a');
-        if (warrantySubmenuLink) {
-            warrantySubmenuLink.addEventListener('click', (e) => {
+        // Submenu toggles
+        document.querySelectorAll('.has-submenu > a').forEach(link => {
+            link.addEventListener('click', (e) => {
                 e.preventDefault();
-                warrantySubmenu.classList.toggle('open');
-                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
+                const parent = link.closest('.has-submenu');
+                parent.classList.toggle('open');
+                parent.querySelector('.submenu-modern')?.classList.toggle('open');
             });
-        }
+        });
         
-        // Submenu for Due Entry
-        const dueSubmenu = document.getElementById('dueSubmenu');
-        const dueSubmenuLink = dueSubmenu?.querySelector('a');
-        if (dueSubmenuLink) {
-            dueSubmenuLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                dueSubmenu.classList.toggle('open');
-                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
-        }
-        
+        // ===== TOAST =====
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -726,341 +823,305 @@
         
         function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
         
-        let allEntries = [];
+        // ===== STATE =====
+        let allEntries = [];              // all warranty entries from firestore
+        let currentPage = 1;
+        let perPage = 25;                 // default
         let deleteWarrantyId = null;
         let editWarrantyId = null;
         let isScanning = false;
+        let activeScanInputId = null;
         
-        // Generate Warranty ID
-        function generateWarrantyId() {
-            const now = new Date();
-            const year = now.getFullYear().toString().slice(-2);
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-            return `WAR-${year}${month}${day}/${random}`;
+        // ===== CAMERA / BARCODE =====
+        const cameraPreview = document.getElementById('cameraPreview');
+        const video = document.getElementById('video');
+        const scanStatus = document.getElementById('scanStatus');
+        const closeCameraBtn = document.getElementById('closeCameraBtn');
+        const captureBarcodeBtn = document.getElementById('captureBarcodeBtn');
+        let stream = null;
+        let scanResolve = null;
+        
+        async function startCameraScan(inputId) {
+            if (isScanning) { showToast('Scanner already active', 'info'); return null; }
+            if (!navigator.mediaDevices?.getUserMedia) {
+                showToast('Camera not supported', 'error');
+                return null;
+            }
+            activeScanInputId = inputId;
+            cameraPreview.style.display = 'flex';
+            scanStatus.textContent = '📷 Starting camera...';
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
+                });
+                video.srcObject = stream;
+                await video.play();
+                scanStatus.textContent = '📸 Point camera at barcode, then tap Capture';
+                isScanning = true;
+                return new Promise((resolve) => { scanResolve = resolve; });
+            } catch (error) {
+                console.error('Camera error:', error);
+                showToast(error.name === 'NotAllowedError' ? 'Camera access denied' : 'Error: ' + error.message, 'error');
+                closeCamera();
+                return null;
+            }
         }
+        function closeCamera() {
+            if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+            video.srcObject = null;
+            cameraPreview.style.display = 'none';
+            isScanning = false;
+            if (scanResolve) { scanResolve(null); scanResolve = null; }
+        }
+        async function captureBarcode() {
+            if (!video.videoWidth) { showToast('Camera not ready', 'error'); return; }
+            scanStatus.textContent = '🔍 Decoding...';
+            // In real app, pass image to barcode library. Here we prompt for manual entry.
+            const manual = prompt('Enter barcode number (or scan result):');
+            if (manual?.trim()) {
+                const input = document.getElementById(activeScanInputId);
+                if (input) input.value = manual.trim();
+                showToast('Barcode captured: ' + manual.trim(), 'success');
+                closeCamera();
+                if (scanResolve) { scanResolve(manual.trim()); scanResolve = null; }
+            } else {
+                showToast('Scan cancelled', 'info');
+                closeCamera();
+                if (scanResolve) { scanResolve(null); scanResolve = null; }
+            }
+        }
+        closeCameraBtn.addEventListener('click', () => { closeCamera(); if (scanResolve) { scanResolve(null); scanResolve = null; } });
+        captureBarcodeBtn.addEventListener('click', captureBarcode);
         
-        // Barcode Scanner Function
-        function activateScanner(inputElementId, buttonElementId) {
-            const input = document.getElementById(inputElementId);
-            const button = document.getElementById(buttonElementId);
-            
-            if (!input || !button) return;
-            
-            button.addEventListener('click', async function() {
-                if (isScanning) {
-                    showToast('Scanner already active', 'info');
-                    return;
-                }
-                
-                // Check if browser supports camera
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    showToast('Camera not supported on this device', 'error');
-                    return;
-                }
-                
-                try {
-                    isScanning = true;
-                    button.classList.add('scanning');
-                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
-                    
-                    // Request camera permission
-                    const stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { facingMode: 'environment' } 
-                    });
-                    
-                    // Stop all tracks - we just need permission
-                    stream.getTracks().forEach(track => track.stop());
-                    
-                    // Show prompt for manual entry or scanning
-                    showToast('Ready to scan. Please point camera at barcode.', 'info');
-                    
-                    // Simulate barcode scan for demo - in production use a barcode library
-                    // For actual implementation, use QuaggaJS or similar library
-                    // Here we're using a prompt as fallback
-                    const scannedValue = prompt('Enter scanned barcode number:');
-                    
-                    if (scannedValue !== null && scannedValue.trim() !== '') {
-                        input.value = scannedValue.trim();
-                        showToast('Barcode scanned successfully!', 'success');
-                    } else {
-                        showToast('Scan cancelled or no input', 'info');
-                    }
-                    
-                } catch (error) {
-                    console.error('Scanner error:', error);
-                    if (error.name === 'NotAllowedError') {
-                        showToast('Camera access denied. Please allow camera permission.', 'error');
-                    } else {
-                        showToast('Error accessing camera: ' + error.message, 'error');
-                    }
-                } finally {
-                    isScanning = false;
-                    button.classList.remove('scanning');
-                    button.innerHTML = '<i class="fas fa-camera"></i> Scan';
-                }
+        function activateScanner(inputId, btnId) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            btn.addEventListener('click', async () => {
+                if (isScanning) { showToast('Scanner already active', 'info'); return; }
+                await startCameraScan(inputId);
             });
         }
+        activateScanner('warrantySerial', 'scanSerialBtn');
+        activateScanner('editSerialNumber', 'editScanSerialBtn');
         
-        // Load Suppliers Dropdown
+        // ===== SUPPLIERS =====
         async function loadSuppliers(selectId = 'warrantySupplier') {
             const select = document.getElementById(selectId);
             if (!select) return;
-            const currentValue = select.value;
+            const current = select.value;
             select.innerHTML = '<option value="">-- Select Supplier --</option>';
             try {
-                const snapshot = await getDocs(collection(db, 'suppliers'));
-                snapshot.forEach(doc => {
-                    const supplier = doc.data();
-                    const option = document.createElement('option');
-                    option.value = doc.id;
-                    option.textContent = supplier.name;
-                    select.appendChild(option);
+                const snap = await getDocs(collection(db, 'suppliers'));
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const opt = document.createElement('option');
+                    opt.value = doc.id;
+                    opt.textContent = data.name;
+                    select.appendChild(opt);
                 });
-                if (currentValue) select.value = currentValue;
-            } catch (error) {
-                console.error('Error loading suppliers:', error);
-                showToast('Error loading suppliers', 'error');
-            }
+                if (current) select.value = current;
+            } catch (e) { console.error(e); showToast('Error loading suppliers', 'error'); }
         }
         
-        // Load Warranty Entries
-        async function loadWarrantyEntries() {
-            const tbody = document.getElementById('warrantyEntriesBody');
-            if (!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading entries...</p></td>';
+        // ===== GENERATE WARRANTY ID =====
+        function generateWarrantyId() {
+            const now = new Date();
+            const y = now.getFullYear().toString().slice(-2);
+            const m = String(now.getMonth()+1).padStart(2,'0');
+            const d = String(now.getDate()).padStart(2,'0');
+            const r = Math.floor(Math.random()*10000).toString().padStart(4,'0');
+            return `WAR-${y}${m}${d}/${r}`;
+        }
+        
+        // ===== PAGINATION HELPERS =====
+        function getPaginatedEntries(entries, page, per) {
+            const start = (page - 1) * per;
+            const end = start + per;
+            return entries.slice(start, end);
+        }
+        
+        function renderPagination(totalEntries, page, per) {
+            const totalPages = Math.ceil(totalEntries / per) || 1;
+            const container = document.getElementById('paginationControls');
+            const info = document.getElementById('paginationInfo');
+            if (!container) return;
             
-            try {
-                const snapshot = await getDocs(query(collection(db, 'warranties'), orderBy('createdAt', 'desc')));
-                const entries = [];
-                for (const docSnap of snapshot.docs) {
-                    const w = { id: docSnap.id, ...docSnap.data() };
-                    if (w.supplierId) {
-                        const supplierDoc = await getDoc(doc(db, 'suppliers', w.supplierId));
-                        w.supplierName = supplierDoc.exists() ? supplierDoc.data().name : 'Unknown';
-                    } else {
-                        w.supplierName = 'Unknown';
-                    }
-                    entries.push(w);
-                }
-                allEntries = entries;
-                renderEntriesTable(entries);
-            } catch (error) {
-                console.error('Error loading entries:', error);
-                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
-                showToast('Error loading warranty entries', 'error');
+            // update info text
+            const start = (page - 1) * per + 1;
+            const end = Math.min(page * per, totalEntries);
+            info.textContent = `Showing ${totalEntries === 0 ? 0 : start} - ${end} of ${totalEntries}`;
+            
+            let html = '';
+            // Prev
+            html += `<button class="pagination-btn arrow" data-page="prev" ${page <= 1 ? 'disabled' : ''}><i class="fas fa-chevron-left text-xs"></i></button>`;
+            
+            // Page numbers (max 7 visible)
+            let pages = [];
+            if (totalPages <= 7) {
+                for (let i = 1; i <= totalPages; i++) pages.push(i);
+            } else {
+                pages.push(1);
+                if (page > 3) pages.push('...');
+                let startP = Math.max(2, page - 1);
+                let endP = Math.min(totalPages - 1, page + 1);
+                for (let i = startP; i <= endP; i++) pages.push(i);
+                if (page < totalPages - 2) pages.push('...');
+                pages.push(totalPages);
             }
+            
+            pages.forEach(p => {
+                if (p === '...') {
+                    html += `<span class="px-1 text-gray-400">…</span>`;
+                } else {
+                    html += `<button class="pagination-btn ${p === page ? 'active' : ''}" data-page="${p}">${p}</button>`;
+                }
+            });
+            
+            // Next
+            html += `<button class="pagination-btn arrow" data-page="next" ${page >= totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right text-xs"></i></button>`;
+            
+            container.innerHTML = html;
+            
+            // attach events
+            container.querySelectorAll('[data-page]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const val = btn.dataset.page;
+                    if (val === 'prev' && currentPage > 1) currentPage--;
+                    else if (val === 'next' && currentPage < totalPages) currentPage++;
+                    else if (val !== 'prev' && val !== 'next') currentPage = parseInt(val);
+                    renderTablePage();
+                });
+            });
         }
         
+        function renderTablePage() {
+            const paginated = getPaginatedEntries(allEntries, currentPage, perPage);
+            renderEntriesTable(paginated);
+            renderPagination(allEntries.length, currentPage, perPage);
+        }
+        
+        // ===== RENDER TABLE =====
         function renderEntriesTable(entries) {
             const tbody = document.getElementById('warrantyEntriesBody');
+            if (!tbody) return;
             if (entries.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No warranty entries found</p></td>';
                 return;
             }
-            
             tbody.innerHTML = '';
             entries.forEach(entry => {
                 let statusClass, statusText, statusIcon;
                 if (entry.status === 'pending') {
-                    statusClass = 'status-pending';
-                    statusText = 'Pending';
-                    statusIcon = 'fa-clock';
+                    statusClass = 'status-pending'; statusText = 'Pending'; statusIcon = 'fa-clock';
                 } else if (entry.status === 'dispatched') {
-                    statusClass = 'status-dispatched';
-                    statusText = 'Dispatched';
-                    statusIcon = 'fa-shipping-fast';
+                    statusClass = 'status-dispatched'; statusText = 'Dispatched'; statusIcon = 'fa-shipping-fast';
                 } else {
-                    statusClass = 'status-received';
-                    statusText = 'Received';
-                    statusIcon = 'fa-check-circle';
+                    statusClass = 'status-received'; statusText = 'Received'; statusIcon = 'fa-check-circle';
                 }
-                const quantity = entry.quantity || 1;
-                const productDisplay = quantity > 1 ? `${entry.productName} (x${quantity})` : entry.productName;
+                const qty = entry.quantity || 1;
+                const productDisplay = qty > 1 ? `${entry.productName} (x${qty})` : entry.productName;
                 const isPending = entry.status === 'pending';
-                
                 const row = tbody.insertRow();
                 row.className = 'table-row-hover transition-colors cursor-pointer';
                 row.setAttribute('data-entry', JSON.stringify(entry));
-                
                 row.innerHTML = `
-                    <td class="px-3 py-2.5 text-xs font-mono font-semibold">${escapeHtml(entry.warrantyId || entry.id.slice(0, 12))}</td>
+                    <td class="px-3 py-2.5 text-xs font-mono font-semibold">${escapeHtml(entry.warrantyId || entry.id.slice(0,12))}</td>
                     <td class="px-3 py-2.5 text-sm whitespace-nowrap">${escapeHtml(entry.warrantyDate || 'N/A')}</td>
                     <td class="px-3 py-2.5 text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(entry.supplierName)}</td>
                     <td class="px-3 py-2.5 text-sm">${escapeHtml(productDisplay)}</td>
                     <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.customerName || '-')}</td>
                     <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.customerPhone || '-')}</td>
-                    <td class="px-3 py-2.5 text-center">
-                        <span class="status-badge ${statusClass}">
-                            <i class="fas ${statusIcon} text-[10px]"></i> ${statusText}
-                        </span>
-                    </td>
+                    <td class="px-3 py-2.5 text-center"><span class="status-badge ${statusClass}"><i class="fas ${statusIcon} text-[10px]"></i> ${statusText}</span></td>
                     <td class="px-3 py-2.5 text-center">
                         <div class="flex items-center justify-center gap-2">
-                            <button class="view-details text-blue-500 hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-entry='${JSON.stringify(entry)}' title="View Details">
-                                <i class="fas fa-eye text-sm"></i>
-                            </button>
-                            ${isPending ? `
-                            <button class="edit-warranty text-accent hover:text-amber-600 p-1.5 rounded-lg transition-colors" data-id="${entry.id}" data-entry='${JSON.stringify(entry)}' title="Edit Warranty Entry">
-                                <i class="fas fa-edit text-sm"></i>
-                            </button>
-                            ` : `
-                            <button class="edit-warranty disabled opacity-40 cursor-not-allowed p-1.5 rounded-lg" title="Cannot edit - already dispatched" disabled>
-                                <i class="fas fa-edit text-sm text-gray-400"></i>
-                            </button>
-                            `}
-                            ${isPending ? `
-                            <button class="delete-warranty text-red-500 hover:text-red-700 p-1.5 rounded-lg transition-colors" data-id="${entry.id}" data-product="${escapeHtml(entry.productName)}" title="Delete Warranty Entry">
-                                <i class="fas fa-trash-alt text-sm"></i>
-                            </button>
-                            ` : `
-                            <button class="delete-warranty disabled opacity-40 cursor-not-allowed p-1.5 rounded-lg" title="Cannot delete - already dispatched" disabled>
-                                <i class="fas fa-trash-alt text-sm text-gray-400"></i>
-                            </button>
-                            `}
+                            <button class="view-details text-blue-500 hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-entry='${JSON.stringify(entry)}' title="View Details"><i class="fas fa-eye text-sm"></i></button>
+                            ${isPending ? `<button class="edit-warranty text-accent hover:text-amber-600 p-1.5 rounded-lg transition-colors" data-id="${entry.id}" data-entry='${JSON.stringify(entry)}' title="Edit"><i class="fas fa-edit text-sm"></i></button>` 
+                            : `<button class="edit-warranty disabled opacity-40 cursor-not-allowed p-1.5 rounded-lg" disabled><i class="fas fa-edit text-sm text-gray-400"></i></button>`}
+                            ${isPending ? `<button class="delete-warranty text-red-500 hover:text-red-700 p-1.5 rounded-lg transition-colors" data-id="${entry.id}" data-product="${escapeHtml(entry.productName)}" title="Delete"><i class="fas fa-trash-alt text-sm"></i></button>`
+                            : `<button class="delete-warranty disabled opacity-40 cursor-not-allowed p-1.5 rounded-lg" disabled><i class="fas fa-trash-alt text-sm text-gray-400"></i></button>`}
                         </div>
                     </td>
                 `;
             });
             
-            // Row click for details
+            // Attach row click (view details)
             document.querySelectorAll('#warrantyEntriesBody tr').forEach(row => {
                 row.addEventListener('click', (e) => {
                     if (e.target.closest('button')) return;
-                    const entryData = row.dataset.entry;
-                    if (entryData) {
-                        const entry = JSON.parse(entryData);
-                        showDetailsModal(entry);
-                    }
+                    const data = row.dataset.entry;
+                    if (data) showDetailsModal(JSON.parse(data));
                 });
             });
-            
-            // View details buttons
             document.querySelectorAll('.view-details').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const entry = JSON.parse(btn.dataset.entry);
-                    showDetailsModal(entry);
+                    showDetailsModal(JSON.parse(btn.dataset.entry));
                 });
             });
-            
-            // Edit buttons
             document.querySelectorAll('.edit-warranty:not(.disabled)').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const entry = JSON.parse(btn.dataset.entry);
-                    openEditModal(entry);
+                    openEditModal(JSON.parse(btn.dataset.entry));
                 });
             });
-            
-            // Delete buttons
             document.querySelectorAll('.delete-warranty:not(.disabled)').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
+                btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const warrantyId = btn.dataset.id;
-                    const productName = btn.dataset.product;
-                    showDeleteConfirmation(warrantyId, productName);
+                    showDeleteConfirmation(btn.dataset.id, btn.dataset.product);
                 });
             });
         }
         
+        // ===== MODALS =====
         function showDetailsModal(entry) {
-            const detailsContent = document.getElementById('detailsContent');
+            const content = document.getElementById('detailsContent');
             let statusClass, statusText;
-            if (entry.status === 'pending') {
-                statusClass = 'status-pending';
-                statusText = 'Pending';
-            } else if (entry.status === 'dispatched') {
-                statusClass = 'status-dispatched';
-                statusText = 'Dispatched';
-            } else {
-                statusClass = 'status-received';
-                statusText = 'Received';
-            }
-            const quantity = entry.quantity || 1;
-            
-            detailsContent.innerHTML = `
+            if (entry.status === 'pending') { statusClass = 'status-pending'; statusText = 'Pending'; }
+            else if (entry.status === 'dispatched') { statusClass = 'status-dispatched'; statusText = 'Dispatched'; }
+            else { statusClass = 'status-received'; statusText = 'Received'; }
+            const qty = entry.quantity || 1;
+            content.innerHTML = `
                 <div class="space-y-3">
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Warranty ID</span>
-                        <span class="font-mono text-sm font-semibold text-primary">${escapeHtml(entry.warrantyId || entry.id.slice(0, 12))}</span>
-                    </div>
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Date</span>
-                        <span class="text-sm">${escapeHtml(entry.warrantyDate || 'N/A')}</span>
-                    </div>
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Supplier</span>
-                        <span class="text-sm font-medium">${escapeHtml(entry.supplierName)}</span>
-                    </div>
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Product Name</span>
-                        <span class="text-sm font-semibold">${escapeHtml(entry.productName)}</span>
-                    </div>
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Quantity</span>
-                        <span class="text-sm font-semibold">${quantity} pcs</span>
-                    </div>
-                    ${entry.serialNumber ? `
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Serial Number</span>
-                        <span class="text-xs font-mono">${escapeHtml(entry.serialNumber)}</span>
-                    </div>
-                    ` : ''}
-                    ${entry.customerName ? `
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Customer Name</span>
-                        <span class="text-sm">${escapeHtml(entry.customerName)}</span>
-                    </div>
-                    ` : ''}
-                    ${entry.customerPhone ? `
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Customer Phone</span>
-                        <span class="text-sm">${escapeHtml(entry.customerPhone)}</span>
-                    </div>
-                    ` : ''}
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Status</span>
-                        <span class="status-badge ${statusClass}">${statusText}</span>
-                    </div>
-                    ${entry.problemDescription ? `
-                    <div class="flex flex-col gap-1">
-                        <span class="text-xs text-gray-500">Problem Description</span>
-                        <p class="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">${escapeHtml(entry.problemDescription)}</p>
-                    </div>
-                    ` : ''}
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Warranty ID</span><span class="font-mono text-sm font-semibold text-primary">${escapeHtml(entry.warrantyId || entry.id.slice(0,12))}</span></div>
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Date</span><span class="text-sm">${escapeHtml(entry.warrantyDate || 'N/A')}</span></div>
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Supplier</span><span class="text-sm font-medium">${escapeHtml(entry.supplierName)}</span></div>
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Product</span><span class="text-sm font-semibold">${escapeHtml(entry.productName)}</span></div>
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Quantity</span><span class="text-sm font-semibold">${qty} pcs</span></div>
+                    ${entry.serialNumber ? `<div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Serial</span><span class="text-xs font-mono">${escapeHtml(entry.serialNumber)}</span></div>` : ''}
+                    ${entry.customerName ? `<div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Customer</span><span class="text-sm">${escapeHtml(entry.customerName)}</span></div>` : ''}
+                    ${entry.customerPhone ? `<div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Phone</span><span class="text-sm">${escapeHtml(entry.customerPhone)}</span></div>` : ''}
+                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Status</span><span class="status-badge ${statusClass}">${statusText}</span></div>
+                    ${entry.problemDescription ? `<div class="flex flex-col gap-1"><span class="text-xs text-gray-500">Problem</span><p class="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">${escapeHtml(entry.problemDescription)}</p></div>` : ''}
                 </div>
             `;
             document.getElementById('detailsModal').classList.remove('hidden');
         }
+        document.getElementById('closeDetailsModalBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
+        document.getElementById('closeDetailsModalFooterBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
+        document.getElementById('detailsModal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) document.getElementById('detailsModal').classList.add('hidden'); });
         
-        function showDeleteConfirmation(warrantyId, productName) {
-            deleteWarrantyId = warrantyId;
-            document.getElementById('deleteProductName').textContent = productName;
+        function showDeleteConfirmation(id, product) {
+            deleteWarrantyId = id;
+            document.getElementById('deleteProductName').textContent = product;
             document.getElementById('deleteModal').classList.remove('hidden');
         }
-        
-        async function confirmDeleteWarranty() {
+        async function confirmDelete() {
             if (!deleteWarrantyId) return;
-            
             try {
                 await deleteDoc(doc(db, 'warranties', deleteWarrantyId));
-                showToast('Warranty entry deleted successfully!', 'success');
+                showToast('Deleted successfully', 'success');
                 document.getElementById('deleteModal').classList.add('hidden');
                 await loadWarrantyEntries();
                 deleteWarrantyId = null;
-            } catch (error) {
-                console.error('Delete error:', error);
-                showToast('Error deleting warranty entry: ' + error.message, 'error');
-            }
+            } catch (e) { showToast('Delete error: ' + e.message, 'error'); }
         }
+        document.getElementById('closeDeleteModalBtn')?.addEventListener('click', () => { document.getElementById('deleteModal').classList.add('hidden'); deleteWarrantyId = null; });
+        document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => { document.getElementById('deleteModal').classList.add('hidden'); deleteWarrantyId = null; });
+        document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+        document.getElementById('deleteModal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) { document.getElementById('deleteModal').classList.add('hidden'); deleteWarrantyId = null; } });
         
-        // Open Edit Modal
         function openEditModal(entry) {
             editWarrantyId = entry.id;
-            
-            // Populate edit form with entry data
             document.getElementById('editWarrantyId').value = entry.id;
             document.getElementById('editSupplier').value = entry.supplierId || '';
             document.getElementById('editWarrantyDate').value = entry.warrantyDate || '';
@@ -1070,17 +1131,11 @@
             document.getElementById('editCustomerName').value = entry.customerName || '';
             document.getElementById('editCustomerPhone').value = entry.customerPhone || '';
             document.getElementById('editProblemDescription').value = entry.problemDescription || '';
-            
-            // Load suppliers for edit dropdown
             loadSuppliers('editSupplier');
-            
             document.getElementById('editModal').classList.remove('hidden');
         }
-        
-        // Submit Edit Warranty
-        async function submitEditWarranty(e) {
+        async function submitEdit(e) {
             e.preventDefault();
-            
             const id = document.getElementById('editWarrantyId').value;
             const supplierId = document.getElementById('editSupplier').value;
             const warrantyDate = document.getElementById('editWarrantyDate').value;
@@ -1090,39 +1145,57 @@
             const customerName = document.getElementById('editCustomerName').value.trim();
             const customerPhone = document.getElementById('editCustomerPhone').value.trim();
             const problemDescription = document.getElementById('editProblemDescription').value;
-            
-            if (!supplierId) { showToast('Please select a supplier', 'error'); return; }
-            if (!warrantyDate) { showToast('Please select warranty date', 'error'); return; }
-            if (!productName) { showToast('Please enter product name', 'error'); return; }
-            
+            if (!supplierId || !warrantyDate || !productName) {
+                showToast('Please fill required fields', 'error'); return;
+            }
             try {
                 await updateDoc(doc(db, 'warranties', id), {
-                    supplierId: supplierId,
-                    warrantyDate: warrantyDate,
-                    productName: productName,
-                    quantity: quantity,
+                    supplierId, warrantyDate, productName, quantity,
                     serialNumber: serialNumber || null,
                     customerName: customerName || null,
                     customerPhone: customerPhone || null,
                     problemDescription: problemDescription || null,
                     updatedAt: new Date().toISOString()
                 });
-                
-                showToast('Warranty entry updated successfully!', 'success');
+                showToast('Updated successfully', 'success');
                 document.getElementById('editModal').classList.add('hidden');
                 await loadWarrantyEntries();
                 editWarrantyId = null;
-                
-            } catch (error) {
-                console.error('Update error:', error);
-                showToast('Error updating warranty entry: ' + error.message, 'error');
+            } catch (e) { showToast('Update error: ' + e.message, 'error'); }
+        }
+        document.getElementById('closeEditModalBtn')?.addEventListener('click', () => { document.getElementById('editModal').classList.add('hidden'); editWarrantyId = null; });
+        document.getElementById('cancelEditBtn')?.addEventListener('click', () => { document.getElementById('editModal').classList.add('hidden'); editWarrantyId = null; });
+        document.getElementById('confirmEditBtn')?.addEventListener('click', submitEdit);
+        document.getElementById('editModal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) { document.getElementById('editModal').classList.add('hidden'); editWarrantyId = null; } });
+        
+        // ===== LOAD WARRANTY ENTRIES =====
+        async function loadWarrantyEntries() {
+            const tbody = document.getElementById('warrantyEntriesBody');
+            tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading entries...</p></td>';
+            try {
+                const snap = await getDocs(query(collection(db, 'warranties'), orderBy('createdAt', 'desc')));
+                const entries = [];
+                for (const docSnap of snap.docs) {
+                    const w = { id: docSnap.id, ...docSnap.data() };
+                    if (w.supplierId) {
+                        const sup = await getDoc(doc(db, 'suppliers', w.supplierId));
+                        w.supplierName = sup.exists() ? sup.data().name : 'Unknown';
+                    } else w.supplierName = 'Unknown';
+                    entries.push(w);
+                }
+                allEntries = entries;
+                currentPage = 1; // reset to first page
+                renderTablePage();
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data.</td></tr>';
+                showToast('Error loading entries', 'error');
             }
         }
         
-        // Submit Warranty
+        // ===== SUBMIT NEW WARRANTY =====
         async function submitWarranty(e) {
             e.preventDefault();
-            
             const supplierId = document.getElementById('warrantySupplier').value;
             const warrantyDate = document.getElementById('warrantyDate').value;
             const productName = document.getElementById('warrantyProduct').value.trim();
@@ -1131,150 +1204,84 @@
             const customerName = document.getElementById('customerName').value.trim();
             const customerPhone = document.getElementById('customerPhone').value.trim();
             const problemDescription = document.getElementById('warrantyProblem').value;
-            
-            if (!supplierId) { showToast('Please select a supplier', 'error'); return; }
-            if (!warrantyDate) { showToast('Please select warranty date', 'error'); return; }
-            if (!productName) { showToast('Please enter product name', 'error'); return; }
-            
+            if (!supplierId || !warrantyDate || !productName) {
+                showToast('Please fill required fields', 'error'); return;
+            }
             try {
                 const warrantyId = generateWarrantyId();
                 await addDoc(collection(db, 'warranties'), {
-                    supplierId: supplierId,
-                    warrantyDate: warrantyDate,
-                    productName: productName,
-                    quantity: quantity,
+                    supplierId, warrantyDate, productName, quantity,
                     serialNumber: serialNumber || null,
                     customerName: customerName || null,
                     customerPhone: customerPhone || null,
                     problemDescription: problemDescription || null,
                     status: 'pending',
-                    warrantyId: warrantyId,
+                    warrantyId,
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString()
                 });
-                
-                showToast(`Warranty submitted! ID: ${warrantyId} (Qty: ${quantity})`, 'success');
+                showToast(`Warranty submitted! ID: ${warrantyId}`, 'success');
                 document.getElementById('warrantyForm').reset();
                 document.getElementById('warrantyDate').valueAsDate = new Date();
                 document.getElementById('warrantyQuantity').value = '1';
                 document.getElementById('warrantySerial').value = '';
                 document.getElementById('warrantyProblem').value = '';
                 await loadWarrantyEntries();
-                
-            } catch (error) {
-                console.error('Submit error:', error);
-                showToast('Error submitting warranty: ' + error.message, 'error');
-            }
+            } catch (e) { showToast('Submit error: ' + e.message, 'error'); }
         }
+        document.getElementById('warrantyForm')?.addEventListener('submit', submitWarranty);
+        document.getElementById('warrantyDate').valueAsDate = new Date();
         
-        // Export CSV
-        function exportToCSV() {
-            if (allEntries.length === 0) {
-                showToast('No data to export', 'error');
-                return;
-            }
-            
-            let csvRows = ['\uFEFF"ID","Date","Supplier","Product","Quantity","Serial No","Customer Name","Customer Phone","Status","Problem Description"'];
-            
+        // ===== EXPORT CSV =====
+        function exportCSV() {
+            if (!allEntries.length) { showToast('No data to export', 'error'); return; }
+            let rows = ['\uFEFF"ID","Date","Supplier","Product","Quantity","Serial No","Customer","Phone","Status","Problem"'];
             allEntries.forEach(entry => {
-                const quantity = entry.quantity || 1;
-                let status = entry.status === 'pending' ? 'Pending' : entry.status === 'dispatched' ? 'Dispatched' : 'Received';
-                csvRows.push(`"${entry.warrantyId || entry.id.slice(0, 12)}","${entry.warrantyDate || 'N/A'}","${(entry.supplierName || 'N/A').replace(/"/g, '""')}","${entry.productName.replace(/"/g, '""')}","${quantity}","${(entry.serialNumber || '-').replace(/"/g, '""')}","${(entry.customerName || '-').replace(/"/g, '""')}","${(entry.customerPhone || '-').replace(/"/g, '""')}","${status}","${(entry.problemDescription || '').replace(/"/g, '""')}"`);
+                const qty = entry.quantity || 1;
+                const status = entry.status === 'pending' ? 'Pending' : entry.status === 'dispatched' ? 'Dispatched' : 'Received';
+                rows.push(`"${entry.warrantyId || entry.id.slice(0,12)}","${entry.warrantyDate || 'N/A'}","${(entry.supplierName || 'N/A').replace(/"/g,'""')}","${entry.productName.replace(/"/g,'""')}","${qty}","${(entry.serialNumber || '-').replace(/"/g,'""')}","${(entry.customerName || '-').replace(/"/g,'""')}","${(entry.customerPhone || '-').replace(/"/g,'""')}","${status}","${(entry.problemDescription || '').replace(/"/g,'""')}"`);
             });
-            
-            const csvContent = csvRows.join('\n');
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = `warranty_entries_${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast('Exported successfully!', 'success');
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            showToast('Exported!', 'success');
         }
+        document.getElementById('exportEntriesBtn')?.addEventListener('click', exportCSV);
         
-        // Event Listeners
-        document.getElementById('warrantyForm')?.addEventListener('submit', submitWarranty);
-        document.getElementById('warrantyDate').valueAsDate = new Date();
+        // ===== PER PAGE CHANGE =====
+        document.getElementById('perPageSelect')?.addEventListener('change', (e) => {
+            perPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderTablePage();
+        });
+        
+        // ===== REFRESH =====
         document.getElementById('refreshBtn')?.addEventListener('click', () => {
             loadSuppliers();
             loadWarrantyEntries();
-            showToast('Refreshed!', 'success');
+            showToast('Refreshed', 'success');
         });
+        
+        // ===== DARK MODE TOGGLE =====
         document.getElementById('darkModeToggle')?.addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
             document.body.classList.toggle('dark');
         });
-        document.getElementById('exportEntriesBtn')?.addEventListener('click', exportToCSV);
         
-        // Close details modal
-        document.getElementById('closeDetailsModalBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
-        document.getElementById('closeDetailsModalFooterBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
-        document.getElementById('detailsModal')?.addEventListener('click', (e) => {
-            if (e.target === document.getElementById('detailsModal')) document.getElementById('detailsModal').classList.add('hidden');
-        });
-        
-        // Delete modal event listeners
-        document.getElementById('closeDeleteModalBtn')?.addEventListener('click', () => {
-            document.getElementById('deleteModal').classList.add('hidden');
-            deleteWarrantyId = null;
-        });
-        document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => {
-            document.getElementById('deleteModal').classList.add('hidden');
-            deleteWarrantyId = null;
-        });
-        document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDeleteWarranty);
-        document.getElementById('deleteModal')?.addEventListener('click', (e) => {
-            if (e.target === document.getElementById('deleteModal')) {
-                document.getElementById('deleteModal').classList.add('hidden');
-                deleteWarrantyId = null;
-            }
-        });
-        
-        // Edit modal event listeners
-        document.getElementById('closeEditModalBtn')?.addEventListener('click', () => {
-            document.getElementById('editModal').classList.add('hidden');
-            editWarrantyId = null;
-        });
-        document.getElementById('cancelEditBtn')?.addEventListener('click', () => {
-            document.getElementById('editModal').classList.add('hidden');
-            editWarrantyId = null;
-        });
-        document.getElementById('confirmEditBtn')?.addEventListener('click', submitEditWarranty);
-        document.getElementById('editModal')?.addEventListener('click', (e) => {
-            if (e.target === document.getElementById('editModal')) {
-                document.getElementById('editModal').classList.add('hidden');
-                editWarrantyId = null;
-            }
-        });
-        
-        // Logout functionality
+        // ===== LOGOUT =====
         const logoutModal = document.getElementById('logoutModal');
-        const logoutLink = document.getElementById('logoutLink');
-        const cancelLogout = document.getElementById('cancelLogoutBtn');
-        const confirmLogout = document.getElementById('confirmLogoutBtn');
-        if (logoutLink) {
-            logoutLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                logoutModal?.classList.remove('hidden');
-            });
-        }
-        if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal?.classList.add('hidden'));
-        if (confirmLogout) {
-            confirmLogout.addEventListener('click', async () => {
-                logoutModal?.classList.add('hidden');
-                const { logout } = await import('./js/auth.js');
-                await logout();
-            });
-        }
+        document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); logoutModal?.classList.remove('hidden'); });
+        document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => logoutModal?.classList.add('hidden'));
+        document.getElementById('confirmLogoutBtn')?.addEventListener('click', async () => {
+            logoutModal?.classList.add('hidden');
+            const { logout } = await import('./js/auth.js');
+            await logout();
+        });
         
-        // Initialize Barcode Scanners
-        activateScanner('warrantySerial', 'scanSerialBtn');
-        activateScanner('editSerialNumber', 'editScanSerialBtn');
-        
-        // Initialize
+        // ===== INIT =====
         loadSuppliers();
         loadWarrantyEntries();
     </script>

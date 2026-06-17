@@ -36,11 +36,17 @@
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; }
         
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-track { background: #1e293b; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        /* Hide scrollbar but keep functionality */
+        .sidebar-nav-fixed {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
         
         .nav-active {
             background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
@@ -93,18 +99,11 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-width: thin;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
         }
         .sidebar-nav-fixed::-webkit-scrollbar {
-            width: 3px;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar-thumb {
-            background: rgba(212,175,55,0.5);
-            border-radius: 10px;
+            display: none; /* Chrome, Safari, Opera */
         }
         
         @media print {
@@ -186,7 +185,7 @@
                 </div>
             </div>
             
-            <!-- Navigation - Scrollable area -->
+            <!-- Navigation - Scrollable area (scrollbar hidden) -->
             <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
                 <nav class="space-y-1.5">
                     <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
@@ -422,7 +421,7 @@
         
         // Sidebar functions
         const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
-        function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.id = 'sidebarOverlay'; overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
+        function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
         function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); const overlay = document.getElementById('sidebarOverlay'); if (overlay) overlay.remove(); }
         if (menuToggle) menuToggle.addEventListener('click', openSidebar);
         if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
@@ -601,7 +600,7 @@
                 if (filteredTransactions.length === 0) {
                     let message = 'No transactions found';
                     if (startDate || endDate) message += ' in selected date range';
-                    tbody.innerHTML = `<table><td colspan="5" class="text-center py-8 text-gray-500"><i class="fas fa-calendar-times text-3xl mb-2 opacity-40 block"></i><p class="text-xs">${message}</p></td>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500"><i class="fas fa-calendar-times text-3xl mb-2 opacity-40 block"></i><p class="text-xs">${message}</p></td></tr>`;
                     document.getElementById('ledgerCard').classList.remove('hidden');
                     currentClosingBalance = 0;
                     showLoading(false);
@@ -632,11 +631,11 @@
                     const openingRow = tbody.insertRow();
                     openingRow.className = 'bg-gray-100 dark:bg-gray-700/30 font-semibold';
                     openingRow.innerHTML = `
-                        <td class="px-3 py-2.5 text-xs whitespace-nowrap">${startDate}</div>
-                        <td class="px-3 py-2.5"><span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium bg-gray-300 dark:bg-gray-600">Opening Balance</span></div>
-                        <td class="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400">Previous balance brought forward</div>
-                        <td class="px-3 py-2.5 text-right text-xs">-</div>
-                        <td class="px-3 py-2.5 text-right text-xs font-bold ${openingBalance > 0 ? 'text-red-600' : 'text-green-600'} whitespace-nowrap">৳${openingBalance.toFixed(2)}</div>
+                        <td class="px-3 py-2.5 text-xs whitespace-nowrap">${startDate}</td>
+                        <td class="px-3 py-2.5"><span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium bg-gray-300 dark:bg-gray-600">Opening Balance</span></td>
+                        <td class="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400">Previous balance brought forward</td>
+                        <td class="px-3 py-2.5 text-right text-xs">-</td>
+                        <td class="px-3 py-2.5 text-right text-xs font-bold ${openingBalance > 0 ? 'text-red-600' : 'text-green-600'} whitespace-nowrap">৳${openingBalance.toFixed(2)}</td>
                     `;
                 }
                 
@@ -691,11 +690,11 @@
                     const row = tbody.insertRow();
                     row.className = 'table-row-hover transition-colors';
                     row.innerHTML = `
-                        <td class="px-3 py-2.5 text-xs whitespace-nowrap">${trans.date || 'N/A'}</div>
-                        <td class="px-3 py-2.5"><span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${typeClass}"><i class="fas ${typeIcon} text-[10px]"></i> ${typeText}</span></div>
-                        <td class="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400 break-words max-w-[350px]">${escapeHtml(description)}</div>
-                        <td class="px-3 py-2.5 text-right text-xs font-semibold ${amountClass} whitespace-nowrap">${displayAmount}</div>
-                        <td class="px-3 py-2.5 text-right text-xs font-semibold ${balanceClass} whitespace-nowrap">৳${runningBalance.toFixed(2)}</div>
+                        <td class="px-3 py-2.5 text-xs whitespace-nowrap">${trans.date || 'N/A'}</td>
+                        <td class="px-3 py-2.5"><span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${typeClass}"><i class="fas ${typeIcon} text-[10px]"></i> ${typeText}</span></td>
+                        <td class="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400 break-words max-w-[350px]">${escapeHtml(description)}</td>
+                        <td class="px-3 py-2.5 text-right text-xs font-semibold ${amountClass} whitespace-nowrap">${displayAmount}</td>
+                        <td class="px-3 py-2.5 text-right text-xs font-semibold ${balanceClass} whitespace-nowrap">৳${runningBalance.toFixed(2)}</td>
                     `;
                 }
                 
@@ -705,9 +704,9 @@
                 const summaryRow = tbody.insertRow();
                 summaryRow.className = 'bg-gray-100 dark:bg-gray-700/50 font-bold border-t-2';
                 summaryRow.innerHTML = `
-                    <td colspan="3" class="px-3 py-3 text-right text-xs">Total Due Added: ৳${totalDueAdded.toFixed(2)} | Total Collection: ৳${totalCollected.toFixed(2)}</div>
-                    <td class="px-3 py-3 text-right"></div>
-                    <td class="px-3 py-3 text-right text-sm font-bold ${runningBalance > 0 ? 'text-red-600' : 'text-green-600'} whitespace-nowrap">Closing: ৳${runningBalance.toFixed(2)}</div>
+                    <td colspan="3" class="px-3 py-3 text-right text-xs">Total Due Added: ৳${totalDueAdded.toFixed(2)} | Total Collection: ৳${totalCollected.toFixed(2)}</td>
+                    <td class="px-3 py-3 text-right"></td>
+                    <td class="px-3 py-3 text-right text-sm font-bold ${runningBalance > 0 ? 'text-red-600' : 'text-green-600'} whitespace-nowrap">Closing: ৳${runningBalance.toFixed(2)}</td>
                 `;
                 
                 document.getElementById('ledgerCard').classList.remove('hidden');

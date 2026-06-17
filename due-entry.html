@@ -36,11 +36,17 @@
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; }
         
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-track { background: #1e293b; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        /* Hide scrollbar in sidebar navigation - Same as ledger.html */
+        .sidebar-nav-fixed {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
         
         .nav-active {
             background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
@@ -58,7 +64,6 @@
             overflow: hidden;
             transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
         }
-    
         .submenu-modern.open { max-height: 280px; }
         
         .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
@@ -149,7 +154,7 @@
             100% { background-position: -200% 0; }
         }
         
-        /* Fixed Sidebar Structure - No overlap issue */
+        /* Fixed Sidebar Structure - Same as ledger.html */
         .sidebar-fixed {
             display: flex;
             flex-direction: column;
@@ -167,18 +172,11 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-width: thin;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
         }
         .sidebar-nav-fixed::-webkit-scrollbar {
-            width: 3px;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar-thumb {
-            background: rgba(212,175,55,0.5);
-            border-radius: 10px;
+            display: none; /* Chrome, Safari, Opera */
         }
     </style>
 </head>
@@ -186,9 +184,9 @@
     
     <div class="flex min-h-screen">
         
-        <!-- Sidebar - Fixed Structure -->
+        <!-- Sidebar - Fixed Structure (Same as ledger.html) -->
         <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
-            <!-- Header - Fixed at top -->
+            <!-- Header - Fixed at top (does not scroll) -->
             <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
@@ -206,7 +204,7 @@
                 </div>
             </div>
             
-            <!-- Navigation - Scrollable area -->
+            <!-- Navigation - Scrollable area (scrollbar hidden) -->
             <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
                 <nav class="space-y-1.5">
                     <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
@@ -754,7 +752,6 @@
             }
         }
         
-        // ==================== IMAGE UPLOAD ====================
         // ==================== IMAGE UPLOAD WITH PROPER VALIDATION ====================
         function setupImageUpload() {
             const uploadArea = document.getElementById('imageUploadArea');
@@ -765,7 +762,7 @@
             const removeImageBtn = document.getElementById('removeImageBtn');
             
             // Maximum file size: 5MB (5,242,880 bytes)
-            const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5,242,880 bytes
+            const MAX_FILE_SIZE = 5 * 1024 * 1024;
             const MAX_FILE_SIZE_MB = 5;
             
             // Allowed file types
@@ -781,33 +778,22 @@
             }
             
             function validateFile(file) {
-                // Check if file exists
-                if (!file) {
-                    showToast('No file selected', 'error');
-                    return false;
-                }
-                
-                // Check file type by MIME type
+                if (!file) { showToast('No file selected', 'error'); return false; }
                 if (!ALLOWED_TYPES.includes(file.type)) {
                     const allowedTypesStr = ALLOWED_EXTENSIONS.join(', ');
                     showToast(`Invalid file type! Allowed types: ${allowedTypesStr}`, 'error');
                     return false;
                 }
-                
-                // Check file extension (additional safety)
                 const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
                 if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
                     showToast(`Invalid file extension! Allowed: ${ALLOWED_EXTENSIONS.join(', ')}`, 'error');
                     return false;
                 }
-                
-                // Check file size (strictly less than or equal to 5MB)
                 if (file.size > MAX_FILE_SIZE) {
                     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
                     showToast(`File too large! Size: ${fileSizeMB}MB. Maximum allowed: ${MAX_FILE_SIZE_MB}MB`, 'error');
                     return false;
                 }
-                
                 return true;
             }
             
@@ -821,8 +807,6 @@
                         img.onload = () => {
                             let width = img.width;
                             let height = img.height;
-                            
-                            // Calculate new dimensions while maintaining aspect ratio
                             if (width > maxWidth) {
                                 height = (height * maxWidth) / width;
                                 width = maxWidth;
@@ -831,43 +815,27 @@
                                 width = (width * maxHeight) / height;
                                 height = maxHeight;
                             }
-                            
-                            // Create canvas and compress
                             const canvas = document.createElement('canvas');
                             canvas.width = width;
                             canvas.height = height;
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
-                            
-                            // Determine output format
                             let outputFormat = 'image/jpeg';
                             let outputQuality = quality;
-                            
                             if (file.type === 'image/png') {
                                 outputFormat = 'image/png';
-                                outputQuality = 0.9; // PNG quality is handled differently
+                                outputQuality = 0.9;
                             } else if (file.type === 'image/webp') {
                                 outputFormat = 'image/webp';
                                 outputQuality = quality;
                             }
-                            
                             canvas.toBlob((blob) => {
                                 if (blob) {
-                                    // Create a new file from compressed blob
                                     const compressedFile = new File([blob], file.name, {
                                         type: outputFormat,
                                         lastModified: Date.now()
                                     });
-                                    
-                                    // Check if compression was successful
-                                    if (compressedFile.size < file.size) {
-                                        console.log(`Compressed: ${formatFileSize(file.size)} → ${formatFileSize(compressedFile.size)}`);
-                                        resolve(compressedFile);
-                                    } else {
-                                        // If compression didn't reduce size, use original
-                                        console.log('Compression not beneficial, using original file');
-                                        resolve(file);
-                                    }
+                                    resolve(compressedFile.size < file.size ? compressedFile : file);
                                 } else {
                                     resolve(file);
                                 }
@@ -880,17 +848,11 @@
             }
             
             async function handleImageFile(file) {
-                // Validate file first
-                if (!validateFile(file)) {
-                    return false;
-                }
-                
+                if (!validateFile(file)) return false;
                 showLoading(true);
-                
                 try {
-                    // Optional: Compress image if it's larger than 1MB (optional optimization)
                     let processedFile = file;
-                    if (file.size > 1024 * 1024) { // If larger than 1MB, compress
+                    if (file.size > 1024 * 1024) {
                         try {
                             processedFile = await compressImage(file, 1200, 1200, 0.8);
                         } catch (compressError) {
@@ -898,19 +860,14 @@
                             processedFile = file;
                         }
                     }
-                    
-                    // Check again after compression (if compression happened)
                     if (processedFile.size > MAX_FILE_SIZE) {
                         const fileSizeMB = (processedFile.size / (1024 * 1024)).toFixed(2);
                         showToast(`File still too large after compression! Size: ${fileSizeMB}MB`, 'error');
                         showLoading(false);
                         return false;
                     }
-                    
                     selectedImageFile = processedFile;
                     fileNameDisplay.textContent = `${processedFile.name} (${formatFileSize(processedFile.size)})`;
-                    
-                    // Show preview
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         previewImg.src = e.target.result;
@@ -924,9 +881,7 @@
                         showLoading(false);
                     };
                     reader.readAsDataURL(processedFile);
-                    
                     return true;
-                    
                 } catch (error) {
                     console.error('Image processing error:', error);
                     showToast('Error processing image: ' + error.message, 'error');
@@ -935,19 +890,9 @@
                 }
             }
             
-            // Click to upload
             uploadArea.addEventListener('click', () => fileInput.click());
-            
-            // Drag and drop
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('drag-over');
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('drag-over');
-            });
-            
+            uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+            uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('drag-over'); });
             uploadArea.addEventListener('drop', async (e) => {
                 e.preventDefault();
                 uploadArea.classList.remove('drag-over');
@@ -958,15 +903,11 @@
                     showToast('Please drop an image file (PNG, JPG, JPEG, WEBP)', 'error');
                 }
             });
-            
-            // File input change
             fileInput.addEventListener('change', async (e) => {
                 if (e.target.files && e.target.files[0]) {
                     await handleImageFile(e.target.files[0]);
                 }
             });
-            
-            // Remove image
             removeImageBtn.addEventListener('click', () => {
                 selectedImageFile = null;
                 fileInput.value = '';
@@ -975,6 +916,7 @@
                 showToast('Image removed', 'info');
             });
         }
+        
         // ==================== SUBMIT DUE ENTRY ====================
         async function submitDueEntry(event) {
             event.preventDefault();

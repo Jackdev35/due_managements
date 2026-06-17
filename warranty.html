@@ -181,12 +181,10 @@
         .table-row-hover:hover { background-color: rgba(15, 59, 58, 0.04); }
         .dark .table-row-hover:hover { background-color: rgba(30, 107, 104, 0.1); }
         
-        /* Full width sections */
         .full-width-section {
             width: 100%;
         }
         
-        /* ========== TABLE CONTAINER - SAME AS WARRANTY-LIST ========== */
         .table-container {
             width: 100%;
             overflow-x: auto;
@@ -330,6 +328,134 @@
         .modal-open {
             overflow: hidden !important;
         }
+        
+        /* Pagination Styles */
+        .pagination-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            gap: 10px;
+            border-top: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+        .dark .pagination-wrapper {
+            background: #111827;
+            border-top-color: #374151;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .pagination-btn {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .dark .pagination-btn {
+            background: #1f2937;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+        .pagination-btn:hover:not(:disabled) {
+            background: #0f3b3a;
+            color: white;
+            border-color: #0f3b3a;
+        }
+        .pagination-btn.active {
+            background: #0f3b3a;
+            color: white;
+            border-color: #0f3b3a;
+        }
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .pagination-info {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .dark .pagination-info {
+            color: #9ca3af;
+        }
+        
+        .per-page-select {
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+        .dark .per-page-select {
+            background: #1f2937;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+        .per-page-select:focus {
+            border-color: #0f3b3a;
+        }
+        
+        @media (max-width: 640px) {
+            .pagination-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .pagination-controls {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .pagination-info {
+                text-align: center;
+            }
+        }
+
+        /* ===== SIDEBAR SUBMENU SPACING FIX ===== */
+        .sidebar-submenu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-left: 32px;
+            margin-top: 6px;
+        }
+        .sidebar-submenu-items a {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #94a3b8;
+            text-decoration: none;
+        }
+        .sidebar-submenu-items a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .sidebar-submenu-items a i {
+            width: 16px;
+            font-size: 10px;
+            text-align: center;
+        }
+        .sidebar-submenu-items .nav-active {
+            color: white;
+            background: rgba(15, 59, 58, 0.25);
+            border-left: 2px solid #d4af37;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
@@ -378,11 +504,13 @@
                         <div class="flex items-center gap-3"><i class="fas fa-shield-alt w-5 text-accent"></i><span>Warranty</span></div>
                         <i class="fas fa-chevron-down chevron-icon text-[10px]"></i>
                     </a>
-                    <div class="submenu-modern open pl-8 mt-1 space-y-1">
-                        <a href="warranty.html" class="nav-active flex items-center gap-2 px-3 py-1.5 rounded text-white bg-primary/20 text-xs"><i class="fas fa-truck w-4"></i>Suppliers</a>
-                        <a href="warranty-entry.html" class="flex items-center gap-2 px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-plus-circle w-4"></i>Warranty Entry</a>
-                        <a href="currier-dispatch.html" class="flex items-center gap-2 px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-shipping-fast w-4"></i>Currier Dispatch</a>
-                        <a href="warranty-list.html" class="flex items-center gap-2 px-3 py-1.5 rounded text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-list w-4"></i>Warranty List</a>
+                    <div class="submenu-modern open">
+                        <div class="sidebar-submenu-items">
+                            <a href="warranty.html" class="nav-active"><i class="fas fa-truck"></i>Suppliers</a>
+                            <a href="warranty-entry.html"><i class="fas fa-plus-circle"></i>Warranty Entry</a>
+                            <a href="currier-dispatch.html"><i class="fas fa-shipping-fast"></i>Currier Dispatch</a>
+                            <a href="warranty-list.html"><i class="fas fa-list"></i>Warranty List</a>
+                        </div>
                     </div>
                 </div>
                 
@@ -484,7 +612,7 @@
                             </div>
                         </div>
                         <div class="scroll-hint"><i class="fas fa-arrows-alt-h mr-1"></i> Swipe left/right to see all columns</div>
-                        <!-- TABLE CONTAINER - ONLY THIS SCROLLS -->
+                        <!-- TABLE CONTAINER -->
                         <div class="table-container supplier-table-container">
                             <table class="supplier-table">
                                 <thead>
@@ -499,10 +627,30 @@
                                 <tbody id="suppliersTableBody"></tbody>
                             </table>
                         </div>
+                        <!-- Pagination Controls -->
+                        <div class="pagination-wrapper" id="supplierPaginationWrapper">
+                            <div class="flex items-center gap-2">
+                                <span class="pagination-info text-xs">Show</span>
+                                <select id="perPageSelect" class="per-page-select">
+                                    <option value="20" selected>20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <span class="pagination-info text-xs">entries</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="pagination-info" id="paginationInfo">Showing 0 - 0 of 0</span>
+                                <div class="pagination-controls" id="paginationControls">
+                                    <button class="pagination-btn" id="prevPageBtn" disabled>«</button>
+                                    <span id="pageNumbers"></span>
+                                    <button class="pagination-btn" id="nextPageBtn" disabled>»</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Courier Section - Full Width Below Supplier -->
+                <!-- Courier Section -->
                 <div class="full-width-section">
                     <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
                         <div class="p-3 border-b flex flex-wrap justify-between items-center gap-2">
@@ -517,7 +665,6 @@
                             </button>
                         </div>
                         <div class="scroll-hint"><i class="fas fa-arrows-alt-h mr-1"></i> Swipe left/right</div>
-                        <!-- TABLE CONTAINER - ONLY THIS SCROLLS -->
                         <div class="table-container courier-table-container">
                             <table class="courier-table">
                                 <thead>
@@ -666,6 +813,9 @@
         const escapeHtml = str => !str ? '' : str.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
         
         let currentDeleteId = null, currentDeleteType = 'supplier';
+        let allSuppliers = [];
+        let currentPage = 1;
+        let perPage = 20;
         
         // Modal close on outside click
         function setupModalCloseOnOutside(modalId, closeBtnId) {
@@ -687,6 +837,101 @@
             }
         }
         
+        // ==================== PAGINATION FUNCTIONS ====================
+        function renderPagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / perPage) || 1;
+            const startIndex = (currentPage - 1) * perPage;
+            const endIndex = Math.min(startIndex + perPage, totalItems);
+            
+            document.getElementById('paginationInfo').textContent = 
+                `Showing ${totalItems === 0 ? 0 : startIndex + 1} - ${endIndex} of ${totalItems}`;
+            
+            document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+            document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+            
+            const pageNumbersContainer = document.getElementById('pageNumbers');
+            let pageHtml = '';
+            
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+            
+            if (startPage > 1) {
+                pageHtml += `<button class="pagination-btn page-number" data-page="1">1</button>`;
+                if (startPage > 2) pageHtml += `<span class="pagination-info text-xs px-1">…</span>`;
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                pageHtml += `<button class="pagination-btn page-number ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+            }
+            
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) pageHtml += `<span class="pagination-info text-xs px-1">…</span>`;
+                pageHtml += `<button class="pagination-btn page-number" data-page="${totalPages}">${totalPages}</button>`;
+            }
+            
+            pageNumbersContainer.innerHTML = pageHtml;
+            
+            document.querySelectorAll('.page-number').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const page = parseInt(btn.dataset.page);
+                    if (page !== currentPage) {
+                        currentPage = page;
+                        renderSupplierTable();
+                    }
+                });
+            });
+        }
+        
+        function renderSupplierTable() {
+            const tbody = document.getElementById('suppliersTableBody');
+            if (!tbody) return;
+            
+            const searchTerm = document.getElementById('supplierSearch').value.toLowerCase();
+            let filteredSuppliers = allSuppliers;
+            if (searchTerm) {
+                filteredSuppliers = allSuppliers.filter(s => 
+                    s.name.toLowerCase().includes(searchTerm) ||
+                    (s.contactPerson && s.contactPerson.toLowerCase().includes(searchTerm)) ||
+                    (s.phone && s.phone.includes(searchTerm))
+                );
+            }
+            
+            const totalItems = filteredSuppliers.length;
+            const startIndex = (currentPage - 1) * perPage;
+            const endIndex = Math.min(startIndex + perPage, totalItems);
+            const pageItems = filteredSuppliers.slice(startIndex, endIndex);
+            
+            if (pageItems.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">No suppliers found</td></tr>';
+                renderPagination(totalItems);
+                return;
+            }
+            
+            tbody.innerHTML = pageItems.map(s => `
+                <tr class="table-row-hover border-b">
+                    <td class="px-2 py-2 text-xs font-medium">${escapeHtml(s.name)}</td>
+                    <td class="px-2 py-2 text-xs">${escapeHtml(s.contactPerson||'-')}</td>
+                    <td class="px-2 py-2 text-xs">${escapeHtml(s.phone)}</td>
+                    <td class="px-2 py-2 text-xs truncate max-w-[120px]" title="${escapeHtml(s.address||'-')}">${escapeHtml(s.address||'-')}</td>
+                    <td class="px-2 py-2 text-center whitespace-nowrap">
+                        <button class="edit-supplier text-blue-500 p-1 hover:bg-blue-50 rounded-lg transition" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-contact="${escapeHtml(s.contactPerson||'')}" data-phone="${escapeHtml(s.phone)}" data-address="${escapeHtml(s.address||'')}"><i class="fas fa-edit text-xs"></i></button>
+                        <button class="delete-supplier text-red-500 p-1 ml-1 hover:bg-red-50 rounded-lg transition" data-id="${s.id}" data-name="${escapeHtml(s.name)}"><i class="fas fa-trash-alt text-xs"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.querySelectorAll('.edit-supplier').forEach(btn => btn.addEventListener('click', () => openSupplierModal(btn.dataset)));
+            document.querySelectorAll('.delete-supplier').forEach(btn => btn.addEventListener('click', () => {
+                currentDeleteId = btn.dataset.id;
+                currentDeleteType = 'supplier';
+                document.getElementById('deleteMessage').innerHTML = `Delete "<strong>${btn.dataset.name}</strong>"?`;
+                document.getElementById('deleteModal').classList.remove('hidden');
+                document.body.classList.add('modal-open');
+            }));
+            
+            renderPagination(totalItems);
+        }
+        
         // Load Suppliers
         async function loadSuppliers() {
             const tbody = document.getElementById('suppliersTableBody');
@@ -694,34 +939,12 @@
             tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">Loading...</td></tr>';
             try {
                 const snap = await getDocs(collection(db,'suppliers'));
-                const suppliers = [];
-                snap.forEach(d => suppliers.push({id:d.id, ...d.data()}));
-                document.getElementById('totalSuppliers').textContent = suppliers.length;
-                if(suppliers.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">No suppliers found</td></tr>';
-                    return;
-                }
-                tbody.innerHTML = suppliers.map(s => `
-                    <tr class="table-row-hover border-b">
-                        <td class="px-2 py-2 text-xs font-medium">${escapeHtml(s.name)}</td>
-                        <td class="px-2 py-2 text-xs">${escapeHtml(s.contactPerson||'-')}</td>
-                        <td class="px-2 py-2 text-xs">${escapeHtml(s.phone)}</td>
-                        <td class="px-2 py-2 text-xs truncate max-w-[120px]" title="${escapeHtml(s.address||'-')}">${escapeHtml(s.address||'-')}</td>
-                        <td class="px-2 py-2 text-center whitespace-nowrap">
-                            <button class="edit-supplier text-blue-500 p-1 hover:bg-blue-50 rounded-lg transition" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-contact="${escapeHtml(s.contactPerson||'')}" data-phone="${escapeHtml(s.phone)}" data-address="${escapeHtml(s.address||'')}"><i class="fas fa-edit text-xs"></i></button>
-                            <button class="delete-supplier text-red-500 p-1 ml-1 hover:bg-red-50 rounded-lg transition" data-id="${s.id}" data-name="${escapeHtml(s.name)}"><i class="fas fa-trash-alt text-xs"></i></button>
-                        </td>
-                    </tr>
-                `).join('');
-                
-                document.querySelectorAll('.edit-supplier').forEach(btn => btn.addEventListener('click', () => openSupplierModal(btn.dataset)));
-                document.querySelectorAll('.delete-supplier').forEach(btn => btn.addEventListener('click', () => {
-                    currentDeleteId = btn.dataset.id;
-                    currentDeleteType = 'supplier';
-                    document.getElementById('deleteMessage').innerHTML = `Delete "<strong>${btn.dataset.name}</strong>"?`;
-                    document.getElementById('deleteModal').classList.remove('hidden');
-                    document.body.classList.add('modal-open');
-                }));
+                allSuppliers = [];
+                snap.forEach(d => allSuppliers.push({id:d.id, ...d.data()}));
+                allSuppliers.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                document.getElementById('totalSuppliers').textContent = allSuppliers.length;
+                currentPage = 1;
+                renderSupplierTable();
             } catch(e) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-red-400 text-xs">Error loading data</td></tr>';
             }
@@ -900,7 +1123,7 @@
             }
         }
         
-        // Event Listeners
+        // ==================== EVENT LISTENERS ====================
         document.getElementById('addCourierBtn')?.addEventListener('click', () => openCourierModal());
         document.getElementById('saveCourierBtn')?.addEventListener('click', saveCourierRecord);
         document.getElementById('cancelCourierBtn')?.addEventListener('click', () => {
@@ -941,12 +1164,30 @@
             showToast('Refreshed!');
         });
         
-        document.getElementById('supplierSearch')?.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            document.querySelectorAll('#suppliersTableBody tr').forEach(row => {
-                if(row.querySelector('td[colspan]')) return;
-                row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
-            });
+        document.getElementById('supplierSearch')?.addEventListener('input', () => {
+            currentPage = 1;
+            renderSupplierTable();
+        });
+        
+        document.getElementById('perPageSelect')?.addEventListener('change', (e) => {
+            perPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderSupplierTable();
+        });
+        
+        document.getElementById('prevPageBtn')?.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderSupplierTable();
+            }
+        });
+        
+        document.getElementById('nextPageBtn')?.addEventListener('click', () => {
+            const totalPages = Math.ceil(allSuppliers.length / perPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderSupplierTable();
+            }
         });
         
         // Modal close on outside click

@@ -49,11 +49,17 @@
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; }
         
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-track { background: #1e293b; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        /* Hide scrollbar in sidebar navigation - Same as ledger.html */
+        .sidebar-nav-fixed {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
         
         .nav-active {
             background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
@@ -108,7 +114,7 @@
         .skeleton-card { height: 80px; }
         .skeleton-chart { height: 210px; }
         
-        /* Fixed Sidebar Structure - No overlap issue */
+        /* Fixed Sidebar Structure - Same as ledger.html */
         .sidebar-fixed {
             display: flex;
             flex-direction: column;
@@ -126,18 +132,11 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-width: thin;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
         }
         .sidebar-nav-fixed::-webkit-scrollbar {
-            width: 3px;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar-thumb {
-            background: rgba(212,175,55,0.5);
-            border-radius: 10px;
+            display: none; /* Chrome, Safari, Opera */
         }
     </style>
 </head>
@@ -145,7 +144,7 @@
 
 <div class="flex min-h-screen">
     
-    <!-- SIDEBAR - Fixed Structure (No overlap issue) -->
+    <!-- SIDEBAR - Fixed Structure (Same as ledger.html) -->
     <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
         <!-- Header - Fixed at top (does not scroll) -->
         <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
@@ -165,7 +164,7 @@
             </div>
         </div>
         
-        <!-- Navigation - Scrollable area (scrolls independently) -->
+        <!-- Navigation - Scrollable area (scrollbar hidden) -->
         <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
             <nav class="space-y-1.5">
                 <a href="dashboard.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150 group">
