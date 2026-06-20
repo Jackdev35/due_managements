@@ -31,6 +31,45 @@ import {
     createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
+    // Suppress all console logs from Firebase
+    const originalConsoleLog = console.log;
+    const originalConsoleWarn = console.warn;
+    const originalConsoleError = console.error;
+
+    console.log = function(...args) {
+        // Filter out Firebase initialization messages
+        if (args.length > 0 && typeof args[0] === 'string') {
+            if (args[0].includes('Firebase') || 
+                args[0].includes('🔥') ||
+                args[0].includes('Auth persistence') ||
+                args[0].includes('initialize')) {
+                return; // Don't show Firebase logs
+            }
+        }
+        originalConsoleLog.apply(console, args);
+    };
+
+    console.warn = function(...args) {
+        if (args.length > 0 && typeof args[0] === 'string') {
+            if (args[0].includes('Firebase') || 
+                args[0].includes('🔥')) {
+                return;
+            }
+        }
+        originalConsoleWarn.apply(console, args);
+    };
+
+    // Keep errors visible but you can filter them too if needed
+    console.error = function(...args) {
+        if (args.length > 0 && typeof args[0] === 'string') {
+            if (args[0].includes('Firebase') && !args[0].includes('critical')) {
+                return;
+            }
+        }
+        originalConsoleError.apply(console, args);
+    };
+
+
 /* =========================
    🔥 Firebase Config
 ========================= */

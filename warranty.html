@@ -226,7 +226,7 @@
         }
         
         .table-container.courier-table-container table {
-            min-width: 450px;
+            min-width: 500px;
         }
         
         .table-container th {
@@ -456,6 +456,17 @@
             background: rgba(15, 59, 58, 0.25);
             border-left: 2px solid #d4af37;
         }
+
+        /* row clickable */
+        .clickable-row {
+            cursor: pointer;
+        }
+        .clickable-row:hover td {
+            background-color: rgba(15, 59, 58, 0.04);
+        }
+        .dark .clickable-row:hover td {
+            background-color: rgba(30, 107, 104, 0.1);
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
@@ -617,11 +628,12 @@
                             <table class="supplier-table">
                                 <thead>
                                     <tr>
+                                        <th style="width:40px;">S.L</th>
                                         <th>Name</th>
                                         <th>Contact</th>
                                         <th>Phone</th>
                                         <th>Address</th>
-                                        <th class="text-center">Actions</th>
+                                        <th class="text-center" style="width:80px;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="suppliersTableBody"></tbody>
@@ -669,14 +681,15 @@
                             <table class="courier-table">
                                 <thead>
                                     <tr>
+                                        <th style="width:40px;">S.L</th>
                                         <th>Name</th>
                                         <th>Phone</th>
                                         <th>Address</th>
-                                        <th class="text-center" style="width:80px">Actions</th>
+                                        <th class="text-center" style="width:80px;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="courierTableBody">
-                                    <tr><td colspan="4" class="empty-state"><i class="fas fa-box-open text-xl mb-1 block opacity-40"></i>No courier contacts</td></tr>
+                                    <tr><td colspan="5" class="empty-state"><i class="fas fa-box-open text-xl mb-1 block opacity-40"></i>No courier contacts</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -784,6 +797,26 @@
         </div>
     </div>
     
+    <!-- Detail View Modal (small) -->
+    <div id="detailModal" class="fixed inset-0 bg-black/40 modal-backdrop flex items-center justify-center z-[100] hidden p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full modal-animate overflow-hidden">
+            <div class="flex justify-between items-center px-5 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                <h3 class="text-base font-semibold text-gray-800 dark:text-white" id="detailModalTitle">
+                    <i class="fas fa-info-circle text-primary mr-2"></i>Details
+                </h3>
+                <button id="closeDetailModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-2 text-sm" id="detailModalBody">
+                <!-- dynamic -->
+            </div>
+            <div class="flex justify-end px-5 py-3 bg-gray-50 dark:bg-gray-700/30 border-t">
+                <button id="closeDetailBtn" class="px-4 py-2 text-sm font-medium rounded-xl btn-outline btn-active">Close</button>
+            </div>
+        </div>
+    </div>
+    
     <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
     <div id="logoutModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[200]">
         <div class="bg-white dark:bg-gray-800 rounded-xl p-5 text-center max-w-xs">
@@ -817,7 +850,6 @@
         let currentPage = 1;
         let perPage = 20;
         
-        // Modal close on outside click
         function setupModalCloseOnOutside(modalId, closeBtnId) {
             const modal = document.getElementById(modalId);
             const closeBtn = document.getElementById(closeBtnId);
@@ -837,7 +869,7 @@
             }
         }
         
-        // ==================== PAGINATION FUNCTIONS ====================
+        // ==================== PAGINATION ====================
         function renderPagination(totalItems) {
             const totalPages = Math.ceil(totalItems / perPage) || 1;
             const startIndex = (currentPage - 1) * perPage;
@@ -902,13 +934,16 @@
             const pageItems = filteredSuppliers.slice(startIndex, endIndex);
             
             if (pageItems.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">No suppliers found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-gray-400 text-xs">No suppliers found</td></tr>';
                 renderPagination(totalItems);
                 return;
             }
             
-            tbody.innerHTML = pageItems.map(s => `
-                <tr class="table-row-hover border-b">
+            tbody.innerHTML = pageItems.map((s, idx) => {
+                const serial = startIndex + idx + 1;
+                return `
+                <tr class="table-row-hover border-b clickable-row" data-id="${s.id}" data-type="supplier">
+                    <td class="px-2 py-2 text-xs text-center">${serial}</td>
                     <td class="px-2 py-2 text-xs font-medium">${escapeHtml(s.name)}</td>
                     <td class="px-2 py-2 text-xs">${escapeHtml(s.contactPerson||'-')}</td>
                     <td class="px-2 py-2 text-xs">${escapeHtml(s.phone)}</td>
@@ -918,10 +953,24 @@
                         <button class="delete-supplier text-red-500 p-1 ml-1 hover:bg-red-50 rounded-lg transition" data-id="${s.id}" data-name="${escapeHtml(s.name)}"><i class="fas fa-trash-alt text-xs"></i></button>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
             
-            document.querySelectorAll('.edit-supplier').forEach(btn => btn.addEventListener('click', () => openSupplierModal(btn.dataset)));
-            document.querySelectorAll('.delete-supplier').forEach(btn => btn.addEventListener('click', () => {
+            // row click -> detail modal
+            document.querySelectorAll('#suppliersTableBody .clickable-row').forEach(row => {
+                row.addEventListener('click', function(e) {
+                    if (e.target.closest('button')) return;
+                    const id = this.dataset.id;
+                    const supplier = allSuppliers.find(s => s.id === id);
+                    if (supplier) openDetailModal('Supplier', supplier);
+                });
+            });
+            
+            document.querySelectorAll('.edit-supplier').forEach(btn => btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openSupplierModal(btn.dataset);
+            }));
+            document.querySelectorAll('.delete-supplier').forEach(btn => btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 currentDeleteId = btn.dataset.id;
                 currentDeleteType = 'supplier';
                 document.getElementById('deleteMessage').innerHTML = `Delete "<strong>${btn.dataset.name}</strong>"?`;
@@ -936,7 +985,7 @@
         async function loadSuppliers() {
             const tbody = document.getElementById('suppliersTableBody');
             if(!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-gray-400 text-xs">Loading...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-gray-400 text-xs">Loading...</td></tr>';
             try {
                 const snap = await getDocs(collection(db,'suppliers'));
                 allSuppliers = [];
@@ -946,7 +995,7 @@
                 currentPage = 1;
                 renderSupplierTable();
             } catch(e) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-red-400 text-xs">Error loading data</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-red-400 text-xs">Error loading data</td></tr>';
             }
         }
         
@@ -960,11 +1009,12 @@
                 snap.forEach(d => couriers.push({id:d.id, ...d.data()}));
                 couriers.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
                 if(couriers.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-box-open text-xl mb-1 block opacity-40"></i>No courier contacts</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-box-open text-xl mb-1 block opacity-40"></i>No courier contacts</td></tr>';
                     return;
                 }
-                tbody.innerHTML = couriers.map(c => `
-                    <tr>
+                tbody.innerHTML = couriers.map((c, idx) => `
+                    <tr class="clickable-row" data-id="${c.id}" data-type="courier">
+                        <td class="px-2 py-2 text-xs text-center">${idx+1}</td>
                         <td class="px-2 py-2 text-xs font-medium">${escapeHtml(c.courierName)}</td>
                         <td class="px-2 py-2 text-xs">${escapeHtml(c.phone)}</td>
                         <td class="px-2 py-2 text-xs truncate max-w-[120px]" title="${escapeHtml(c.address||'-')}">${escapeHtml(c.address||'-')}</td>
@@ -975,8 +1025,21 @@
                     </tr>
                 `).join('');
                 
-                document.querySelectorAll('.edit-courier').forEach(btn => btn.addEventListener('click', () => openCourierModal(btn.dataset)));
-                document.querySelectorAll('.delete-courier').forEach(btn => btn.addEventListener('click', () => {
+                document.querySelectorAll('#courierTableBody .clickable-row').forEach(row => {
+                    row.addEventListener('click', function(e) {
+                        if (e.target.closest('button')) return;
+                        const id = this.dataset.id;
+                        const courier = couriers.find(c => c.id === id);
+                        if (courier) openDetailModal('Courier', courier);
+                    });
+                });
+                
+                document.querySelectorAll('.edit-courier').forEach(btn => btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openCourierModal(btn.dataset);
+                }));
+                document.querySelectorAll('.delete-courier').forEach(btn => btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     currentDeleteId = btn.dataset.id;
                     currentDeleteType = 'courier';
                     document.getElementById('deleteMessage').innerHTML = `Delete courier "<strong>${btn.dataset.name}</strong>"?`;
@@ -984,7 +1047,7 @@
                     document.body.classList.add('modal-open');
                 }));
             } catch(e) {
-                tbody.innerHTML = '<tr><td colspan="4" class="empty-state text-red-400">Error loading data</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state text-red-400">Error loading data</td></tr>';
             }
         }
         
@@ -1123,6 +1186,32 @@
             }
         }
         
+        // Detail Modal
+        function openDetailModal(type, data) {
+            const modal = document.getElementById('detailModal');
+            const title = document.getElementById('detailModalTitle');
+            const body = document.getElementById('detailModalBody');
+            title.innerHTML = `<i class="fas fa-info-circle text-primary mr-2"></i>${type} Details`;
+            let html = '';
+            if (type === 'Supplier') {
+                html = `
+                    <div><span class="font-semibold text-gray-600 dark:text-gray-300">Name:</span> ${escapeHtml(data.name)}</div>
+                    <div><span class="font-semibold text-gray-600 dark:text-gray-300">Contact:</span> ${escapeHtml(data.contactPerson || '-')}</div>
+                    <div><span class="font-semibold text-gray-600 dark:text-gray-300">Phone:</span> ${escapeHtml(data.phone)}</div>
+                    <div><span class="font-semibold text-gray-600 dark:text-gray-300">Address:</span> ${escapeHtml(data.address || '-')}</div>
+                `;
+            } else if (type === 'Courier') {
+                html = `
+                    <div><span class="font-semibold text-gray-600 dark:text-gray-300">Name:</span> ${escapeHtml(data.courierName)}</div>
+                    <div><span class="font-semibold text-gray-600 dark:text-gray-300">Phone:</span> ${escapeHtml(data.phone)}</div>
+                    <div><span class="font-semibold text-gray-600 dark:text-gray-300">Address:</span> ${escapeHtml(data.address || '-')}</div>
+                `;
+            }
+            body.innerHTML = html;
+            modal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
+        }
+        
         // ==================== EVENT LISTENERS ====================
         document.getElementById('addCourierBtn')?.addEventListener('click', () => openCourierModal());
         document.getElementById('saveCourierBtn')?.addEventListener('click', saveCourierRecord);
@@ -1154,6 +1243,22 @@
         document.getElementById('closeDeleteModalBtn')?.addEventListener('click', () => {
             document.getElementById('deleteModal').classList.add('hidden');
             document.body.classList.remove('modal-open');
+        });
+        
+        // Detail modal close
+        document.getElementById('closeDetailModalBtn')?.addEventListener('click', () => {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+        document.getElementById('closeDetailBtn')?.addEventListener('click', () => {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+        document.getElementById('detailModal')?.addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                document.getElementById('detailModal').classList.add('hidden');
+                document.body.classList.remove('modal-open');
+            }
         });
         
         document.getElementById('exportSupplierBtn')?.addEventListener('click', () => showToast('Export CSV ready', 'success'));
@@ -1190,7 +1295,6 @@
             }
         });
         
-        // Modal close on outside click
         setupModalCloseOnOutside('supplierModal', 'closeSupplierModalBtn2');
         setupModalCloseOnOutside('courierModal', 'closeCourierModalBtn');
         setupModalCloseOnOutside('deleteModal', 'closeDeleteModalBtn');

@@ -36,11 +36,36 @@
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; }
         
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-track { background: #1e293b; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        ::-webkit-scrollbar { width: 0px; height: 0px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: transparent; }
+        * { scrollbar-width: none; }
+        
+        .table-scroll-wrapper::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .table-scroll-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        .table-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .dark .table-scroll-wrapper::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .dark .table-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        .table-scroll-wrapper {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+        }
+        .dark .table-scroll-wrapper {
+            scrollbar-color: #475569 #1e293b;
+        }
         
         .nav-active {
             background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
@@ -68,38 +93,26 @@
         
         .btn-active:active { transform: scale(0.97); }
         
-        .status-pending { background: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; }
-        .dark .status-pending { background: #451A03; color: #FBBF24; border-color: #78350F; }
-        .status-currier { background: #DBEAFE; color: #2563EB; border: 1px solid #BFDBFE; }
-        .dark .status-currier { background: #1E3A5F; color: #60A5FA; border-color: #1E40AF; }
-        .status-received { background: #D1FAE5; color: #059669; border: 1px solid #A7F3D0; }
-        .dark .status-received { background: #064E3B; color: #34D399; border-color: #065F46; }
-        .status-delivered { background: #E0E7FF; color: #4338CA; border: 1px solid #C7D2FE; }
-        .dark .status-delivered { background: #1E1B4B; color: #818CF8; border-color: #312E81; }
-        
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        
         .action-icon {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             border-radius: 8px;
             transition: all 0.2s ease;
             cursor: pointer;
+            background: rgba(15, 59, 58, 0.06);
         }
         .action-icon:hover {
-            background: rgba(15, 59, 58, 0.1);
-            transform: scale(1.05);
+            background: rgba(15, 59, 58, 0.15);
+            transform: scale(1.08);
+        }
+        .dark .action-icon {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .dark .action-icon:hover {
+            background: rgba(255, 255, 255, 0.12);
         }
         
         .table-row-hover:hover {
@@ -107,26 +120,6 @@
         }
         .dark .table-row-hover:hover {
             background-color: rgba(30, 107, 104, 0.1);
-        }
-        
-        .table-scroll-hint {
-            display: none;
-        }
-        @media (max-width: 768px) {
-            .table-scroll-hint {
-                display: flex;
-                font-size: 9px;
-                padding: 4px 8px;
-                background: #f0fdf4;
-                color: #166534;
-                border-radius: 20px;
-                margin-bottom: 8px;
-                width: fit-content;
-            }
-            .dark .table-scroll-hint {
-                background: #064e3b;
-                color: #86efac;
-            }
         }
         
         #sidebarOverlay {
@@ -140,16 +133,15 @@
             to { opacity: 1; }
         }
         
-        /* Skeleton Loading */
         .skeleton-row td {
-            padding: 8px 12px;
+            padding: 8px 10px;
         }
         .skeleton-row .skeleton-text {
             height: 14px;
             background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
-            border-radius: 4px;
+            border-radius: 6px;
         }
         .dark .skeleton-row .skeleton-text {
             background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
@@ -159,6 +151,310 @@
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
+
+        /* MULTILINE TABLE */
+        .table-compact td, .table-compact th {
+            padding: 10px 10px;
+            font-size: 0.72rem;
+            line-height: 1.6;
+            white-space: normal;
+            word-wrap: break-word;
+            word-break: break-word;
+            height: auto;
+            max-height: none;
+            overflow: visible;
+            vertical-align: middle;
+        }
+        
+        .table-compact td .sub-text {
+            font-size: 0.6rem;
+            color: #6b7280;
+            display: block;
+            line-height: 1.4;
+        }
+        .dark .table-compact td .sub-text {
+            color: #9ca3af;
+        }
+        
+        .table-compact td .highlight {
+            color: #0f3b3a;
+            font-weight: 600;
+        }
+        .dark .table-compact td .highlight {
+            color: #d4af37;
+        }
+        
+        .table-compact td .old-serial {
+            text-decoration: line-through;
+            color: #ef4444;
+            font-size: 0.55rem;
+        }
+        .dark .table-compact td .old-serial {
+            color: #f87171;
+        }
+        
+        .table-compact td .new-serial {
+            color: #22c55e;
+            font-weight: 600;
+        }
+        .dark .table-compact td .new-serial {
+            color: #4ade80;
+        }
+        
+        .table-compact td,
+        .table-compact th {
+            max-width: 200px;
+            overflow: visible;
+        }
+        .table-compact .col-id { min-width: 100px; max-width: 120px; }
+        .table-compact .col-supplier { min-width: 90px; max-width: 130px; }
+        .table-compact .col-product { min-width: 110px; max-width: 160px; }
+        .table-compact .col-serial { min-width: 110px; max-width: 150px; }
+        .table-compact .col-customer { min-width: 80px; max-width: 110px; }
+        .table-compact .col-phone { min-width: 90px; max-width: 120px; }
+        .table-compact .col-date { min-width: 90px; max-width: 110px; }
+        
+        /* STATUS ICON ONLY */
+        .status-icon-only {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 16px;
+            transition: all 0.25s ease;
+            position: relative;
+            cursor: default;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .status-icon-only:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+        
+        .status-icon-only.pending { background: #FEF3C7; color: #D97706; }
+        .status-icon-only.currier { background: #DBEAFE; color: #2563EB; }
+        .status-icon-only.currier_to_supplier { background: #E0E7FF; color: #4338CA; }
+        .status-icon-only.supplier_received { background: #D1FAE5; color: #059669; }
+        .status-icon-only.supplier_to_shop { background: #FCE7F3; color: #DB2777; }
+        .status-icon-only.customer_delivered { background: #F3E8FF; color: #7E22CE; }
+        
+        .dark .status-icon-only.pending { background: #451A03; color: #FBBF24; }
+        .dark .status-icon-only.currier { background: #1E3A5F; color: #60A5FA; }
+        .dark .status-icon-only.currier_to_supplier { background: #1E1B4B; color: #818CF8; }
+        .dark .status-icon-only.supplier_received { background: #064E3B; color: #34D399; }
+        .dark .status-icon-only.supplier_to_shop { background: #4C0519; color: #F472B6; }
+        .dark .status-icon-only.customer_delivered { background: #3B0764; color: #A855F7; }
+        
+        .status-icon-only .tooltip-text {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: #1e293b;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            z-index: 10;
+            pointer-events: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+        }
+        
+        .status-icon-only:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .status-icon-only .tooltip-text::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1e293b;
+        }
+        
+        /* New Serial Input in Status Update Modal */
+        .new-serial-input-group {
+            border: 2px dashed #22c55e;
+            border-radius: 14px;
+            padding: 14px 16px;
+            background: #f0fdf4;
+        }
+        .dark .new-serial-input-group {
+            background: #052e16;
+            border-color: #4ade80;
+        }
+        
+        .new-serial-input-group label {
+            color: #16a34a;
+            font-weight: 600;
+        }
+        .dark .new-serial-input-group label {
+            color: #4ade80;
+        }
+        
+        /* Enhanced Tab Buttons */
+        .nav-tab {
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid transparent;
+        }
+        .dark .nav-tab {
+            background: #1e293b;
+            color: #94a3b8;
+        }
+        .nav-tab:hover {
+            background: #e2e8f0;
+            color: #0f3b3a;
+            transform: translateY(-1px);
+        }
+        .dark .nav-tab:hover {
+            background: #2d3a4f;
+            color: #e2e8f0;
+        }
+        .nav-tab.active {
+            background: #0f3b3a;
+            color: white;
+            box-shadow: 0 4px 16px rgba(15, 59, 58, 0.3);
+            border-color: #0f3b3a;
+        }
+        .dark .nav-tab.active {
+            background: #1e6b68;
+            box-shadow: 0 4px 16px rgba(30, 107, 104, 0.3);
+        }
+        .nav-tab i {
+            font-size: 0.7rem;
+        }
+        
+        /* Filter Section Enhanced */
+        .filter-section {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            padding: 14px 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .dark .filter-section {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        
+        .filter-section select,
+        .filter-section input {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .dark .filter-section select,
+        .dark .filter-section input {
+            background: #0f172a;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+        .filter-section select:focus,
+        .filter-section input:focus {
+            outline: none;
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.15);
+        }
+        
+        /* Table Header Enhanced */
+        .table-header {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, rgba(15, 59, 58, 0.08) 0%, rgba(15, 59, 58, 0.02) 100%);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .dark .table-header {
+            background: linear-gradient(135deg, rgba(30, 107, 104, 0.15) 0%, rgba(30, 107, 104, 0.05) 100%);
+            border-bottom-color: #334155;
+        }
+        
+        .table-header .title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #0f3b3a;
+            letter-spacing: 0.3px;
+        }
+        .dark .table-header .title {
+            color: #e2e8f0;
+        }
+        
+        .table-header .badge-flow {
+            font-size: 0.6rem;
+            color: #94a3b8;
+            background: rgba(255,255,255,0.5);
+            padding: 3px 12px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .dark .table-header .badge-flow {
+            background: rgba(0,0,0,0.3);
+            border-color: #334155;
+        }
+        
+        /* Per Page Dropdown */
+        .per-page-select {
+            padding: 4px 8px 4px 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #0f3b3a;
+            cursor: pointer;
+        }
+        .dark .per-page-select {
+            background: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+        .per-page-select:focus {
+            outline: none;
+            border-color: #0f3b3a;
+        }
+        
+        .per-page-label {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        
+        #sidebar .mt-auto {
+            margin-top: auto;
+        }
+        #sidebar nav {
+            overflow-y: auto;
+            flex: 1;
+        }
+        #sidebar nav::-webkit-scrollbar {
+            width: 2px;
+        }
+        #sidebar nav::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -166,117 +462,109 @@
     <div class="flex min-h-screen">
         
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-hidden border-r border-white/5">
-            <div class="flex flex-col h-full">
-                <div class="px-5 py-5 border-b border-white/10 flex items-center justify-between sticky top-0 bg-inherit z-10">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
-                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
-                        </div>
-                        <div class="leading-tight">
-                            <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
-                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
-                        </div>
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 flex flex-col">
+            <div class="px-5 py-5 border-b border-white/10 flex items-center justify-between sticky top-0 bg-inherit z-10 flex-shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                        <i class="fas fa-chart-line text-slate-900 text-sm"></i>
                     </div>
-                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
-                        <i class="fas fa-times text-sm"></i>
-                    </button>
+                    <div class="leading-tight">
+                        <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
+                        <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
+                    </div>
                 </div>
-                
-                <nav class="flex-1 px-3 py-5 space-y-1.5">
-                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
-                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
-                        <span class="text-sm font-medium">Dashboard</span>
+                <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            
+            <nav class="flex-1 px-3 py-5 space-y-1.5 overflow-y-auto">
+                <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                    <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                    <span class="text-sm font-medium">Dashboard</span>
+                </a>
+                <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                    <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                    <span class="text-sm font-medium">Customers</span>
+                </a>
+                <div class="has-submenu" id="dueSubmenu">
+                    <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div>
+                            <span class="text-sm font-medium">Due Entry</span>
+                        </div>
+                        <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
                     </a>
-                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
-                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
-                        <span class="text-sm font-medium">Customers</span>
-                    </a>
-                    <div class="has-submenu" id="dueSubmenu">
-                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div>
-                                <span class="text-sm font-medium">Due Entry</span>
-                            </div>
-                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                    <div class="submenu-modern pl-9 mt-1 space-y-1">
+                        <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                            <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
                         </a>
-                        <div class="submenu-modern pl-9 mt-1 space-y-1">
-                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-file-invoice text-[10px] w-4"></i>
-                                <span>New Due Entry</span>
-                            </a>
-                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-bell text-[10px] w-4"></i>
-                                <span>Follow-ups</span>
-                            </a>
-                        </div>
-                    </div>
-                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div>
-                        <span class="text-sm font-medium">Collection</span>
-                    </a>
-                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div>
-                        <span class="text-sm font-medium">Ledger</span>
-                    </a>
-                    <div class="has-submenu open" id="warrantySubmenu">
-                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-white bg-white/5 transition">
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 text-center"><i class="fas fa-shield-alt text-sm text-accent"></i></div>
-                                <span class="text-sm font-medium">Warranty</span>
-                            </div>
-                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                            <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
                         </a>
-                        <div class="submenu-modern open pl-9 mt-1 space-y-1">
-                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-truck text-[10px] w-4"></i>
-                                <span>Suppliers</span>
-                            </a>
-                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-plus-circle text-[10px] w-4"></i>
-                                <span>Warranty Entry</span>
-                            </a>
-                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-shipping-fast text-[10px] w-4"></i>
-                                <span>Currier Dispatch</span>
-                            </a>
-                            <a href="warranty-list.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition">
-                                <i class="fas fa-list text-[10px] w-4"></i>
-                                <span>Warranty List</span>
-                            </a>
-                        </div>
                     </div>
-                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
-                        <span class="text-sm font-medium">Customer Warranty</span>
-                    </a>
-                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div>
-                        <span class="text-sm font-medium">Backup & Restore</span>
-                    </a>
-                </nav>
-                
-                <div class="px-3 py-4 border-t border-white/10 mt-auto">
-                    <div class="flex items-center justify-between mb-2 px-1">
-                        <span class="text-[9px] text-slate-500">v2.3.1 · secure</span>
-                        <div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center">
-                            <i class="fas fa-lock text-[8px] text-slate-400"></i>
-                        </div>
-                    </div>
-                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
-                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
-                        <span class="text-sm font-medium">Logout</span>
-                    </a>
                 </div>
+                <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                    <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div>
+                    <span class="text-sm font-medium">Collection</span>
+                </a>
+                <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                    <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div>
+                    <span class="text-sm font-medium">Ledger</span>
+                </a>
+                <div class="has-submenu open" id="warrantySubmenu">
+                    <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-white bg-white/5 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 text-center"><i class="fas fa-shield-alt text-sm text-accent"></i></div>
+                            <span class="text-sm font-medium">Warranty</span>
+                        </div>
+                        <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                    </a>
+                    <div class="submenu-modern open pl-9 mt-1 space-y-1">
+                        <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                            <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
+                        </a>
+                        <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                            <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
+                        </a>
+                        <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                            <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
+                        </a>
+                        <a href="warranty-list.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition">
+                            <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
+                        </a>
+                    </div>
+                </div>
+                <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                    <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                    <span class="text-sm font-medium">Customer Warranty</span>
+                </a>
+                <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                    <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div>
+                    <span class="text-sm font-medium">Backup & Restore</span>
+                </a>
+            </nav>
+            
+            <div class="px-3 py-4 border-t border-white/10 flex-shrink-0">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <span class="text-[9px] text-slate-500">v2.5.0 · secure</span>
+                    <div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center">
+                        <i class="fas fa-lock text-[8px] text-slate-400"></i>
+                    </div>
+                </div>
+                <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
+                    <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                    <span class="text-sm font-medium">Logout</span>
+                </a>
             </div>
         </aside>
         
         <!-- Main Content -->
-        <main class="flex-1 md:ml-64 min-h-screen w-full">
+        <main class="flex-1 md:ml-64 min-h-screen w-full overflow-x-hidden">
             
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-                <div class="px-3 py-2.5 flex justify-between items-center">
-                    <div class="flex items-center gap-2">
+                <div class="px-4 py-3 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
                         <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg">
                             <i class="fas fa-bars text-lg"></i>
                         </button>
@@ -284,11 +572,11 @@
                             <i class="fas fa-list text-primary mr-2"></i>Warranty List
                         </h2>
                     </div>
-                    <div class="flex items-center gap-1">
-                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <div class="flex items-center gap-2">
+                        <button id="refreshBtn" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
                             <i class="fas fa-sync-alt text-sm"></i>
                         </button>
-                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <button id="darkModeToggle" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
                             <i class="fas fa-moon dark:hidden text-sm"></i>
                             <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
                         </button>
@@ -296,81 +584,105 @@
                 </div>
             </header>
             
-            <div class="p-3 md:p-4">
+            <div class="p-4 md:p-5">
                 
-                <!-- Navigation Tabs -->
+                <!-- Navigation Tabs - Enhanced -->
                 <div class="flex flex-wrap gap-2 mb-4">
-                    <a href="warranty.html" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">
-                        <i class="fas fa-truck mr-1"></i> Suppliers
+                    <a href="warranty.html" class="nav-tab">
+                        <i class="fas fa-truck"></i> Suppliers
                     </a>
-                    <a href="warranty-entry.html" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">
-                        <i class="fas fa-plus-circle mr-1"></i> Warranty Entry
+                    <a href="warranty-entry.html" class="nav-tab">
+                        <i class="fas fa-plus-circle"></i> Warranty Entry
                     </a>
-                    <a href="currier-dispatch.html" class="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">
-                        <i class="fas fa-shipping-fast mr-1"></i> Courier Dispatch
+                    <a href="currier-dispatch.html" class="nav-tab">
+                        <i class="fas fa-shipping-fast"></i> Courier Dispatch
                     </a>
-                    <a href="warranty-list.html" class="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-white shadow-md transition-all">
-                        <i class="fas fa-list mr-1"></i> Warranty List
+                    <a href="warranty-list.html" class="nav-tab active">
+                        <i class="fas fa-list"></i> Warranty List
                     </a>
+                </div>
+                
+                <!-- Filters Section - Enhanced -->
+                <div class="filter-section mb-4">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="text-[11px] font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                            <i class="fas fa-sliders-h text-primary mr-1.5"></i>Filters
+                        </span>
+                        <input type="date" id="filterFromDate" class="w-28 md:w-32">
+                        <span class="text-[10px] text-gray-400">to</span>
+                        <input type="date" id="filterToDate" class="w-28 md:w-32">
+                        <select id="filterStatus" class="min-w-[140px]">
+                            <option value="all">All Statuses</option>
+                            <option value="pending">⏳ Pending</option>
+                            <option value="currier">🚚 Currier</option>
+                            <option value="currier_to_supplier">📦 Currier→Supplier</option>
+                            <option value="supplier_received">✅ Supplier Received</option>
+                            <option value="supplier_to_shop">🔄 Supplier→Shop</option>
+                            <option value="customer_delivered">🏠 Customer Delivered</option>
+                        </select>
+                        <div class="relative flex-1 min-w-[140px]">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[11px]"></i>
+                            <input type="text" id="warrantySearch" placeholder="Search warranty..." class="w-full pl-8 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm">
+                        </div>
+                        <button id="exportWarrantyBtn" class="bg-success hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg text-[11px] flex items-center gap-2 btn-active transition-all whitespace-nowrap">
+                            <i class="fas fa-download text-[10px]"></i> Export
+                        </button>
+                        <button id="refreshFilterBtn" class="bg-primary hover:bg-primary-dark text-white font-semibold px-4 py-2 rounded-lg text-[11px] flex items-center gap-2 btn-active transition-all whitespace-nowrap">
+                            <i class="fas fa-undo text-[10px]"></i> Reset
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- Warranty List Table -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-3">
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-800 dark:text-white">
-                                <i class="fas fa-shield-alt text-primary mr-2"></i>All Warranty Records
-                            </h3>
-                            <p class="text-[9px] text-gray-500 mt-0.5">Track warranty status from pending to delivered</p>
+                    <!-- Table Header - Enhanced -->
+                    <div class="table-header flex justify-between items-center flex-wrap gap-2">
+                        <div class="flex items-center gap-3">
+                            <span class="title">
+                                <i class="fas fa-shield-alt text-primary mr-1.5"></i>Warranty Records
+                            </span>
+                            
                         </div>
-                        <div class="flex gap-2">
-                            <div class="relative w-full sm:w-64">
-                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                                <input type="text" id="warrantySearch" placeholder="Search by ID, product, customer..." class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        <div class="flex items-center gap-3">
+                            <!-- Per Page Dropdown -->
+                            <div class="flex items-center gap-2">
+                                <span class="per-page-label">Show:</span>
+                                <select id="perPageSelect" class="per-page-select">
+                                    <option value="20">20</option>
+                                    <option value="50" selected>50</option>
+                                    <option value="100">100</option>
+                                    <option value="200">200</option>
+                                    <option value="all">All</option>
+                                </select>
                             </div>
-                            <button id="exportWarrantyBtn" class="bg-success hover:bg-green-700 text-white font-medium px-3 py-2 rounded-lg text-sm flex items-center gap-1 btn-active transition-all">
-                                <i class="fas fa-download text-xs"></i> Export CSV
+                            <span id="selectedCount" class="text-[10px] text-gray-500 dark:text-gray-400 hidden"></span>
+                            <button id="bulkUpdateBtn" class="bg-primary hover:bg-primary-dark text-white font-medium px-3 py-1 rounded-lg text-[10px] hidden items-center gap-1.5 btn-active transition-all">
+                                <i class="fas fa-layer-group text-[8px]"></i> Bulk Update
                             </button>
                         </div>
                     </div>
                     
-                    <div class="table-scroll-hint px-3 pt-2">
-                        <i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns →
-                    </div>
-                    
-                    <!-- Optimized Table with Skeleton Loading -->
-                    <div class="overflow-x-auto">
-                        <table class="w-full min-w-[1000px]">
+                    <div class="table-scroll-wrapper overflow-x-auto overflow-y-hidden">
+                        <table class="w-full table-compact min-w-[1150px]">
                             <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                 <tr>
-                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">ID</th>
-                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Date</th>
-                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Supplier</th>
-                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Product</th>
-                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Serial No</th>
-                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer</th>
-                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Phone</th>
-                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                    <th class="px-3 py-2.5 text-center text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider w-8">#</th>
+                                    <th class="px-3 py-2.5 text-center text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider w-8">
+                                        <i class="fas fa-check-square text-[8px]"></i>
+                                    </th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-id">ID</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-date">Date</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-supplier">Supplier</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-product">Product</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-serial">Serial</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-customer">Customer</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-phone">Phone</th>
+                                    <th class="px-3 py-2.5 text-center text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-3 py-2.5 text-center text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="warrantyListBody" class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <!-- Skeleton loading rows -->
-                                <tr class="skeleton-row">
-                                    <td colspan="9" class="px-4 py-3">
-                                        <div class="skeleton-text" style="height:16px;width:80px;margin:0 auto;"></div>
-                                    </td>
-                                </tr>
-                                <tr class="skeleton-row">
-                                    <td colspan="9" class="px-4 py-3">
-                                        <div class="skeleton-text" style="height:16px;width:80px;margin:0 auto;"></div>
-                                    </td>
-                                </tr>
-                                <tr class="skeleton-row">
-                                    <td colspan="9" class="px-4 py-3">
-                                        <div class="skeleton-text" style="height:16px;width:80px;margin:0 auto;"></div>
-                                    </td>
-                                </tr>
+                                <!-- Dynamic content -->
                             </tbody>
                         </table>
                     </div>
@@ -379,12 +691,12 @@
         </main>
     </div>
     
-    <!-- Status Update Modal -->
+    <!-- Status Update Modal - Remarks Removed -->
     <div id="statusModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-all duration-300 p-3">
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl modal-animate overflow-hidden">
-            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-base font-semibold text-gray-800 dark:text-white">
-                    <i class="fas fa-exchange-alt text-primary mr-2"></i>Update Warranty Status
+                    <i class="fas fa-exchange-alt text-primary mr-2"></i>Update Status
                 </h3>
                 <button id="closeStatusModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
                     <i class="fas fa-times text-xl"></i>
@@ -392,25 +704,84 @@
             </div>
             <input type="hidden" id="statusWarrantyId">
             <input type="hidden" id="currentStatus">
-            <div class="p-5 space-y-4">
-                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3">
-                    <p class="text-xs text-gray-600 dark:text-gray-400">Current Status:</p>
-                    <span id="currentStatusDisplay" class="inline-block mt-1"></span>
+            <div class="p-6 space-y-4">
+                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 flex items-center gap-3">
+                    <i class="fas fa-info-circle text-blue-500 text-sm"></i>
+                    <div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Current Status</p>
+                        <span id="currentStatusDisplay" class="inline-block mt-0.5"></span>
+                    </div>
                 </div>
+                
+                <div class="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-3 flex items-center gap-3">
+                    <i class="fas fa-barcode text-primary text-sm"></i>
+                    <div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Current Serial</p>
+                        <p id="currentSerialDisplay" class="text-sm font-mono font-semibold text-primary mt-0.5">-</p>
+                    </div>
+                </div>
+                
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Select New Status <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">New Status <span class="text-red-500">*</span></label>
                     <select id="updateStatus" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></select>
-                    <p class="text-[10px] text-gray-400 mt-1">Status can only move forward</p>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Remarks / Notes</label>
-                    <textarea id="statusRemarks" rows="2" placeholder="Add any remarks..." class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
+                
+                <!-- New Serial Input - Only shows for supplier_to_shop -->
+                <div id="newSerialGroup" class="new-serial-input-group hidden">
+                    <label class="block text-sm font-medium mb-1.5">
+                        <i class="fas fa-plus-circle mr-1.5"></i> New Serial Number
+                    </label>
+                    <input type="text" id="newSerialNumber" placeholder="Enter new serial from supplier..." 
+                           class="w-full px-4 py-3 text-sm border border-green-300 dark:border-green-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <p class="text-[10px] text-gray-500 mt-1.5">
+                        <i class="fas fa-info-circle text-green-500"></i> 
+                        Enter new serial if supplier replaced the product
+                    </p>
                 </div>
             </div>
-            <div class="flex justify-end gap-3 px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex justify-end gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
                 <button id="cancelStatusBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 btn-active">Cancel</button>
                 <button id="saveStatusBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-primary text-white shadow-md btn-active">
-                    <i class="fas fa-save mr-1"></i> Update Status
+                    <i class="fas fa-save mr-1.5"></i> Update
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bulk Update Modal -->
+    <div id="bulkUpdateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-all duration-300 p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl modal-animate overflow-hidden">
+            <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-base font-semibold text-gray-800 dark:text-white">
+                    <i class="fas fa-layer-group text-primary mr-2"></i>Bulk Update
+                </h3>
+                <button id="closeBulkModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 flex items-center gap-3">
+                    <i class="fas fa-info-circle text-amber-500 text-sm"></i>
+                    <p class="text-xs text-amber-700 dark:text-amber-400">
+                        <span id="bulkSelectedCount" class="font-bold">0</span> warranties selected
+                    </p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">New Status <span class="text-red-500">*</span></label>
+                    <select id="bulkUpdateStatus" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                        <option value="">-- Select --</option>
+                        <option value="currier">🚚 Sent to Currier</option>
+                        <option value="currier_to_supplier">📦 Currier → Supplier</option>
+                        <option value="supplier_received">✅ Supplier Received</option>
+                        <option value="supplier_to_shop">🔄 Supplier → Shop</option>
+                        <option value="customer_delivered">🏠 Customer Delivered</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
+                <button id="cancelBulkBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 btn-active">Cancel</button>
+                <button id="saveBulkStatusBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-primary text-white shadow-md btn-active">
+                    <i class="fas fa-save mr-1.5"></i> Update All
                 </button>
             </div>
         </div>
@@ -419,7 +790,7 @@
     <!-- Details Modal -->
     <div id="detailsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[150] hidden transition-all duration-300 p-3">
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl modal-animate overflow-hidden">
-            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-base font-semibold text-gray-800 dark:text-white">
                     <i class="fas fa-info-circle text-primary mr-2"></i>Warranty Details
                 </h3>
@@ -427,8 +798,8 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <div class="p-5 max-h-[60vh] overflow-y-auto" id="detailsContent"></div>
-            <div class="flex justify-end px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
+            <div class="p-6 max-h-[60vh] overflow-y-auto" id="detailsContent"></div>
+            <div class="flex justify-end px-6 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
                 <button id="closeDetailsModalFooterBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 btn-active">Close</button>
             </div>
         </div>
@@ -454,9 +825,8 @@
     
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
-        import { db, collection, getDocs, query, orderBy, updateDoc, doc, getDoc } from './js/firebase.js';
+        import { db, collection, getDocs, updateDoc, doc, getDoc } from './js/firebase.js';
         
-        // Check authentication
         checkAuthState(true);
         
         // DOM Elements
@@ -466,29 +836,43 @@
         const tbody = document.getElementById('warrantyListBody');
         const searchInput = document.getElementById('warrantySearch');
         const refreshBtn = document.getElementById('refreshBtn');
+        const refreshFilterBtn = document.getElementById('refreshFilterBtn');
+        const bulkUpdateBtn = document.getElementById('bulkUpdateBtn');
+        const selectedCount = document.getElementById('selectedCount');
+        const perPageSelect = document.getElementById('perPageSelect');
         
         // State
         let allWarranties = [];
+        let filteredWarranties = [];
         let currentUpdateId = null;
         let isLoading = false;
-        
-        // Supplier Cache
+        let selectedIds = new Set();
+        let currentPage = 1;
         const supplierCache = new Map();
         
-        // Status Configuration
+        // Status Config
         const statusConfig = {
-            'pending': { class: 'status-pending', icon: 'fa-clock', text: 'Pending' },
-            'currier': { class: 'status-currier', icon: 'fa-truck', text: 'Currier' },
-            'received': { class: 'status-received', icon: 'fa-check-circle', text: 'Received' },
-            'delivered': { class: 'status-delivered', icon: 'fa-home', text: 'Delivered' }
+            'pending': { class: 'pending', icon: 'fa-clock', text: 'Pending', order: 1 },
+            'currier': { class: 'currier', icon: 'fa-truck', text: 'Currier', order: 2 },
+            'currier_to_supplier': { class: 'currier_to_supplier', icon: 'fa-exchange-alt', text: 'Currier→Supplier', order: 3 },
+            'supplier_received': { class: 'supplier_received', icon: 'fa-check-circle', text: 'Supplier Received', order: 4 },
+            'supplier_to_shop': { class: 'supplier_to_shop', icon: 'fa-undo-alt', text: 'Supplier→Shop', order: 5 },
+            'customer_delivered': { class: 'customer_delivered', icon: 'fa-home', text: 'Customer Delivered', order: 6 }
         };
-        const statusOrder = { 'pending': 1, 'currier': 2, 'received': 3, 'delivered': 4 };
         
-        // Utility Functions
+        const statusOrder = {
+            'pending': 1,
+            'currier': 2,
+            'currier_to_supplier': 3,
+            'supplier_received': 4,
+            'supplier_to_shop': 5,
+            'customer_delivered': 6
+        };
+        
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            toast.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+            toast.className = `px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
             toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 2500);
@@ -499,141 +883,197 @@
             return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); 
         }
         
+        function getStatusIcon(status) {
+            const config = statusConfig[status] || statusConfig['pending'];
+            return `<span class="status-icon-only ${config.class}">
+                <i class="fas ${config.icon}"></i>
+                <span class="tooltip-text">${config.text}</span>
+            </span>`;
+        }
+        
         function getStatusBadge(status) {
             const config = statusConfig[status] || statusConfig['pending'];
-            return `<span class="status-badge ${config.class}"><i class="fas ${config.icon} text-[10px]"></i> ${config.text}</span>`;
+            return `<span class="status-icon-only ${config.class}">
+                <i class="fas ${config.icon}"></i>
+                <span class="tooltip-text">${config.text}</span>
+            </span>`;
         }
         
         function canChangeStatus(currentStatus, newStatus) {
             return statusOrder[newStatus] > statusOrder[currentStatus];
         }
         
-        // Show skeleton loading
         function showSkeletonLoading() {
             tbody.innerHTML = `
-                <tr class="skeleton-row">
-                    <td colspan="9" class="px-4 py-3">
-                        <div class="skeleton-text" style="height:16px;width:80px;margin:0 auto;"></div>
-                    </td>
-                </tr>
-                <tr class="skeleton-row">
-                    <td colspan="9" class="px-4 py-3">
-                        <div class="skeleton-text" style="height:16px;width:80px;margin:0 auto;"></div>
-                    </td>
-                </tr>
-                <tr class="skeleton-row">
-                    <td colspan="9" class="px-4 py-3">
-                        <div class="skeleton-text" style="height:16px;width:80px;margin:0 auto;"></div>
-                    </td>
-                </tr>
+                <tr class="skeleton-row"><td colspan="11" class="px-3 py-3"><div class="skeleton-text" style="height:12px;width:40px;margin:0 auto;"></div></td></tr>
+                <tr class="skeleton-row"><td colspan="11" class="px-3 py-3"><div class="skeleton-text" style="height:12px;width:40px;margin:0 auto;"></div></td></tr>
+                <tr class="skeleton-row"><td colspan="11" class="px-3 py-3"><div class="skeleton-text" style="height:12px;width:40px;margin:0 auto;"></div></td></tr>
+                <tr class="skeleton-row"><td colspan="11" class="px-3 py-3"><div class="skeleton-text" style="height:12px;width:40px;margin:0 auto;"></div></td></tr>
+                <tr class="skeleton-row"><td colspan="11" class="px-3 py-3"><div class="skeleton-text" style="height:12px;width:40px;margin:0 auto;"></div></td></tr>
             `;
         }
         
-        // Load supplier name with caching
         async function getSupplierName(supplierId) {
             if (!supplierId) return 'Unknown';
-            if (supplierCache.has(supplierId)) {
-                return supplierCache.get(supplierId);
-            }
+            if (supplierCache.has(supplierId)) return supplierCache.get(supplierId);
             try {
                 const docSnap = await getDoc(doc(db, 'suppliers', supplierId));
                 const name = docSnap.exists() ? docSnap.data().name : 'Unknown';
                 supplierCache.set(supplierId, name);
                 return name;
-            } catch {
-                return 'Unknown';
-            }
+            } catch { return 'Unknown'; }
         }
         
-        // Main load function - optimized
         async function loadWarrantyList() {
             if (isLoading) return;
             isLoading = true;
-            
             showSkeletonLoading();
-            
             try {
-                // Single query - no ordering to reduce load time
                 const snapshot = await getDocs(collection(db, 'warranties'));
                 const warranties = [];
-                
-                // Process in parallel for speed
                 const promises = [];
-                const tempWarranties = [];
                 
                 snapshot.forEach(docSnap => {
                     const w = { id: docSnap.id, ...docSnap.data() };
-                    tempWarranties.push(w);
+                    warranties.push(w);
                     if (w.supplierId) {
-                        promises.push(getSupplierName(w.supplierId).then(name => {
-                            w.supplierName = name;
-                        }));
+                        promises.push(getSupplierName(w.supplierId).then(name => { w.supplierName = name; }));
                     } else {
                         w.supplierName = 'Unknown';
                     }
                 });
                 
-                // Wait for all supplier names to load
                 await Promise.all(promises);
                 
-                // Sort by createdAt (newest first)
-                tempWarranties.sort((a, b) => {
+                warranties.sort((a, b) => {
                     const dateA = a.createdAt || '';
                     const dateB = b.createdAt || '';
                     return dateB.localeCompare(dateA);
                 });
                 
-                allWarranties = tempWarranties;
-                renderWarrantyTable(allWarranties);
+                allWarranties = warranties;
+                applyAllFilters();
                 
             } catch (error) {
                 console.error('Error loading warranties:', error);
-                tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" class="px-3 py-6 text-center text-red-500 text-sm">Error loading data.</td></tr>`;
                 showToast('Error loading data', 'error');
             } finally {
                 isLoading = false;
             }
         }
         
-        // Render table - optimized with DocumentFragment
+        function applyAllFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filterStatus = document.getElementById('filterStatus').value;
+            const fromDate = document.getElementById('filterFromDate').value;
+            const toDate = document.getElementById('filterToDate').value;
+            
+            let filtered = [...allWarranties];
+            
+            if (filterStatus !== 'all') {
+                filtered = filtered.filter(w => w.status === filterStatus);
+            }
+            if (fromDate) {
+                filtered = filtered.filter(w => w.warrantyDate && w.warrantyDate >= fromDate);
+            }
+            if (toDate) {
+                filtered = filtered.filter(w => w.warrantyDate && w.warrantyDate <= toDate);
+            }
+            if (searchTerm) {
+                filtered = filtered.filter(w => 
+                    (w.warrantyId && w.warrantyId.toLowerCase().includes(searchTerm)) ||
+                    (w.productName && w.productName.toLowerCase().includes(searchTerm)) ||
+                    (w.customerName && w.customerName.toLowerCase().includes(searchTerm)) ||
+                    (w.serialNumber && w.serialNumber.toLowerCase().includes(searchTerm)) ||
+                    (w.newSerialNumber && w.newSerialNumber.toLowerCase().includes(searchTerm)) ||
+                    (w.supplierName && w.supplierName.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            filteredWarranties = filtered;
+            selectedIds.clear();
+            updateSelectionUI();
+            
+            // Apply per page limit
+            const perPage = perPageSelect.value;
+            let displayData = filtered;
+            if (perPage !== 'all') {
+                const limit = parseInt(perPage);
+                displayData = filtered.slice(0, limit);
+            }
+            
+            renderWarrantyTable(displayData);
+        }
+        
         function renderWarrantyTable(warranties) {
             if (!warranties || warranties.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-gray-500">
-                    <i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i>
-                    <p class="text-xs">No warranty records found</p>
+                tbody.innerHTML = `<tr><td colspan="11" class="px-3 py-8 text-center text-gray-500 text-sm">
+                    <i class="fas fa-inbox text-2xl mb-2 opacity-30 block"></i>
+                    <p>No records found</p>
                 </td></tr>`;
                 return;
             }
             
             const fragment = document.createDocumentFragment();
             
-            warranties.forEach(warranty => {
-                const statusBadge = getStatusBadge(warranty.status);
-                const isLocked = warranty.status === 'delivered';
+            warranties.forEach((warranty, index) => {
+                const isLocked = warranty.status === 'customer_delivered';
+                const slNo = index + 1;
                 const row = document.createElement('tr');
                 row.className = 'table-row-hover transition-colors cursor-pointer';
+                row.setAttribute('data-id', warranty.id);
+                row.setAttribute('data-status', warranty.status);
                 row.setAttribute('data-warranty', JSON.stringify(warranty));
                 
+                let serialHtml = `<span class="font-mono">${escapeHtml(warranty.serialNumber || '-')}</span>`;
+                if (warranty.newSerialNumber) {
+                    serialHtml += `<span class="sub-text old-serial"><i class="fas fa-arrow-right text-[8px]"></i> New: <span class="new-serial">${escapeHtml(warranty.newSerialNumber)}</span></span>`;
+                }
+                
                 row.innerHTML = `
-                    <td class="px-3 py-2.5 text-xs font-mono font-semibold text-primary">${warranty.warrantyId || warranty.id.slice(0, 12)}</td>
-                    <td class="px-3 py-2.5 text-sm whitespace-nowrap">${warranty.warrantyDate || 'N/A'}</td>
-                    <td class="px-3 py-2.5 text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(warranty.supplierName)}</td>
-                    <td class="px-3 py-2.5 text-sm">${escapeHtml(warranty.productName)}</td>
-                    <td class="px-3 py-2.5 text-xs font-mono">${escapeHtml(warranty.serialNumber || '-')}</td>
-                    <td class="px-3 py-2.5 text-sm">${escapeHtml(warranty.customerName || '-')}</td>
-                    <td class="px-3 py-2.5 text-sm">${escapeHtml(warranty.customerPhone || '-')}</td>
-                    <td class="px-3 py-2.5 text-center">${statusBadge}</td>
+                    <td class="px-3 py-2.5 text-center text-[10px] font-semibold text-gray-500">${slNo}</td>
+                    <td class="px-3 py-2.5 text-center" onclick="event.stopPropagation()">
+                        ${!isLocked ? `<input type="checkbox" class="row-checkbox w-3.5 h-3.5 rounded border-gray-300 text-primary focus:ring-primary" data-id="${warranty.id}" data-status="${warranty.status}">` : ''}
+                    </td>
+                    <td class="px-3 py-2.5 col-id">
+                        <span class="font-mono font-semibold text-primary">${warranty.warrantyId || warranty.id.slice(0, 10)}</span>
+                        ${warranty.branch ? `<span class="sub-text">${escapeHtml(warranty.branch)}</span>` : ''}
+                    </td>
+                    <td class="px-3 py-2.5 col-date">
+                        <span>${warranty.warrantyDate || 'N/A'}</span>
+                    </td>
+                    <td class="px-3 py-2.5 col-supplier">
+                        <span class="font-medium">${escapeHtml(warranty.supplierName)}</span>
+                        ${warranty.supplierType ? `<span class="sub-text">${escapeHtml(warranty.supplierType)}</span>` : ''}
+                    </td>
+                    <td class="px-3 py-2.5 col-product">
+                        <span>${escapeHtml(warranty.productName)}</span>
+                        ${warranty.productCode ? `<span class="sub-text">${escapeHtml(warranty.productCode)}</span>` : ''}
+                    </td>
+                    <td class="px-3 py-2.5 col-serial">
+                        ${serialHtml}
+                    </td>
+                    <td class="px-3 py-2.5 col-customer">
+                        <span class="font-medium">${escapeHtml(warranty.customerName || '-')}</span>
+                    </td>
+                    <td class="px-3 py-2.5 col-phone">
+                        <span>${escapeHtml(warranty.customerPhone || '-')}</span>
+                    </td>
+                    <td class="px-3 py-2.5 text-center">
+                        ${getStatusIcon(warranty.status)}
+                    </td>
                     <td class="px-3 py-2.5 text-center">
                         ${!isLocked ? 
                             `<div class="action-icon update-status-icon inline-flex" data-id="${warranty.id}" data-status="${warranty.status}" title="Update Status">
-                                <i class="fas fa-edit text-primary text-sm"></i>
+                                <i class="fas fa-edit text-primary text-[11px]"></i>
                             </div>` : 
-                            `<div class="action-icon inline-flex opacity-50 cursor-not-allowed" title="Completed">
-                                <i class="fas fa-lock text-gray-400 text-sm"></i>
+                            `<div class="action-icon inline-flex opacity-40 cursor-not-allowed" title="Completed">
+                                <i class="fas fa-lock text-gray-400 text-[11px]"></i>
                             </div>`
                         }
                         <div class="action-icon view-details-icon inline-flex ml-1" data-warranty='${JSON.stringify(warranty)}' title="View Details">
-                            <i class="fas fa-eye text-info text-sm"></i>
+                            <i class="fas fa-eye text-info text-[11px]"></i>
                         </div>
                     </td>
                 `;
@@ -641,38 +1081,55 @@
                 fragment.appendChild(row);
             });
             
-            // Clear and append once
             tbody.innerHTML = '';
             tbody.appendChild(fragment);
             
-            // Attach event listeners (delegated)
             attachEventListeners();
         }
         
-        // Attach event listeners using delegation
         function attachEventListeners() {
-            // Row click for details (delegated)
+            tbody.querySelectorAll('.row-checkbox').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    e.stopPropagation();
+                    const id = cb.dataset.id;
+                    if (cb.checked) selectedIds.add(id);
+                    else selectedIds.delete(id);
+                    updateSelectionUI();
+                });
+            });
+            
             tbody.querySelectorAll('tr').forEach(row => {
                 row.removeEventListener('click', handleRowClick);
                 row.addEventListener('click', handleRowClick);
             });
             
-            // Update status buttons (delegated)
             tbody.querySelectorAll('.update-status-icon').forEach(icon => {
                 icon.removeEventListener('click', handleStatusUpdate);
                 icon.addEventListener('click', handleStatusUpdate);
             });
             
-            // View details buttons (delegated)
             tbody.querySelectorAll('.view-details-icon').forEach(icon => {
                 icon.removeEventListener('click', handleViewDetails);
                 icon.addEventListener('click', handleViewDetails);
             });
         }
         
-        // Event handlers
+        function updateSelectionUI() {
+            const count = selectedIds.size;
+            if (count > 0) {
+                selectedCount.textContent = `${count} selected`;
+                selectedCount.classList.remove('hidden');
+                bulkUpdateBtn.classList.remove('hidden');
+                bulkUpdateBtn.classList.add('flex');
+            } else {
+                selectedCount.classList.add('hidden');
+                bulkUpdateBtn.classList.add('hidden');
+                bulkUpdateBtn.classList.remove('flex');
+            }
+        }
+        
         function handleRowClick(e) {
-            if (e.target.closest('.action-icon')) return;
+            if (e.target.closest('.action-icon') || e.target.closest('input[type="checkbox"]')) return;
             const row = e.currentTarget;
             const warrantyData = row.dataset.warranty;
             if (warrantyData) {
@@ -687,23 +1144,44 @@
             const currentStatus = icon.dataset.status;
             const warranty = allWarranties.find(w => w.id === id);
             
+            if (!warranty) return;
+            
             currentUpdateId = id;
             document.getElementById('statusWarrantyId').value = id;
             document.getElementById('currentStatus').value = currentStatus;
             document.getElementById('currentStatusDisplay').innerHTML = getStatusBadge(currentStatus);
             
+            document.getElementById('currentSerialDisplay').textContent = warranty.newSerialNumber || warranty.serialNumber || '-';
+            
             const statusSelect = document.getElementById('updateStatus');
             statusSelect.innerHTML = '';
             
-            if (currentStatus === 'pending') {
-                statusSelect.innerHTML = '<option value="currier">🚚 Sent to Currier</option>';
-            } else if (currentStatus === 'currier') {
-                statusSelect.innerHTML = '<option value="received">✅ Received from Supplier</option>';
-            } else if (currentStatus === 'received') {
-                statusSelect.innerHTML = '<option value="delivered">🏠 Delivered to Customer</option>';
+            const nextStatuses = {
+                'pending': [{ value: 'currier', label: '🚚 Sent to Currier' }],
+                'currier': [{ value: 'currier_to_supplier', label: '📦 Currier → Supplier' }],
+                'currier_to_supplier': [{ value: 'supplier_received', label: '✅ Supplier Received' }],
+                'supplier_received': [{ value: 'supplier_to_shop', label: '🔄 Supplier → Shop' }],
+                'supplier_to_shop': [{ value: 'customer_delivered', label: '🏠 Customer Delivered' }]
+            };
+            
+            const options = nextStatuses[currentStatus] || [];
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.label;
+                statusSelect.appendChild(option);
+            });
+            
+            const newSerialGroup = document.getElementById('newSerialGroup');
+            const newSerialInput = document.getElementById('newSerialNumber');
+            newSerialInput.value = '';
+            
+            if (currentStatus === 'supplier_received') {
+                newSerialGroup.classList.remove('hidden');
+            } else {
+                newSerialGroup.classList.add('hidden');
             }
             
-            document.getElementById('statusRemarks').value = warranty.statusRemarks || '';
             document.getElementById('statusModal').classList.remove('hidden');
         }
         
@@ -714,124 +1192,154 @@
             showDetailsModal(warranty);
         }
         
-        // Show details modal
         function showDetailsModal(warranty) {
             const statusBadge = getStatusBadge(warranty.status);
             const detailsContent = document.getElementById('detailsContent');
+            
+            let serialDisplay = warranty.serialNumber || '-';
+            if (warranty.newSerialNumber) {
+                serialDisplay = `
+                    <div>
+                        <span class="old-serial text-sm line-through text-red-500">${escapeHtml(warranty.serialNumber)}</span>
+                        <span class="text-xs text-gray-400 mx-1">→</span>
+                        <span class="new-serial text-sm font-bold text-green-500">${escapeHtml(warranty.newSerialNumber)}</span>
+                    </div>
+                `;
+            }
+            
             detailsContent.innerHTML = `
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
                         <span class="text-xs text-gray-500">Warranty ID</span>
                         <span class="font-mono text-sm font-semibold text-primary">${warranty.warrantyId || warranty.id.slice(0, 12)}</span>
                     </div>
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
                         <span class="text-xs text-gray-500">Date</span>
                         <span class="text-sm">${warranty.warrantyDate || 'N/A'}</span>
                     </div>
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
                         <span class="text-xs text-gray-500">Supplier</span>
                         <span class="text-sm font-medium">${escapeHtml(warranty.supplierName)}</span>
                     </div>
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Product Name</span>
+                    <div class="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-xs text-gray-500">Product</span>
                         <span class="text-sm font-semibold">${escapeHtml(warranty.productName)}</span>
                     </div>
-                    ${warranty.serialNumber ? `
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
                         <span class="text-xs text-gray-500">Serial Number</span>
-                        <span class="text-xs font-mono">${escapeHtml(warranty.serialNumber)}</span>
+                        <span class="text-sm font-mono">${serialDisplay}</span>
                     </div>
-                    ` : ''}
-                    ${warranty.customerName ? `
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Customer Name</span>
-                        <span class="text-sm">${escapeHtml(warranty.customerName)}</span>
-                    </div>
-                    ` : ''}
-                    ${warranty.customerPhone ? `
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Customer Phone</span>
-                        <span class="text-sm">${escapeHtml(warranty.customerPhone)}</span>
-                    </div>
-                    ` : ''}
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
+                    ${warranty.customerName ? `<div class="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Customer</span><span class="text-sm">${escapeHtml(warranty.customerName)}</span></div>` : ''}
+                    ${warranty.customerPhone ? `<div class="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Phone</span><span class="text-sm">${escapeHtml(warranty.customerPhone)}</span></div>` : ''}
+                    <div class="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
                         <span class="text-xs text-gray-500">Status</span>
                         <span>${statusBadge}</span>
                     </div>
-                    ${warranty.problemDescription ? `
-                    <div class="flex flex-col gap-1 pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <span class="text-xs text-gray-500">Problem Description</span>
-                        <p class="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">${escapeHtml(warranty.problemDescription)}</p>
-                    </div>
-                    ` : ''}
-                    ${warranty.statusRemarks ? `
-                    <div class="flex flex-col gap-1">
-                        <span class="text-xs text-gray-500">Status Remarks</span>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg">${escapeHtml(warranty.statusRemarks)}</p>
-                    </div>
-                    ` : ''}
+                    ${warranty.problemDescription ? `<div class="flex flex-col gap-1.5 pb-3 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Problem</span><p class="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl">${escapeHtml(warranty.problemDescription)}</p></div>` : ''}
+                    ${warranty.statusRemarks ? `<div class="flex flex-col gap-1.5"><span class="text-xs text-gray-500">Remarks</span><p class="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl">${escapeHtml(warranty.statusRemarks)}</p></div>` : ''}
                 </div>
             `;
             document.getElementById('detailsModal').classList.remove('hidden');
         }
         
-        // Update warranty status
         async function updateWarrantyStatus() {
             const warrantyId = document.getElementById('statusWarrantyId').value;
             const currentStatus = document.getElementById('currentStatus').value;
             const newStatus = document.getElementById('updateStatus').value;
-            const remarks = document.getElementById('statusRemarks').value;
+            const newSerial = document.getElementById('newSerialNumber').value.trim();
+            
+            if (!newStatus) {
+                showToast('Please select a status', 'error');
+                return;
+            }
             
             if (!canChangeStatus(currentStatus, newStatus)) {
                 showToast('Cannot change status backward!', 'error');
                 return;
             }
             
+            if (newStatus === 'supplier_to_shop' && !newSerial) {
+                showToast('Please enter the new serial number from supplier', 'error');
+                return;
+            }
+            
             try {
-                await updateDoc(doc(db, 'warranties', warrantyId), {
+                const updateData = {
                     status: newStatus,
-                    statusRemarks: remarks,
-                    statusUpdatedAt: new Date().toISOString(),
-                    ...(newStatus === 'received' ? { receivedDate: new Date().toISOString().split('T')[0] } : {}),
-                    ...(newStatus === 'delivered' ? { deliveredDate: new Date().toISOString().split('T')[0] } : {})
-                });
-                showToast(`Status updated to ${newStatus.toUpperCase()}!`, 'success');
+                    statusUpdatedAt: new Date().toISOString()
+                };
+                
+                if (newSerial) {
+                    updateData.newSerialNumber = newSerial;
+                }
+                
+                await updateDoc(doc(db, 'warranties', warrantyId), updateData);
+                showToast(`Status updated to ${statusConfig[newStatus]?.text || newStatus}!`, 'success');
                 document.getElementById('statusModal').classList.add('hidden');
                 loadWarrantyList();
             } catch (error) {
+                console.error('Error updating status:', error);
                 showToast('Error updating status', 'error');
             }
         }
         
-        // Filter warranties
-        function filterWarranties() {
-            const searchTerm = searchInput.value.toLowerCase();
-            if (!searchTerm) {
-                renderWarrantyTable(allWarranties);
+        async function bulkUpdateStatus() {
+            const newStatus = document.getElementById('bulkUpdateStatus').value;
+            
+            if (!newStatus) { showToast('Select a status', 'error'); return; }
+            if (selectedIds.size === 0) { showToast('No warranties selected', 'error'); return; }
+            
+            const hasSupplierReceived = [...selectedIds].some(id => {
+                const warranty = allWarranties.find(w => w.id === id);
+                return warranty && warranty.status === 'supplier_received' && newStatus === 'supplier_to_shop';
+            });
+            
+            if (hasSupplierReceived) {
+                showToast('New serial required for Supplier→Shop. Use individual update.', 'error');
                 return;
             }
-            const filtered = allWarranties.filter(w => 
-                (w.warrantyId && w.warrantyId.toLowerCase().includes(searchTerm)) ||
-                (w.productName && w.productName.toLowerCase().includes(searchTerm)) ||
-                (w.customerName && w.customerName.toLowerCase().includes(searchTerm)) ||
-                (w.serialNumber && w.serialNumber.toLowerCase().includes(searchTerm)) ||
-                (w.supplierName && w.supplierName.toLowerCase().includes(searchTerm))
-            );
-            renderWarrantyTable(filtered);
+            
+            const invalidIds = [];
+            for (const id of selectedIds) {
+                const warranty = allWarranties.find(w => w.id === id);
+                if (warranty && !canChangeStatus(warranty.status, newStatus)) {
+                    invalidIds.push(warranty.warrantyId || id.slice(0, 8));
+                }
+            }
+            
+            if (invalidIds.length > 0) {
+                showToast(`Cannot update ${invalidIds.length} warranties. Status can only move forward.`, 'error');
+                return;
+            }
+            
+            try {
+                const promises = [];
+                for (const id of selectedIds) {
+                    promises.push(updateDoc(doc(db, 'warranties', id), {
+                        status: newStatus,
+                        statusUpdatedAt: new Date().toISOString()
+                    }));
+                }
+                await Promise.all(promises);
+                showToast(`${selectedIds.size} warranties updated!`, 'success');
+                document.getElementById('bulkUpdateModal').classList.add('hidden');
+                selectedIds.clear();
+                updateSelectionUI();
+                loadWarrantyList();
+            } catch (error) {
+                showToast('Error updating warranties', 'error');
+            }
         }
         
-        // Export CSV
         function exportToCSV() {
-            if (allWarranties.length === 0) {
+            if (filteredWarranties.length === 0) {
                 showToast('No data to export', 'error');
                 return;
             }
-            
-            let csvRows = ['\uFEFF"ID","Date","Supplier","Product","Serial No","Customer Name","Customer Phone","Status","Problem Description","Remarks"'];
-            allWarranties.forEach(w => {
-                csvRows.push(`"${w.warrantyId || w.id.slice(0, 12)}","${w.warrantyDate || 'N/A'}","${(w.supplierName || 'N/A').replace(/"/g, '""')}","${w.productName.replace(/"/g, '""')}","${(w.serialNumber || '-').replace(/"/g, '""')}","${(w.customerName || '-').replace(/"/g, '""')}","${(w.customerPhone || '-').replace(/"/g, '""')}","${w.status || 'pending'}","${(w.problemDescription || '').replace(/"/g, '""')}","${(w.statusRemarks || '').replace(/"/g, '""')}"`);
+            let csvRows = ['\uFEFF"SL","ID","Date","Supplier","Product","Serial","New Serial","Customer","Phone","Status","Problem","Remarks"'];
+            filteredWarranties.forEach((w, i) => {
+                csvRows.push(`"${i+1}","${w.warrantyId || w.id.slice(0,12)}","${w.warrantyDate || 'N/A'}","${(w.supplierName||'N/A').replace(/"/g,'""')}","${w.productName.replace(/"/g,'""')}","${(w.serialNumber||'-').replace(/"/g,'""')}","${(w.newSerialNumber||'').replace(/"/g,'""')}","${(w.customerName||'-').replace(/"/g,'""')}","${(w.customerPhone||'-').replace(/"/g,'""')}","${(statusConfig[w.status]?.text||w.status)}","${(w.problemDescription||'').replace(/"/g,'""')}","${(w.statusRemarks||'').replace(/"/g,'""')}"`);
             });
-            
             const csvContent = csvRows.join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -840,7 +1348,17 @@
             a.href = url;
             a.click();
             URL.revokeObjectURL(url);
-            showToast('Exported successfully!', 'success');
+            showToast('Exported!', 'success');
+        }
+        
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('filterFromDate').value = '';
+            document.getElementById('filterToDate').value = '';
+            document.getElementById('filterStatus').value = 'all';
+            searchInput.value = '';
+            applyAllFilters();
+            showToast('Filters reset', 'success');
         }
         
         // Sidebar functions
@@ -855,15 +1373,12 @@
                 document.body.appendChild(overlay);
             }
         }
-        
         function closeSidebar() {
             sidebar.classList.add('-translate-x-full');
             document.body.classList.remove('sidebar-open');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (overlay) overlay.remove();
+            document.getElementById('sidebarOverlay')?.remove();
         }
         
-        // Event Listeners
         menuToggle?.addEventListener('click', openSidebar);
         closeSidebarBtn?.addEventListener('click', closeSidebar);
         
@@ -876,11 +1391,9 @@
                 sidebar.classList.add('-translate-x-full');
             }
         });
-        
         if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
         else sidebar.classList.add('-translate-x-full');
         
-        // Submenu toggles
         document.querySelectorAll('.has-submenu').forEach(menu => {
             const link = menu.querySelector('a');
             if (link) {
@@ -892,65 +1405,65 @@
             }
         });
         
-        // Dark mode toggle
         document.getElementById('darkModeToggle')?.addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
             document.body.classList.toggle('dark');
         });
         
-        // Search
-        searchInput?.addEventListener('input', filterWarranties);
+        bulkUpdateBtn?.addEventListener('click', () => {
+            document.getElementById('bulkSelectedCount').textContent = selectedIds.size;
+            document.getElementById('bulkUpdateStatus').value = '';
+            document.getElementById('bulkUpdateModal').classList.remove('hidden');
+        });
         
-        // Refresh
+        document.getElementById('filterFromDate')?.addEventListener('change', applyAllFilters);
+        document.getElementById('filterToDate')?.addEventListener('change', applyAllFilters);
+        document.getElementById('filterStatus')?.addEventListener('change', applyAllFilters);
+        perPageSelect?.addEventListener('change', applyAllFilters);
+        refreshFilterBtn?.addEventListener('click', resetFilters);
+        
+        let searchTimeout;
+        searchInput?.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyAllFilters, 300);
+        });
+        
         refreshBtn?.addEventListener('click', () => {
             loadWarrantyList();
             showToast('Refreshed!', 'success');
         });
-        
-        // Export
         document.getElementById('exportWarrantyBtn')?.addEventListener('click', exportToCSV);
         
-        // Status modal events
-        document.getElementById('closeStatusModalBtn')?.addEventListener('click', () => {
-            document.getElementById('statusModal').classList.add('hidden');
-        });
-        document.getElementById('cancelStatusBtn')?.addEventListener('click', () => {
-            document.getElementById('statusModal').classList.add('hidden');
-        });
+        document.getElementById('closeStatusModalBtn')?.addEventListener('click', () => document.getElementById('statusModal').classList.add('hidden'));
+        document.getElementById('cancelStatusBtn')?.addEventListener('click', () => document.getElementById('statusModal').classList.add('hidden'));
         document.getElementById('saveStatusBtn')?.addEventListener('click', updateWarrantyStatus);
         document.getElementById('statusModal')?.addEventListener('click', (e) => {
-            if (e.target === document.getElementById('statusModal')) {
-                document.getElementById('statusModal').classList.add('hidden');
-            }
+            if (e.target === document.getElementById('statusModal')) document.getElementById('statusModal').classList.add('hidden');
         });
         
-        // Details modal events
-        document.getElementById('closeDetailsModalBtn')?.addEventListener('click', () => {
-            document.getElementById('detailsModal').classList.add('hidden');
+        document.getElementById('closeBulkModalBtn')?.addEventListener('click', () => document.getElementById('bulkUpdateModal').classList.add('hidden'));
+        document.getElementById('cancelBulkBtn')?.addEventListener('click', () => document.getElementById('bulkUpdateModal').classList.add('hidden'));
+        document.getElementById('saveBulkStatusBtn')?.addEventListener('click', bulkUpdateStatus);
+        document.getElementById('bulkUpdateModal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('bulkUpdateModal')) document.getElementById('bulkUpdateModal').classList.add('hidden');
         });
-        document.getElementById('closeDetailsModalFooterBtn')?.addEventListener('click', () => {
-            document.getElementById('detailsModal').classList.add('hidden');
-        });
+        
+        document.getElementById('closeDetailsModalBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
+        document.getElementById('closeDetailsModalFooterBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
         document.getElementById('detailsModal')?.addEventListener('click', (e) => {
-            if (e.target === document.getElementById('detailsModal')) {
-                document.getElementById('detailsModal').classList.add('hidden');
-            }
+            if (e.target === document.getElementById('detailsModal')) document.getElementById('detailsModal').classList.add('hidden');
         });
         
-        // Logout
         document.getElementById('logoutLink')?.addEventListener('click', (e) => {
             e.preventDefault();
             document.getElementById('logoutModal')?.classList.remove('hidden');
         });
-        document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => {
-            document.getElementById('logoutModal')?.classList.add('hidden');
-        });
+        document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => document.getElementById('logoutModal')?.classList.add('hidden'));
         document.getElementById('confirmLogoutBtn')?.addEventListener('click', async () => {
             document.getElementById('logoutModal')?.classList.add('hidden');
             await logout();
         });
         
-        // Initialize - load data immediately
         loadWarrantyList();
     </script>
 </body>

@@ -136,7 +136,7 @@
             border: 2px solid rgba(255,255,255,0.3);
             border-radius: 50%;
             border-top-color: white;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.8s linear inline;
             display: inline-block;
         }
         
@@ -334,7 +334,15 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            setPersistence, 
+            browserLocalPersistence, 
+            browserSessionPersistence, 
+            sendPasswordResetEmail,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAceLr1Q3ivackOnYBozmNyXM87CAySHoM",
@@ -348,10 +356,74 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        // Check if user is already logged in
+        // ============ CROSS-TAB SYNC PREVENTION ============
+        // Use sessionStorage to track if this tab is already redirecting
+        const REDIRECT_KEY = 'is_redirecting';
+        const REDIRECT_TIMESTAMP_KEY = 'redirect_timestamp';
+        
+        function isRedirecting() {
+            return sessionStorage.getItem(REDIRECT_KEY) === 'true';
+        }
+        
+        function setRedirecting(value) {
+            sessionStorage.setItem(REDIRECT_KEY, value ? 'true' : 'false');
+            if (value) {
+                sessionStorage.setItem(REDIRECT_TIMESTAMP_KEY, Date.now().toString());
+            }
+        }
+        
+        function shouldRedirect() {
+            // If already redirecting, don't redirect again
+            if (isRedirecting()) {
+                console.log("⏳ Already redirecting, skipping...");
+                return false;
+            }
+            
+            // Check if a redirect happened recently (within last 5 seconds)
+            const lastRedirect = sessionStorage.getItem(REDIRECT_TIMESTAMP_KEY);
+            if (lastRedirect) {
+                const timeSince = Date.now() - parseInt(lastRedirect);
+                if (timeSince < 5000) { // 5 seconds cooldown
+                    console.log(`⏳ Recent redirect (${timeSince}ms ago), skipping...`);
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        // ============ CHECK IF ALREADY LOGGED IN ============
+        let authStateChecked = false;
+        
         onAuthStateChanged(auth, (user) => {
+            // Prevent multiple executions
+            if (authStateChecked) {
+                console.log("⏳ Auth state already checked, skipping...");
+                return;
+            }
+            authStateChecked = true;
+            
             if (user) {
-                window.location.href = 'dashboard.html';
+                console.log("✅ User already logged in:", user.email);
+                
+                // Check if we should redirect
+                if (shouldRedirect()) {
+                    console.log("🔄 Redirecting to dashboard...");
+                    setRedirecting(true);
+                    
+                    // Clear redirect flag after navigation
+                    setTimeout(() => {
+                        setRedirecting(false);
+                    }, 3000);
+                    
+                    window.location.replace('dashboard.html');
+                } else {
+                    console.log("⏳ Skipping redirect (cooldown active)");
+                }
+            } else {
+                console.log("ℹ️ User not logged in");
+                // Clear redirect flag if user is not logged in
+                setRedirecting(false);
             }
         });
         
@@ -434,6 +506,8 @@
         
         document.addEventListener('DOMContentLoaded', () => {
             loadBrandLogo();
+            // Clear redirect flag on page load
+            setRedirecting(false);
         });
         
         // Login Form Submit
@@ -470,18 +544,30 @@
             // Show loading overlay
             loadingOverlay.style.display = 'flex';
             loginBtn.disabled = true;
+            loginBtn.innerHTML = '<div class="spinner"></div><span>Signing in...</span>';
             
             // Set persistence
             const persistence = remember ? browserLocalPersistence : browserSessionPersistence;
             await setPersistence(auth, persistence);
             
             try {
-                await signInWithEmailAndPassword(auth, email, password);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                console.log("✅ Login successful:", userCredential.user.email);
+                
+                // Show success message
                 window.showToast('Login successful! Redirecting...', 'success');
+                
+                // Set redirect flag before redirecting
+                setRedirecting(true);
+                
+                // Redirect to dashboard
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
+                    window.location.replace('dashboard.html');
+                }, 500);
+                
             } catch (error) {
+                console.error("❌ Login error:", error.code, error.message);
+                
                 let errorMessage = '';
                 switch (error.code) {
                     case 'auth/invalid-credential':
@@ -495,15 +581,23 @@
                     case 'auth/invalid-email':
                         errorMessage = 'Invalid email format.';
                         break;
+                    case 'auth/user-disabled':
+                        errorMessage = 'This account has been disabled. Contact administrator.';
+                        break;
                     default:
                         errorMessage = 'Login failed. Please try again.';
                 }
                 showMessage('messageContainer', errorMessage, 'error');
                 window.showToast(errorMessage, 'error');
                 shakeElement(loginBtn);
-            } finally {
-                loadingOverlay.style.display = 'none';
+                
+                // Reset button
+                loginBtn.innerHTML = '<i class="fas fa-arrow-right-to-bracket group-hover:translate-x-1 transition-transform"></i><span>Sign In</span>';
                 loginBtn.disabled = false;
+                loadingOverlay.style.display = 'none';
+                
+                // Clear redirect flag on error
+                setRedirecting(false);
             }
         });
         
@@ -551,7 +645,7 @@
         resetEmailInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendResetBtn.click(); });
         passwordInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') loginForm.dispatchEvent(new Event('submit')); });
         
-        console.log('🔥 Simple login page loaded!');
+        console.log('🔥 Login page loaded with cross-tab sync prevention!');
     </script>
 </body>
 </html>

@@ -345,9 +345,33 @@
                     <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm"><div class="bg-amber-100 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-truck text-amber-600 text-sm"></i></div><h3 class="text-gray-500 text-[10px] font-semibold uppercase">In Transit</h3><p class="text-xl font-bold" id="totalInTransit">0</p></div>
                 </div>
                 
+                <!-- Select Date Section - Only From and To -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-5">
-                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-sm font-semibold"><i class="fas fa-calendar-alt text-primary mr-2"></i>Select Date</h3></div>
-                    <div class="p-4"><div class="flex flex-col sm:flex-row gap-3 items-end"><div class="flex-1"><label class="block text-xs font-medium mb-1.5">Dispatch Date</label><input type="date" id="dispatchDate" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800"></div><button id="loadWarrantyBtn" class="bg-primary text-white px-5 py-2.5 rounded-xl text-sm">Show Items</button></div></div>
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                        <h3 class="text-sm font-semibold"><i class="fas fa-calendar-alt text-primary mr-2"></i>Select Date Range</h3>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex flex-wrap gap-3 items-end">
+                            <!-- From Date -->
+                            <div class="flex-1 min-w-[160px]">
+                                <label class="block text-xs font-medium mb-1.5">From Date</label>
+                                <input type="date" id="fromDate" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                            </div>
+                            
+                            <!-- To Date -->
+                            <div class="flex-1 min-w-[160px]">
+                                <label class="block text-xs font-medium mb-1.5">To Date</label>
+                                <input type="date" id="toDate" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                            </div>
+                            
+                            <!-- Show Items Button -->
+                            <div class="flex-1 min-w-[120px]">
+                                <button id="loadWarrantyBtn" class="w-full bg-success text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-green-700 transition">
+                                    <i class="fas fa-search mr-2"></i>Show Items
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div id="warrantyItemsSection" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-5 hidden">
@@ -355,7 +379,7 @@
                     <div class="p-4"><div class="mb-3 flex justify-between"><label class="flex items-center gap-2"><input type="checkbox" id="selectAllWarranty"> Select All</label><span id="selectedCount" class="text-xs">0 selected</span></div><div id="warrantyItemsList" class="space-y-2"></div></div>
                 </div>
                 
-                <!-- Currier Details Section with DROPDOWN -->
+                <!-- Currier Details Section -->
                 <div id="currierFormSection" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-5 hidden">
                     <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-sm font-semibold"><i class="fas fa-truck text-primary mr-2"></i>Currier Details</h3></div>
                     <div class="p-4 space-y-3">
@@ -400,7 +424,6 @@
                                 </tr>
                             </thead>
                             <tbody id="dispatchTableBody">
-                                <!-- Initial empty state - no loading text -->
                                 <tr>
                                     <td colspan="6" class="text-center py-8 text-gray-400 text-sm">No dispatch records found</td>
                                 </tr>
@@ -465,9 +488,24 @@
         let supplierCache = new Map();
         let couriersList = [];
         
-        function showToast(msg, type='success') { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `px-4 py-2 rounded-lg shadow text-sm ${type==='success'?'bg-green-500 text-white':'bg-red-500 text-white'}`; t.innerText = msg; c.appendChild(t); setTimeout(()=>t.remove(),3000); }
-        function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
-        function generateDispatchId() { const now = new Date(); return `DSP-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${Math.floor(Math.random() * 900) + 100}`; }
+        function showToast(msg, type='success') { 
+            const c = document.getElementById('toastContainer'); 
+            const t = document.createElement('div'); 
+            t.className = `px-4 py-2 rounded-lg shadow text-sm ${type==='success'?'bg-green-500 text-white':'bg-red-500 text-white'}`; 
+            t.innerText = msg; 
+            c.appendChild(t); 
+            setTimeout(()=>t.remove(),3000); 
+        }
+        
+        function escapeHtml(str) { 
+            if(!str) return ''; 
+            return String(str).replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); 
+        }
+        
+        function generateDispatchId() { 
+            const now = new Date(); 
+            return `DSP-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${Math.floor(Math.random() * 900) + 100}`; 
+        }
         
         // Modal close on outside click
         function setupModalCloseOnOutside(modalId, closeBtnId) {
@@ -489,6 +527,129 @@
                     document.body.classList.remove('modal-open');
                 });
             }
+        }
+        
+        // ============= SET DEFAULT DATE = TODAY =============
+        function setDefaultDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('fromDate').value = today;
+            document.getElementById('toDate').value = today;
+        }
+        
+        // Load warranty by date range
+        async function loadWarrantyByDateRange() {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            
+            if(!fromDate || !toDate) { 
+                showToast('Please select both From and To dates', 'error'); 
+                return; 
+            }
+            
+            if(fromDate > toDate) {
+                showToast('From date cannot be greater than To date', 'error');
+                return;
+            }
+            
+            document.getElementById('warrantyItemsSection').classList.remove('hidden');
+            document.getElementById('currierFormSection').classList.add('hidden');
+            
+            const container = document.getElementById('warrantyItemsList');
+            container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</div>';
+            
+            try {
+                // Get all warranties with date range
+                const q = query(
+                    collection(db, 'warranties'),
+                    where('warrantyDate', '>=', fromDate),
+                    where('warrantyDate', '<=', toDate)
+                );
+                
+                const querySnapshot = await getDocs(q);
+                pendingWarrantyItems = [];
+                
+                // Filter by status in JavaScript (avoids composite index requirement)
+                for(const docSnap of querySnapshot.docs) {
+                    const data = docSnap.data();
+                    const status = data.status || 'pending';
+                    
+                    // Only include pending or received status
+                    if (status === 'pending' || status === 'received') {
+                        const w = { id: docSnap.id, ...data };
+                        
+                        // Load supplier info if exists
+                        if(w.supplierId) { 
+                            let s = supplierCache.get(w.supplierId); 
+                            if(!s) { 
+                                try {
+                                    const sd = await getDoc(doc(db,'suppliers',w.supplierId)); 
+                                    s = sd.exists() ? { name: sd.data().name, phone: sd.data().phone } : { name:'Unknown', phone:'N/A' }; 
+                                    supplierCache.set(w.supplierId,s); 
+                                } catch(e) {
+                                    s = { name:'Unknown', phone:'N/A' };
+                                }
+                            } 
+                            w.supplierName = s.name; 
+                            w.supplierPhone = s.phone; 
+                        }
+                        pendingWarrantyItems.push(w);
+                    }
+                }
+                renderWarrantyCards();
+            } catch(error) { 
+                console.error('Error loading warranties:', error);
+                container.innerHTML = `<div class="text-center py-8 text-red-500 text-sm">Error loading data</div>`; 
+                showToast('Error loading warranty items', 'error');
+            }
+        }
+        
+        function renderWarrantyCards() {
+            const container = document.getElementById('warrantyItemsList');
+            if(pendingWarrantyItems.length === 0) { 
+                container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">No pending warranty items in this date range</div>'; 
+                return; 
+            }
+            selectedWarrantyIds.clear();
+            document.getElementById('selectedCount').innerText = '0 selected';
+            container.innerHTML = pendingWarrantyItems.map(w => `
+                <div class="warranty-card" data-id="${w.id}">
+                    <div class="flex items-start gap-2">
+                        <input type="checkbox" class="warranty-checkbox mt-1" data-id="${w.id}">
+                        <div>
+                            <div class="font-semibold text-sm">${escapeHtml(w.productName || 'Unknown Product')}</div>
+                            <div class="text-xs text-gray-500">Supplier: ${escapeHtml(w.supplierName || 'Unknown')} | Qty: ${w.quantity||1} | Date: ${escapeHtml(w.warrantyDate)}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.warranty-checkbox').forEach(cb => cb.addEventListener('change', (e) => { 
+                const id = cb.dataset.id; 
+                if(cb.checked) selectedWarrantyIds.add(id); 
+                else selectedWarrantyIds.delete(id); 
+                document.getElementById('selectedCount').innerText = `${selectedWarrantyIds.size} selected`; 
+                document.getElementById('currierFormSection').classList.toggle('hidden', selectedWarrantyIds.size === 0); 
+                if(selectedWarrantyIds.size > 0) loadCouriersForDropdown(); 
+            }));
+            
+            document.querySelectorAll('.warranty-card').forEach(card => card.addEventListener('click', (e) => { 
+                if(e.target.type !== 'checkbox') { 
+                    const cb = card.querySelector('.warranty-checkbox'); 
+                    if(cb) cb.click(); 
+                } 
+            }));
+            
+            document.getElementById('selectAllWarranty').onchange = (e) => { 
+                document.querySelectorAll('.warranty-checkbox').forEach(cb => { 
+                    cb.checked = e.target.checked; 
+                    const id = cb.dataset.id; 
+                    if(e.target.checked) selectedWarrantyIds.add(id); 
+                    else selectedWarrantyIds.delete(id); 
+                }); 
+                document.getElementById('selectedCount').innerText = `${selectedWarrantyIds.size} selected`; 
+                document.getElementById('currierFormSection').classList.toggle('hidden', selectedWarrantyIds.size === 0); 
+                if(selectedWarrantyIds.size > 0) loadCouriersForDropdown(); 
+            };
         }
         
         async function loadCouriersForDropdown() {
@@ -569,84 +730,6 @@
             document.getElementById('totalInTransit').textContent = allDispatches.filter(d => d.status === 'dispatched').length;
         }
         
-        async function loadWarrantyByDate() {
-            const date = document.getElementById('dispatchDate').value;
-            if(!date) { showToast('Select date','error'); return; }
-            document.getElementById('warrantyItemsSection').classList.remove('hidden');
-            document.getElementById('currierFormSection').classList.add('hidden');
-            const container = document.getElementById('warrantyItemsList');
-            container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</div>';
-            try {
-                const q = query(collection(db, 'warranties'), where('warrantyDate', '==', date), where('status', 'in', ['pending', 'received']));
-                const querySnapshot = await getDocs(q);
-                pendingWarrantyItems = [];
-                for(const docSnap of querySnapshot.docs) {
-                    const w = { id: docSnap.id, ...docSnap.data() };
-                    if(w.supplierId) { 
-                        let s = supplierCache.get(w.supplierId); 
-                        if(!s) { 
-                            const sd = await getDoc(doc(db,'suppliers',w.supplierId)); 
-                            s = sd.exists() ? { name: sd.data().name, phone: sd.data().phone } : { name:'Unknown', phone:'N/A' }; 
-                            supplierCache.set(w.supplierId,s); 
-                        } 
-                        w.supplierName = s.name; 
-                        w.supplierPhone = s.phone; 
-                    }
-                    pendingWarrantyItems.push(w);
-                }
-                renderWarrantyCards();
-            } catch(error) { container.innerHTML = '<div class="text-center py-8 text-red-500 text-sm">Error loading data</div>'; }
-        }
-        
-        function renderWarrantyCards() {
-            const container = document.getElementById('warrantyItemsList');
-            if(pendingWarrantyItems.length === 0) { 
-                container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">No pending warranty items for this date</div>'; 
-                return; 
-            }
-            selectedWarrantyIds.clear();
-            document.getElementById('selectedCount').innerText = '0 selected';
-            container.innerHTML = pendingWarrantyItems.map(w => `
-                <div class="warranty-card" data-id="${w.id}">
-                    <div class="flex items-start gap-2">
-                        <input type="checkbox" class="warranty-checkbox mt-1" data-id="${w.id}">
-                        <div>
-                            <div class="font-semibold text-sm">${escapeHtml(w.productName)}</div>
-                            <div class="text-xs text-gray-500">Supplier: ${escapeHtml(w.supplierName)} | Qty: ${w.quantity||1}</div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            document.querySelectorAll('.warranty-checkbox').forEach(cb => cb.addEventListener('change', (e) => { 
-                const id = cb.dataset.id; 
-                if(cb.checked) selectedWarrantyIds.add(id); 
-                else selectedWarrantyIds.delete(id); 
-                document.getElementById('selectedCount').innerText = `${selectedWarrantyIds.size} selected`; 
-                document.getElementById('currierFormSection').classList.toggle('hidden', selectedWarrantyIds.size === 0); 
-                if(selectedWarrantyIds.size > 0) loadCouriersForDropdown(); 
-            }));
-            
-            document.querySelectorAll('.warranty-card').forEach(card => card.addEventListener('click', (e) => { 
-                if(e.target.type !== 'checkbox') { 
-                    const cb = card.querySelector('.warranty-checkbox'); 
-                    if(cb) cb.click(); 
-                } 
-            }));
-            
-            document.getElementById('selectAllWarranty').onchange = (e) => { 
-                document.querySelectorAll('.warranty-checkbox').forEach(cb => { 
-                    cb.checked = e.target.checked; 
-                    const id = cb.dataset.id; 
-                    if(e.target.checked) selectedWarrantyIds.add(id); 
-                    else selectedWarrantyIds.delete(id); 
-                }); 
-                document.getElementById('selectedCount').innerText = `${selectedWarrantyIds.size} selected`; 
-                document.getElementById('currierFormSection').classList.toggle('hidden', selectedWarrantyIds.size === 0); 
-                if(selectedWarrantyIds.size > 0) loadCouriersForDropdown(); 
-            };
-        }
-        
         async function createDispatch() {
             if(selectedWarrantyIds.size === 0) { showToast('Select items','error'); return; }
             const selectedCourierId = currierSelect.value;
@@ -654,7 +737,8 @@
             const selectedCourier = couriersList.find(c => c.id === selectedCourierId);
             const selectedItems = pendingWarrantyItems.filter(w => selectedWarrantyIds.has(w.id));
             const dispatchId = generateDispatchId();
-            const dispatchDate = document.getElementById('dispatchDate').value;
+            const dispatchDate = document.getElementById('fromDate').value || new Date().toISOString().split('T')[0];
+            
             await addDoc(collection(db,'dispatches'), { 
                 dispatchId, dispatchDate, 
                 currierName: selectedCourier.name, 
@@ -664,9 +748,11 @@
                 items: selectedItems.map(i=>({ id:i.id, productName:i.productName, quantity:i.quantity||1, serialNumber:i.serialNumber, problemDescription:i.problemDescription, supplierName:i.supplierName, supplierPhone:i.supplierPhone, warrantyId:i.warrantyId })), 
                 status:'dispatched', createdAt:new Date().toISOString() 
             });
+            
             const batch = writeBatch(db);
             for(const item of selectedItems) batch.update(doc(db,'warranties',item.id), { status:'currier', currierDispatched:true, dispatchDate, currierName:selectedCourier.name });
             await batch.commit();
+            
             showToast(`Dispatch ${dispatchId} created`);
             document.getElementById('warrantyItemsSection').classList.add('hidden');
             document.getElementById('currierFormSection').classList.add('hidden');
@@ -737,8 +823,8 @@
                     ${suppliersHtml}
                     <div class="separator-dashed"></div>
                     <div class="footer-text">
-                        ======================================================<br>
-                        Generated by JackDev Due System | Valid for record keeping
+                        --------------------------------------------------<br>
+                        Generated by JackDev Due System | Valid for record keeping<br>
                     </div>
                 </div>
             `;
@@ -747,18 +833,43 @@
             document.body.classList.add('modal-open');
         }
         
-        // Event Listeners
-        document.getElementById('printInvoiceBtn')?.addEventListener('click', () => { setTimeout(() => window.print(), 100); });
-        document.getElementById('loadWarrantyBtn')?.addEventListener('click', loadWarrantyByDate);
+        // ============= EVENT LISTENERS =============
+        
+        // Load Warranty Button
+        document.getElementById('loadWarrantyBtn')?.addEventListener('click', loadWarrantyByDateRange);
+        
+        // Create Dispatch
         document.getElementById('createDispatchBtn')?.addEventListener('click', createDispatch);
-        document.getElementById('refreshBtn')?.addEventListener('click', () => { loadDispatches(); loadCouriersForDropdown(); showToast('Refreshed'); });
+        
+        // Refresh
+        document.getElementById('refreshBtn')?.addEventListener('click', () => { 
+            loadDispatches(); 
+            loadCouriersForDropdown(); 
+            showToast('Refreshed'); 
+        });
+        
+        // Search
         document.getElementById('dispatchSearch')?.addEventListener('input', renderDispatches);
+        
+        // Print Invoice
+        document.getElementById('printInvoiceBtn')?.addEventListener('click', () => { 
+            setTimeout(() => window.print(), 100); 
+        });
+        
+        // Close Invoice Modal
         document.getElementById('closeInvoiceModalBtn')?.addEventListener('click', () => {
             document.getElementById('invoiceModal').classList.add('hidden');
             document.body.classList.remove('modal-open');
         });
-        document.getElementById('darkModeToggle')?.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
-        document.getElementById('dispatchDate').value = new Date().toISOString().split('T')[0];
+        
+        // Dark Mode
+        document.getElementById('darkModeToggle')?.addEventListener('click', () => { 
+            document.documentElement.classList.toggle('dark'); 
+            document.body.classList.toggle('dark'); 
+        });
+        
+        // Set default dates to today
+        setDefaultDates();
         
         // Setup modal close on outside click
         setupModalCloseOnOutside('invoiceModal', 'closeInvoiceModalBtn');
@@ -804,6 +915,9 @@
         // Initialize
         loadDispatches();
         loadCouriersForDropdown();
+        
+        // Auto-load today's items
+        setTimeout(() => loadWarrantyByDateRange(), 500);
     </script>
 </body>
 </html>

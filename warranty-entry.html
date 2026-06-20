@@ -177,83 +177,6 @@
             cursor: not-allowed;
             pointer-events: none;
         }
-        
-        /* Barcode scan button style */
-        .scan-btn {
-            background: linear-gradient(135deg, #0f3b3a, #1e6b68);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 13px;
-            white-space: nowrap;
-        }
-        .scan-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(15, 59, 58, 0.3);
-        }
-        .scan-btn:active {
-            transform: scale(0.95);
-        }
-        .scan-btn i {
-            margin-right: 6px;
-        }
-        .scan-btn.scanning {
-            background: linear-gradient(135deg, #dd6b20, #ed8936);
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-        /* camera preview overlay for barcode scanning */
-        #cameraPreview {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            flex-direction: column;
-        }
-        #cameraPreview video {
-            width: 90%;
-            max-width: 400px;
-            border-radius: 24px;
-            border: 3px solid #d4af37;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-        #cameraPreview .scan-controls {
-            margin-top: 20px;
-            display: flex;
-            gap: 20px;
-        }
-        #cameraPreview .scan-controls button {
-            background: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 60px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-            transition: 0.2s;
-        }
-        #cameraPreview .scan-controls button:active { transform: scale(0.94); }
-        #cameraPreview .scan-controls button.cancel-btn { background: #e53e3e; color: white; }
-        #cameraPreview .scan-controls button.scan-btn-confirm { background: #0f3b3a; color: white; }
-        #cameraPreview .scan-status {
-            color: #f1f5f9;
-            margin-bottom: 12px;
-            font-size: 18px;
-            background: rgba(0,0,0,0.5);
-            padding: 8px 24px;
-            border-radius: 40px;
-            backdrop-filter: blur(4px);
-        }
 
         /* pagination styles */
         .pagination-btn {
@@ -380,7 +303,6 @@
                                 <i class="fas fa-list text-[10px] w-4"></i>
                                 <span>Warranty List</span>
                             </a>
-                            
                         </div>
                     </div>
                     
@@ -489,13 +411,7 @@
                                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                                         <i class="fas fa-barcode text-primary mr-1"></i> Serial Number <span class="text-gray-400 text-[10px]">(Optional)</span>
                                     </label>
-                                    <div class="flex gap-2">
-                                        <input type="text" id="warrantySerial" placeholder="Scan or type serial number" class="flex-1 px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                                        <button type="button" id="scanSerialBtn" class="scan-btn">
-                                            <i class="fas fa-camera"></i> Scan
-                                        </button>
-                                    </div>
-                                    <p class="text-[9px] text-gray-400 mt-1"><i class="fas fa-info-circle"></i> Click scan to activate barcode scanner</p>
+                                    <input type="text" id="warrantySerial" placeholder="Enter serial/scan barcode number" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -687,12 +603,7 @@
                         <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                             <i class="fas fa-barcode text-accent mr-1"></i> Serial Number <span class="text-gray-400 text-[10px]">(Optional)</span>
                         </label>
-                        <div class="flex gap-2">
-                            <input type="text" id="editSerialNumber" placeholder="Scan or type serial number" class="flex-1 px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/50">
-                            <button type="button" id="editScanSerialBtn" class="scan-btn">
-                                <i class="fas fa-camera"></i> Scan
-                            </button>
-                        </div>
+                        <input type="text" id="editSerialNumber" placeholder="Enter serial number" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-accent/50">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -744,16 +655,6 @@
                 <button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-100 dark:bg-gray-700 btn-active">Cancel</button>
                 <button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-danger text-white btn-active">Logout</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Camera Preview Overlay for Barcode Scanning (mobile + desktop) -->
-    <div id="cameraPreview">
-        <div class="scan-status" id="scanStatus">📷 Position barcode in frame</div>
-        <video id="video" autoplay playsinline></video>
-        <div class="scan-controls">
-            <button class="cancel-btn" id="closeCameraBtn">Cancel</button>
-            <button class="scan-btn-confirm" id="captureBarcodeBtn">📸 Capture</button>
         </div>
     </div>
     
@@ -824,85 +725,11 @@
         function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
         
         // ===== STATE =====
-        let allEntries = [];              // all warranty entries from firestore
+        let allEntries = [];
         let currentPage = 1;
-        let perPage = 25;                 // default
+        let perPage = 25;
         let deleteWarrantyId = null;
         let editWarrantyId = null;
-        let isScanning = false;
-        let activeScanInputId = null;
-        
-        // ===== CAMERA / BARCODE =====
-        const cameraPreview = document.getElementById('cameraPreview');
-        const video = document.getElementById('video');
-        const scanStatus = document.getElementById('scanStatus');
-        const closeCameraBtn = document.getElementById('closeCameraBtn');
-        const captureBarcodeBtn = document.getElementById('captureBarcodeBtn');
-        let stream = null;
-        let scanResolve = null;
-        
-        async function startCameraScan(inputId) {
-            if (isScanning) { showToast('Scanner already active', 'info'); return null; }
-            if (!navigator.mediaDevices?.getUserMedia) {
-                showToast('Camera not supported', 'error');
-                return null;
-            }
-            activeScanInputId = inputId;
-            cameraPreview.style.display = 'flex';
-            scanStatus.textContent = '📷 Starting camera...';
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
-                });
-                video.srcObject = stream;
-                await video.play();
-                scanStatus.textContent = '📸 Point camera at barcode, then tap Capture';
-                isScanning = true;
-                return new Promise((resolve) => { scanResolve = resolve; });
-            } catch (error) {
-                console.error('Camera error:', error);
-                showToast(error.name === 'NotAllowedError' ? 'Camera access denied' : 'Error: ' + error.message, 'error');
-                closeCamera();
-                return null;
-            }
-        }
-        function closeCamera() {
-            if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-            video.srcObject = null;
-            cameraPreview.style.display = 'none';
-            isScanning = false;
-            if (scanResolve) { scanResolve(null); scanResolve = null; }
-        }
-        async function captureBarcode() {
-            if (!video.videoWidth) { showToast('Camera not ready', 'error'); return; }
-            scanStatus.textContent = '🔍 Decoding...';
-            // In real app, pass image to barcode library. Here we prompt for manual entry.
-            const manual = prompt('Enter barcode number (or scan result):');
-            if (manual?.trim()) {
-                const input = document.getElementById(activeScanInputId);
-                if (input) input.value = manual.trim();
-                showToast('Barcode captured: ' + manual.trim(), 'success');
-                closeCamera();
-                if (scanResolve) { scanResolve(manual.trim()); scanResolve = null; }
-            } else {
-                showToast('Scan cancelled', 'info');
-                closeCamera();
-                if (scanResolve) { scanResolve(null); scanResolve = null; }
-            }
-        }
-        closeCameraBtn.addEventListener('click', () => { closeCamera(); if (scanResolve) { scanResolve(null); scanResolve = null; } });
-        captureBarcodeBtn.addEventListener('click', captureBarcode);
-        
-        function activateScanner(inputId, btnId) {
-            const btn = document.getElementById(btnId);
-            if (!btn) return;
-            btn.addEventListener('click', async () => {
-                if (isScanning) { showToast('Scanner already active', 'info'); return; }
-                await startCameraScan(inputId);
-            });
-        }
-        activateScanner('warrantySerial', 'scanSerialBtn');
-        activateScanner('editSerialNumber', 'editScanSerialBtn');
         
         // ===== SUPPLIERS =====
         async function loadSuppliers(selectId = 'warrantySupplier') {
@@ -946,16 +773,13 @@
             const info = document.getElementById('paginationInfo');
             if (!container) return;
             
-            // update info text
             const start = (page - 1) * per + 1;
             const end = Math.min(page * per, totalEntries);
             info.textContent = `Showing ${totalEntries === 0 ? 0 : start} - ${end} of ${totalEntries}`;
             
             let html = '';
-            // Prev
             html += `<button class="pagination-btn arrow" data-page="prev" ${page <= 1 ? 'disabled' : ''}><i class="fas fa-chevron-left text-xs"></i></button>`;
             
-            // Page numbers (max 7 visible)
             let pages = [];
             if (totalPages <= 7) {
                 for (let i = 1; i <= totalPages; i++) pages.push(i);
@@ -977,12 +801,10 @@
                 }
             });
             
-            // Next
             html += `<button class="pagination-btn arrow" data-page="next" ${page >= totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right text-xs"></i></button>`;
             
             container.innerHTML = html;
             
-            // attach events
             container.querySelectorAll('[data-page]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const val = btn.dataset.page;
@@ -1044,7 +866,6 @@
                 `;
             });
             
-            // Attach row click (view details)
             document.querySelectorAll('#warrantyEntriesBody tr').forEach(row => {
                 row.addEventListener('click', (e) => {
                     if (e.target.closest('button')) return;
@@ -1184,7 +1005,7 @@
                     entries.push(w);
                 }
                 allEntries = entries;
-                currentPage = 1; // reset to first page
+                currentPage = 1;
                 renderTablePage();
             } catch (e) {
                 console.error(e);

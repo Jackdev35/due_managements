@@ -41,11 +41,11 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: none;
         }
         
         .nav-active {
@@ -55,9 +55,6 @@
         .dark .nav-active {
             background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
         }
-        
-        .stat-card { transition: all 0.2s ease; }
-        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12); }
         
         .submenu-modern {
             max-height: 0;
@@ -81,7 +78,6 @@
         .sidebar-open { overflow: hidden; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        /* Fixed Sidebar Structure */
         .sidebar-fixed {
             display: flex;
             flex-direction: column;
@@ -99,24 +95,179 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: none;
         }
         
+        /* ========== PRINT STYLES ========== */
         @media print {
+            /* Remove all scrollbars in print */
+            html, body {
+                overflow: visible !important;
+                overflow-x: visible !important;
+                overflow-y: visible !important;
+                height: auto !important;
+                width: 100% !important;
+            }
+            
             body * { visibility: hidden; }
             #ledgerCard, #ledgerCard * { visibility: visible; }
-            #ledgerCard { position: absolute; top: 0; left: 0; width: 100%; margin: 0; padding: 1rem; box-shadow: none; }
+            #ledgerCard { 
+                position: absolute; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+                margin: 0; 
+                padding: 20px 30px; 
+                box-shadow: none;
+                border: none;
+                border-radius: 0;
+                background: white !important;
+                overflow: visible !important;
+                max-height: none !important;
+            }
+            
+            /* Remove all scrollbars from containers */
+            .overflow-x-auto, .overflow-y-auto, .overflow-auto {
+                overflow: visible !important;
+                max-height: none !important;
+                height: auto !important;
+            }
+            
             .no-print, .no-print * { display: none !important; }
+            
+            /* Print Header */
+            #printHeader {
+                display: block !important;
+                text-align: center;
+                border-bottom: 3px solid #0f3b3a;
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+            }
+            #printHeader .company-name {
+                font-size: 22px;
+                font-weight: 700;
+                color: #0f3b3a;
+                letter-spacing: 3px;
+                margin: 0;
+            }
+            #printHeader .statement-title {
+                font-size: 14px;
+                font-weight: 600;
+                color: #4a5568;
+                margin: 4px 0 0 0;
+            }
+            #printHeader .customer-info {
+                font-size: 11px;
+                color: #4a5568;
+                margin-top: 6px;
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+            #printHeader .customer-info span {
+                display: inline-block;
+            }
+            #printHeader .separator-line {
+                border: none;
+                border-top: 2px dashed #cbd5e0;
+                margin: 8px 0 6px 0;
+            }
+            
+            #ledgerTable {
+                width: 100%;
+                font-size: 10px;
+                border-collapse: collapse;
+                margin-top: 8px;
+                table-layout: fixed;
+            }
+            
+            #ledgerTable th {
+                background: #f7fafc !important;
+                border-bottom: 2px solid #0f3b3a;
+                padding: 6px 8px;
+                text-align: left;
+                font-size: 9px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                color: #0f3b3a;
+            }
+            #ledgerTable td {
+                padding: 5px 8px;
+                border-bottom: 1px solid #e2e8f0;
+                font-size: 9.5px;
+            }
+            #ledgerTable tr:last-child td {
+                border-bottom: none;
+            }
+            
+            /* Column widths for print */
+            #ledgerTable th:nth-child(1), #ledgerTable td:nth-child(1) { width: 12%; }
+            #ledgerTable th:nth-child(2), #ledgerTable td:nth-child(2) { width: 12%; }
+            #ledgerTable th:nth-child(3), #ledgerTable td:nth-child(3) { width: 45%; }
+            #ledgerTable th:nth-child(4), #ledgerTable td:nth-child(4) { width: 15%; }
+            #ledgerTable th:nth-child(5), #ledgerTable td:nth-child(5) { width: 16%; }
+            
+            .print-summary-row td {
+                border-top: 2px solid #0f3b3a !important;
+                font-weight: 700;
+                padding-top: 8px;
+            }
+            .print-footer {
+                text-align: center;
+                font-size: 9px;
+                color: #4a5568;
+                margin-top: 16px;
+                padding-top: 10px;
+                border-top: 2px solid #0f3b3a;
+                letter-spacing: 1px;
+            }
+            
+            /* Amount and Balance alignment */
+            #ledgerTable td:nth-child(4),
+            #ledgerTable td:nth-child(5) {
+                text-align: right;
+            }
+            #ledgerTable th:nth-child(4),
+            #ledgerTable th:nth-child(5) {
+                text-align: right;
+            }
+            
+            .print-opening-row td {
+                background: #f7fafc !important;
+                font-weight: 600;
+            }
+            
+            /* Remove scrollbar from table container */
+            #ledgerCard .overflow-x-auto {
+                overflow: visible !important;
+                max-height: none !important;
+            }
+            
+            /* Ensure table fits in page */
+            #ledgerTable {
+                table-layout: fixed;
+                word-wrap: break-word;
+            }
+            
+            #ledgerTable td, #ledgerTable th {
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+        }
+        
+        /* Print header - hidden by default, visible only in print */
+        #printHeader {
+            display: none;
         }
         
         .table-row-hover:hover { background-color: rgba(15, 59, 58, 0.04); }
         .dark .table-row-hover:hover { background-color: rgba(30, 107, 104, 0.1); }
         
-        /* Date Filter Info Badge */
         .date-filter-badge {
             display: inline-flex;
             align-items: center;
@@ -133,19 +284,6 @@
             color: #bae6fd;
         }
         
-        .skeleton {
-            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 4px;
-        }
-        .dark .skeleton { background: linear-gradient(90deg, #2d3748 25%, #4a5568 50%, #2d3748 75%); }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        
-        /* Clear Date Button */
         .clear-date-btn {
             position: absolute;
             right: 10px;
@@ -165,9 +303,8 @@
     
     <div class="flex min-h-screen">
         
-        <!-- Sidebar - Fixed Structure -->
+        <!-- Sidebar -->
         <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
-            <!-- Header - Fixed at top -->
             <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
@@ -185,19 +322,16 @@
                 </div>
             </div>
             
-            <!-- Navigation - Scrollable area (scrollbar hidden) -->
             <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
                 <nav class="space-y-1.5">
                     <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
                         <span class="text-sm font-medium">Dashboard</span>
                     </a>
-                    
                     <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
                         <span class="text-sm font-medium">Customers</span>
                     </a>
-                    
                     <div class="has-submenu" id="dueSubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                             <div class="flex items-center gap-3">
@@ -215,16 +349,13 @@
                             </a>
                         </div>
                     </div>
-                    
                     <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span>
                     </a>
-                    
                     <a href="ledger.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-book-open text-sm text-accent"></i></div>
                         <span class="text-sm font-medium">Ledger</span>
                     </a>
-                    
                     <div class="has-submenu" id="warrantySubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                             <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
@@ -245,17 +376,14 @@
                             </a>
                         </div>
                     </div>
-                    
                     <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
                     </a>
-                    
                     <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
                     </a>
                 </nav>
                 
-                <!-- Logout Button -->
                 <div class="pt-4 mt-2 border-t border-white/10">
                     <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
                         <i class="fas fa-sign-out-alt text-sm w-5"></i>
@@ -319,7 +447,6 @@
                             </div>
                         </div>
                         
-                        <!-- Date Filter Info -->
                         <div id="dateFilterInfo" class="mt-3 hidden">
                             <div class="date-filter-badge">
                                 <i class="fas fa-filter"></i>
@@ -349,6 +476,20 @@
                 
                 <!-- Ledger Card -->
                 <div id="ledgerCard" class="hidden bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                    
+                    <!-- PRINT HEADER - Only visible in print -->
+                    <div id="printHeader">
+                        <h1 class="company-name">JackDev DUE MANAGEMENTS</h1>
+                        <h2 class="statement-title">Customer Ledger Statement</h2>
+                        <div class="customer-info">
+                            <span><strong>Customer:</strong> <span id="printCustomerName"></span></span>
+                            <span><strong>Phone:</strong> <span id="printCustomerPhone"></span></span>
+                            <span><strong>Address:</strong> <span id="printCustomerAddress"></span></span>
+                            <span><strong>As on:</strong> <span id="printDate"></span></span>
+                        </div>
+                        <hr class="separator-line">
+                    </div>
+                    
                     <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex justify-between items-center flex-wrap gap-2 no-print">
                         <div>
                             <h3 class="text-sm font-semibold text-gray-800 dark:text-white"><i class="fas fa-history text-primary mr-2"></i>Transaction History</h3>
@@ -389,7 +530,6 @@
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div><h3 class="text-lg font-semibold mb-2">Logout?</h3><p class="text-sm text-gray-500 mb-5">Are you sure you want to logout?</p><div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-gray-100">Cancel</button><button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-danger text-white">Logout</button></div></div>
     </div>
     
-    <!-- Global clear date function -->
     <script>
         window.clearDate = function(inputId) {
             const input = document.getElementById(inputId);
@@ -455,10 +595,11 @@
         let allTransactions = [];
         let currentClosingBalance = 0;
         let currentCustomerName = '';
+        let currentCustomerPhone = '';
+        let currentCustomerAddress = '';
         let currentFilterStartDate = '';
         let currentFilterEndDate = '';
         
-        // Track date input changes for clear button styling
         const startDateInput = document.getElementById('startDate');
         const endDateInput = document.getElementById('endDate');
         
@@ -542,7 +683,6 @@
             updateDateInputClass(startDateInput);
             updateDateInputClass(endDateInput);
             updateDateFilterInfo();
-            // Reload ledger with same customer if selected
             const customerId = document.getElementById('customerSelect').value;
             if (customerId) {
                 viewLedger();
@@ -572,7 +712,9 @@
                     return;
                 }
                 
-                currentCustomerName = customer.name;
+                currentCustomerName = customer.name || 'N/A';
+                currentCustomerPhone = customer.phone || 'N/A';
+                currentCustomerAddress = customer.address || 'N/A';
                 
                 document.getElementById('customerName').textContent = customer.name || 'N/A';
                 document.getElementById('customerPhone').textContent = customer.phone || 'N/A';
@@ -580,13 +722,15 @@
                 document.getElementById('customerCurrentDue').innerHTML = `৳${(customer.totalDue || 0).toFixed(2)}`;
                 document.getElementById('customerInfoCard').classList.remove('hidden');
                 
+                document.getElementById('printCustomerName').textContent = customer.name || 'N/A';
+                document.getElementById('printCustomerPhone').textContent = customer.phone || 'N/A';
+                document.getElementById('printCustomerAddress').textContent = customer.address || 'N/A';
+                document.getElementById('printDate').textContent = new Date().toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' });
+                
                 const transactions = await loadAllTransactions();
                 let customerTransactions = transactions.filter(trans => trans.customerId === customerId);
-                
-                // Sort by date (oldest first for running balance calculation)
                 customerTransactions.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
                 
-                // Apply date filters (optional)
                 let filteredTransactions = [...customerTransactions];
                 if (startDate) {
                     filteredTransactions = filteredTransactions.filter(t => t.date >= startDate);
@@ -609,7 +753,6 @@
                 
                 tbody.innerHTML = '';
                 
-                // Calculate opening balance (sum of all transactions before start date)
                 let openingBalance = 0;
                 if (startDate) {
                     const transactionsBeforeStart = customerTransactions.filter(t => t.date < startDate);
@@ -626,10 +769,9 @@
                 let totalDueAdded = 0;
                 let totalCollected = 0;
                 
-                // Add opening balance row if start date is set
                 if (startDate && openingBalance !== 0) {
                     const openingRow = tbody.insertRow();
-                    openingRow.className = 'bg-gray-100 dark:bg-gray-700/30 font-semibold';
+                    openingRow.className = 'bg-gray-100 dark:bg-gray-700/30 font-semibold print-opening-row';
                     openingRow.innerHTML = `
                         <td class="px-3 py-2.5 text-xs whitespace-nowrap">${startDate}</td>
                         <td class="px-3 py-2.5"><span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium bg-gray-300 dark:bg-gray-600">Opening Balance</span></td>
@@ -700,9 +842,8 @@
                 
                 currentClosingBalance = runningBalance;
                 
-                // Add summary row
                 const summaryRow = tbody.insertRow();
-                summaryRow.className = 'bg-gray-100 dark:bg-gray-700/50 font-bold border-t-2';
+                summaryRow.className = 'bg-gray-100 dark:bg-gray-700/50 font-bold border-t-2 print-summary-row';
                 summaryRow.innerHTML = `
                     <td colspan="3" class="px-3 py-3 text-right text-xs">Total Due Added: ৳${totalDueAdded.toFixed(2)} | Total Collection: ৳${totalCollected.toFixed(2)}</td>
                     <td class="px-3 py-3 text-right"></td>
@@ -738,7 +879,11 @@
                 return;
             }
             
-            const currentDate = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+            const today = new Date();
+            const dateStr = today.getFullYear() + '-' + 
+                           String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                           String(today.getDate()).padStart(2, '0');
+            
             let csvRows = [];
             csvRows.push('"Date","Transaction Type","Description","Amount (TK)","Balance (TK)"');
             
@@ -765,18 +910,29 @@
             csvRows.push('"","","","",""');
             csvRows.push(`"Closing Balance","","","${currentClosingBalance.toFixed(2)}","${currentClosingBalance.toFixed(2)}"`);
             
-            const filterText = (currentFilterStartDate || currentFilterEndDate) ? `_filtered_${currentFilterStartDate || 'start'}_to_${currentFilterEndDate || 'end'}` : '';
             const blob = new Blob(["\uFEFF" + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.download = `ledger_${currentCustomerName.replace(/[^a-z0-9]/gi, '_')}${filterText}_${currentDate}.csv`;
+            a.download = `ledger_${dateStr}.csv`;
             a.href = url;
             a.click();
             URL.revokeObjectURL(url);
             showToast('CSV exported successfully!', 'success');
         }
         
-        function printLedger() { window.print(); }
+        function printLedger() { 
+            const customerId = document.getElementById('customerSelect').value;
+            if (customerId) {
+                const customer = customerMap.get(customerId);
+                if (customer) {
+                    document.getElementById('printCustomerName').textContent = customer.name || 'N/A';
+                    document.getElementById('printCustomerPhone').textContent = customer.phone || 'N/A';
+                    document.getElementById('printCustomerAddress').textContent = customer.address || 'N/A';
+                }
+            }
+            document.getElementById('printDate').textContent = new Date().toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' });
+            window.print(); 
+        }
         
         // Event Listeners
         document.getElementById('viewLedgerBtn').addEventListener('click', viewLedger);
@@ -797,7 +953,6 @@
         });
         document.getElementById('darkModeToggle').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
         
-        // Enter key support on customer select
         document.getElementById('customerSelect').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') viewLedger();
         });
