@@ -6,6 +6,11 @@
     <meta name="theme-color" content="#0f3b3a">
     <title>Warranty List | JackDev Due Managements</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -31,190 +36,46 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
-        
+        /* ===== CUSTOMER PAGE STYLES (unified design) ===== */
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; }
         
-        ::-webkit-scrollbar { width: 0px; height: 0px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: transparent; }
-        * { scrollbar-width: none; }
+        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
         
-        .table-scroll-wrapper::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .table-scroll-wrapper::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 10px;
-        }
-        .table-scroll-wrapper::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        .dark .table-scroll-wrapper::-webkit-scrollbar-track {
-            background: #1e293b;
-        }
-        .dark .table-scroll-wrapper::-webkit-scrollbar-thumb {
-            background: #475569;
-        }
-        .table-scroll-wrapper {
-            scrollbar-width: thin;
-            scrollbar-color: #cbd5e1 #f1f5f9;
-        }
-        .dark .table-scroll-wrapper {
-            scrollbar-color: #475569 #1e293b;
-        }
+        .nav-active { background:linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%); border-left:3px solid #d4af37; }
+        .dark .nav-active { background:linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%); }
         
-        .nav-active {
-            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
-            border-left: 3px solid #d4af37;
-        }
-        .dark .nav-active {
-            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
-        }
+        .stat-card { transition: all 0.2s ease; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12); }
         
-        .submenu-modern {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .submenu-modern.open { max-height: 280px; }
+        .submenu-modern { max-height:0; overflow:hidden; transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
+        .submenu-modern.open { max-height:280px; }
         
         .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
         .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
         
-        @keyframes modalSlideUp {
-            from { opacity: 0; transform: translateY(20px) scale(0.96); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
+        @keyframes modalSlideUp { from { opacity:0; transform:translateY(20px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); } }
         .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
         
+        .table-row-hover { transition: background-color 0.15s ease; cursor: pointer; }
+        .table-row-hover:hover { background-color: rgba(15,59,58,0.05); }
+        .dark .table-row-hover:hover { background-color: rgba(30,107,104,0.1); }
+        
+        .table-scroll-hint { display:none; }
+        @media (max-width:768px) { .table-scroll-hint { display:flex; font-size:9px; padding:4px 8px; background:#f0fdf4; color:#166534; border-radius:20px; margin-bottom:8px; width:fit-content; } .dark .table-scroll-hint { background:#064e3b; color:#86efac; } }
+        
         .btn-active:active { transform: scale(0.97); }
+        #sidebarOverlay { animation: fadeIn 0.2s ease-out; }
+        .sidebar-open { overflow:hidden; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
         
-        .action-icon {
-            width: 30px;
-            height: 30px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            background: rgba(15, 59, 58, 0.06);
-        }
-        .action-icon:hover {
-            background: rgba(15, 59, 58, 0.15);
-            transform: scale(1.08);
-        }
-        .dark .action-icon {
-            background: rgba(255, 255, 255, 0.06);
-        }
-        .dark .action-icon:hover {
-            background: rgba(255, 255, 255, 0.12);
-        }
+        .sidebar-fixed { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+        .sidebar-header-fixed { flex-shrink:0; position:sticky; top:0; background:inherit; z-index:10; }
+        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
         
-        .table-row-hover:hover {
-            background-color: rgba(15, 59, 58, 0.04);
-        }
-        .dark .table-row-hover:hover {
-            background-color: rgba(30, 107, 104, 0.1);
-        }
-        
-        #sidebarOverlay {
-            animation: fadeIn 0.2s ease-out;
-        }
-        .sidebar-open {
-            overflow: hidden;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .skeleton-row td {
-            padding: 8px 10px;
-        }
-        .skeleton-row .skeleton-text {
-            height: 14px;
-            background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 6px;
-        }
-        .dark .skeleton-row .skeleton-text {
-            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
-            background-size: 200% 100%;
-        }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* MULTILINE TABLE */
-        .table-compact td, .table-compact th {
-            padding: 10px 10px;
-            font-size: 0.72rem;
-            line-height: 1.6;
-            white-space: normal;
-            word-wrap: break-word;
-            word-break: break-word;
-            height: auto;
-            max-height: none;
-            overflow: visible;
-            vertical-align: middle;
-        }
-        
-        .table-compact td .sub-text {
-            font-size: 0.6rem;
-            color: #6b7280;
-            display: block;
-            line-height: 1.4;
-        }
-        .dark .table-compact td .sub-text {
-            color: #9ca3af;
-        }
-        
-        .table-compact td .highlight {
-            color: #0f3b3a;
-            font-weight: 600;
-        }
-        .dark .table-compact td .highlight {
-            color: #d4af37;
-        }
-        
-        .table-compact td .old-serial {
-            text-decoration: line-through;
-            color: #ef4444;
-            font-size: 0.55rem;
-        }
-        .dark .table-compact td .old-serial {
-            color: #f87171;
-        }
-        
-        .table-compact td .new-serial {
-            color: #22c55e;
-            font-weight: 600;
-        }
-        .dark .table-compact td .new-serial {
-            color: #4ade80;
-        }
-        
-        .table-compact td,
-        .table-compact th {
-            max-width: 200px;
-            overflow: visible;
-        }
-        .table-compact .col-id { min-width: 100px; max-width: 120px; }
-        .table-compact .col-supplier { min-width: 90px; max-width: 130px; }
-        .table-compact .col-product { min-width: 110px; max-width: 160px; }
-        .table-compact .col-serial { min-width: 110px; max-width: 150px; }
-        .table-compact .col-customer { min-width: 80px; max-width: 110px; }
-        .table-compact .col-phone { min-width: 90px; max-width: 120px; }
-        .table-compact .col-date { min-width: 90px; max-width: 110px; }
-        
-        /* STATUS ICON ONLY */
+        /* Status Icons - unified */
         .status-icon-only {
             display: inline-flex;
             align-items: center;
@@ -228,12 +89,7 @@
             cursor: default;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
-        
-        .status-icon-only:hover {
-            transform: scale(1.15);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-        }
-        
+        .status-icon-only:hover { transform: scale(1.12); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
         .status-icon-only.pending { background: #FEF3C7; color: #D97706; }
         .status-icon-only.currier { background: #DBEAFE; color: #2563EB; }
         .status-icon-only.currier_to_supplier { background: #E0E7FF; color: #4338CA; }
@@ -267,13 +123,11 @@
             pointer-events: none;
             box-shadow: 0 4px 16px rgba(0,0,0,0.25);
         }
-        
         .status-icon-only:hover .tooltip-text {
             visibility: visible;
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
-        
         .status-icon-only .tooltip-text::after {
             content: '';
             position: absolute;
@@ -284,27 +138,198 @@
             border-top-color: #1e293b;
         }
         
-        /* New Serial Input in Status Update Modal */
-        .new-serial-input-group {
-            border: 2px dashed #22c55e;
+        /* Action buttons - unified - now inline-flex with no wrap */
+        .action-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: rgba(15, 59, 58, 0.06);
+            position: relative;
+            flex-shrink: 0;
+        }
+        .action-icon:hover { transform: scale(1.08); background: rgba(15, 59, 58, 0.15); }
+        .dark .action-icon { background: rgba(255, 255, 255, 0.06); }
+        .dark .action-icon:hover { background: rgba(255, 255, 255, 0.12); }
+        .action-icon .tooltip-text {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: #1e293b;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .action-icon:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .action-icon .tooltip-text::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #1e293b;
+        }
+        
+        /* Action container - nowrap to keep icons in one line */
+        .action-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+        
+        /* ===== TABLE SCROLLBAR - LARGER SIZE ===== */
+        .table-scroll-wrapper {
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: #94a3b8 #f1f5f9;
+        }
+        .table-scroll-wrapper::-webkit-scrollbar {
+            height: 12px;
+            width: 12px;
+        }
+        .table-scroll-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .table-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+        }
+        .table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .dark .table-scroll-wrapper::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .dark .table-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-color: #334155;
+        }
+        .dark .table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        
+        /* ===== PAGE BOTTOM SCROLLBAR REMOVED ===== */
+        html, body {
+            overflow-x: hidden;
+        }
+        main {
+            overflow-x: hidden;
+        }
+        
+        /* Filter section - unified */
+        .filter-section {
+            background: white;
             border-radius: 14px;
-            padding: 14px 16px;
-            background: #f0fdf4;
+            border: 1px solid #e2e8f0;
+            padding: 14px 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        .dark .new-serial-input-group {
-            background: #052e16;
-            border-color: #4ade80;
-        }
-        
-        .new-serial-input-group label {
-            color: #16a34a;
-            font-weight: 600;
-        }
-        .dark .new-serial-input-group label {
-            color: #4ade80;
+        .dark .filter-section {
+            background: #1e293b;
+            border-color: #334155;
         }
         
-        /* Enhanced Tab Buttons */
+        .filter-section select,
+        .filter-section input {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .dark .filter-section select,
+        .dark .filter-section input {
+            background: #0f172a;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+        .filter-section select:focus,
+        .filter-section input:focus {
+            outline: none;
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.15);
+        }
+        
+        /* Search icon positioning - inside input */
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 140px;
+        }
+        .search-wrapper .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 11px;
+            pointer-events: none;
+        }
+        .search-wrapper input {
+            width: 100%;
+            padding: 8px 12px 8px 32px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .dark .search-wrapper input {
+            background: #0f172a;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+        .search-wrapper input:focus {
+            outline: none;
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.15);
+        }
+        
+        /* Table header - unified */
+        .table-header {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, rgba(15, 59, 58, 0.08) 0%, rgba(15, 59, 58, 0.02) 100%);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .dark .table-header {
+            background: linear-gradient(135deg, rgba(30, 107, 104, 0.15) 0%, rgba(30, 107, 104, 0.05) 100%);
+            border-bottom-color: #334155;
+        }
+        .table-header .title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #0f3b3a;
+            letter-spacing: 0.3px;
+        }
+        .dark .table-header .title { color: #e2e8f0; }
+        
+        /* Nav tabs - unified */
         .nav-tab {
             padding: 8px 18px;
             border-radius: 10px;
@@ -341,80 +366,9 @@
             background: #1e6b68;
             box-shadow: 0 4px 16px rgba(30, 107, 104, 0.3);
         }
-        .nav-tab i {
-            font-size: 0.7rem;
-        }
+        .nav-tab i { font-size: 0.7rem; }
         
-        /* Filter Section Enhanced */
-        .filter-section {
-            background: white;
-            border-radius: 14px;
-            border: 1px solid #e2e8f0;
-            padding: 14px 18px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .dark .filter-section {
-            background: #1e293b;
-            border-color: #334155;
-        }
-        
-        .filter-section select,
-        .filter-section input {
-            padding: 8px 12px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
-            font-size: 0.75rem;
-            transition: all 0.2s ease;
-        }
-        .dark .filter-section select,
-        .dark .filter-section input {
-            background: #0f172a;
-            border-color: #334155;
-            color: #e2e8f0;
-        }
-        .filter-section select:focus,
-        .filter-section input:focus {
-            outline: none;
-            border-color: #0f3b3a;
-            box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.15);
-        }
-        
-        /* Table Header Enhanced */
-        .table-header {
-            padding: 12px 16px;
-            background: linear-gradient(135deg, rgba(15, 59, 58, 0.08) 0%, rgba(15, 59, 58, 0.02) 100%);
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .dark .table-header {
-            background: linear-gradient(135deg, rgba(30, 107, 104, 0.15) 0%, rgba(30, 107, 104, 0.05) 100%);
-            border-bottom-color: #334155;
-        }
-        
-        .table-header .title {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #0f3b3a;
-            letter-spacing: 0.3px;
-        }
-        .dark .table-header .title {
-            color: #e2e8f0;
-        }
-        
-        .table-header .badge-flow {
-            font-size: 0.6rem;
-            color: #94a3b8;
-            background: rgba(255,255,255,0.5);
-            padding: 3px 12px;
-            border-radius: 20px;
-            border: 1px solid #e2e8f0;
-        }
-        .dark .table-header .badge-flow {
-            background: rgba(0,0,0,0.3);
-            border-color: #334155;
-        }
-        
-        /* Per Page Dropdown */
+        /* Per page select */
         .per-page-select {
             padding: 4px 8px 4px 12px;
             border-radius: 8px;
@@ -430,30 +384,77 @@
             border-color: #334155;
             color: #e2e8f0;
         }
-        .per-page-select:focus {
-            outline: none;
-            border-color: #0f3b3a;
-        }
-        
+        .per-page-select:focus { outline: none; border-color: #0f3b3a; }
         .per-page-label {
             font-size: 0.65rem;
             color: #94a3b8;
             font-weight: 500;
         }
         
-        #sidebar .mt-auto {
-            margin-top: auto;
+        /* Skeleton */
+        .skeleton-row td { padding: 8px 10px; }
+        .skeleton-row .skeleton-text {
+            height: 14px;
+            background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 6px;
         }
-        #sidebar nav {
+        .dark .skeleton-row .skeleton-text {
+            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Table compact */
+        .table-compact td, .table-compact th {
+            padding: 8px 5px;
+            font-size: 0.60rem;
+            line-height: 1.2;
+            white-space: normal;
+            word-wrap: break-word;
+            word-break: break-word;
+            vertical-align: middle;
+        }
+        .table-compact td .sub-text {
+            font-size: 0.6rem;
+            color: #6b7280;
+            display: block;
+            line-height: 1.4;
+        }
+        .dark .table-compact td .sub-text { color: #9ca3af; }
+        .table-compact td .old-serial { text-decoration: line-through; color: #ef4444; font-size: 0.55rem; }
+        .dark .table-compact td .old-serial { color: #f87171; }
+        .table-compact td .new-serial { color: #22c55e; font-weight: 600; }
+        .dark .table-compact td .new-serial { color: #4ade80; }
+        
+        /* New serial input group */
+        .new-serial-input-group {
+            border: 2px dashed #22c55e;
+            border-radius: 14px;
+            padding: 14px 16px;
+            background: #f0fdf4;
+        }
+        .dark .new-serial-input-group {
+            background: #052e16;
+            border-color: #4ade80;
+        }
+        .new-serial-input-group label {
+            color: #16a34a;
+            font-weight: 600;
+        }
+        .dark .new-serial-input-group label { color: #4ade80; }
+        
+        /* Remove scrollbar from details modal */
+        #detailsContent {
             overflow-y: auto;
-            flex: 1;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
-        #sidebar nav::-webkit-scrollbar {
-            width: 2px;
-        }
-        #sidebar nav::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 10px;
+        #detailsContent::-webkit-scrollbar {
+            display: none;
         }
     </style>
 </head>
@@ -462,109 +463,81 @@
     <div class="flex min-h-screen">
         
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 flex flex-col">
-            <div class="px-5 py-5 border-b border-white/10 flex items-center justify-between sticky top-0 bg-inherit z-10 flex-shrink-0">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
-                        <i class="fas fa-chart-line text-slate-900 text-sm"></i>
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
+            <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
+                        </div>
+                        <div class="leading-tight">
+                            <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
+                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
+                        </div>
                     </div>
-                    <div class="leading-tight">
-                        <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
-                        <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
-                    </div>
+                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
                 </div>
-                <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
-                    <i class="fas fa-times text-sm"></i>
-                </button>
             </div>
             
-            <nav class="flex-1 px-3 py-5 space-y-1.5 overflow-y-auto">
-                <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
-                    <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
-                    <span class="text-sm font-medium">Dashboard</span>
-                </a>
-                <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
-                    <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
-                    <span class="text-sm font-medium">Customers</span>
-                </a>
-                <div class="has-submenu" id="dueSubmenu">
-                    <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="flex items-center gap-3">
-                            <div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div>
-                            <span class="text-sm font-medium">Due Entry</span>
-                        </div>
-                        <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+            <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
+                <nav class="space-y-1.5">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                        <span class="text-sm font-medium">Dashboard</span>
                     </a>
-                    <div class="submenu-modern pl-9 mt-1 space-y-1">
-                        <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                            <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
-                        </a>
-                        <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                            <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
-                        </a>
-                    </div>
-                </div>
-                <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                    <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div>
-                    <span class="text-sm font-medium">Collection</span>
-                </a>
-                <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                    <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div>
-                    <span class="text-sm font-medium">Ledger</span>
-                </a>
-                <div class="has-submenu open" id="warrantySubmenu">
-                    <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-white bg-white/5 transition">
-                        <div class="flex items-center gap-3">
-                            <div class="w-6 text-center"><i class="fas fa-shield-alt text-sm text-accent"></i></div>
-                            <span class="text-sm font-medium">Warranty</span>
-                        </div>
-                        <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customers</span>
                     </a>
-                    <div class="submenu-modern open pl-9 mt-1 space-y-1">
-                        <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                            <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
+                    <div class="has-submenu" id="dueSubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
                         </a>
-                        <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                            <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
-                        </a>
-                        <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                            <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
-                        </a>
-                        <a href="warranty-list.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition">
-                            <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
-                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a>
+                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a>
+                        </div>
                     </div>
-                </div>
-                <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                    <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
-                    <span class="text-sm font-medium">Customer Warranty</span>
-                </a>
-                <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                    <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div>
-                    <span class="text-sm font-medium">Backup & Restore</span>
-                </a>
-            </nav>
-            
-            <div class="px-3 py-4 border-t border-white/10 flex-shrink-0">
-                <div class="flex items-center justify-between mb-2 px-1">
-                    <span class="text-[9px] text-slate-500">v2.5.0 · secure</span>
-                    <div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center">
-                        <i class="fas fa-lock text-[8px] text-slate-400"></i>
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span></a>
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span></a>
+                    <div class="has-submenu" id="warrantySubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span></a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span></a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span></a>
+                            <a href="warranty-list.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition">
+                                <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
+                            </a>
+                        </div>
                     </div>
+                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customer Warranty</span>
+                    </a>
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span></a>
+                </nav>
+                <div class="pt-4 mt-2 border-t border-white/10">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
+                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                        <span class="text-sm font-medium">Logout</span>
+                    </a>
                 </div>
-                <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
-                    <i class="fas fa-sign-out-alt text-sm w-5"></i>
-                    <span class="text-sm font-medium">Logout</span>
-                </a>
             </div>
         </aside>
         
         <!-- Main Content -->
-        <main class="flex-1 md:ml-64 min-h-screen w-full overflow-x-hidden">
+        <main class="flex-1 md:ml-64 min-h-screen w-full">
             
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-                <div class="px-4 py-3 flex justify-between items-center">
-                    <div class="flex items-center gap-3">
+                <div class="px-3 py-2.5 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
                         <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg">
                             <i class="fas fa-bars text-lg"></i>
                         </button>
@@ -572,11 +545,11 @@
                             <i class="fas fa-list text-primary mr-2"></i>Warranty List
                         </h2>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button id="refreshBtn" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+                    <div class="flex items-center gap-1">
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                             <i class="fas fa-sync-alt text-sm"></i>
                         </button>
-                        <button id="darkModeToggle" class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                             <i class="fas fa-moon dark:hidden text-sm"></i>
                             <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
                         </button>
@@ -584,25 +557,17 @@
                 </div>
             </header>
             
-            <div class="p-4 md:p-5">
+            <div class="p-3 md:p-4">
                 
-                <!-- Navigation Tabs - Enhanced -->
+                <!-- Navigation Tabs -->
                 <div class="flex flex-wrap gap-2 mb-4">
-                    <a href="warranty.html" class="nav-tab">
-                        <i class="fas fa-truck"></i> Suppliers
-                    </a>
-                    <a href="warranty-entry.html" class="nav-tab">
-                        <i class="fas fa-plus-circle"></i> Warranty Entry
-                    </a>
-                    <a href="currier-dispatch.html" class="nav-tab">
-                        <i class="fas fa-shipping-fast"></i> Courier Dispatch
-                    </a>
-                    <a href="warranty-list.html" class="nav-tab active">
-                        <i class="fas fa-list"></i> Warranty List
-                    </a>
+                    <a href="warranty.html" class="nav-tab"><i class="fas fa-truck"></i> Suppliers</a>
+                    <a href="warranty-entry.html" class="nav-tab"><i class="fas fa-plus-circle"></i> Warranty Entry</a>
+                    <a href="currier-dispatch.html" class="nav-tab"><i class="fas fa-shipping-fast"></i> Courier Dispatch</a>
+                    <a href="warranty-list.html" class="nav-tab active"><i class="fas fa-list"></i> Warranty List</a>
                 </div>
                 
-                <!-- Filters Section - Enhanced -->
+                <!-- Filters Section - Reset button removed, search icon fixed -->
                 <div class="filter-section mb-4">
                     <div class="flex flex-wrap items-center gap-3">
                         <span class="text-[11px] font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
@@ -620,31 +585,25 @@
                             <option value="supplier_to_shop">🔄 Supplier→Shop</option>
                             <option value="customer_delivered">🏠 Customer Delivered</option>
                         </select>
-                        <div class="relative flex-1 min-w-[140px]">
-                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[11px]"></i>
-                            <input type="text" id="warrantySearch" placeholder="Search warranty..." class="w-full pl-8 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm">
+                        <!-- Search with icon positioned inside -->
+                        <div class="search-wrapper">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="warrantySearch" placeholder="Search warranty...">
                         </div>
                         <button id="exportWarrantyBtn" class="bg-success hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg text-[11px] flex items-center gap-2 btn-active transition-all whitespace-nowrap">
                             <i class="fas fa-download text-[10px]"></i> Export
-                        </button>
-                        <button id="refreshFilterBtn" class="bg-primary hover:bg-primary-dark text-white font-semibold px-4 py-2 rounded-lg text-[11px] flex items-center gap-2 btn-active transition-all whitespace-nowrap">
-                            <i class="fas fa-undo text-[10px]"></i> Reset
                         </button>
                     </div>
                 </div>
                 
                 <!-- Warranty List Table -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                    <!-- Table Header - Enhanced -->
+                    <!-- Table Header -->
                     <div class="table-header flex justify-between items-center flex-wrap gap-2">
                         <div class="flex items-center gap-3">
-                            <span class="title">
-                                <i class="fas fa-shield-alt text-primary mr-1.5"></i>Warranty Records
-                            </span>
-                            
+                            <span class="title"><i class="fas fa-shield-alt text-primary mr-1.5"></i>Warranty Records</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            <!-- Per Page Dropdown -->
                             <div class="flex items-center gap-2">
                                 <span class="per-page-label">Show:</span>
                                 <select id="perPageSelect" class="per-page-select">
@@ -662,6 +621,7 @@
                         </div>
                     </div>
                     
+                    <!-- Table with visible scrollbar (larger size) -->
                     <div class="table-scroll-wrapper overflow-x-auto overflow-y-hidden">
                         <table class="w-full table-compact min-w-[1150px]">
                             <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
@@ -670,13 +630,13 @@
                                     <th class="px-3 py-2.5 text-center text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider w-8">
                                         <i class="fas fa-check-square text-[8px]"></i>
                                     </th>
-                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-id">ID</th>
-                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-date">Date</th>
-                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-supplier">Supplier</th>
-                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-product">Product</th>
-                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-serial">Serial</th>
-                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-customer">Customer</th>
-                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider col-phone">Phone</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">ID</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Supplier</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Product</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Serial</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer</th>
+                                    <th class="px-3 py-2.5 text-left text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Phone</th>
                                     <th class="px-3 py-2.5 text-center text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
                                     <th class="px-3 py-2.5 text-center text-[8px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
@@ -688,10 +648,23 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Footer -->
+            <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                    <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span> 
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
+                    </p>
+                </div>
+            </footer>
         </main>
     </div>
     
-    <!-- Status Update Modal - Remarks Removed -->
+    <!-- Status Update Modal -->
     <div id="statusModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-all duration-300 p-3">
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl modal-animate overflow-hidden">
             <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
@@ -712,7 +685,6 @@
                         <span id="currentStatusDisplay" class="inline-block mt-0.5"></span>
                     </div>
                 </div>
-                
                 <div class="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-3 flex items-center gap-3">
                     <i class="fas fa-barcode text-primary text-sm"></i>
                     <div>
@@ -720,13 +692,10 @@
                         <p id="currentSerialDisplay" class="text-sm font-mono font-semibold text-primary mt-0.5">-</p>
                     </div>
                 </div>
-                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">New Status <span class="text-red-500">*</span></label>
                     <select id="updateStatus" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></select>
                 </div>
-                
-                <!-- New Serial Input - Only shows for supplier_to_shop -->
                 <div id="newSerialGroup" class="new-serial-input-group hidden">
                     <label class="block text-sm font-medium mb-1.5">
                         <i class="fas fa-plus-circle mr-1.5"></i> New Serial Number
@@ -734,8 +703,7 @@
                     <input type="text" id="newSerialNumber" placeholder="Enter new serial from supplier..." 
                            class="w-full px-4 py-3 text-sm border border-green-300 dark:border-green-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500">
                     <p class="text-[10px] text-gray-500 mt-1.5">
-                        <i class="fas fa-info-circle text-green-500"></i> 
-                        Enter new serial if supplier replaced the product
+                        <i class="fas fa-info-circle text-green-500"></i> Enter new serial if supplier replaced the product
                     </p>
                 </div>
             </div>
@@ -787,7 +755,7 @@
         </div>
     </div>
     
-    <!-- Details Modal -->
+    <!-- Details Modal - scrollbar removed -->
     <div id="detailsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[150] hidden transition-all duration-300 p-3">
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl modal-animate overflow-hidden">
             <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
@@ -995,7 +963,6 @@
             selectedIds.clear();
             updateSelectionUI();
             
-            // Apply per page limit
             const perPage = perPageSelect.value;
             let displayData = filtered;
             if (perPage !== 'all') {
@@ -1036,44 +1003,49 @@
                     <td class="px-3 py-2.5 text-center" onclick="event.stopPropagation()">
                         ${!isLocked ? `<input type="checkbox" class="row-checkbox w-3.5 h-3.5 rounded border-gray-300 text-primary focus:ring-primary" data-id="${warranty.id}" data-status="${warranty.status}">` : ''}
                     </td>
-                    <td class="px-3 py-2.5 col-id">
+                    <td class="px-3 py-2.5">
                         <span class="font-mono font-semibold text-primary">${warranty.warrantyId || warranty.id.slice(0, 10)}</span>
                         ${warranty.branch ? `<span class="sub-text">${escapeHtml(warranty.branch)}</span>` : ''}
                     </td>
-                    <td class="px-3 py-2.5 col-date">
+                    <td class="px-3 py-2.5">
                         <span>${warranty.warrantyDate || 'N/A'}</span>
                     </td>
-                    <td class="px-3 py-2.5 col-supplier">
+                    <td class="px-3 py-2.5">
                         <span class="font-medium">${escapeHtml(warranty.supplierName)}</span>
                         ${warranty.supplierType ? `<span class="sub-text">${escapeHtml(warranty.supplierType)}</span>` : ''}
                     </td>
-                    <td class="px-3 py-2.5 col-product">
+                    <td class="px-3 py-2.5">
                         <span>${escapeHtml(warranty.productName)}</span>
                         ${warranty.productCode ? `<span class="sub-text">${escapeHtml(warranty.productCode)}</span>` : ''}
                     </td>
-                    <td class="px-3 py-2.5 col-serial">
+                    <td class="px-3 py-2.5">
                         ${serialHtml}
                     </td>
-                    <td class="px-3 py-2.5 col-customer">
+                    <td class="px-3 py-2.5">
                         <span class="font-medium">${escapeHtml(warranty.customerName || '-')}</span>
                     </td>
-                    <td class="px-3 py-2.5 col-phone">
+                    <td class="px-3 py-2.5">
                         <span>${escapeHtml(warranty.customerPhone || '-')}</span>
                     </td>
                     <td class="px-3 py-2.5 text-center">
                         ${getStatusIcon(warranty.status)}
                     </td>
                     <td class="px-3 py-2.5 text-center">
-                        ${!isLocked ? 
-                            `<div class="action-icon update-status-icon inline-flex" data-id="${warranty.id}" data-status="${warranty.status}" title="Update Status">
-                                <i class="fas fa-edit text-primary text-[11px]"></i>
-                            </div>` : 
-                            `<div class="action-icon inline-flex opacity-40 cursor-not-allowed" title="Completed">
-                                <i class="fas fa-lock text-gray-400 text-[11px]"></i>
-                            </div>`
-                        }
-                        <div class="action-icon view-details-icon inline-flex ml-1" data-warranty='${JSON.stringify(warranty)}' title="View Details">
-                            <i class="fas fa-eye text-info text-[11px]"></i>
+                        <div class="action-container">
+                            ${!isLocked ? 
+                                `<div class="action-icon update-status-icon" data-id="${warranty.id}" data-status="${warranty.status}" title="Update Status">
+                                    <i class="fas fa-edit text-primary text-[11px]"></i>
+                                    <span class="tooltip-text">Update Status</span>
+                                </div>` : 
+                                `<div class="action-icon opacity-40 cursor-not-allowed" title="Completed">
+                                    <i class="fas fa-lock text-gray-400 text-[11px]"></i>
+                                    <span class="tooltip-text">Completed</span>
+                                </div>`
+                            }
+                            <div class="action-icon view-details-icon" data-warranty='${JSON.stringify(warranty)}' title="View Details">
+                                <i class="fas fa-eye text-info text-[11px]"></i>
+                                <span class="tooltip-text">View Details</span>
+                            </div>
                         </div>
                     </td>
                 `;
@@ -1351,7 +1323,6 @@
             showToast('Exported!', 'success');
         }
         
-        // Reset filters
         function resetFilters() {
             document.getElementById('filterFromDate').value = '';
             document.getElementById('filterToDate').value = '';
@@ -1464,6 +1435,7 @@
             await logout();
         });
         
+        document.getElementById('footerYear').textContent = new Date().getFullYear();
         loadWarrantyList();
     </script>
 </body>

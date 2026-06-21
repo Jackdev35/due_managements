@@ -178,6 +178,25 @@
         .sidebar-nav-fixed::-webkit-scrollbar {
             display: none; /* Chrome, Safari, Opera */
         }
+        
+        /* Pagination styles */
+        .pagination-select {
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            font-size: 11px;
+            background: white;
+            cursor: pointer;
+        }
+        .dark .pagination-select {
+            background: #1f2937;
+            border-color: #4b5563;
+            color: white;
+        }
+        .pagination-select:focus {
+            outline: none;
+            ring: 2px solid #0f3b3a;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -421,9 +440,18 @@
                             </h3>
                             <p class="text-[10px] text-gray-500 mt-0.5">Last 20 entries</p>
                         </div>
-                        <button id="exportDueBtn" class="bg-success hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 btn-active transition-all">
-                            <i class="fas fa-download text-xs"></i> Export CSV
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <select id="paginationSize" class="pagination-select text-xs">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <button id="exportDueBtn" class="bg-success hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 btn-active transition-all">
+                                <i class="fas fa-download text-xs"></i> Export CSV
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="table-scroll-hint px-3 pt-2">
@@ -448,8 +476,37 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- Pagination Controls -->
+                    <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2">
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                            Showing <span id="pageStart">0</span> - <span id="pageEnd">0</span> of <span id="totalEntries">0</span> entries
+                        </div>
+                        <div class="flex gap-1">
+                            <button id="prevPageBtn" class="px-3 py-1 text-xs rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                <i class="fas fa-chevron-left text-[10px]"></i> Prev
+                            </button>
+                            <span id="pageInfo" class="px-3 py-1 text-xs flex items-center">Page 1</span>
+                            <button id="nextPageBtn" class="px-3 py-1 text-xs rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                Next <i class="fas fa-chevron-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Footer -->
+            <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                    <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span> 
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
+                    </p>
+                </div>
+            </footer>
         </main>
     </div>
     
@@ -518,6 +575,12 @@
         let selectedImageFile = null;
         let allDueEntriesData = [];
         let customerMap = new Map();
+        let customerNameMap = new Map(); // Store customer names with ID
+        
+        // Pagination variables
+        let currentPage = 1;
+        let pageSize = 10;
+        let filteredData = [];
         
         // ==================== UTILITY FUNCTIONS ====================
         function showToast(message, type = 'success') { 
@@ -553,10 +616,12 @@
                 const select = document.getElementById('customerId');
                 select.innerHTML = '<option value="">-- Select Customer --</option>';
                 customerMap.clear();
+                customerNameMap.clear();
                 
                 querySnapshot.forEach(doc => {
                     const customer = doc.data();
-                    customerMap.set(doc.id, customer.name);
+                    customerMap.set(doc.id, customer);
+                    customerNameMap.set(doc.id, customer.name);
                     const option = document.createElement('option');
                     option.value = doc.id;
                     const dueText = (customer.totalDue || 0) > 0 ? ` (Due: ৳${(customer.totalDue || 0).toFixed(2)})` : '';
@@ -569,10 +634,16 @@
             }
         }
         
-        // ==================== GET CUSTOMER NAME FROM MAP ====================
+        // ==================== GET CUSTOMER NAME ====================
         function getCustomerName(customerId) {
             if (!customerId) return 'Unknown';
-            return customerMap.get(customerId) || 'Unknown';
+            return customerNameMap.get(customerId) || customerMap.get(customerId)?.name || 'Unknown';
+        }
+        
+        // ==================== GET CUSTOMER DUE ====================
+        function getCustomerDue(customerId) {
+            if (!customerId) return 0;
+            return customerMap.get(customerId)?.totalDue || 0;
         }
         
         // ==================== CALCULATE TOTALS ====================
@@ -634,13 +705,75 @@
             }
         }
         
+        // ==================== PAGINATION FUNCTIONS ====================
+        function renderPage() {
+            const tbody = document.getElementById('recentDueBody');
+            const start = (currentPage - 1) * pageSize;
+            const end = Math.min(start + pageSize, filteredData.length);
+            const pageData = filteredData.slice(start, end);
+            
+            // Update pagination info
+            document.getElementById('pageStart').textContent = filteredData.length > 0 ? start + 1 : 0;
+            document.getElementById('pageEnd').textContent = end;
+            document.getElementById('totalEntries').textContent = filteredData.length;
+            document.getElementById('pageInfo').textContent = `Page ${currentPage}`;
+            
+            // Update button states
+            document.getElementById('prevPageBtn').disabled = currentPage === 1;
+            document.getElementById('nextPageBtn').disabled = end >= filteredData.length;
+            
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No due entries found</p></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            for (const due of pageData) {
+                let customerName = due.customerName || getCustomerName(due.customerId);
+                
+                let detailsDisplay = '';
+                if (due.products && due.products.length > 0) {
+                    detailsDisplay = due.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).slice(0, 2).join(', ');
+                    if (due.products.length > 2) detailsDisplay += ` +${due.products.length - 2}`;
+                } else if (due.directDueAmount && due.directDueAmount > 0) {
+                    detailsDisplay = `Direct: ৳${due.directDueAmount.toFixed(2)}`;
+                } else if (due.productName) {
+                    detailsDisplay = due.productName;
+                } else {
+                    detailsDisplay = 'Due Entry';
+                }
+                
+                const row = tbody.insertRow();
+                row.className = 'table-row-hover transition-colors';
+                row.innerHTML = `
+                    <td class="px-3 py-2.5 text-sm whitespace-nowrap">${due.date || 'N/A'}</td>
+                    <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(customerName)}</td>
+                    <td class="px-3 py-2.5 text-sm text-gray-600 dark:text-gray-400 max-w-[250px] truncate" title="${escapeHtml(detailsDisplay)}">${escapeHtml(detailsDisplay)}</td>
+                    <td class="px-3 py-2.5 text-right text-sm font-semibold">৳${(due.totalAmount || 0).toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-right text-sm text-green-600 font-semibold">৳${(due.paidAmount || 0).toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-right text-sm text-red-600 font-bold">৳${(due.dueAmount || 0).toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-center"><button class="view-invoice-btn text-info hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-image="${due.invoiceImage || ''}" title="View Invoice"><i class="fas fa-eye text-sm"></i></button></td>
+                `;
+            }
+            
+            document.querySelectorAll('.view-invoice-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const imageData = btn.getAttribute('data-image');
+                    if (imageData && imageData !== '' && imageData !== 'null') showInvoiceModal(imageData);
+                    else showToast('No invoice image attached', 'error');
+                });
+            });
+        }
+        
         // ==================== LOAD RECENT DUE ENTRIES ====================
         async function loadRecentDueEntries() {
             const tbody = document.getElementById('recentDueBody');
             tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading due entries...</p></td>';
             
             try {
-                const q = query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(100));
+                const q = query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(500));
                 const querySnapshot = await getDocs(q);
                 const dueEntries = [];
                 
@@ -651,65 +784,31 @@
                     }
                 });
                 
+                // Sort by date descending
                 dueEntries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-                const recentEntries = dueEntries.slice(0, 20);
-                allDueEntriesData = recentEntries;
-                
-                if (recentEntries.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No due entries found</p><tr>';
-                    return;
-                }
-                
-                tbody.innerHTML = '';
-                
-                for (const due of recentEntries) {
-                    let customerName = due.customerName || getCustomerName(due.customerId);
-                    
-                    let detailsDisplay = '';
-                    if (due.products && due.products.length > 0) {
-                        detailsDisplay = due.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).slice(0, 2).join(', ');
-                        if (due.products.length > 2) detailsDisplay += ` +${due.products.length - 2}`;
-                    } else if (due.directDueAmount && due.directDueAmount > 0) {
-                        detailsDisplay = `Direct: ৳${due.directDueAmount.toFixed(2)}`;
-                    } else if (due.productName) {
-                        detailsDisplay = due.productName;
-                    } else {
-                        detailsDisplay = 'Due Entry';
-                    }
-                    
-                    const row = tbody.insertRow();
-                    row.className = 'table-row-hover transition-colors';
-                    row.innerHTML = `
-                        <td class="px-3 py-2.5 text-sm whitespace-nowrap">${due.date || 'N/A'}</td>
-                        <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(customerName)}</td>
-                        <td class="px-3 py-2.5 text-sm text-gray-600 dark:text-gray-400 max-w-[250px] truncate" title="${escapeHtml(detailsDisplay)}">${escapeHtml(detailsDisplay)}</td>
-                        <td class="px-3 py-2.5 text-right text-sm font-semibold">৳${(due.totalAmount || 0).toFixed(2)}</td>
-                        <td class="px-3 py-2.5 text-right text-sm text-green-600 font-semibold">৳${(due.paidAmount || 0).toFixed(2)}</td>
-                        <td class="px-3 py-2.5 text-right text-sm text-red-600 font-bold">৳${(due.dueAmount || 0).toFixed(2)}</td>
-                        <td class="px-3 py-2.5 text-center"><button class="view-invoice-btn text-info hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-image="${due.invoiceImage || ''}" title="View Invoice"><i class="fas fa-eye text-sm"></i></button></td>
-                    `;
-                }
-                
-                document.querySelectorAll('.view-invoice-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const imageData = btn.getAttribute('data-image');
-                        if (imageData && imageData !== '' && imageData !== 'null') showInvoiceModal(imageData);
-                        else showToast('No invoice image attached', 'error');
-                    });
-                });
+                allDueEntriesData = dueEntries;
+                filteredData = [...allDueEntriesData];
+                currentPage = 1;
+                renderPage();
                 
             } catch (error) {
                 console.error('Error loading due entries:', error);
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh. </td></td>';
+                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
             }
         }
         
         // ==================== EXPORT TO CSV ====================
         async function exportDueToCSV() {
-            if (allDueEntriesData.length === 0) { showToast('No data to export', 'error'); return; }
+            if (allDueEntriesData.length === 0) { 
+                showToast('No data to export', 'error'); 
+                return; 
+            }
             
             try {
+                // Show loading
+                showLoading(true);
+                
+                // Prepare CSV data from all entries (not just filtered)
                 const csvRows = [['Date', 'Customer Name', 'Details', 'Total Amount (৳)', 'Paid Amount (৳)', 'Due Amount (৳)', 'Remarks', 'Expected Date']];
                 
                 for (const due of allDueEntriesData) {
@@ -736,23 +835,41 @@
                     ]);
                 }
                 
-                const csvContent = csvRows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
-                const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+                // Create CSV content with BOM for proper UTF-8 encoding
+                const csvContent = csvRows.map(row => 
+                    row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+                ).join('\n');
+                
+                // Add BOM for UTF-8
+                const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+                
+                // Create download link
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.download = `due_entries_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast('Export successful!', 'success');
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `due_entries_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+                document.body.appendChild(link);
+                
+                // Trigger download
+                link.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                showToast(`Export successful! ${allDueEntriesData.length} entries exported.`, 'success');
+                showLoading(false);
+                
             } catch (error) { 
                 console.error('Export error:', error);
-                showToast('Export failed: ' + error.message, 'error'); 
+                showToast('Export failed: ' + error.message, 'error');
+                showLoading(false);
             }
         }
         
-        // ==================== IMAGE UPLOAD WITH PROPER VALIDATION ====================
+        // ==================== IMAGE UPLOAD ====================
         function setupImageUpload() {
             const uploadArea = document.getElementById('imageUploadArea');
             const fileInput = document.getElementById('invoiceImage');
@@ -761,11 +878,8 @@
             const fileNameDisplay = document.getElementById('fileNameDisplay');
             const removeImageBtn = document.getElementById('removeImageBtn');
             
-            // Maximum file size: 5MB (5,242,880 bytes)
+            // Maximum file size: 5MB
             const MAX_FILE_SIZE = 5 * 1024 * 1024;
-            const MAX_FILE_SIZE_MB = 5;
-            
-            // Allowed file types
             const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/bmp'];
             const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.bmp'];
             
@@ -791,7 +905,7 @@
                 }
                 if (file.size > MAX_FILE_SIZE) {
                     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                    showToast(`File too large! Size: ${fileSizeMB}MB. Maximum allowed: ${MAX_FILE_SIZE_MB}MB`, 'error');
+                    showToast(`File too large! Size: ${fileSizeMB}MB. Maximum allowed: 5MB`, 'error');
                     return false;
                 }
                 return true;
@@ -1015,9 +1129,41 @@
         document.getElementById('paidAmount').addEventListener('input', calculateTotals);
         document.getElementById('directDueAmount').addEventListener('input', calculateTotals);
         document.getElementById('dueDate').valueAsDate = new Date();
+        
+        // Pagination events
         document.getElementById('exportDueBtn').addEventListener('click', exportDueToCSV);
-        document.getElementById('refreshBtn').addEventListener('click', () => { loadRecentDueEntries(); loadCustomers(); showToast('Refreshed!', 'success'); });
-        document.getElementById('darkModeToggle').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
+        
+        document.getElementById('paginationSize').addEventListener('change', (e) => {
+            pageSize = parseInt(e.target.value);
+            currentPage = 1;
+            renderPage();
+        });
+        
+        document.getElementById('prevPageBtn').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage();
+            }
+        });
+        
+        document.getElementById('nextPageBtn').addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderPage();
+            }
+        });
+        
+        document.getElementById('refreshBtn').addEventListener('click', () => { 
+            loadRecentDueEntries(); 
+            loadCustomers(); 
+            showToast('Refreshed!', 'success'); 
+        });
+        
+        document.getElementById('darkModeToggle').addEventListener('click', () => { 
+            document.documentElement.classList.toggle('dark'); 
+            document.body.classList.toggle('dark'); 
+        });
         
         // Logout functionality
         const logoutLink = document.getElementById('logoutLink');

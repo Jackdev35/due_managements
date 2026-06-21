@@ -6,6 +6,11 @@
     <meta name="theme-color" content="#0f3b3a">
     <title>Customer Warranty | JackDev Due Managements</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -31,74 +36,46 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
-        
+        /* ===== CUSTOMER PAGE STYLES ===== */
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; }
         
-        ::-webkit-scrollbar { width: 0px; height: 0px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: transparent; }
-        * { scrollbar-width: none; }
+        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
         
-        .sidebar-nav-fixed {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none;
-        }
+        .nav-active { background:linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%); border-left:3px solid #d4af37; }
+        .dark .nav-active { background:linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%); }
         
-        .nav-active {
-            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
-            border-left: 3px solid #d4af37;
-        }
-        .dark .nav-active {
-            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
-        }
+        .stat-card { transition: all 0.2s ease; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12); }
         
-        .stat-card {
-            transition: all 0.2s ease;
-        }
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12);
-        }
+        .submenu-modern { max-height:0; overflow:hidden; transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
+        .submenu-modern.open { max-height:280px; }
         
-        .submenu-modern {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .submenu-modern.open {
-            max-height: 280px;
-        }
+        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
+        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
         
-        .has-submenu > a .chevron-icon {
-            transition: transform 0.2s ease;
-        }
-        .has-submenu.open > a .chevron-icon {
-            transform: rotate(180deg);
-        }
+        @keyframes modalSlideUp { from { opacity:0; transform:translateY(20px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+        .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
         
-        @keyframes modalSlideUp {
-            from { opacity: 0; transform: translateY(20px) scale(0.96); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .modal-animate {
-            animation: modalSlideUp 0.2s ease-out forwards;
-        }
+        .table-row-hover { transition: background-color 0.15s ease; cursor: pointer; }
+        .table-row-hover:hover { background-color: rgba(15,59,58,0.05); }
+        .dark .table-row-hover:hover { background-color: rgba(30,107,104,0.1); }
         
-        .btn-active:active {
-            transform: scale(0.97);
-        }
+        .table-scroll-hint { display:none; }
+        @media (max-width:768px) { .table-scroll-hint { display:flex; font-size:9px; padding:4px 8px; background:#f0fdf4; color:#166534; border-radius:20px; margin-bottom:8px; width:fit-content; } .dark .table-scroll-hint { background:#064e3b; color:#86efac; } }
         
-        /* ============================================= */
-        /* STATUS ICON - Same as warranty_list.html      */
-        /* ============================================= */
+        .btn-active:active { transform: scale(0.97); }
+        #sidebarOverlay { animation: fadeIn 0.2s ease-out; }
+        .sidebar-open { overflow:hidden; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        
+        .sidebar-fixed { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+        .sidebar-header-fixed { flex-shrink:0; position:sticky; top:0; background:inherit; z-index:10; }
+        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
+        
+        /* Status Icons */
         .status-icon-only {
             display: inline-flex;
             align-items: center;
@@ -112,12 +89,7 @@
             cursor: default;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
-        
-        .status-icon-only:hover {
-            transform: scale(1.12);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-        }
-        
+        .status-icon-only:hover { transform: scale(1.12); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
         .status-icon-only.pending { background: #FEF3C7; color: #D97706; }
         .status-icon-only.currier { background: #DBEAFE; color: #2563EB; }
         .status-icon-only.currier_to_supplier { background: #E0E7FF; color: #4338CA; }
@@ -151,13 +123,11 @@
             pointer-events: none;
             box-shadow: 0 4px 16px rgba(0,0,0,0.25);
         }
-        
         .status-icon-only:hover .tooltip-text {
             visibility: visible;
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
-        
         .status-icon-only .tooltip-text::after {
             content: '';
             position: absolute;
@@ -168,7 +138,7 @@
             border-top-color: #1e293b;
         }
         
-        /* Action Buttons */
+        /* Action buttons */
         .action-btn {
             display: inline-flex;
             align-items: center;
@@ -180,17 +150,11 @@
             cursor: pointer;
             border: none;
             background: rgba(15, 59, 58, 0.06);
+            position: relative;
         }
-        .action-btn:hover {
-            transform: scale(1.08);
-            background: rgba(15, 59, 58, 0.15);
-        }
-        .dark .action-btn {
-            background: rgba(255, 255, 255, 0.06);
-        }
-        .dark .action-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-        }
+        .action-btn:hover { transform: scale(1.08); background: rgba(15, 59, 58, 0.15); }
+        .dark .action-btn { background: rgba(255, 255, 255, 0.06); }
+        .dark .action-btn:hover { background: rgba(255, 255, 255, 0.12); }
         .action-btn .tooltip-text {
             visibility: hidden;
             opacity: 0;
@@ -223,88 +187,67 @@
             border: 5px solid transparent;
             border-top-color: #1e293b;
         }
-        .action-btn {
-            position: relative;
+        
+        /* Filter dropdowns */
+        .filter-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        .dark .filter-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
         }
         
-        .filter-tab {
-            transition: all 0.2s ease;
+        /* Pagination dropdown inline with filter */
+        .pagination-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
         }
-        .filter-tab.active {
-            background: #0f3b3a;
-            color: white;
-            border-color: #0f3b3a;
-        }
-        .dark .filter-tab.active {
-            background: #1e6b68;
-            border-color: #1e6b68;
-        }
-        
-        .table-scroll-hint {
-            display: none;
-        }
-        @media (max-width: 768px) {
-            .table-scroll-hint {
-                display: flex;
-                font-size: 9px;
-                padding: 4px 8px;
-                background: #f0fdf4;
-                color: #166534;
-                border-radius: 20px;
-                margin-bottom: 8px;
-                width: fit-content;
-            }
-            .dark .table-scroll-hint {
-                background: #064e3b;
-                color: #86efac;
-            }
+        .dark .pagination-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
         }
         
-        .table-row-hover:hover {
-            background-color: rgba(15, 59, 58, 0.04);
+        /* ===== FILTER ROW HEIGHT INCREASED ===== */
+        .filter-row {
+            padding-top: 10px;
+            padding-bottom: 10px;
         }
-        .dark .table-row-hover:hover {
-            background-color: rgba(30, 107, 104, 0.1);
+        .filter-row input,
+        .filter-row select {
+            height: 40px;
+            font-size: 13px;
+        }
+        .filter-row .filter-icon {
+            font-size: 16px;
+        }
+        .filter-row .filter-label {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        /* Search bar width reduced */
+        .filter-row .search-wrap {
+            max-width: 180px;
+            min-width: 140px;
         }
         
-        #sidebarOverlay {
-            animation: fadeIn 0.2s ease-out;
-        }
-        .sidebar-open {
-            overflow: hidden;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .sidebar-fixed {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .sidebar-header-fixed {
-            flex-shrink: 0;
-            position: sticky;
-            top: 0;
-            background: inherit;
-            z-index: 10;
-        }
-        .sidebar-nav-fixed {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
+        /* ===== TABLE SCROLLBAR REMOVED ===== */
+        .table-wrap {
+            overflow-x: auto;
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
-        .sidebar-nav-fixed::-webkit-scrollbar {
+        .table-wrap::-webkit-scrollbar {
             display: none;
         }
-
-        /* ============================================= */
-        /* INVOICE SLIP STYLES - Custom Design            */
-        /* ============================================= */
+        
+        /* invoice slip print styles */
         #invoicePrintArea {
             font-family: 'Inter', 'Courier New', monospace;
             background: white;
@@ -313,316 +256,68 @@
             margin: 0 auto;
             border-radius: 12px;
         }
+        .invoice-slip-header { text-align:center; border-bottom:2px dashed #0f3b3a; padding-bottom:14px; margin-bottom:14px; }
+        .invoice-slip-header h1 { color:#0f3b3a; font-size:22px; font-weight:700; letter-spacing:1px; }
+        .invoice-slip-header .sub-title { color:#4b5563; font-size:11px; font-weight:500; letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
+        .invoice-slip-header .slip-title { color:#6b7280; font-size:13px; font-weight:600; margin-top:4px; letter-spacing:1px; }
+        .invoice-divider { border:none; border-top:1px dashed #d1d5db; margin:10px 0; }
+        .invoice-receipt-info { display:flex; justify-content:space-between; align-items:flex-start; font-size:12px; padding:4px 0; }
+        .invoice-receipt-info .left-info { line-height:1.7; }
+        .invoice-receipt-info .right-info { text-align:right; line-height:1.7; }
+        .invoice-receipt-info strong { color:#374151; font-weight:600; }
+        .status-badge-invoice { display:inline-flex; align-items:center; gap:4px; padding:2px 12px; border-radius:20px; font-size:10px; font-weight:600; text-transform:uppercase; }
+        .status-badge-invoice.pending { background:#FEF3C7; color:#D97706; }
+        .status-badge-invoice.currier { background:#DBEAFE; color:#2563EB; }
+        .status-badge-invoice.currier_to_supplier { background:#E0E7FF; color:#4338CA; }
+        .status-badge-invoice.supplier_received { background:#D1FAE5; color:#059669; }
+        .status-badge-invoice.supplier_to_shop { background:#FCE7F3; color:#DB2777; }
+        .status-badge-invoice.customer_delivered { background:#F3E8FF; color:#7E22CE; }
+        .invoice-customer-section { background:#f8fafc; padding:12px 16px; border-radius:8px; margin:12px 0; font-size:12px; line-height:1.8; border-left:3px solid #0f3b3a; }
+        .dark .invoice-customer-section { background:#1e293b; border-left-color:#d4af37; }
+        .invoice-customer-section strong { color:#374151; font-weight:600; }
+        .dark .invoice-customer-section strong { color:#e2e8f0; }
+        .invoice-details-table { width:100%; border-collapse:collapse; font-size:12px; margin:10px 0; }
+        .invoice-details-table th { text-align:left; padding:6px 10px; font-weight:600; color:#374151; border-bottom:1px solid #d1d5db; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; }
+        .dark .invoice-details-table th { color:#e2e8f0; border-color:#4b5563; }
+        .invoice-details-table td { padding:6px 10px; border-bottom:1px solid #e5e7eb; }
+        .dark .invoice-details-table td { border-color:#374151; }
+        .invoice-details-table tr:last-child td { border-bottom:none; }
+        .invoice-details-table .label { color:#6b7280; font-weight:500; }
+        .dark .invoice-details-table .label { color:#9ca3af; }
+        .invoice-details-table .value { font-weight:500; color:#1f2937; }
+        .dark .invoice-details-table .value { color:#f1f5f9; }
+        .invoice-details-table .serial-value { font-family:'Courier New',monospace; font-size:11px; color:#0f3b3a; font-weight:600; }
+        .invoice-problem-section { background:#fef3c7; padding:10px 14px; border-radius:6px; margin:8px 0; font-size:12px; border-left:3px solid #d97706; }
+        .dark .invoice-problem-section { background:#451A03; border-left-color:#FBBF24; }
+        .invoice-problem-section strong { color:#92400e; }
+        .dark .invoice-problem-section strong { color:#FBBF24; }
+        .invoice-problem-section .problem-text { color:#78350f; margin-top:2px; }
+        .dark .invoice-problem-section .problem-text { color:#fdba74; }
+        .invoice-footer { text-align:center; border-top:2px dashed #d1d5db; padding-top:14px; margin-top:12px; }
+        .invoice-footer p { color:#6b7280; font-size:10px; margin:2px 0; }
+        .invoice-footer .contact { color:#0f3b3a; font-weight:600; font-size:11px; }
+        .dark .invoice-footer .contact { color:#d4af37; }
+        .invoice-footer .ref { color:#9ca3af; font-size:9px; margin-top:4px; }
         
-        .invoice-slip-header {
-            text-align: center;
-            border-bottom: 2px dashed #0f3b3a;
-            padding-bottom: 14px;
-            margin-bottom: 14px;
-        }
-        .invoice-slip-header h1 {
-            color: #0f3b3a;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        .invoice-slip-header .sub-title {
-            color: #4b5563;
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-top: 2px;
-        }
-        .invoice-slip-header .slip-title {
-            color: #6b7280;
-            font-size: 13px;
-            font-weight: 600;
-            margin-top: 4px;
-            letter-spacing: 1px;
-        }
-        .invoice-divider {
-            border: none;
-            border-top: 1px dashed #d1d5db;
-            margin: 10px 0;
-        }
-        
-        .invoice-receipt-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            font-size: 12px;
-            padding: 4px 0;
-        }
-        .invoice-receipt-info .left-info {
-            line-height: 1.7;
-        }
-        .invoice-receipt-info .right-info {
-            text-align: right;
-            line-height: 1.7;
-        }
-        .invoice-receipt-info strong {
-            color: #374151;
-            font-weight: 600;
-        }
-        .invoice-receipt-info .status-badge-invoice {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        .status-badge-invoice.pending { background: #FEF3C7; color: #D97706; }
-        .status-badge-invoice.currier { background: #DBEAFE; color: #2563EB; }
-        .status-badge-invoice.currier_to_supplier { background: #E0E7FF; color: #4338CA; }
-        .status-badge-invoice.supplier_received { background: #D1FAE5; color: #059669; }
-        .status-badge-invoice.supplier_to_shop { background: #FCE7F3; color: #DB2777; }
-        .status-badge-invoice.customer_delivered { background: #F3E8FF; color: #7E22CE; }
-        
-        .invoice-customer-section {
-            background: #f8fafc;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin: 12px 0;
-            font-size: 12px;
-            line-height: 1.8;
-            border-left: 3px solid #0f3b3a;
-        }
-        .dark .invoice-customer-section {
-            background: #1e293b;
-            border-left-color: #d4af37;
-        }
-        .invoice-customer-section strong {
-            color: #374151;
-            font-weight: 600;
-        }
-        .dark .invoice-customer-section strong {
-            color: #e2e8f0;
-        }
-        
-        .invoice-details-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            margin: 10px 0;
-        }
-        .invoice-details-table th {
-            text-align: left;
-            padding: 6px 10px;
-            font-weight: 600;
-            color: #374151;
-            border-bottom: 1px solid #d1d5db;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .dark .invoice-details-table th {
-            color: #e2e8f0;
-            border-color: #4b5563;
-        }
-        .invoice-details-table td {
-            padding: 6px 10px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .dark .invoice-details-table td {
-            border-color: #374151;
-        }
-        .invoice-details-table tr:last-child td {
-            border-bottom: none;
-        }
-        .invoice-details-table .label {
-            color: #6b7280;
-            font-weight: 500;
-        }
-        .dark .invoice-details-table .label {
-            color: #9ca3af;
-        }
-        .invoice-details-table .value {
-            font-weight: 500;
-            color: #1f2937;
-        }
-        .dark .invoice-details-table .value {
-            color: #f1f5f9;
-        }
-        .invoice-details-table .serial-value {
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            color: #0f3b3a;
-            font-weight: 600;
-        }
-        
-        .invoice-problem-section {
-            background: #fef3c7;
-            padding: 10px 14px;
-            border-radius: 6px;
-            margin: 8px 0;
-            font-size: 12px;
-            border-left: 3px solid #d97706;
-        }
-        .dark .invoice-problem-section {
-            background: #451A03;
-            border-left-color: #FBBF24;
-        }
-        .invoice-problem-section strong {
-            color: #92400e;
-        }
-        .dark .invoice-problem-section strong {
-            color: #FBBF24;
-        }
-        .invoice-problem-section .problem-text {
-            color: #78350f;
-            margin-top: 2px;
-        }
-        .dark .invoice-problem-section .problem-text {
-            color: #fdba74;
-        }
-        
-        .invoice-footer {
-            text-align: center;
-            border-top: 2px dashed #d1d5db;
-            padding-top: 14px;
-            margin-top: 12px;
-        }
-        .invoice-footer p {
-            color: #6b7280;
-            font-size: 10px;
-            margin: 2px 0;
-        }
-        .invoice-footer .contact {
-            color: #0f3b3a;
-            font-weight: 600;
-            font-size: 11px;
-        }
-        .dark .invoice-footer .contact {
-            color: #d4af37;
-        }
-        .invoice-footer .ref {
-            color: #9ca3af;
-            font-size: 9px;
-            margin-top: 4px;
-        }
-        
-        /* ============================================= */
-        /* FIXED PRINT STYLES                            */
-        /* ============================================= */
         @media print {
-            /* Hide everything except the invoice modal content */
-            body * {
-                visibility: hidden !important;
-            }
-            
-            /* Show only the invoice modal and its children */
-            #invoiceModal,
-            #invoiceModal * {
-                visibility: visible !important;
-            }
-            
-            /* Make modal full screen for printing */
-            #invoiceModal {
-                position: fixed !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                background: white !important;
-                backdrop-filter: none !important;
-                z-index: 9999 !important;
-                display: block !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                overflow: auto !important;
-            }
-            
-            /* Hide modal backdrop and container styles */
-            #invoiceModal .bg-black\/60,
-            #invoiceModal .backdrop-blur-sm {
-                background: white !important;
-                backdrop-filter: none !important;
-                display: block !important;
-                padding: 0 !important;
-            }
-            
-            /* Show the content area */
-            #invoiceContent {
-                display: block !important;
-                max-height: none !important;
-                overflow: visible !important;
-                padding: 0 !important;
-            }
-            
-            /* Hide modal header and footer (no-print) */
-            .no-print,
-            #invoiceModal .no-print,
-            #invoiceModal .invoice-print-btn {
-                display: none !important;
-            }
-            
-            /* Ensure invoice print area is visible and properly styled */
-            #invoicePrintArea {
-                visibility: visible !important;
-                position: relative !important;
-                background: white !important;
-                padding: 30px 35px !important;
-                max-width: 100% !important;
-                margin: 0 auto !important;
-                border-radius: 0 !important;
-                box-shadow: none !important;
-            }
-            
-            #invoicePrintArea * {
-                visibility: visible !important;
-            }
-            
-            .invoice-slip-header h1 {
-                color: #0f3b3a !important;
-            }
-            
-            /* Force dark mode elements to be readable in print */
-            .dark .invoice-slip-header h1 {
-                color: #0f3b3a !important;
-            }
-            .dark .invoice-customer-section {
-                background: #f8fafc !important;
-                border-left-color: #0f3b3a !important;
-            }
-            .dark .invoice-customer-section strong {
-                color: #374151 !important;
-            }
-            .dark .invoice-details-table th {
-                color: #374151 !important;
-                border-color: #d1d5db !important;
-            }
-            .dark .invoice-details-table td {
-                border-color: #e5e7eb !important;
-            }
-            .dark .invoice-details-table .label {
-                color: #6b7280 !important;
-            }
-            .dark .invoice-details-table .value {
-                color: #1f2937 !important;
-            }
-            .dark .invoice-problem-section {
-                background: #fef3c7 !important;
-                border-left-color: #d97706 !important;
-            }
-            .dark .invoice-problem-section strong {
-                color: #92400e !important;
-            }
-            .dark .invoice-problem-section .problem-text {
-                color: #78350f !important;
-            }
-            .dark .invoice-footer .contact {
-                color: #0f3b3a !important;
-            }
-            .dark .invoice-footer p {
-                color: #6b7280 !important;
-            }
-            .dark .invoice-footer .ref {
-                color: #9ca3af !important;
-            }
+            body * { visibility: hidden !important; }
+            #invoiceModal, #invoiceModal * { visibility: visible !important; }
+            #invoiceModal { position:fixed !important; left:0 !important; top:0 !important; width:100% !important; height:100% !important; background:white !important; backdrop-filter:none !important; z-index:9999 !important; display:block !important; padding:0 !important; margin:0 !important; overflow:auto !important; }
+            #invoiceModal .bg-black\/60, #invoiceModal .backdrop-blur-sm { background:white !important; backdrop-filter:none !important; display:block !important; padding:0 !important; }
+            #invoiceContent { display:block !important; max-height:none !important; overflow:visible !important; padding:0 !important; }
+            .no-print, #invoiceModal .no-print, #invoiceModal .invoice-print-btn { display:none !important; }
+            #invoicePrintArea { visibility:visible !important; position:relative !important; background:white !important; padding:30px 35px !important; max-width:100% !important; margin:0 auto !important; border-radius:0 !important; box-shadow:none !important; }
+            #invoicePrintArea * { visibility:visible !important; }
+            .dark .invoice-customer-section { background:#f8fafc !important; border-left-color:#0f3b3a !important; }
+            .dark .invoice-customer-section strong { color:#374151 !important; }
+            .dark .invoice-details-table th { color:#374151 !important; border-color:#d1d5db !important; }
+            .dark .invoice-details-table td { border-color:#e5e7eb !important; }
+            .dark .invoice-details-table .label { color:#6b7280 !important; }
+            .dark .invoice-details-table .value { color:#1f2937 !important; }
+            .dark .invoice-problem-section { background:#fef3c7 !important; border-left-color:#d97706 !important; }
+            .dark .invoice-problem-section strong { color:#92400e !important; }
+            .dark .invoice-problem-section .problem-text { color:#78350f !important; }
+            .dark .invoice-footer .contact { color:#0f3b3a !important; }
         }
     </style>
 </head>
@@ -655,75 +350,40 @@
                         <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
                         <span class="text-sm font-medium">Dashboard</span>
                     </a>
-                    
                     <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
                         <span class="text-sm font-medium">Customers</span>
                     </a>
-                    
                     <div class="has-submenu" id="dueSubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div>
-                                <span class="text-sm font-medium">Due Entry</span>
-                            </div>
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
                             <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
                         </a>
                         <div class="submenu-modern pl-9 mt-1 space-y-1">
-                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
-                            </a>
-                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
-                            </a>
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a>
+                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a>
                         </div>
                     </div>
-                    
-                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div>
-                        <span class="text-sm font-medium">Collection</span>
-                    </a>
-                    
-                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div>
-                        <span class="text-sm font-medium">Ledger</span>
-                    </a>
-                    
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span></a>
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span></a>
                     <div class="has-submenu" id="warrantySubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div>
-                                <span class="text-sm font-medium">Warranty</span>
-                            </div>
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
                             <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
                         </a>
                         <div class="submenu-modern pl-9 mt-1 space-y-1">
-                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
-                            </a>
-                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
-                            </a>
-                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
-                            </a>
-                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
-                            </a>
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span></a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span></a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span></a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span></a>
                         </div>
                     </div>
-                    
                     <a href="customer-warranty.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm text-accent"></i></div>
                         <span class="text-sm font-medium">Customer Warranty</span>
                     </a>
-                    
-                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div>
-                        <span class="text-sm font-medium">Backup & Restore</span>
-                    </a>
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span></a>
                 </nav>
-                
                 <div class="pt-4 mt-2 border-t border-white/10">
                     <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
                         <i class="fas fa-sign-out-alt text-sm w-5"></i>
@@ -743,7 +403,7 @@
                             <i class="fas fa-bars text-lg"></i>
                         </button>
                         <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
-                            <i class="fas fa-shield-alt text-primary mr-2"></i>Customer Warranty Tracking
+                            <i class="fas fa-shield-alt text-primary mr-2"></i>Customer Warranty
                         </h2>
                     </div>
                     <div class="flex items-center gap-1">
@@ -790,26 +450,61 @@
                         <div class="bg-blue-100 dark:bg-blue-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2">
                             <i class="fas fa-check-double text-blue-600 dark:text-blue-400 text-sm"></i>
                         </div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Customer Delivered</h3>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Delivered</h3>
                         <p class="text-xl font-bold text-gray-800 dark:text-white" id="deliveredCount">0</p>
                     </div>
                 </div>
                 
-                <!-- Filter Tabs -->
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                    <div class="flex flex-wrap gap-2">
-                        <button data-filter="all" class="filter-tab active px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">All</button>
-                        <button data-filter="pending" class="filter-tab px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">Pending</button>
-                        <button data-filter="currier" class="filter-tab px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">With Currier</button>
-                        <button data-filter="currier_to_supplier" class="filter-tab px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">Currier→Supplier</button>
-                        <button data-filter="supplier_received" class="filter-tab px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">Supplier Received</button>
-                        <button data-filter="supplier_to_shop" class="filter-tab px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">Supplier→Shop</button>
-                        <button data-filter="customer_delivered" class="filter-tab px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">Customer Delivered</button>
+                <!-- Filter Row: icon | Filter Text | From | To | Status Dropdown | Search | Pagination Dropdown -->
+                <!-- Increased height via filter-row class, search bar width reduced -->
+                <div class="filter-row flex flex-wrap items-center gap-2 mb-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-3 shadow-sm">
+                    <!-- Icon -->
+                    <div class="text-gray-400 dark:text-gray-500 filter-icon">
+                        <i class="fas fa-filter"></i>
                     </div>
                     
-                    <div class="relative w-full sm:w-64">
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                        <input type="text" id="customerWarrantySearch" placeholder="Search by customer name or phone..." class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-800 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <!-- Filter Text -->
+                    <span class="filter-label text-gray-600 dark:text-gray-400 whitespace-nowrap">Filter</span>
+                    
+                    <!-- From Date -->
+                    <div class="flex items-center gap-1">
+                        <input type="date" id="filterDateFrom" class="bg-gray-50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-2.5 py-1.5 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50 w-32" title="From Date">
+                    </div>
+                    
+                    <!-- To -->
+                    <span class="text-xs text-gray-400">to</span>
+                    
+                    <!-- To Date -->
+                    <div class="flex items-center gap-1">
+                        <input type="date" id="filterDateTo" class="bg-gray-50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-2.5 py-1.5 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50 w-32" title="To Date">
+                    </div>
+                    
+                    <!-- Status Dropdown -->
+                    <select id="filterStatus" class="filter-select bg-gray-50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50 w-36">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="currier">With Currier</option>
+                        <option value="currier_to_supplier">Currier→Supplier</option>
+                        <option value="supplier_received">Supplier Received</option>
+                        <option value="supplier_to_shop">Supplier→Shop</option>
+                        <option value="customer_delivered">Customer Delivered</option>
+                    </select>
+                    
+                    <!-- Search Input - width reduced -->
+                    <div class="search-wrap relative flex-1 min-w-[120px] max-w-[180px]">
+                        <i class="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="text" id="customerWarrantySearch" placeholder="Search customer..." class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700/50 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    </div>
+                    
+                    <!-- Pagination Dropdown -->
+                    <div class="flex items-center gap-1 ml-auto">
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Show</span>
+                        <select id="perPageSelect" class="pagination-select bg-gray-50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50 w-16">
+                            <option value="20">20</option>
+                            <option value="50" selected>50</option>
+                            <option value="100">100</option>
+                            <option value="200">200</option>
+                        </select>
                     </div>
                 </div>
                 
@@ -817,9 +512,9 @@
                     <i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns → <span class="mx-2">|</span> <i class="fas fa-hand-pointer mr-1 text-[8px]"></i> Tap row for details
                 </div>
                 
-                <!-- Customer Warranty Table -->
+                <!-- Customer Warranty Table - scrollbar removed -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
-                    <div class="overflow-x-auto">
+                    <div class="table-wrap overflow-x-auto">
                         <table class="w-full min-w-[1000px]">
                             <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                 <tr>
@@ -840,10 +535,23 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Footer -->
+            <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                    <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span> 
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
+                    </p>
+                </div>
+            </footer>
         </main>
     </div>
     
-    <!-- Invoice / Slip Modal -->
+    <!-- Invoice Modal -->
     <div id="invoiceModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[150] hidden transition-all duration-300 p-3">
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full shadow-2xl modal-animate overflow-hidden">
             <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 no-print">
@@ -859,9 +567,7 @@
                     </button>
                 </div>
             </div>
-            <div class="p-4 max-h-[75vh] overflow-y-auto" id="invoiceContent">
-                <!-- Invoice content will be rendered here -->
-            </div>
+            <div class="p-4 max-h-[75vh] overflow-y-auto" id="invoiceContent"></div>
         </div>
     </div>
     
@@ -886,9 +592,7 @@
     <script type="module">
         import { db, collection, getDocs, query, orderBy, updateDoc, doc, getDoc } from './js/firebase.js';
         
-        // =============================================
-        // STATUS CONFIG - Same as warranty_list.html
-        // =============================================
+        // ===== STATUS CONFIG =====
         const statusConfig = {
             'pending': { class: 'pending', icon: 'fa-clock', text: 'Pending' },
             'currier': { class: 'currier', icon: 'fa-truck', text: 'Currier' },
@@ -905,43 +609,33 @@
                 <span class="tooltip-text">${config.text}</span>
             </span>`;
         }
-        
         function getStatusText(status) {
             const config = statusConfig[status] || statusConfig['pending'];
             return config.text;
         }
-        
         function getStatusClass(status) {
             const config = statusConfig[status] || statusConfig['pending'];
             return config.class;
         }
         
-        // Sidebar submenu toggle
-        const warrantySubmenu = document.getElementById('warrantySubmenu');
-        const warrantyLink = warrantySubmenu?.querySelector('a');
-        if (warrantyLink) {
-            warrantyLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                warrantySubmenu.classList.toggle('open');
-                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
-        }
-        
-        const dueSubmenu = document.getElementById('dueSubmenu');
-        const dueLink = dueSubmenu?.querySelector('a');
-        if (dueLink) {
-            dueLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                dueSubmenu.classList.toggle('open');
-                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
-        }
+        // Sidebar submenu toggles
+        document.getElementById('warrantySubmenu')?.querySelector('a')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            const el = document.getElementById('warrantySubmenu');
+            el.classList.toggle('open');
+            el.querySelector('.submenu-modern')?.classList.toggle('open');
+        });
+        document.getElementById('dueSubmenu')?.querySelector('a')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            const el = document.getElementById('dueSubmenu');
+            el.classList.toggle('open');
+            el.querySelector('.submenu-modern')?.classList.toggle('open');
+        });
         
         // Sidebar toggle
         const sidebar = document.getElementById('sidebar');
         const menuToggle = document.getElementById('menuToggle');
         const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-        
         function openSidebar() {
             sidebar.classList.remove('-translate-x-full');
             document.body.classList.add('sidebar-open');
@@ -953,39 +647,28 @@
                 document.body.appendChild(overlay);
             }
         }
-        
         function closeSidebar() {
             sidebar.classList.add('-translate-x-full');
             document.body.classList.remove('sidebar-open');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (overlay) overlay.remove();
+            document.getElementById('sidebarOverlay')?.remove();
         }
-        
-        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
-        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
-        
+        menuToggle?.addEventListener('click', openSidebar);
+        closeSidebarBtn?.addEventListener('click', closeSidebar);
         window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768) {
-                sidebar.classList.remove('-translate-x-full');
-                document.getElementById('sidebarOverlay')?.remove();
-                document.body.classList.remove('sidebar-open');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-            }
+            if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); }
         });
-        
         if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
         else sidebar.classList.add('-translate-x-full');
         
+        // State
         let allWarranties = [];
-        let currentFilter = 'all';
         let supplierNameMap = new Map();
+        let perPage = 50;
+        let currentPage = 1;
         
         async function getSupplierName(supplierId) {
             if (!supplierId) return 'N/A';
-            if (supplierNameMap.has(supplierId)) {
-                return supplierNameMap.get(supplierId);
-            }
+            if (supplierNameMap.has(supplierId)) return supplierNameMap.get(supplierId);
             try {
                 const docSnap = await getDoc(doc(db, 'suppliers', supplierId));
                 if (docSnap.exists()) {
@@ -993,9 +676,7 @@
                     supplierNameMap.set(supplierId, name);
                     return name;
                 }
-            } catch (e) {
-                console.warn('Could not fetch supplier:', e);
-            }
+            } catch (e) { console.warn('Could not fetch supplier:', e); }
             return 'Unknown Supplier';
         }
         
@@ -1010,215 +691,46 @@
             setTimeout(() => toast.remove(), 2500);
         }
         
-        function filterWarranties(warranties, filterType) {
-            if (filterType === 'all') return warranties;
-            return warranties.filter(w => w.status === filterType);
-        }
-        
-        function exportToCSV() {
-            const searchTerm = document.getElementById('customerWarrantySearch').value.toLowerCase();
-            let filteredData = filterWarranties(allWarranties, currentFilter);
-            if (searchTerm) {
-                filteredData = filteredData.filter(w => 
-                    (w.customerName && w.customerName.toLowerCase().includes(searchTerm)) ||
-                    (w.customerPhone && w.customerPhone.includes(searchTerm))
-                );
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return new Date(parts[0], parts[1] - 1, parts[2]);
             }
-            
-            if (filteredData.length === 0) {
-                showToast('No data to export', 'error');
-                return;
-            }
-            
-            const headers = ['Date', 'Customer Name', 'Phone', 'Product', 'Serial Number', 'Currier Name', 'Supplier', 'Status'];
-            const rows = filteredData.map(w => [
-                w.warrantyDate || 'N/A',
-                w.customerName || 'N/A',
-                w.customerPhone || 'N/A',
-                w.productName || 'N/A',
-                w.serialNumber || 'N/A',
-                w.currierName || 'N/A',
-                w.supplierName || 'N/A',
-                getStatusText(w.status)
-            ]);
-            
-            const csvContent = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.href = url;
-            link.setAttribute('download', `customer_warranty_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            showToast('Data exported successfully!', 'success');
-        }
-        
-        function generateInvoiceHTML(warranty) {
-            const statusText = getStatusText(warranty.status);
-            const statusClass = getStatusClass(warranty.status);
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            
-            // Get problem description
-            const problemDesc = warranty.problemDescription || warranty.remarks || 'No problem description provided';
-            
-            return `
-                <div id="invoicePrintArea">
-                    <!-- Header -->
-                    <div class="invoice-slip-header">
-                        <h1>${escapeHtml(warranty.businessName || 'Elias Computer')}</h1>
-                        <div class="sub-title">Warranty Management System</div>
-                        <div class="slip-title">Warranty Receipt / Slip</div>
-                    </div>
-                    
-                    <hr class="invoice-divider">
-                    
-                    <!-- Receipt Info -->
-                    <div class="invoice-receipt-info">
-                        <div class="left-info">
-                            <strong>Receipt #:</strong> ${warranty.warrantyId || warranty.id.slice(0, 12)}<br>
-                            <strong>Date:</strong> ${dateStr}<br>
-                            <strong>Time:</strong> ${timeStr}
-                        </div>
-                        <div class="right-info">
-                            <span class="status-badge-invoice ${statusClass}">
-                                <i class="fas ${statusConfig[warranty.status]?.icon || 'fa-clock'}"></i> ${statusText}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <hr class="invoice-divider">
-                    
-                    <!-- Customer & Currier Info -->
-                    <div class="invoice-customer-section">
-                        <div><strong>Customer:</strong> ${escapeHtml(warranty.customerName || 'N/A')}</div>
-                        <div><strong>Phone:</strong> ${escapeHtml(warranty.customerPhone || 'N/A')}</div>
-                        <div><strong>Currier:</strong> ${escapeHtml(warranty.currierName || 'Not dispatched yet')}</div>
-                        ${warranty.currierTracking ? `<div><strong>Tracking:</strong> ${escapeHtml(warranty.currierTracking)}</div>` : ''}
-                    </div>
-                    
-                    <!-- Details Table -->
-                    <table class="invoice-details-table">
-                        <thead>
-                            <tr>
-                                <th style="width:40%;">Description</th>
-                                <th style="width:60%;">Details</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="label">Warranty Date</td>
-                                <td class="value">${warranty.warrantyDate || 'N/A'}</td>
-                            </tr>
-                            <tr>
-                                <td class="label">Product Name</td>
-                                <td class="value">${escapeHtml(warranty.productName || 'N/A')}</td>
-                            </tr>
-                            <tr>
-                                <td class="label">Serial Number</td>
-                                <td class="serial-value">${escapeHtml(warranty.serialNumber || 'N/A')}</td>
-                            </tr>
-                            ${warranty.newSerialNumber ? `
-                            <tr>
-                                <td class="label">New Serial (Replaced)</td>
-                                <td class="serial-value" style="color:#22c55e;">${escapeHtml(warranty.newSerialNumber)}</td>
-                            </tr>` : ''}
-                            <tr>
-                                <td class="label">Supplier</td>
-                                <td class="value">${escapeHtml(warranty.supplierName || 'N/A')}</td>
-                            </tr>
-                            <tr>
-                                <td class="label">Currier</td>
-                                <td class="value">${escapeHtml(warranty.currierName || 'Not dispatched yet')}</td>
-                            </tr>
-                            ${warranty.supplierReceivedDate ? `
-                            <tr>
-                                <td class="label">Supplier Received</td>
-                                <td class="value">${warranty.supplierReceivedDate}</td>
-                            </tr>` : ''}
-                            ${warranty.deliveredDate ? `
-                            <tr>
-                                <td class="label">Customer Delivered</td>
-                                <td class="value">${warranty.deliveredDate}</td>
-                            </tr>` : ''}
-                        </tbody>
-                    </table>
-                    
-                    <!-- Problem Section -->
-                    ${warranty.problemDescription ? `
-                    <div class="invoice-problem-section">
-                        <strong><i class="fas fa-exclamation-triangle"></i> Problem Description</strong>
-                        <div class="problem-text">${escapeHtml(warranty.problemDescription)}</div>
-                    </div>` : ''}
-                    
-                    <!-- Footer -->
-                    <div class="invoice-footer">
-                        <p>This is a computer generated receipt. Thank you for choosing JackDev.</p>
-                        <p class="contact"><i class="fas fa-phone"></i> For any query, please contact 01711-204628</p>
-                        <div class="ref">${dateStr} • Ref: ${warranty.warrantyId || warranty.id.slice(0, 8)}</div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        function showInvoiceModal(warranty) {
-            const content = document.getElementById('invoiceContent');
-            content.innerHTML = generateInvoiceHTML(warranty);
-            document.getElementById('invoiceModal').classList.remove('hidden');
-        }
-        
-        async function loadCustomerWarranties() {
-            const tbody = document.getElementById('customerWarrantyBody');
-            tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading warranty records...</p></td>';
-            
-            try {
-                const q = query(collection(db, 'warranties'), orderBy('createdAt', 'desc'));
-                const querySnapshot = await getDocs(q);
-                allWarranties = [];
-                
-                const supplierIds = new Set();
-                for (const docSnap of querySnapshot.docs) {
-                    const data = docSnap.data();
-                    if (data.supplierId) supplierIds.add(data.supplierId);
-                }
-                
-                for (const supplierId of supplierIds) {
-                    await getSupplierName(supplierId);
-                }
-                
-                for (const docSnap of querySnapshot.docs) {
-                    const data = docSnap.data();
-                    allWarranties.push({ 
-                        id: docSnap.id, 
-                        ...data,
-                        supplierName: data.supplierId ? await getSupplierName(data.supplierId) : 'N/A'
-                    });
-                }
-                
-                const total = allWarranties.length;
-                const currierCount = allWarranties.filter(w => w.status === 'currier').length;
-                const receivedCount = allWarranties.filter(w => w.status === 'supplier_received').length;
-                const deliveredCount = allWarranties.filter(w => w.status === 'customer_delivered').length;
-                
-                document.getElementById('totalWarranty').textContent = total;
-                document.getElementById('currierCount').textContent = currierCount;
-                document.getElementById('receivedCount').textContent = receivedCount;
-                document.getElementById('deliveredCount').textContent = deliveredCount;
-                
-                applyFiltersAndRender();
-                
-            } catch (error) {
-                console.error('Error loading warranties:', error);
-                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
-            }
+            return null;
         }
         
         function applyFiltersAndRender() {
             const searchTerm = document.getElementById('customerWarrantySearch').value.toLowerCase();
-            let filtered = filterWarranties(allWarranties, currentFilter);
+            const statusFilter = document.getElementById('filterStatus').value;
+            const fromDate = document.getElementById('filterDateFrom').value;
+            const toDate = document.getElementById('filterDateTo').value;
+            
+            let filtered = allWarranties;
+            
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(w => w.status === statusFilter);
+            }
+            
+            if (fromDate) {
+                const from = parseDate(fromDate);
+                if (from) {
+                    filtered = filtered.filter(w => {
+                        const wDate = w.warrantyDate ? parseDate(w.warrantyDate) : null;
+                        return wDate && wDate >= from;
+                    });
+                }
+            }
+            if (toDate) {
+                const to = parseDate(toDate);
+                if (to) {
+                    to.setHours(23,59,59,999);
+                    filtered = filtered.filter(w => {
+                        const wDate = w.warrantyDate ? parseDate(w.warrantyDate) : null;
+                        return wDate && wDate <= to;
+                    });
+                }
+            }
             
             if (searchTerm) {
                 filtered = filtered.filter(w => 
@@ -1227,25 +739,25 @@
                 );
             }
             
-            renderTable(filtered);
+            // Paginate
+            const start = (currentPage - 1) * perPage;
+            const end = start + perPage;
+            const paginated = filtered.slice(start, end);
+            renderTable(paginated, filtered.length);
         }
         
-        function renderTable(filtered) {
+        function renderTable(filtered, totalCount = 0) {
             const tbody = document.getElementById('customerWarrantyBody');
-            
             if (filtered.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No warranty records found</p></td>';
                 return;
             }
-            
             tbody.innerHTML = '';
             for (const warranty of filtered) {
                 const statusIcon = getStatusIcon(warranty.status);
-                
                 const row = tbody.insertRow();
-                row.className = 'table-row-hover transition-colors cursor-pointer';
+                row.className = 'table-row-hover transition-colors';
                 row.setAttribute('data-warranty-id', warranty.id);
-                
                 row.innerHTML = `
                     <td class="px-3 py-2.5 text-sm whitespace-nowrap">${escapeHtml(warranty.warrantyDate || 'N/A')}</td>
                     <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(warranty.customerName)}</td>
@@ -1253,19 +765,14 @@
                     <td class="px-3 py-2.5 text-sm">${escapeHtml(warranty.productName)}</td>
                     <td class="px-3 py-2.5 text-xs font-mono">${escapeHtml(warranty.serialNumber || '-')}</td>
                     <td class="px-3 py-2.5 text-xs">${escapeHtml(warranty.currierName || '-')}</td>
-                    <td class="px-3 py-2.5 text-center">
-                        ${statusIcon}
-                    </td>
+                    <td class="px-3 py-2.5 text-center">${statusIcon}</td>
                     <td class="px-3 py-2.5 text-center">
                         <div class="flex items-center justify-center gap-1.5">
-                            <!-- Details Button -->
                             <button class="action-btn details-btn text-info hover:bg-info/10" data-warranty='${JSON.stringify(warranty)}' title="View Details">
                                 <i class="fas fa-eye text-sm"></i>
                                 <span class="tooltip-text">View Details</span>
                             </button>
-                            
-                            <!-- Invoice Button -->
-                            <button class="action-btn invoice-btn text-primary hover:bg-primary/10" data-id="${warranty.id}" title="Generate Slip/Receipt">
+                            <button class="action-btn invoice-btn text-primary hover:bg-primary/10" data-id="${warranty.id}" title="Generate Slip">
                                 <i class="fas fa-file-invoice text-sm"></i>
                                 <span class="tooltip-text">Generate Slip</span>
                             </button>
@@ -1282,7 +789,6 @@
                     showDetailsModal(warranty);
                 });
             });
-            
             // Invoice buttons
             document.querySelectorAll('.invoice-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -1294,7 +800,6 @@
             });
         }
         
-        // Details Modal
         function showDetailsModal(warranty) {
             const statusIcon = getStatusIcon(warranty.status);
             const detailsHtml = `
@@ -1357,7 +862,6 @@
                     </div>` : ''}
                 </div>
             `;
-            
             const detailsModal = document.createElement('div');
             detailsModal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[160] hidden transition-all duration-300 p-3';
             detailsModal.innerHTML = `
@@ -1378,14 +882,8 @@
             `;
             document.body.appendChild(detailsModal);
             detailsModal.classList.remove('hidden');
-            
-            const closeModal = () => {
-                detailsModal.classList.add('hidden');
-                setTimeout(() => detailsModal.remove(), 300);
-            };
-            detailsModal.querySelectorAll('.close-details-modal, .close-details-modal-footer').forEach(btn => {
-                btn.addEventListener('click', closeModal);
-            });
+            const closeModal = () => { detailsModal.classList.add('hidden'); setTimeout(() => detailsModal.remove(), 300); };
+            detailsModal.querySelectorAll('.close-details-modal, .close-details-modal-footer').forEach(btn => btn.addEventListener('click', closeModal));
             detailsModal.addEventListener('click', (e) => { if (e.target === detailsModal) closeModal(); });
         }
         
@@ -1394,65 +892,164 @@
             return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
         
-        // Event listeners
-        document.getElementById('exportBtn').addEventListener('click', exportToCSV);
-        document.getElementById('refreshBtn').addEventListener('click', () => {
-            loadCustomerWarranties();
-            showToast('Data refreshed!', 'success');
-        });
-        document.getElementById('customerWarrantySearch').addEventListener('input', () => applyFiltersAndRender());
-        document.getElementById('darkModeToggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            document.body.classList.toggle('dark');
-        });
+        // Invoice / Slip
+        function generateInvoiceHTML(warranty) {
+            const statusText = getStatusText(warranty.status);
+            const statusClass = getStatusClass(warranty.status);
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            return `
+                <div id="invoicePrintArea">
+                    <div class="invoice-slip-header">
+                        <h1>${escapeHtml(warranty.businessName || 'Elias Computer')}</h1>
+                        <div class="sub-title">Warranty Management System</div>
+                        <div class="slip-title">Warranty Receipt / Slip</div>
+                    </div>
+                    <hr class="invoice-divider">
+                    <div class="invoice-receipt-info">
+                        <div class="left-info">
+                            <strong>Receipt #:</strong> ${warranty.warrantyId || warranty.id.slice(0, 12)}<br>
+                            <strong>Date:</strong> ${dateStr}<br>
+                            <strong>Time:</strong> ${timeStr}
+                        </div>
+                        <div class="right-info">
+                            <span class="status-badge-invoice ${statusClass}">
+                                <i class="fas ${statusConfig[warranty.status]?.icon || 'fa-clock'}"></i> ${statusText}
+                            </span>
+                        </div>
+                    </div>
+                    <hr class="invoice-divider">
+                    <div class="invoice-customer-section">
+                        <div><strong>Customer:</strong> ${escapeHtml(warranty.customerName || 'N/A')}</div>
+                        <div><strong>Phone:</strong> ${escapeHtml(warranty.customerPhone || 'N/A')}</div>
+                        <div><strong>Currier:</strong> ${escapeHtml(warranty.currierName || 'Not dispatched yet')}</div>
+                        ${warranty.currierTracking ? `<div><strong>Tracking:</strong> ${escapeHtml(warranty.currierTracking)}</div>` : ''}
+                    </div>
+                    <table class="invoice-details-table">
+                        <thead><tr><th style="width:40%;">Description</th><th style="width:60%;">Details</th></tr></thead>
+                        <tbody>
+                            <tr><td class="label">Warranty Date</td><td class="value">${warranty.warrantyDate || 'N/A'}</td></tr>
+                            <tr><td class="label">Product Name</td><td class="value">${escapeHtml(warranty.productName || 'N/A')}</td></tr>
+                            <tr><td class="label">Serial Number</td><td class="serial-value">${escapeHtml(warranty.serialNumber || 'N/A')}</td></tr>
+                            ${warranty.newSerialNumber ? `<tr><td class="label">New Serial (Replaced)</td><td class="serial-value" style="color:#22c55e;">${escapeHtml(warranty.newSerialNumber)}</td></tr>` : ''}
+                            <tr><td class="label">Supplier</td><td class="value">${escapeHtml(warranty.supplierName || 'N/A')}</td></tr>
+                            <tr><td class="label">Currier</td><td class="value">${escapeHtml(warranty.currierName || 'Not dispatched yet')}</td></tr>
+                            ${warranty.supplierReceivedDate ? `<tr><td class="label">Supplier Received</td><td class="value">${warranty.supplierReceivedDate}</td></tr>` : ''}
+                            ${warranty.deliveredDate ? `<tr><td class="label">Customer Delivered</td><td class="value">${warranty.deliveredDate}</td></tr>` : ''}
+                        </tbody>
+                    </table>
+                    ${warranty.problemDescription ? `
+                    <div class="invoice-problem-section">
+                        <strong><i class="fas fa-exclamation-triangle"></i> Problem Description</strong>
+                        <div class="problem-text">${escapeHtml(warranty.problemDescription)}</div>
+                    </div>` : ''}
+                    <div class="invoice-footer">
+                        <p>This is a computer generated receipt. Thank you for choosing JackDev.</p>
+                        <p class="contact"><i class="fas fa-phone"></i> For any query, please contact 01711-204628</p>
+                        <div class="ref">${dateStr} • Ref: ${warranty.warrantyId || warranty.id.slice(0, 8)}</div>
+                    </div>
+                </div>
+            `;
+        }
         
-        document.querySelectorAll('.filter-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                currentFilter = tab.dataset.filter;
+        function showInvoiceModal(warranty) {
+            document.getElementById('invoiceContent').innerHTML = generateInvoiceHTML(warranty);
+            document.getElementById('invoiceModal').classList.remove('hidden');
+        }
+        
+        // Load data
+        async function loadCustomerWarranties() {
+            const tbody = document.getElementById('customerWarrantyBody');
+            tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading warranty records...</p></td>';
+            try {
+                const q = query(collection(db, 'warranties'), orderBy('createdAt', 'desc'));
+                const querySnapshot = await getDocs(q);
+                allWarranties = [];
+                const supplierIds = new Set();
+                for (const docSnap of querySnapshot.docs) {
+                    const data = docSnap.data();
+                    if (data.supplierId) supplierIds.add(data.supplierId);
+                }
+                for (const supplierId of supplierIds) {
+                    await getSupplierName(supplierId);
+                }
+                for (const docSnap of querySnapshot.docs) {
+                    const data = docSnap.data();
+                    allWarranties.push({ 
+                        id: docSnap.id, 
+                        ...data,
+                        supplierName: data.supplierId ? await getSupplierName(data.supplierId) : 'N/A'
+                    });
+                }
+                document.getElementById('totalWarranty').textContent = allWarranties.length;
+                document.getElementById('currierCount').textContent = allWarranties.filter(w => w.status === 'currier').length;
+                document.getElementById('receivedCount').textContent = allWarranties.filter(w => w.status === 'supplier_received').length;
+                document.getElementById('deliveredCount').textContent = allWarranties.filter(w => w.status === 'customer_delivered').length;
                 applyFiltersAndRender();
-            });
+            } catch (error) {
+                console.error('Error loading warranties:', error);
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const searchTerm = document.getElementById('customerWarrantySearch').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            let filtered = allWarranties;
+            if (statusFilter !== 'all') filtered = filtered.filter(w => w.status === statusFilter);
+            if (searchTerm) filtered = filtered.filter(w => (w.customerName && w.customerName.toLowerCase().includes(searchTerm)) || (w.customerPhone && w.customerPhone.includes(searchTerm)));
+            if (filtered.length === 0) { showToast('No data to export', 'error'); return; }
+            const headers = ['Date','Customer Name','Phone','Product','Serial Number','Currier Name','Supplier','Status'];
+            const rows = filtered.map(w => [w.warrantyDate||'N/A', w.customerName||'N/A', w.customerPhone||'N/A', w.productName||'N/A', w.serialNumber||'N/A', w.currierName||'N/A', w.supplierName||'N/A', getStatusText(w.status)]);
+            const csvContent = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `customer_warranty_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            showToast('Data exported successfully!', 'success');
         });
         
-        // Invoice modal events - IMPROVED PRINT FUNCTIONALITY
-        document.getElementById('closeInvoiceModalBtn').addEventListener('click', () => document.getElementById('invoiceModal').classList.add('hidden'));
+        document.getElementById('refreshBtn').addEventListener('click', () => { loadCustomerWarranties(); showToast('Data refreshed!', 'success'); });
+        document.getElementById('customerWarrantySearch').addEventListener('input', applyFiltersAndRender);
+        document.getElementById('filterStatus').addEventListener('change', applyFiltersAndRender);
+        document.getElementById('filterDateFrom').addEventListener('change', applyFiltersAndRender);
+        document.getElementById('filterDateTo').addEventListener('change', applyFiltersAndRender);
+        document.getElementById('perPageSelect').addEventListener('change', (e) => {
+            perPage = parseInt(e.target.value);
+            currentPage = 1;
+            applyFiltersAndRender();
+        });
+        document.getElementById('darkModeToggle').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
         
+        // Invoice modal events
+        document.getElementById('closeInvoiceModalBtn').addEventListener('click', () => document.getElementById('invoiceModal').classList.add('hidden'));
         document.getElementById('printInvoiceBtn').addEventListener('click', () => {
-            // Make sure modal is visible for printing
             const modal = document.getElementById('invoiceModal');
             modal.classList.remove('hidden');
-            
-            // Wait for any pending renders, then print
-            setTimeout(() => {
-                window.print();
-            }, 300);
+            setTimeout(() => window.print(), 300);
         });
-        
         document.getElementById('invoiceModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('invoiceModal')) {
-                document.getElementById('invoiceModal').classList.add('hidden');
-            }
+            if (e.target === document.getElementById('invoiceModal')) document.getElementById('invoiceModal').classList.add('hidden');
         });
         
-        // Logout functionality
+        // Logout
         const logoutModal = document.getElementById('logoutModal');
         const logoutLink = document.getElementById('logoutLink');
         const cancelLogout = document.getElementById('cancelLogoutBtn');
         const confirmLogout = document.getElementById('confirmLogoutBtn');
         const { logout } = await import('./js/auth.js');
+        logoutLink?.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
+        cancelLogout?.addEventListener('click', () => logoutModal.classList.add('hidden'));
+        confirmLogout?.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
         
-        if (logoutLink) {
-            logoutLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                logoutModal.classList.remove('hidden');
-            });
-        }
-        if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
-        if (confirmLogout) confirmLogout.addEventListener('click', async () => {
-            logoutModal.classList.add('hidden');
-            await logout();
-        });
+        // Footer year
+        document.getElementById('footerYear').textContent = new Date().getFullYear();
         
         // Initialize
         loadCustomerWarranties();

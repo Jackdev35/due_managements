@@ -49,16 +49,16 @@
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; }
         
-        /* Hide scrollbar in sidebar navigation - Same as ledger.html */
+        /* Hide scrollbar in sidebar navigation */
         .sidebar-nav-fixed {
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: none;
         }
         
         .nav-active {
@@ -111,10 +111,8 @@
         }
         
         .skeleton-text { height: 20px; width: 100%; margin: 4px 0; }
-        .skeleton-card { height: 80px; }
-        .skeleton-chart { height: 210px; }
         
-        /* Fixed Sidebar Structure - Same as ledger.html */
+        /* Fixed Sidebar Structure */
         .sidebar-fixed {
             display: flex;
             flex-direction: column;
@@ -132,11 +130,46 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: none;
+        }
+
+        /* Custom scroll for activity lists */
+        .activity-scroll {
+            max-height: 280px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        .activity-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .activity-scroll::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+        .dark .activity-scroll::-webkit-scrollbar-thumb {
+            background: #4b5563;
+        }
+        .activity-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .ratio-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+        .ratio-bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+        .dark .ratio-bar {
+            background: #374151;
         }
     </style>
 </head>
@@ -144,9 +177,8 @@
 
 <div class="flex min-h-screen">
     
-    <!-- SIDEBAR - Fixed Structure (Same as ledger.html) -->
+    <!-- SIDEBAR -->
     <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
-        <!-- Header - Fixed at top (does not scroll) -->
         <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
@@ -164,7 +196,6 @@
             </div>
         </div>
         
-        <!-- Navigation - Scrollable area (scrollbar hidden) -->
         <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
             <nav class="space-y-1.5">
                 <a href="dashboard.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150 group">
@@ -200,7 +231,6 @@
                     <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
                 </a>
                 
-                <!-- Warranty Submenu - Updated -->
                 <div class="has-submenu" id="warrantySubmenu">
                     <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
@@ -230,7 +260,6 @@
                 </a>
             </nav>
             
-            <!-- Logout Button - Now scrolls with menu -->
             <div class="pt-4 mt-2 border-t border-white/10">
                 <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
                     <i class="fas fa-sign-out-alt text-sm w-5"></i><span class="text-sm font-medium">Logout</span>
@@ -253,14 +282,11 @@
                         <h2 class="text-sm font-semibold text-gray-800 dark:text-white tracking-tight">Executive Dashboard</h2>
                     </div>
                 </div>
-                
                 <div class="flex items-center gap-3">
-                    <div class="relative">
-                        <button id="notificationBell" class="relative p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all focus:outline-none">
-                            <i class="far fa-bell text-base"></i>
-                            <span id="notificationBadge" class="absolute -top-0.5 -right-0.5 w-3 h-3 bg-accent rounded-full border border-white dark:border-gray-800 notification-badge"></span>
-                        </button>
-                    </div>
+                    <button id="notificationBell" class="relative p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+                        <i class="far fa-bell text-base"></i>
+                        <span id="notificationBadge" class="absolute -top-0.5 -right-0.5 w-3 h-3 bg-accent rounded-full border border-white dark:border-gray-800 notification-badge"></span>
+                    </button>
                     <button id="darkModeToggle" class="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
                         <i class="fas fa-moon dark:hidden text-sm"></i><i class="fas fa-sun hidden dark:inline-block text-sm"></i>
                     </button>
@@ -273,68 +299,132 @@
         
         <div class="p-4 md:p-5">
             
-            <!-- Stats Cards with Skeleton Loader -->
+            <!-- Stats Cards -->
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-                <!-- Card 1 -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm stat-card">
                     <div class="flex items-center justify-between"><div class="bg-blue-50 dark:bg-blue-900/20 w-9 h-9 rounded-xl flex items-center justify-center"><i class="fas fa-users text-blue-600 dark:text-blue-400 text-sm"></i></div><span class="text-[10px] font-medium text-gray-400">active</span></div>
                     <div class="mt-2"><h3 class="text-gray-500 dark:text-gray-400 text-[11px] font-semibold uppercase tracking-wider">Total Customers</h3><p class="text-2xl font-bold text-gray-800 dark:text-white mt-0.5" id="totalCustomers">0</p></div>
                 </div>
-                <!-- Card 2 -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm stat-card">
                     <div class="flex items-center justify-between"><div class="bg-rose-50 dark:bg-rose-900/20 w-9 h-9 rounded-xl flex items-center justify-center"><i class="fas fa-dollar-sign text-rose-600 dark:text-rose-400 text-sm"></i></div><span class="text-[10px] font-medium text-gray-400">outstanding</span></div>
                     <div><h3 class="text-gray-500 dark:text-gray-400 text-[11px] font-semibold">Total Due</h3><p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalDue">৳0</p></div>
                 </div>
-                <!-- Card 3 -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm stat-card">
                     <div class="flex items-center justify-between"><div class="bg-emerald-50 dark:bg-emerald-900/20 w-9 h-9 rounded-xl flex items-center justify-center"><i class="fas fa-wallet text-emerald-600 dark:text-emerald-400 text-sm"></i></div><span class="text-[10px] font-medium text-gray-400">revenue</span></div>
                     <div><h3 class="text-gray-500 dark:text-gray-400 text-[11px] font-semibold">Collections</h3><p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalCollections">৳0</p></div>
                 </div>
-                <!-- Card 4 -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm stat-card">
                     <div class="flex items-center justify-between"><div class="bg-amber-50 dark:bg-amber-900/20 w-9 h-9 rounded-xl flex items-center justify-center"><i class="fas fa-calendar-day text-amber-600 dark:text-amber-400 text-sm"></i></div><span class="text-[10px] font-medium text-gray-400">today</span></div>
                     <div><h3 class="text-gray-500 dark:text-gray-400 text-[11px] font-semibold">Today's Coll.</h3><p class="text-2xl font-bold text-gray-800 dark:text-white" id="todayCollection">৳0</p></div>
                 </div>
-                <!-- Card 5 -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm stat-card">
-                    <div class="flex items-center justify-between"><div class="bg-purple-50 dark:bg-purple-900/20 w-9 h-9 rounded-xl flex items-center justify-center"><i class="fas fa-file-invoice-dollar text-purple-600 dark:text-purple-400 text-sm"></i></div><span class="text-[10px] font-medium text-gray-400">total sales</span></div>
-                    <div><h3 class="text-gray-500 dark:text-gray-400 text-[11px] font-semibold">Invoice Value</h3><p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalInvoiceValue">৳0</p></div>
+                    <div class="flex items-center justify-between"><div class="bg-purple-50 dark:bg-purple-900/20 w-9 h-9 rounded-xl flex items-center justify-center"><i class="fas fa-file-invoice-dollar text-purple-600 dark:text-purple-400 text-sm"></i></div><span class="text-[10px] font-medium text-gray-400">total due entry</span></div>
+                    <div><h3 class="text-gray-500 dark:text-gray-400 text-[11px] font-semibold">Total Due Entry</h3><p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalInvoiceValue">৳0</p></div>
                 </div>
             </div>
             
-            <!-- Charts Section with Skeleton -->
+            <!-- Charts Section -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
-                <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
-                    <div class="flex justify-between items-center mb-3"><h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-chart-line text-primary mr-2"></i>Monthly Due Trend</h3><span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">current year</span></div>
-                    <canvas id="dueChart" style="max-height: 210px;"></canvas>
+                <div class="space-y-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
+                        <div class="flex justify-between items-center mb-3"><h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-chart-line text-primary mr-2"></i>Monthly Due Trend</h3><span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">current year</span></div>
+                        <canvas id="dueChart" style="max-height: 180px;"></canvas>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
+                        <div class="flex justify-between items-center mb-3"><h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-chart-line text-amber-600 mr-2"></i>Daily Due (Last 7 Days)</h3><span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">realtime</span></div>
+                        <canvas id="dailyDueChart" style="max-height: 160px;"></canvas>
+                    </div>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
-                    <div class="flex justify-between items-center mb-3"><h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-chart-bar text-primary mr-2"></i>Collection Performance</h3><span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">monthly</span></div>
-                    <canvas id="collectionChart" style="max-height: 210px;"></canvas>
+                <div class="space-y-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
+                        <div class="flex justify-between items-center mb-3"><h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-chart-line text-emerald-600 mr-2"></i>Daily Collection (Current Month)</h3><span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">realtime</span></div>
+                        <canvas id="collectionChart" style="max-height: 180px;"></canvas>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
+                        <div class="flex justify-between items-center mb-3"><h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-chart-bar text-primary mr-2"></i>Monthly Collection</h3><span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">current year</span></div>
+                        <canvas id="monthlyCollectionChart" style="max-height: 160px;"></canvas>
+                    </div>
                 </div>
             </div>
             
-            <!-- Recent Transactions with Skeleton -->
-            <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
-                <div class="flex justify-between items-center px-5 py-3 border-b border-gray-100 dark:border-gray-700">
-                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-history text-primary mr-2"></i>Recent Activity</h3>
-                    <button id="viewAllBtn" class="text-[11px] font-medium text-primary hover:text-primary-dark transition flex items-center gap-1">Full Ledger <i class="fas fa-arrow-right text-[9px]"></i></button>
+            <!-- Recent Activity + Recent Collection + Ratio -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+                <!-- Recent Activity -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
+                    <div class="flex justify-between items-center px-5 py-3 border-b border-gray-100 dark:border-gray-700">
+                        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-history text-primary mr-2"></i>Recent Activity</h3>
+                        <button id="viewAllBtn" class="text-[11px] font-medium text-primary hover:text-primary-dark transition flex items-center gap-1">Full Ledger <i class="fas fa-arrow-right text-[9px]"></i></button>
+                    </div>
+                    <div id="recentTransactionsList" class="divide-y divide-gray-100 dark:divide-gray-700 activity-scroll">
+                        <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
+                        <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
+                        <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
+                    </div>
                 </div>
-                <div id="recentTransactionsList" class="divide-y divide-gray-100 dark:divide-gray-700 max-h-[340px] overflow-y-auto">
-                    <!-- Skeleton Loader for Transactions -->
-                    <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
-                    <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
-                    <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
+                
+                <!-- Recent Collection + Ratio -->
+                <div class="space-y-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm">
+                        <div class="flex justify-between items-center px-5 py-3 border-b border-gray-100 dark:border-gray-700">
+                            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-hand-holding-usd text-emerald-600 mr-2"></i>Recent Collection</h3>
+                            <span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">latest</span>
+                        </div>
+                        <div id="recentCollectionList" class="divide-y divide-gray-100 dark:divide-gray-700 activity-scroll">
+                            <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
+                            <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Collection Ratio -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 shadow-sm">
+                        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3"><i class="fas fa-percentage text-accent mr-2"></i>Collection Ratio</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                                    <span>Collection vs Total Due</span>
+                                    <span id="ratioPercentage" class="font-semibold">0%</span>
+                                </div>
+                                <div class="ratio-bar mt-1">
+                                    <div class="fill" id="ratioFill" style="width:0%; background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e);"></div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 text-center text-xs">
+                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2">
+                                    <p class="text-gray-500 dark:text-gray-400">Total Due</p>
+                                    <p class="font-bold text-red-600 dark:text-red-400" id="ratioTotalDue">৳0</p>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2">
+                                    <p class="text-gray-500 dark:text-gray-400">Total Collected</p>
+                                    <p class="font-bold text-emerald-600 dark:text-emerald-400" id="ratioTotalCollected">৳0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            
         </div>
+        
+        <!-- Footer -->
+        <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+            <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                    &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span> 
+                    <span class="text-gray-300 dark:border-gray-600">|</span> 
+                    <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                    <span class="text-gray-300 dark:border-gray-600">|</span> 
+                    <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
+                </p>
+            </div>
+        </footer>
+        
     </main>
 </div>
 
-<!-- NOTIFICATION MODAL -->
-<div id="notificationModal" class="fixed inset-0 z-[200] hidden items-center justify-center" style="display: none;">
+<!-- Notification Modal -->
+<div id="notificationModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
     <div class="absolute inset-0 modal-backdrop" id="modalBackdrop"></div>
-    <div class="relative bg-white dark:bg-gray-850 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden modal-animate" id="modalContainer">
+    <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden modal-animate">
         <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center"><i class="fas fa-bell text-accent text-sm"></i></div>
@@ -343,7 +433,7 @@
             <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-all p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-times text-base"></i></button>
         </div>
         <div class="p-3 max-h-[420px] overflow-y-auto space-y-2 bg-gray-50 dark:bg-gray-900/50" id="notificationList">
-            <div class="flex gap-3 p-3 rounded-xl bg-white dark:bg-gray-800 shadow-sm border-l-3 border-accent" style="border-left-width: 3px; border-left-color: #d4af37;">
+            <div class="flex gap-3 p-3 rounded-xl bg-white dark:bg-gray-800 shadow-sm border-l-3 border-accent" style="border-left-width:3px;border-left-color:#d4af37;">
                 <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0"><i class="fas fa-dollar-sign text-accent text-xs"></i></div>
                 <div><p class="text-xs font-medium text-gray-800 dark:text-white">Collection reminder: <span class="font-semibold">3 due entries</span> pending follow-up</p><span class="text-[9px] text-gray-400 flex items-center gap-1 mt-1"><i class="far fa-clock"></i> Just now</span></div>
             </div>
@@ -373,31 +463,22 @@
 </script>
 
 <script type="module">
-    import { db, collection, getDocs, query, orderBy, limit, doc, getDoc } from './js/firebase.js';
+    import { db, collection, getDocs, query, orderBy, limit } from './js/firebase.js';
     
-    let dueChart, collectionChart;
+    let dueChart, dailyDueChart, collectionChart, monthlyCollectionChart;
     let statsCache = null;
     let customerNameMap = new Map();
     
-    // Submenu toggle for Due Entry
-    const dueSubmenu = document.getElementById('dueSubmenu');
-    const dueTrigger = dueSubmenu?.querySelector('a');
-    dueTrigger?.addEventListener('click', (e) => {
-        e.preventDefault();
-        dueSubmenu.classList.toggle('open');
-        dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
+    // ─── Sidebar Toggles ───
+    document.querySelectorAll('.has-submenu > a').forEach(trigger => {
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            const parent = trigger.closest('.has-submenu');
+            parent.classList.toggle('open');
+            parent.querySelector('.submenu-modern')?.classList.toggle('open');
+        });
     });
     
-    // Submenu toggle for Warranty
-    const warrantySubmenu = document.getElementById('warrantySubmenu');
-    const warrantyTrigger = warrantySubmenu?.querySelector('a');
-    warrantyTrigger?.addEventListener('click', (e) => {
-        e.preventDefault();
-        warrantySubmenu.classList.toggle('open');
-        warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-    });
-    
-    // Sidebar toggle
     const sidebar = document.getElementById('sidebar');
     const menuToggle = document.getElementById('menuToggle');
     const closeSidebarBtn = document.getElementById('closeSidebarBtn');
@@ -418,8 +499,7 @@
     
     function closeSidebar() {
         sidebar.classList.add('-translate-x-full');
-        const overlay = document.getElementById('mobileOverlay');
-        if (overlay) overlay.remove();
+        document.getElementById('mobileOverlay')?.remove();
     }
     
     menuToggle?.addEventListener('click', openSidebar);
@@ -435,6 +515,7 @@
     if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
     else sidebar.classList.add('-translate-x-full');
     
+    // ─── Toast ───
     function showToast(message, type = 'success') {
         const toast = document.createElement('div');
         toast.className = `fixed bottom-5 right-5 z-[300] px-4 py-2 rounded-lg shadow-lg text-xs font-medium ${type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} flex items-center gap-2`;
@@ -445,46 +526,38 @@
     
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
     
+    // ─── Customer Names ───
     async function loadCustomerNames() {
         try {
-            const customersSnap = await getDocs(collection(db, 'customers'));
+            const snap = await getDocs(collection(db, 'customers'));
             customerNameMap.clear();
-            customersSnap.forEach(doc => {
-                customerNameMap.set(doc.id, doc.data().name);
-            });
-        } catch (error) {
-            console.error('Error loading customer names:', error);
-        }
+            snap.forEach(d => customerNameMap.set(d.id, d.data().name));
+        } catch (e) { console.error('Error loading customer names:', e); }
     }
     
-    function getCustomerName(customerId) {
-        if (!customerId) return 'Unknown';
-        return customerNameMap.get(customerId) || 'Unknown';
+    function getCustomerName(id) {
+        if (!id) return 'Unknown';
+        return customerNameMap.get(id) || 'Unknown';
     }
     
+    // ─── Load Dashboard ───
     async function loadDashboardData() {
         try {
-            if (customerNameMap.size === 0) {
-                await loadCustomerNames();
-            }
+            if (customerNameMap.size === 0) await loadCustomerNames();
             
             if (!statsCache) {
-                const statsDoc = await getDoc(doc(db, 'stats', 'global'));
-                if (statsDoc.exists()) {
-                    statsCache = statsDoc.data();
-                } else {
-                    const customersSnap = await getDocs(collection(db, 'customers'));
-                    const transactionsSnap = await getDocs(collection(db, 'transactions'));
-                    let totalDue = 0, totalInvoiceValue = 0, totalCollections = 0;
-                    customersSnap.forEach(d => { totalDue += (d.data().totalDue || 0); totalInvoiceValue += (d.data().invoiceValue || 0); });
-                    transactionsSnap.forEach(d => { if (d.data().type === 'collection') totalCollections += (d.data().collectionAmount || 0); });
-                    statsCache = {
-                        totalCustomers: customersSnap.size,
-                        totalDue: totalDue,
-                        totalInvoiceValue: totalInvoiceValue,
-                        totalCollections: totalCollections
-                    };
-                }
+                const customersSnap = await getDocs(collection(db, 'customers'));
+                const transactionsSnap = await getDocs(collection(db, 'transactions'));
+                
+                let totalDue = 0, totalInvoiceValue = 0, totalCollections = 0;
+                customersSnap.forEach(d => { totalDue += (d.data().totalDue || 0); });
+                transactionsSnap.forEach(d => {
+                    const t = d.data();
+                    if (t.type === 'due') totalInvoiceValue += (t.dueAmount || t.totalAmount || 0);
+                    else if (t.type === 'collection') totalCollections += (t.collectionAmount || 0);
+                });
+                
+                statsCache = { totalCustomers: customersSnap.size, totalDue, totalInvoiceValue, totalCollections };
             }
             
             document.getElementById('totalCustomers').textContent = statsCache.totalCustomers || 0;
@@ -493,18 +566,19 @@
             document.getElementById('totalCollections').textContent = '৳' + (statsCache.totalCollections || 0).toFixed(2);
             
             const today = new Date().toISOString().split('T')[0];
-            const todayTransQuery = query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(100));
-            const todaySnap = await getDocs(todayTransQuery);
+            const todaySnap = await getDocs(query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(100)));
             let todayCollection = 0;
-            todaySnap.forEach(doc => {
-                const t = doc.data();
+            todaySnap.forEach(d => {
+                const t = d.data();
                 if (t.type === 'collection' && t.date === today) todayCollection += (t.collectionAmount || 0);
             });
             document.getElementById('todayCollection').textContent = '৳' + todayCollection.toFixed(2);
             
             await Promise.all([
                 loadCharts(),
-                loadRecentTransactions()
+                loadRecentTransactions(),
+                loadRecentCollection(),
+                updateRatio()
             ]);
             
         } catch (e) {
@@ -513,45 +587,103 @@
         }
     }
     
+    // ─── Charts ───
     async function loadCharts() {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const dueData = new Array(12).fill(0);
-        const collData = new Array(12).fill(0);
+        const monthlyCollData = new Array(12).fill(0);
         
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
         const lastYear = new Date();
-        lastYear.setFullYear(lastYear.getFullYear() - 1);
+        lastYear.setFullYear(year - 1);
         const lastYearStr = lastYear.toISOString().split('T')[0];
         
-        const transQuery = query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(500));
-        const transSnap = await getDocs(transQuery);
+        const transSnap = await getDocs(query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(1000)));
+        
+        // Daily Due (last 7 days)
+        const dayLabels = [];
+        const dailyDueData = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - i);
+            dayLabels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            dailyDueData.push(0);
+        }
+        
+        // Daily Collection (current month)
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const dailyCollLabels = [];
+        const dailyCollData = [];
+        for (let d = 1; d <= daysInMonth; d++) {
+            dailyCollLabels.push(d.toString());
+            dailyCollData.push(0);
+        }
         
         transSnap.forEach(doc => {
             const t = doc.data();
-            if (t.date && t.date >= lastYearStr) {
+            if (!t.date) return;
+            
+            if (t.date >= lastYearStr) {
                 const m = new Date(t.date).getMonth();
                 if (t.type === 'due') dueData[m] += (t.dueAmount || t.totalAmount || 0);
-                else if (t.type === 'collection') collData[m] += (t.collectionAmount || 0);
+                else if (t.type === 'collection') monthlyCollData[m] += (t.collectionAmount || 0);
+            }
+            
+            if (t.type === 'due') {
+                const txDate = new Date(t.date);
+                const diff = Math.floor((now - txDate) / (1000 * 60 * 60 * 24));
+                if (diff >= 0 && diff <= 6) {
+                    dailyDueData[6 - diff] += (t.dueAmount || t.totalAmount || 0);
+                }
+            }
+            
+            if (t.type === 'collection') {
+                const txDate = new Date(t.date);
+                if (txDate.getFullYear() === year && txDate.getMonth() === month) {
+                    const day = txDate.getDate();
+                    if (day >= 1 && day <= daysInMonth) {
+                        dailyCollData[day - 1] += (t.collectionAmount || 0);
+                    }
+                }
             }
         });
+        
+        const chartOptions = { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { font: { size: 8 } } } }, scales: { y: { beginAtZero: true, ticks: { font: { size: 8 } } }, x: { ticks: { font: { size: 8 } } } } };
         
         if (dueChart) dueChart.destroy();
         dueChart = new Chart(document.getElementById('dueChart'), {
             type: 'line',
-            data: { labels: months, datasets: [{ label: 'Due Amount (৳)', data: dueData, borderColor: '#d4af37', backgroundColor: 'rgba(212,175,55,0.05)', borderWidth: 2, pointBackgroundColor: '#d4af37', tension: 0.3, fill: true }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { font: { size: 9 } } }, tooltip: { callbacks: { label: (ctx) => `৳${ctx.raw.toFixed(0)}` } } } }
+            data: { labels: months, datasets: [{ label: 'Due (৳)', data: dueData, borderColor: '#d4af37', backgroundColor: 'rgba(212,175,55,0.05)', borderWidth: 2, pointBackgroundColor: '#d4af37', tension: 0.3, fill: true }] },
+            options: chartOptions
+        });
+        
+        if (dailyDueChart) dailyDueChart.destroy();
+        dailyDueChart = new Chart(document.getElementById('dailyDueChart'), {
+            type: 'line',
+            data: { labels: dayLabels, datasets: [{ label: 'Daily Due (৳)', data: dailyDueData, borderColor: '#d97706', backgroundColor: 'rgba(217,119,6,0.08)', borderWidth: 2, pointBackgroundColor: '#d97706', pointRadius: 3, tension: 0.3, fill: true }] },
+            options: chartOptions
         });
         
         if (collectionChart) collectionChart.destroy();
         collectionChart = new Chart(document.getElementById('collectionChart'), {
+            type: 'line',
+            data: { labels: dailyCollLabels, datasets: [{ label: 'Daily Coll. (৳)', data: dailyCollData, borderColor: '#2c7a4d', backgroundColor: 'rgba(44,122,77,0.08)', borderWidth: 2, pointBackgroundColor: '#2c7a4d', pointRadius: 2, tension: 0.3, fill: true }] },
+            options: { ...chartOptions, scales: { ...chartOptions.scales, x: { ...chartOptions.scales.x, maxTicksLimit: 12 } } }
+        });
+        
+        if (monthlyCollectionChart) monthlyCollectionChart.destroy();
+        monthlyCollectionChart = new Chart(document.getElementById('monthlyCollectionChart'), {
             type: 'bar',
-            data: { labels: months, datasets: [{ label: 'Collection (৳)', data: collData, backgroundColor: '#2c7a4d', borderRadius: 6, barPercentage: 0.6 }] },
-            options: { responsive: true, plugins: { legend: { labels: { font: { size: 9 } } }, tooltip: { callbacks: { label: (ctx) => `৳${ctx.raw.toFixed(0)}` } } } }
+            data: { labels: months, datasets: [{ label: 'Monthly Coll. (৳)', data: monthlyCollData, backgroundColor: '#2c7a4d', borderRadius: 4 }] },
+            options: chartOptions
         });
     }
     
+    // ─── Recent Transactions ───
     async function loadRecentTransactions() {
-        const q = query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(10));
-        const snap = await getDocs(q);
+        const snap = await getDocs(query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(8)));
         const container = document.getElementById('recentTransactionsList');
         
         if (snap.empty) {
@@ -561,95 +693,142 @@
         
         let html = '';
         for (const docSnap of snap.docs) {
-            const trans = docSnap.data();
-            let customerName = trans.customerName || getCustomerName(trans.customerId);
-            
-            const isDue = trans.type === 'due';
-            const amount = isDue ? (trans.dueAmount || trans.totalAmount || 0) : (trans.collectionAmount || 0);
+            const t = docSnap.data();
+            const name = t.customerName || getCustomerName(t.customerId);
+            const isDue = t.type === 'due';
+            const amount = isDue ? (t.dueAmount || t.totalAmount || 0) : (t.collectionAmount || 0);
             const badge = isDue ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-600' : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600';
             const icon = isDue ? 'fa-plus-circle' : 'fa-hand-holding-usd';
-            const prefix = isDue ? '+ due: ' : '- paid: ';
-            const signClass = isDue ? 'text-rose-600' : 'text-emerald-600';
+            const label = isDue ? 'Due: ' : 'Paid: ';
+            const cls = isDue ? 'text-rose-600' : 'text-emerald-600';
             
             html += `<div class="flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition">
                         <div class="flex gap-3">
                             <div class="w-8 h-8 rounded-full ${badge} flex items-center justify-center"><i class="fas ${icon} text-xs"></i></div>
-                            <div><p class="text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(customerName)}</p><p class="text-[10px] text-gray-400">${trans.date || 'N/A'}</p></div>
+                            <div><p class="text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(name)}</p><p class="text-[10px] text-gray-400">${t.date || 'N/A'}</p></div>
                         </div>
-                        <p class="font-semibold text-sm ${signClass}">${prefix} ৳${amount.toFixed(2)}</p>
+                        <p class="font-semibold text-sm ${cls}">${label} ৳${amount.toFixed(2)}</p>
                     </div>`;
         }
         container.innerHTML = html;
     }
     
-    // Notification Modal
-    const notificationModal = document.getElementById('notificationModal');
-    const notificationBell = document.getElementById('notificationBell');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const modalBackdrop = document.getElementById('modalBackdrop');
-    
-    function openNotificationModal() {
-        notificationModal.style.display = 'flex';
-        notificationModal.classList.remove('hidden');
-        notificationModal.classList.add('flex');
-        document.body.style.overflow = 'hidden';
-        const modalContainer = document.getElementById('modalContainer');
-        modalContainer.style.animation = 'none';
-        modalContainer.offsetHeight;
-        modalContainer.style.animation = 'modalSlideUp 0.2s ease-out forwards';
+    // ─── Recent Collection ───
+    async function loadRecentCollection() {
+        const snap = await getDocs(query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(8)));
+        const container = document.getElementById('recentCollectionList');
+        const collections = [];
+        snap.forEach(d => { if (d.data().type === 'collection') collections.push(d.data()); });
+        
+        if (collections.length === 0) {
+            container.innerHTML = `<div class="text-center py-8 text-gray-400"><i class="fas fa-coins text-3xl mb-2 opacity-40"></i><p class="text-xs">No collections yet</p></div>`;
+            return;
+        }
+        
+        let html = '';
+        for (const t of collections.slice(0, 8)) {
+            const name = t.customerName || getCustomerName(t.customerId);
+            html += `<div class="flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition">
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center"><i class="fas fa-hand-holding-usd text-xs"></i></div>
+                            <div><p class="text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(name)}</p><p class="text-[10px] text-gray-400">${t.date || 'N/A'}</p></div>
+                        </div>
+                        <p class="font-semibold text-sm text-emerald-600">+ ৳${(t.collectionAmount || 0).toFixed(2)}</p>
+                    </div>`;
+        }
+        container.innerHTML = html;
     }
     
-    function closeNotificationModal() {
-        notificationModal.style.display = 'none';
-        notificationModal.classList.add('hidden');
-        notificationModal.classList.remove('flex');
+    // ─── Collection Ratio ───
+    async function updateRatio() {
+        try {
+            const snap = await getDocs(collection(db, 'transactions'));
+            let due = 0, collected = 0;
+            snap.forEach(d => {
+                const t = d.data();
+                if (t.type === 'due') due += (t.dueAmount || t.totalAmount || 0);
+                else if (t.type === 'collection') collected += (t.collectionAmount || 0);
+            });
+            
+            document.getElementById('ratioTotalDue').textContent = '৳' + due.toFixed(2);
+            document.getElementById('ratioTotalCollected').textContent = '৳' + collected.toFixed(2);
+            
+            const pct = due > 0 ? Math.min((collected / due) * 100, 100) : 0;
+            const el = document.getElementById('ratioPercentage');
+            el.textContent = pct.toFixed(1) + '%';
+            
+            if (pct < 50) el.className = 'font-semibold text-red-600 dark:text-red-400';
+            else if (pct < 80) el.className = 'font-semibold text-amber-500 dark:text-amber-400';
+            else el.className = 'font-semibold text-emerald-600 dark:text-emerald-400';
+            
+            document.getElementById('ratioFill').style.width = pct + '%';
+        } catch (e) { console.error('Ratio error:', e); }
+    }
+    
+    // ─── Notification Modal ───
+    const notifModal = document.getElementById('notificationModal');
+    const notifBell = document.getElementById('notificationBell');
+    const closeNotif = document.getElementById('closeModalBtn');
+    const backdrop = document.getElementById('modalBackdrop');
+    
+    function openNotif() {
+        notifModal.style.display = 'flex';
+        notifModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('modalContainer').style.animation = 'modalSlideUp 0.2s ease-out forwards';
+    }
+    
+    function closeNotifModal() {
+        notifModal.style.display = 'none';
+        notifModal.classList.add('hidden');
         document.body.style.overflow = '';
     }
     
-    notificationBell?.addEventListener('click', (e) => { e.stopPropagation(); openNotificationModal(); });
-    closeModalBtn?.addEventListener('click', closeNotificationModal);
-    modalBackdrop?.addEventListener('click', closeNotificationModal);
+    notifBell?.addEventListener('click', openNotif);
+    closeNotif?.addEventListener('click', closeNotifModal);
+    backdrop?.addEventListener('click', closeNotifModal);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && notifModal.style.display === 'flex') closeNotifModal(); });
     
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && notificationModal.style.display === 'flex') closeNotificationModal();
-    });
-    
-    const markAllBtn = document.getElementById('markAllReadBtn');
-    markAllBtn?.addEventListener('click', () => {
+    document.getElementById('markAllReadBtn')?.addEventListener('click', () => {
         showToast('All notifications marked as read', 'success');
-        const badge = document.getElementById('notificationBadge');
-        if (badge) badge.style.opacity = '0.5';
+        document.getElementById('notificationBadge').style.opacity = '0.5';
     });
     
+    // ─── Dark Mode ───
     document.getElementById('darkModeToggle')?.addEventListener('click', () => {
         document.documentElement.classList.toggle('dark');
         document.body.classList.toggle('dark');
     });
-    document.getElementById('refreshBtn')?.addEventListener('click', () => { 
+    
+    // ─── Refresh ───
+    document.getElementById('refreshBtn')?.addEventListener('click', () => {
         statsCache = null;
-        loadDashboardData(); 
-        showToast('Dashboard refreshed', 'success'); 
+        loadDashboardData();
+        showToast('Dashboard refreshed', 'success');
     });
+    
     document.getElementById('viewAllBtn')?.addEventListener('click', () => { window.location.href = 'ledger.html'; });
     
+    // ─── Logout ───
     const logoutModal = document.getElementById('logoutModal');
-    const cancelLogout = document.getElementById('cancelLogoutBtn');
-    const confirmLogout = document.getElementById('confirmLogoutBtn');
-    const logoutLink = document.getElementById('logoutLink');
-    const { logout } = await import('./js/auth.js');
-    
-    logoutLink?.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
-    cancelLogout?.addEventListener('click', () => logoutModal.classList.add('hidden'));
-    confirmLogout?.addEventListener('click', async () => {
+    document.getElementById('logoutLink')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        logoutModal.classList.remove('hidden');
+    });
+    document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => logoutModal.classList.add('hidden'));
+    document.getElementById('confirmLogoutBtn')?.addEventListener('click', async () => {
         logoutModal.classList.add('hidden');
         try { await logout(); } catch (e) { showToast('Logout error', 'error'); }
     });
     window.addEventListener('click', (e) => { if (e.target === logoutModal) logoutModal.classList.add('hidden'); });
     
-    loadCustomerNames().then(() => {
-        loadDashboardData();
-    });
-    setInterval(() => loadDashboardData(), 60000);
+    // ─── Dynamic Footer Year ───
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+    
+    // ─── Init ───
+    await loadCustomerNames();
+    await loadDashboardData();
+    setInterval(loadDashboardData, 60000);
 </script>
 
 </body>

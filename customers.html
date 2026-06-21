@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#0f3b3a">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes" />
+    <meta name="theme-color" content="#0f3b3a" />
     <title>Customers | JackDev Due Managements</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -28,9 +26,7 @@
                         warning: '#dd6b20',
                         info: '#3182ce',
                     },
-                    fontFamily: {
-                        'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'] },
                 }
             }
         }
@@ -38,959 +34,663 @@
     <style>
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; }
-        
-        /* Hide scrollbar in sidebar navigation - Same as ledger.html */
-        .sidebar-nav-fixed {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
-        }
-        
-        .nav-active {
-            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
-            border-left: 3px solid #d4af37;
-        }
-        .dark .nav-active {
-            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
-        }
-        
+        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
+        .nav-active { background:linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%); border-left:3px solid #d4af37; }
+        .dark .nav-active { background:linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%); }
         .stat-card { transition: all 0.2s ease; }
         .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12); }
-        
-        .submenu-modern {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .submenu-modern.open { max-height: 280px; }
-        
+        .submenu-modern { max-height:0; overflow:hidden; transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
+        .submenu-modern.open { max-height:280px; }
         .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
         .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
-        
-        @keyframes modalSlideUp {
-            from { opacity: 0; transform: translateY(20px) scale(0.96); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
+        @keyframes modalSlideUp { from { opacity:0; transform:translateY(20px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); } }
         .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
-        
-        .customer-row {
-            transition: background-color 0.15s ease;
-            cursor: pointer;
-        }
-        .customer-row:hover { background-color: rgba(15, 59, 58, 0.05); }
-        .dark .customer-row:hover { background-color: rgba(30, 107, 104, 0.1); }
-        
-        .table-scroll-hint { display: none; }
-        @media (max-width: 768px) {
-            .table-scroll-hint {
-                display: flex;
-                font-size: 9px;
-                padding: 4px 8px;
-                background: #f0fdf4;
-                color: #166534;
-                border-radius: 20px;
-                margin-bottom: 8px;
-                width: fit-content;
-            }
-            .dark .table-scroll-hint { background: #064e3b; color: #86efac; }
-        }
-        
-        .pagination-btn {
-            transition: all 0.2s ease;
-        }
-        .pagination-btn:hover:not(:disabled) {
-            background: #0f3b3a;
-            color: white;
-            transform: translateY(-1px);
-        }
-        .pagination-btn.active {
-            background: #0f3b3a;
-            color: white;
-        }
-        
+        .customer-row { transition: background-color 0.15s ease; cursor: pointer; }
+        .customer-row:hover { background-color: rgba(15,59,58,0.05); }
+        .dark .customer-row:hover { background-color: rgba(30,107,104,0.1); }
+        .table-scroll-hint { display:none; }
+        @media (max-width:768px) { .table-scroll-hint { display:flex; font-size:9px; padding:4px 8px; background:#f0fdf4; color:#166534; border-radius:20px; margin-bottom:8px; width:fit-content; } .dark .table-scroll-hint { background:#064e3b; color:#86efac; } }
+        .pagination-btn { transition: all 0.2s ease; }
+        .pagination-btn:hover:not(:disabled) { background:#0f3b3a; color:white; transform:translateY(-1px); }
+        .pagination-btn.active { background:#0f3b3a; color:white; }
         .btn-active:active { transform: scale(0.97); }
-        
         #sidebarOverlay { animation: fadeIn 0.2s ease-out; }
-        .sidebar-open { overflow: hidden; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        /* Fixed Sidebar Structure - Same as ledger.html */
-        .sidebar-fixed {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .sidebar-header-fixed {
-            flex-shrink: 0;
-            position: sticky;
-            top: 0;
-            background: inherit;
-            z-index: 10;
-        }
-        .sidebar-nav-fixed {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
-        }
-        
-        .skeleton {
-            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 4px;
-            height: 40px;
-        }
-        .dark .skeleton {
-            background: linear-gradient(90deg, #2d3748 25%, #4a5568 50%, #2d3748 75%);
-        }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        
-        @keyframes rowFlash {
-            0% { background-color: rgba(212, 175, 55, 0.3); }
-            100% { background-color: transparent; }
-        }
-        .row-updated {
-            animation: rowFlash 0.5s ease-out;
-        }
-        
-        /* Phone input error style */
-        .phone-input-error {
-            border-color: #dc2626 !important;
-            background-color: rgba(220, 38, 38, 0.05) !important;
-        }
-        .phone-error-message {
-            color: #dc2626;
-            font-size: 11px;
-            margin-top: 4px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        .sidebar-open { overflow:hidden; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        .sidebar-fixed { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+        .sidebar-header-fixed { flex-shrink:0; position:sticky; top:0; background:inherit; z-index:10; }
+        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
+        .skeleton { background:linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:4px; height:40px; }
+        .dark .skeleton { background:linear-gradient(90deg, #2d3748 25%, #4a5568 50%, #2d3748 75%); }
+        @keyframes shimmer { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
+        @keyframes rowFlash { 0% { background-color:rgba(212,175,55,0.3); } 100% { background-color:transparent; } }
+        .row-updated { animation:rowFlash 0.5s ease-out; }
+        .phone-input-error { border-color:#dc2626 !important; background-color:rgba(220,38,38,0.05) !important; }
+        .phone-error-message { color:#dc2626; font-size:11px; margin-top:4px; display:flex; align-items:center; gap:4px; }
+        footer .max-w-7xl { margin-left:auto; margin-right:auto; text-align:center; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-    
-    <div class="flex min-h-screen">
-        
-        <!-- Sidebar - Fixed Structure (Same as ledger.html) -->
-        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
-            <!-- Header - Fixed at top (does not scroll) -->
-            <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
-                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
-                        </div>
-                        <div class="leading-tight">
-                            <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
-                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
-                        </div>
+
+<div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
+        <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                        <i class="fas fa-chart-line text-slate-900 text-sm"></i>
                     </div>
-                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
-                        <i class="fas fa-times text-sm"></i>
-                    </button>
+                    <div class="leading-tight">
+                        <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
+                        <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
+                    </div>
+                </div>
+                <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+        </div>
+        <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
+            <nav class="space-y-1.5">
+                <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                    <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                    <span class="text-sm font-medium">Dashboard</span>
+                </a>
+                <a href="customers.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150">
+                    <div class="w-6 text-center"><i class="fas fa-users text-sm text-accent"></i></div>
+                    <span class="text-sm font-medium">Customers</span>
+                </a>
+                <div class="has-submenu" id="dueSubmenu">
+                    <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
+                        <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                    </a>
+                    <div class="submenu-modern pl-9 mt-1 space-y-1">
+                        <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a>
+                        <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a>
+                    </div>
+                </div>
+                <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span></a>
+                <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span></a>
+                <div class="has-submenu" id="warrantySubmenu">
+                    <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
+                        <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                    </a>
+                    <div class="submenu-modern pl-9 mt-1 space-y-1">
+                        <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span></a>
+                        <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span></a>
+                        <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span></a>
+                        <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span></a>
+                    </div>
+                </div>
+                <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span></a>
+                <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span></a>
+            </nav>
+            <div class="pt-4 mt-2 border-t border-white/10">
+                <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
+                    <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                    <span class="text-sm font-medium">Logout</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 md:ml-64 min-h-screen w-full">
+        <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+            <div class="px-3 py-2.5 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg"><i class="fas fa-bars text-lg"></i></button>
+                    <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-users text-primary mr-2"></i>Customers</h2>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt text-sm"></i></button>
+                    <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-moon dark:hidden text-sm"></i><i class="fas fa-sun hidden dark:inline-block text-sm"></i></button>
                 </div>
             </div>
-            
-            <!-- Navigation - Scrollable area (scrollbar hidden) -->
-            <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
-                <nav class="space-y-1.5">
-                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
-                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
-                        <span class="text-sm font-medium">Dashboard</span>
-                    </a>
-                    
-                    <a href="customers.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150">
-                        <div class="w-6 text-center"><i class="fas fa-users text-sm text-accent"></i></div>
-                        <span class="text-sm font-medium">Customers</span>
-                    </a>
-                    
-                    <div class="has-submenu" id="dueSubmenu">
-                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
-                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
-                        </a>
-                        <div class="submenu-modern pl-9 mt-1 space-y-1">
-                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
-                            </a>
-                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span>
-                    </a>
-                    
-                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
-                    </a>
-                    
-                    <div class="has-submenu" id="warrantySubmenu">
-                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
-                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
-                        </a>
-                        <div class="submenu-modern pl-9 mt-1 space-y-1">
-                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
-                            </a>
-                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
-                            </a>
-                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
-                            </a>
-                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
-                    </a>
-                    
-                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
-                    </a>
-                </nav>
-                
-                <!-- Logout Button - Now scrolls with menu -->
-                <div class="pt-4 mt-2 border-t border-white/10">
-                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
-                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
-                        <span class="text-sm font-medium">Logout</span>
-                    </a>
+        </header>
+
+        <div class="p-3 md:p-4">
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                    <div class="bg-blue-100 dark:bg-blue-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-users text-blue-600 dark:text-blue-400 text-sm"></i></div>
+                    <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total</h3>
+                    <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalCustomers">0</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                    <div class="bg-red-100 dark:bg-red-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-dollar-sign text-red-600 dark:text-red-400 text-sm"></i></div>
+                    <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total Due</h3>
+                    <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalDue">৳0</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                    <div class="bg-purple-100 dark:bg-purple-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-file-invoice text-purple-600 dark:text-purple-400 text-sm"></i></div>
+                    <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total Due Entry</h3>
+                    <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalInvoiceValue">৳0</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                    <div class="bg-green-100 dark:bg-green-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-wallet text-green-600 dark:text-green-400 text-sm"></i></div>
+                    <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Collections</h3>
+                    <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalCollections">৳0</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                    <div class="bg-indigo-100 dark:bg-indigo-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-id-card text-indigo-600 dark:text-indigo-400 text-sm"></i></div>
+                    <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Active</h3>
+                    <p class="text-xl font-bold text-gray-800 dark:text-white" id="activeCustomers">0</p>
                 </div>
             </div>
-        </aside>
-        
-        <!-- Main Content -->
-        <main class="flex-1 md:ml-64 min-h-screen w-full">
-            
-            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-                <div class="px-3 py-2.5 flex justify-between items-center">
+
+            <!-- Actions Bar -->
+            <div class="flex flex-col gap-3 mb-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex gap-2">
+                        <button id="addCustomerBtn" class="bg-primary hover:bg-primary-dark text-white font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-md btn-active"><i class="fas fa-plus text-sm"></i><span class="text-sm">Add Customer</span></button>
+                        <button id="exportBtn" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 btn-active"><i class="fas fa-download text-sm"></i><span class="text-sm hidden sm:inline">Export</span><span class="text-sm sm:hidden">Excel</span></button>
+                    </div>
+                    <div class="relative w-full sm:w-72">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="text" id="searchInput" placeholder="Search by name, phone..." class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mt-2">
                     <div class="flex items-center gap-2">
-                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg"><i class="fas fa-bars text-lg"></i></button>
-                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-users text-primary mr-2"></i>Customers</h2>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Show</span>
+                        <select id="perPageSelect" class="px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50" selected>50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">entries</span>
                     </div>
-                    <div class="flex items-center gap-1">
-                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt text-sm"></i></button>
-                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-moon dark:hidden text-sm"></i><i class="fas fa-sun hidden dark:inline-block text-sm"></i></button>
-                    </div>
-                </div>
-            </header>
-            
-            <div class="p-3 md:p-4">
-                
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
-                        <div class="bg-blue-100 dark:bg-blue-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-users text-blue-600 dark:text-blue-400 text-sm"></i></div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total</h3>
-                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalCustomers">0</p>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
-                        <div class="bg-red-100 dark:bg-red-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-dollar-sign text-red-600 dark:text-red-400 text-sm"></i></div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total Due</h3>
-                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalDue">৳0</p>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
-                        <div class="bg-purple-100 dark:bg-purple-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-file-invoice text-purple-600 dark:text-purple-400 text-sm"></i></div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Invoice Value</h3>
-                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalInvoiceValue">৳0</p>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
-                        <div class="bg-green-100 dark:bg-green-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-wallet text-green-600 dark:text-green-400 text-sm"></i></div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Collections</h3>
-                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalCollections">৳0</p>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
-                        <div class="bg-indigo-100 dark:bg-indigo-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-id-card text-indigo-600 dark:text-indigo-400 text-sm"></i></div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Active</h3>
-                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="activeCustomers">0</p>
-                    </div>
-                </div>
-                
-                <!-- Actions Bar -->
-                <div class="flex flex-col gap-3 mb-4">
-                    <div class="flex flex-wrap items-center justify-between gap-3">
-                        <div class="flex gap-2">
-                            <button id="addCustomerBtn" class="bg-primary hover:bg-primary-dark text-white font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-md btn-active"><i class="fas fa-plus text-sm"></i><span class="text-sm">Add Customer</span></button>
-                            <button id="exportBtn" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 btn-active"><i class="fas fa-download text-sm"></i><span class="text-sm hidden sm:inline">Export</span><span class="text-sm sm:hidden">Excel</span></button>
-                        </div>
-                        <div class="relative w-full sm:w-72">
-                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                            <input type="text" id="searchInput" placeholder="Search by name, phone..." class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mt-2">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Show</span>
-                            <select id="perPageSelect" class="px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="50" selected>50</option>
-                                <option value="100">100</option>
-                            </select>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">entries</span>
-                        </div>
-                        <div id="paginationControls" class="flex items-center gap-1 flex-wrap justify-center"></div>
-                    </div>
-                </div>
-                
-                <div class="table-scroll-hint mb-2"><i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns → <span class="mx-2">|</span> <i class="fas fa-hand-pointer mr-1 text-[8px]"></i> Tap row for details</div>
-                
-                <!-- Customers Table -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
-                    <div class="overflow-x-auto">
-                        <table class="w-full min-w-[750px]">
-                            <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                                <tr><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">SL</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Name</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Phone</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">Address</th><th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Invoice</th><th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Due</th><th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th> </thead>
-                            <tbody id="customersTableBody">
-                                <tr><td colspan="7"><div class="skeleton"></div></tr>
-                                <tr><td colspan="7"><div class="skeleton"></div></tr>
-                                <tr><td colspan="7"><div class="skeleton"></div></tr>
-                                <tr><td colspan="7"><div class="skeleton"></div></tr>
-                                <tr><td colspan="7"><div class="skeleton"></div></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div id="paginationControls" class="flex items-center gap-1 flex-wrap justify-center"></div>
                 </div>
             </div>
-        </main>
-    </div>
-    
-    <!-- Customer Modal -->
-    <div id="customerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-all duration-300 p-3">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl modal-animate overflow-hidden">
-            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white" id="modalTitle"><i class="fas fa-user-plus text-primary mr-2"></i> Add Customer</h3><button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><i class="fas fa-times text-xl"></i></button></div>
-            <input type="hidden" id="customerId">
-            <div class="p-5 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-user text-primary mr-1 text-xs"></i> Full Name <span class="text-red-500">*</span></label>
-                    <input type="text" id="custName" placeholder="Enter customer name" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
+
+            <div class="table-scroll-hint mb-2"><i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns → <span class="mx-2">|</span> <i class="fas fa-hand-pointer mr-1 text-[8px]"></i> Tap row for details</div>
+
+            <!-- Customers Table -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[750px]">
+                        <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">SL</th>
+                                <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Name</th>
+                                <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Phone</th>
+                                <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">Address</th>
+                                <th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Invoice</th>
+                                <th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Due</th>
+                                <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <tr><td colspan="7"><div class="skeleton"></div></tr>
+                            <tr><td colspan="7"><div class="skeleton"></div></tr>
+                            <tr><td colspan="7"><div class="skeleton"></div></tr>
+                            <tr><td colspan="7"><div class="skeleton"></div></tr>
+                            <tr><td colspan="7"><div class="skeleton"></div></tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-phone text-primary mr-1 text-xs"></i> Phone Number <span class="text-red-500">*</span></label>
-                    <input type="tel" id="custPhone" placeholder="Enter phone number" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                    <div id="phoneError" class="phone-error-message hidden"></div>
-                </div>
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-map-marker-alt text-primary mr-1 text-xs"></i> Address</label><input type="text" id="custAddress" placeholder="Enter address" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></div>
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-sticky-note text-primary mr-1 text-xs"></i> Notes</label><textarea id="custNotes" rows="2" placeholder="Additional notes..." class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 resize-none"></textarea></div>
             </div>
-            <div class="flex justify-end gap-3 px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t"><button id="cancelModalBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 btn-active">Cancel</button><button id="saveCustomerBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-primary text-white shadow-md btn-active"><i class="fas fa-save mr-1"></i> Save</button></div>
         </div>
-    </div>
-    
-    <div id="deleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-all duration-300 p-3">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full shadow-2xl modal-animate overflow-hidden">
-            <div class="p-6 text-center"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center"><i class="fas fa-exclamation-triangle text-red-500 text-xl"></i></div><h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2" id="deleteModalTitle">Delete Customer</h3><p class="text-sm text-gray-600 dark:text-gray-400 mb-5" id="deleteModalMessage">Are you sure?</p><div class="flex gap-3 justify-center"><button id="cancelDeleteBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-100 dark:bg-gray-700 btn-active">Cancel</button><button id="confirmDeleteBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-red-500 text-white btn-active">Delete</button></div></div>
+    </main>
+</div>
+
+<!-- Modals -->
+<div id="customerModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-all duration-300 p-3">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl modal-animate overflow-hidden">
+        <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
+            <h3 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white" id="modalTitle"><i class="fas fa-user-plus text-primary mr-2"></i> Add Customer</h3>
+            <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><i class="fas fa-times text-xl"></i></button>
         </div>
-    </div>
-    
-    <div id="detailsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[150] hidden transition-all duration-300 p-3">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full shadow-2xl modal-animate overflow-hidden">
-            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-user-circle text-primary mr-2"></i>Customer Details</h3><button id="closeDetailsModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><i class="fas fa-times text-xl"></i></button></div>
-            <div class="p-5" id="detailsContent"></div>
-            <div class="flex justify-end px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t"><button id="closeDetailsModalFooterBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 btn-active">Close</button></div>
+        <input type="hidden" id="customerId">
+        <div class="p-5 space-y-4">
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-user text-primary mr-1 text-xs"></i> Full Name <span class="text-red-500">*</span></label><input type="text" id="custName" placeholder="Enter customer name" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-phone text-primary mr-1 text-xs"></i> Phone Number <span class="text-red-500">*</span></label><input type="tel" id="custPhone" placeholder="Enter phone number" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50"><div id="phoneError" class="phone-error-message hidden"></div></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-map-marker-alt text-primary mr-1 text-xs"></i> Address</label><input type="text" id="custAddress" placeholder="Enter address" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></div>
+            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-sticky-note text-primary mr-1 text-xs"></i> Notes</label><textarea id="custNotes" rows="2" placeholder="Additional notes..." class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 resize-none"></textarea></div>
         </div>
+        <div class="flex justify-end gap-3 px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t"><button id="cancelModalBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 btn-active">Cancel</button><button id="saveCustomerBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-primary text-white shadow-md btn-active"><i class="fas fa-save mr-1"></i> Save</button></div>
     </div>
-    
-    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-2"></div>
-    <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3"><div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl modal-animate"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div><h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3><p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Are you sure you want to logout?</p><div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-100 dark:bg-gray-700 btn-active">Cancel</button><button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-red-500 text-white btn-active">Logout</button></div></div></div>
-    
-    <!-- Auth Check Script -->
-    <script type="module">
-        import { checkAuthState, logout } from './js/auth.js';
-        checkAuthState(true);
-    </script>
-    
-    <script type="module">
-        import { db, collection, doc, getDoc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, limit, startAfter, where, writeBatch } from './js/firebase.js';
-        
-        // Sidebar submenu toggle
-        const warrantySubmenu = document.getElementById('warrantySubmenu');
-        const warrantyLink = warrantySubmenu?.querySelector('a');
-        if (warrantyLink) {
-            warrantyLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                warrantySubmenu.classList.toggle('open');
-                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
-        }
-        
-        const dueSubmenu = document.getElementById('dueSubmenu');
-        const dueLink = dueSubmenu?.querySelector('a');
-        if (dueLink) {
-            dueLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                dueSubmenu.classList.toggle('open');
-                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
-        }
-        
-        // ==================== GLOBAL VARIABLES ====================
-        let currentPage = 1;
-        let perPage = 50;
-        let currentSearchTerm = '';
-        let searchDebounceTimer = null;
-        let currentDeleteId = null;
-        let currentCustomerName = '';
-        let isLoading = false;
-        let hasMore = true;
-        let lastDoc = null;
-        let totalCustomersCount = 0;
-        
-        // Cache
-        let allCustomers = [];
-        let customerMap = new Map();
-        
-        // ==================== UTILITY FUNCTIONS ====================
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : type === 'error' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'}`;
-            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2 text-xs"></i>${message}`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
-        }
-        
-        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
-        
-        function clearPhoneError() {
-            const phoneInput = document.getElementById('custPhone');
-            const phoneError = document.getElementById('phoneError');
-            if (phoneInput) phoneInput.classList.remove('phone-input-error');
-            if (phoneError) {
-                phoneError.classList.add('hidden');
-                phoneError.innerHTML = '';
-            }
-        }
-        
-        function showPhoneError(message) {
-            const phoneInput = document.getElementById('custPhone');
-            const phoneError = document.getElementById('phoneError');
-            if (phoneInput) phoneInput.classList.add('phone-input-error');
-            if (phoneError) {
-                phoneError.innerHTML = `<i class="fas fa-exclamation-circle text-xs"></i> ${message}`;
-                phoneError.classList.remove('hidden');
-            }
-        }
-        
-        // ==================== STATS SYSTEM ====================
-        async function loadStats() {
-            try {
-                const statsDoc = await getDoc(doc(db, 'stats', 'global'));
-                if (statsDoc.exists()) {
-                    const stats = statsDoc.data();
-                    document.getElementById('totalCustomers').textContent = stats.totalCustomers || 0;
-                    document.getElementById('activeCustomers').textContent = stats.totalCustomers || 0;
-                    document.getElementById('totalDue').textContent = '৳' + (stats.totalDue || 0).toFixed(2);
-                    document.getElementById('totalInvoiceValue').textContent = '৳' + (stats.totalInvoiceValue || 0).toFixed(2);
-                    document.getElementById('totalCollections').textContent = '৳' + (stats.totalCollections || 0).toFixed(2);
-                    totalCustomersCount = stats.totalCustomers || 0;
-                    return;
-                }
-                
-                const customersSnap = await getDocs(collection(db, 'customers'));
-                let totalDue = 0;
-                let totalInvoiceValue = 0;
-                customersSnap.forEach(doc => {
-                    totalDue += (doc.data().totalDue || 0);
-                    totalInvoiceValue += (doc.data().invoiceValue || 0);
-                });
-                
-                const transactionsSnap = await getDocs(collection(db, 'transactions'));
-                let totalCollections = 0;
-                transactionsSnap.forEach(doc => {
-                    if (doc.data().type === 'collection') totalCollections += (doc.data().collectionAmount || 0);
-                });
-                
-                document.getElementById('totalCustomers').textContent = customersSnap.size;
-                document.getElementById('activeCustomers').textContent = customersSnap.size;
-                document.getElementById('totalDue').textContent = '৳' + totalDue.toFixed(2);
-                document.getElementById('totalInvoiceValue').textContent = '৳' + totalInvoiceValue.toFixed(2);
-                document.getElementById('totalCollections').textContent = '৳' + totalCollections.toFixed(2);
-                totalCustomersCount = customersSnap.size;
-            } catch (error) { console.error('Stats error:', error); }
-        }
-        
-        // ==================== GENERATE ROW HTML ====================
-        function generateRowHTML(customer, sl) {
-            const dueClass = (customer.totalDue || 0) >= 10000 ? 'text-red-600 font-bold' : (customer.totalDue || 0) >= 5000 ? 'text-orange-500 font-semibold' : 'text-green-600';
-            return `
-                <td class="px-3 py-2.5 text-sm font-medium text-center">${sl}</td>
-                <td class="px-3 py-2.5"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">${(customer.name?.charAt(0) || '?').toUpperCase()}</div><span class="font-medium text-xs md:text-sm">${escapeHtml(customer.name)}</span></div></td>
-                <td class="px-3 py-2.5 text-xs md:text-sm">${escapeHtml(customer.phone)}</td>
-                <td class="px-3 py-2.5 text-xs md:text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">${escapeHtml(customer.address) || '-'}</td>
-                <td class="px-3 py-2.5 text-right text-purple-600 font-semibold text-xs md:text-sm">৳${(customer.invoiceValue || 0).toFixed(2)}</td>
-                <td class="px-3 py-2.5 text-right ${dueClass} text-xs md:text-sm">৳${(customer.totalDue || 0).toFixed(2)}</td>
-                <td class="px-3 py-2.5 text-center"><div class="flex items-center justify-center gap-1"><button class="edit-customer text-blue-500 hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-id="${customer.id}"><i class="fas fa-edit text-xs md:text-sm"></i></button><button class="delete-customer text-red-500 hover:text-red-700 p-1.5 rounded-lg transition-colors" data-id="${customer.id}" data-name="${escapeHtml(customer.name)}"><i class="fas fa-trash-alt text-xs md:text-sm"></i></button></div></td>
-            `;
-        }
-        
-        function renderTable() {
-            const tbody = document.getElementById('customersTableBody');
-            if (allCustomers.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-users text-3xl mb-2 opacity-50 block"></i>No customers found</td>' +
-                    '';
+</div>
+
+<div id="deleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-all duration-300 p-3">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full shadow-2xl modal-animate overflow-hidden">
+        <div class="p-6 text-center"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center"><i class="fas fa-exclamation-triangle text-red-500 text-xl"></i></div><h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2" id="deleteModalTitle">Delete Customer</h3><p class="text-sm text-gray-600 dark:text-gray-400 mb-5" id="deleteModalMessage">Are you sure?</p><div class="flex gap-3 justify-center"><button id="cancelDeleteBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-100 dark:bg-gray-700 btn-active">Cancel</button><button id="confirmDeleteBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-red-500 text-white btn-active">Delete</button></div></div>
+    </div>
+</div>
+
+<div id="detailsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[150] hidden transition-all duration-300 p-3">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full shadow-2xl modal-animate overflow-hidden">
+        <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-user-circle text-primary mr-2"></i>Customer Details</h3><button id="closeDetailsModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><i class="fas fa-times text-xl"></i></button></div>
+        <div class="p-5" id="detailsContent"></div>
+        <div class="flex justify-end px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t"><button id="closeDetailsModalFooterBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 btn-active">Close</button></div>
+    </div>
+</div>
+
+<div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-2"></div>
+<div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3"><div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl modal-animate"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div><h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3><p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Are you sure you want to logout?</p><div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-100 dark:bg-gray-700 btn-active">Cancel</button><button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-red-500 text-white btn-active">Logout</button></div></div></div>
+
+<!-- Footer (centered) -->
+<footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+        <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+            &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span>
+            <span class="text-gray-300 dark:border-gray-600">|</span>
+            <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+            <span class="text-gray-300 dark:border-gray-600">|</span>
+            <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
+        </p>
+    </div>
+</footer>
+
+<!-- Auth & Firebase -->
+<script type="module">
+    import { checkAuthState, logout } from './js/auth.js';
+    checkAuthState(true);
+</script>
+<script type="module">
+    import { db, collection, doc, getDoc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, limit, startAfter, where, writeBatch } from './js/firebase.js';
+
+    // ----- submenu toggles -----
+    const warrantySubmenu = document.getElementById('warrantySubmenu');
+    if (warrantySubmenu) {
+        warrantySubmenu.querySelector('a')?.addEventListener('click', (e) => { e.preventDefault(); warrantySubmenu.classList.toggle('open'); warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open'); });
+    }
+    const dueSubmenu = document.getElementById('dueSubmenu');
+    if (dueSubmenu) {
+        dueSubmenu.querySelector('a')?.addEventListener('click', (e) => { e.preventDefault(); dueSubmenu.classList.toggle('open'); dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open'); });
+    }
+
+    // ----- state -----
+    let currentPage = 1, perPage = 50, currentSearchTerm = '', searchDebounceTimer = null, currentDeleteId = null, currentCustomerName = '', isLoading = false, hasMore = true, lastDoc = null, totalCustomersCount = 0;
+    let allCustomers = [], customerMap = new Map();
+
+    // ----- helpers -----
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : type === 'error' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'}`;
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2 text-xs"></i>${message}`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+    }
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m])); }
+    function clearPhoneError() {
+        document.getElementById('custPhone')?.classList.remove('phone-input-error');
+        const err = document.getElementById('phoneError');
+        if (err) { err.classList.add('hidden'); err.innerHTML = ''; }
+    }
+    function showPhoneError(msg) {
+        document.getElementById('custPhone')?.classList.add('phone-input-error');
+        const err = document.getElementById('phoneError');
+        if (err) { err.innerHTML = `<i class="fas fa-exclamation-circle text-xs"></i> ${msg}`; err.classList.remove('hidden'); }
+    }
+
+    // ----- stats (FIXED: invoice value = total due entry value) -----
+    async function loadStats() {
+        try {
+            const statsDoc = await getDoc(doc(db, 'stats', 'global'));
+            if (statsDoc.exists()) {
+                const stats = statsDoc.data();
+                document.getElementById('totalCustomers').textContent = stats.totalCustomers || 0;
+                document.getElementById('activeCustomers').textContent = stats.totalCustomers || 0;
+                document.getElementById('totalDue').textContent = '৳' + (stats.totalDue || 0).toFixed(2);
+                // FIXED: invoice value = total due entry value from stats
+                document.getElementById('totalInvoiceValue').textContent = '৳' + (stats.totalInvoiceValue || 0).toFixed(2);
+                document.getElementById('totalCollections').textContent = '৳' + (stats.totalCollections || 0).toFixed(2);
+                totalCustomersCount = stats.totalCustomers || 0;
                 return;
             }
+            // fallback: compute from customers + transactions
+            const customersSnap = await getDocs(collection(db, 'customers'));
+            const transactionsSnap = await getDocs(collection(db, 'transactions'));
             
-            const start = (currentPage - 1) * perPage;
-            const end = start + perPage;
-            const paginatedCustomers = allCustomers.slice(start, end);
+            let totalDue = 0, totalInvoiceValue = 0, totalCollections = 0;
             
-            tbody.innerHTML = '';
-            let sl = start + 1;
-            
-            for (const customer of paginatedCustomers) {
-                const row = tbody.insertRow();
-                row.className = 'customer-row';
-                row.setAttribute('data-id', customer.id);
-                row.innerHTML = generateRowHTML(customer, sl++);
-            }
-            
-            attachRowEvents();
-        }
-        
-        function attachRowEvents() {
-            document.querySelectorAll('.customer-row').forEach(row => {
-                row.removeEventListener('click', rowClickHandler);
-                row.addEventListener('click', rowClickHandler);
+            // Sum due from customers
+            customersSnap.forEach(doc => {
+                const d = doc.data();
+                totalDue += (d.totalDue || 0);
             });
             
-            document.querySelectorAll('.edit-customer').forEach(btn => {
-                btn.removeEventListener('click', editClickHandler);
-                btn.addEventListener('click', editClickHandler);
+            // Sum invoice value = total due entry value from transactions
+            transactionsSnap.forEach(doc => {
+                const t = doc.data();
+                if (t.type === 'due') {
+                    totalInvoiceValue += (t.dueAmount || t.totalAmount || 0);
+                } else if (t.type === 'collection') {
+                    totalCollections += (t.collectionAmount || 0);
+                }
             });
             
-            document.querySelectorAll('.delete-customer').forEach(btn => {
-                btn.removeEventListener('click', deleteClickHandler);
-                btn.addEventListener('click', deleteClickHandler);
-            });
+            document.getElementById('totalCustomers').textContent = customersSnap.size;
+            document.getElementById('activeCustomers').textContent = customersSnap.size;
+            document.getElementById('totalDue').textContent = '৳' + totalDue.toFixed(2);
+            document.getElementById('totalInvoiceValue').textContent = '৳' + totalInvoiceValue.toFixed(2);
+            document.getElementById('totalCollections').textContent = '৳' + totalCollections.toFixed(2);
+            totalCustomersCount = customersSnap.size;
+        } catch (error) { console.error('Stats error:', error); }
+    }
+
+    // ----- render table -----
+    function generateRowHTML(customer, sl) {
+        const dueClass = (customer.totalDue || 0) >= 10000 ? 'text-red-600 font-bold' : (customer.totalDue || 0) >= 5000 ? 'text-orange-500 font-semibold' : 'text-green-600';
+        return `
+            <td class="px-3 py-2.5 text-sm font-medium text-center">${sl}</td>
+            <td class="px-3 py-2.5"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">${(customer.name?.charAt(0) || '?').toUpperCase()}</div><span class="font-medium text-xs md:text-sm">${escapeHtml(customer.name)}</span></div></td>
+            <td class="px-3 py-2.5 text-xs md:text-sm">${escapeHtml(customer.phone)}</td>
+            <td class="px-3 py-2.5 text-xs md:text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">${escapeHtml(customer.address) || '-'}</td>
+            <td class="px-3 py-2.5 text-right text-purple-600 font-semibold text-xs md:text-sm">৳${(customer.invoiceValue || 0).toFixed(2)}</td>
+            <td class="px-3 py-2.5 text-right ${dueClass} text-xs md:text-sm">৳${(customer.totalDue || 0).toFixed(2)}</td>
+            <td class="px-3 py-2.5 text-center"><div class="flex items-center justify-center gap-1"><button class="edit-customer text-blue-500 hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-id="${customer.id}"><i class="fas fa-edit text-xs md:text-sm"></i></button><button class="delete-customer text-red-500 hover:text-red-700 p-1.5 rounded-lg transition-colors" data-id="${customer.id}" data-name="${escapeHtml(customer.name)}"><i class="fas fa-trash-alt text-xs md:text-sm"></i></button></div></td>
+        `;
+    }
+    function renderTable() {
+        const tbody = document.getElementById('customersTableBody');
+        if (allCustomers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-users text-3xl mb-2 opacity-50 block"></i>No customers found</td></tr>';
+            return;
         }
-        
-        function rowClickHandler(e) {
-            if (e.target.closest('.edit-customer') || e.target.closest('.delete-customer')) return;
-            const customer = customerMap.get(this.dataset.id);
-            if (customer) showDetailsModal(customer);
+        const start = (currentPage - 1) * perPage;
+        const end = Math.min(start + perPage, allCustomers.length);
+        const paginated = allCustomers.slice(start, end);
+        tbody.innerHTML = '';
+        let sl = start + 1;
+        for (const customer of paginated) {
+            const row = tbody.insertRow();
+            row.className = 'customer-row';
+            row.dataset.id = customer.id;
+            row.innerHTML = generateRowHTML(customer, sl++);
         }
-        
-        function editClickHandler(e) {
-            e.stopPropagation();
-            const customer = customerMap.get(this.dataset.id);
-            if (customer) openEditModal(customer);
-        }
-        
-        async function deleteClickHandler(e) {
-            e.stopPropagation();
-            currentDeleteId = this.dataset.id;
-            currentCustomerName = this.dataset.name;
-            document.getElementById('deleteModalTitle').innerHTML = 'Delete Customer';
-            document.getElementById('deleteModalMessage').innerHTML = `Delete "${currentCustomerName}"?`;
-            document.getElementById('deleteModal').classList.remove('hidden');
-        }
-        
-        function showDetailsModal(customer) {
-            const detailsContent = document.getElementById('detailsContent');
-            detailsContent.innerHTML = `
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Name</span><span class="font-semibold text-sm">${escapeHtml(customer.name)}</span></div>
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Phone</span><span class="text-sm">${escapeHtml(customer.phone)}</span></div>
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Address</span><span class="text-sm text-right">${escapeHtml(customer.address || '-')}</span></div>
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Invoice Value</span><span class="font-semibold text-purple-600">৳${(customer.invoiceValue || 0).toFixed(2)}</span></div>
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Total Due</span><span class="font-semibold">৳${(customer.totalDue || 0).toFixed(2)}</span></div>
-                    <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Notes</span><span class="text-sm text-right">${escapeHtml(customer.notes || '-')}</span></div>
-                    <div class="flex justify-between items-center"><span class="text-xs text-gray-500">Created</span><span class="text-xs">${customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : 'N/A'}</span></div>
-                </div>
-            `;
-            document.getElementById('detailsModal').classList.remove('hidden');
-        }
-        
-        function openEditModal(customer) {
-            clearPhoneError();
-            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-edit text-primary mr-2"></i> Edit Customer';
-            document.getElementById('customerId').value = customer.id;
-            document.getElementById('custName').value = customer.name || '';
-            document.getElementById('custPhone').value = customer.phone || '';
-            document.getElementById('custAddress').value = customer.address || '';
-            document.getElementById('custNotes').value = customer.notes || '';
-            document.getElementById('customerModal').classList.remove('hidden');
-        }
-        
-        // ==================== FIXED PAGINATION WITH PROPER ORDER ====================
-        async function loadCustomers(reset = true) {
-            if (isLoading) return;
-            isLoading = true;
-            
-            const tbody = document.getElementById('customersTableBody');
-            tbody.innerHTML = `
-                <tr class="skeleton-row"><td colspan="7"><div class="skeleton"></div></tr>
-                <tr class="skeleton-row"><td colspan="7"><div class="skeleton"></div></tr>
-                <tr class="skeleton-row"><td colspan="7"><div class="skeleton"></div></tr>
-                <tr class="skeleton-row"><td colspan="7"><div class="skeleton"></div></tr>
-                <tr class="skeleton-row"><td colspan="7"><div class="skeleton"></div></tr>
-            `;
-            
-            try {
-                let q;
-                
-                if (!reset && lastDoc) {
-                    q = query(
-                        collection(db, 'customers'),
-                        orderBy('createdAt', 'desc'),
-                        startAfter(lastDoc),
-                        limit(perPage)
-                    );
-                } else {
-                    q = query(
-                        collection(db, 'customers'),
-                        orderBy('createdAt', 'desc'),
-                        limit(perPage)
-                    );
-                }
-                
-                const snapshot = await getDocs(q);
-                
-                const customers = [];
-                snapshot.forEach(doc => {
-                    customers.push({ id: doc.id, ...doc.data() });
-                });
-                
-                if (reset) {
-                    allCustomers = customers;
-                    customerMap.clear();
-                    customers.forEach(c => customerMap.set(c.id, c));
-                    currentPage = 1;
-                    hasMore = snapshot.docs.length === perPage;
-                    if (snapshot.docs.length > 0) {
-                        lastDoc = snapshot.docs[snapshot.docs.length - 1];
-                    } else {
-                        lastDoc = null;
-                    }
-                } else {
-                    allCustomers = [...allCustomers, ...customers];
-                    customers.forEach(c => customerMap.set(c.id, c));
-                    hasMore = snapshot.docs.length === perPage;
-                    if (snapshot.docs.length > 0) {
-                        lastDoc = snapshot.docs[snapshot.docs.length - 1];
-                    }
-                    currentPage++;
-                }
-                
-                renderTable();
-                updatePaginationButtons();
-                
-                if (reset && customers.length === 0) {
-                    totalCustomersCount = 0;
-                } else if (reset && customers.length < perPage) {
-                    totalCustomersCount = customers.length;
-                }
-                
-            } catch (error) {
-                console.error('Load customers error:', error);
-                showToast('Error loading customers: ' + error.message, 'error');
-                if (reset) {
-                    lastDoc = null;
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-500">Error loading customers. Please refresh.</td></tr>';
-                }
-            } finally {
-                isLoading = false;
+        attachRowEvents();
+    }
+
+    function attachRowEvents() {
+        document.querySelectorAll('.customer-row').forEach(row => {
+            row.removeEventListener('click', rowClickHandler);
+            row.addEventListener('click', rowClickHandler);
+        });
+        document.querySelectorAll('.edit-customer').forEach(btn => {
+            btn.removeEventListener('click', editClickHandler);
+            btn.addEventListener('click', editClickHandler);
+        });
+        document.querySelectorAll('.delete-customer').forEach(btn => {
+            btn.removeEventListener('click', deleteClickHandler);
+            btn.addEventListener('click', deleteClickHandler);
+        });
+    }
+    function rowClickHandler(e) {
+        if (e.target.closest('.edit-customer') || e.target.closest('.delete-customer')) return;
+        const cust = customerMap.get(this.dataset.id);
+        if (cust) showDetailsModal(cust);
+    }
+    function editClickHandler(e) {
+        e.stopPropagation();
+        const cust = customerMap.get(this.dataset.id);
+        if (cust) openEditModal(cust);
+    }
+    async function deleteClickHandler(e) {
+        e.stopPropagation();
+        currentDeleteId = this.dataset.id;
+        currentCustomerName = this.dataset.name;
+        document.getElementById('deleteModalTitle').innerHTML = 'Delete Customer';
+        document.getElementById('deleteModalMessage').innerHTML = `Delete "${currentCustomerName}"?`;
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+    function showDetailsModal(customer) {
+        const content = document.getElementById('detailsContent');
+        content.innerHTML = `
+            <div class="space-y-3">
+                <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Name</span><span class="font-semibold text-sm">${escapeHtml(customer.name)}</span></div>
+                <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Phone</span><span class="text-sm">${escapeHtml(customer.phone)}</span></div>
+                <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Address</span><span class="text-sm text-right">${escapeHtml(customer.address || '-')}</span></div>
+                <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Invoice Value</span><span class="font-semibold text-purple-600">৳${(customer.invoiceValue || 0).toFixed(2)}</span></div>
+                <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Total Due</span><span class="font-semibold">৳${(customer.totalDue || 0).toFixed(2)}</span></div>
+                <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Notes</span><span class="text-sm text-right">${escapeHtml(customer.notes || '-')}</span></div>
+                <div class="flex justify-between items-center"><span class="text-xs text-gray-500">Created</span><span class="text-xs">${customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : 'N/A'}</span></div>
+            </div>
+        `;
+        document.getElementById('detailsModal').classList.remove('hidden');
+    }
+    function openEditModal(customer) {
+        clearPhoneError();
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-edit text-primary mr-2"></i> Edit Customer';
+        document.getElementById('customerId').value = customer.id;
+        document.getElementById('custName').value = customer.name || '';
+        document.getElementById('custPhone').value = customer.phone || '';
+        document.getElementById('custAddress').value = customer.address || '';
+        document.getElementById('custNotes').value = customer.notes || '';
+        document.getElementById('customerModal').classList.remove('hidden');
+    }
+
+    // ----- load customers (pagination) -----
+    async function loadCustomers(reset = true) {
+        if (isLoading) return;
+        isLoading = true;
+        const tbody = document.getElementById('customersTableBody');
+        tbody.innerHTML = `<tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr>`;
+        try {
+            let q;
+            if (!reset && lastDoc) {
+                q = query(collection(db, 'customers'), orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(perPage));
+            } else {
+                q = query(collection(db, 'customers'), orderBy('createdAt', 'desc'), limit(perPage));
             }
-        }
-        
-        async function loadNextPage() {
-            if (!hasMore || isLoading) {
-                if (!hasMore) showToast('No more customers to load', 'info');
-                return;
-            }
-            await loadCustomers(false);
-        }
-        
-        async function loadPrevPage() {
-            if (currentPage <= 1 || isLoading) return;
-            currentPage = 1;
-            lastDoc = null;
-            await loadCustomers(true);
-        }
-        
-        function updatePaginationButtons() {
-            const container = document.getElementById('paginationControls');
-            if (!container) return;
-            
-            let totalPages = Math.ceil(totalCustomersCount / perPage);
-            if (totalPages === 0 && allCustomers.length > 0) {
-                totalPages = Math.ceil(allCustomers.length / perPage);
-            }
-            
-            let html = `
-                <button id="prevPageBtn" class="pagination-btn px-2 py-1 rounded-lg text-xs border border-gray-300 dark:border-gray-600 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-white'}" ${currentPage === 1 ? 'disabled' : ''}>
-                    « Prev
-                </button>
-                <span class="px-2 py-1 text-xs text-gray-600 dark:text-gray-400">
-                    Page ${currentPage} ${totalPages > 0 ? `of ${totalPages}` : ''}
-                </span>
-                <button id="nextPageBtn" class="pagination-btn px-2 py-1 rounded-lg text-xs border border-gray-300 dark:border-gray-600 ${!hasMore ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-white'}" ${!hasMore ? 'disabled' : ''}>
-                    Next »
-                </button>
-            `;
-            
-            container.innerHTML = html;
-            
-            const prevBtn = document.getElementById('prevPageBtn');
-            const nextBtn = document.getElementById('nextPageBtn');
-            
-            if (prevBtn) {
-                prevBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    loadPrevPage();
-                });
-            }
-            
-            if (nextBtn) {
-                nextBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    loadNextPage();
-                });
-            }
-        }
-        
-        // ==================== SEARCH ====================
-        async function searchCustomers(term) {
-            if (!term.trim()) {
-                await loadCustomers(true);
-                return;
-            }
-            
-            if (isLoading) return;
-            isLoading = true;
-            
-            const tbody = document.getElementById('customersTableBody');
-            tbody.innerHTML = '<tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr>';
-            
-            try {
-                const lowerTerm = term.toLowerCase();
-                const q = query(
-                    collection(db, 'customers'),
-                    orderBy('createdAt', 'desc'),
-                    limit(100)
-                );
-                const snapshot = await getDocs(q);
-                
-                const results = [];
-                snapshot.forEach(doc => {
-                    const customer = { id: doc.id, ...doc.data() };
-                    if (customer.name?.toLowerCase().includes(lowerTerm) ||
-                        customer.phone?.includes(term) ||
-                        customer.address?.toLowerCase().includes(lowerTerm)) {
-                        results.push(customer);
-                    }
-                });
-                
-                allCustomers = results;
+            const snapshot = await getDocs(q);
+            const customers = [];
+            snapshot.forEach(doc => customers.push({ id: doc.id, ...doc.data() }));
+            if (reset) {
+                allCustomers = customers;
                 customerMap.clear();
-                results.forEach(c => customerMap.set(c.id, c));
+                customers.forEach(c => customerMap.set(c.id, c));
                 currentPage = 1;
-                hasMore = false;
-                
-                renderTable();
-                updatePaginationButtons();
-                
-            } catch (error) {
-                console.error('Search error:', error);
-                showToast('Error searching customers', 'error');
-            } finally {
-                isLoading = false;
+                hasMore = snapshot.docs.length === perPage;
+                lastDoc = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null;
+            } else {
+                allCustomers = [...allCustomers, ...customers];
+                customers.forEach(c => customerMap.set(c.id, c));
+                hasMore = snapshot.docs.length === perPage;
+                if (snapshot.docs.length > 0) lastDoc = snapshot.docs[snapshot.docs.length - 1];
+                currentPage++;
             }
-        }
-        
-        // ==================== SAVE CUSTOMER ====================
-        async function saveCustomer() {
-            const customerId = document.getElementById('customerId').value;
-            const phone = document.getElementById('custPhone').value.trim();
-            const name = document.getElementById('custName').value.trim();
-            const address = document.getElementById('custAddress').value;
-            const notes = document.getElementById('custNotes').value;
-            
-            clearPhoneError();
-            
-            if (!name || !phone) {
-                showToast('Name and phone are required', 'error');
-                return;
-            }
-            
-            try {
-                const phoneCheck = await getDocs(query(collection(db, 'customers'), where('phone', '==', phone)));
-                
-                if (!customerId && !phoneCheck.empty) {
-                    showPhoneError('This phone number is already registered!');
-                    showToast('Phone number already exists', 'error');
-                    return;
-                }
-                
-                if (customerId && !phoneCheck.empty) {
-                    const existingCustomer = phoneCheck.docs[0];
-                    if (existingCustomer.id !== customerId) {
-                        showPhoneError('This phone number is already registered with another customer!');
-                        showToast('Phone number already exists', 'error');
-                        return;
-                    }
-                }
-                
-                const customerData = {
-                    name: name,
-                    phone: phone,
-                    address: address,
-                    notes: notes,
-                    searchName: name.toLowerCase(),
-                    updatedAt: new Date().toISOString()
-                };
-                
-                if (customerId) {
-                    await updateDoc(doc(db, 'customers', customerId), customerData);
-                    showToast('Customer updated successfully', 'success');
-                } else {
-                    customerData.createdAt = new Date().toISOString();
-                    customerData.invoiceValue = 0;
-                    customerData.totalDue = 0;
-                    await addDoc(collection(db, 'customers'), customerData);
-                    showToast(`Customer added successfully!`, 'success');
-                }
-                
-                closeCustomerModal();
-                await loadStats();
-                await loadCustomers(true);
-                
-            } catch (error) {
-                console.error(error);
-                showToast('Error saving customer', 'error');
-            }
-        }
-        
-        // ==================== DELETE CUSTOMER ====================
-        async function deleteCustomer() {
-            if (!currentDeleteId) return;
-            
-            try {
-                const transQuery = await getDocs(query(collection(db, 'transactions'), where('customerId', '==', currentDeleteId)));
-                const batch = writeBatch(db);
-                
-                transQuery.forEach(transDoc => {
-                    batch.delete(doc(db, 'transactions', transDoc.id));
-                });
-                batch.delete(doc(db, 'customers', currentDeleteId));
-                
-                await batch.commit();
-                showToast(`Deleted ${currentCustomerName}${transQuery.size ? ` + ${transQuery.size} transactions` : ''}`, 'success');
-                document.getElementById('deleteModal').classList.add('hidden');
-                
-                await loadStats();
-                await loadCustomers(true);
-            } catch (error) { showToast('Delete failed', 'error'); }
-        }
-        
-        // ==================== EXPORT ====================
-        function exportToExcel() {
-            if (allCustomers.length === 0) { showToast('No data to export', 'error'); return; }
-            let csv = ['\uFEFF"SL","Name","Phone","Address","Invoice Value","Total Due"'];
-            allCustomers.forEach((c, index) => {
-                csv.push(`"${index + 1}","${c.name}","${c.phone}","${c.address || ''}","${(c.invoiceValue || 0).toFixed(2)}","${(c.totalDue || 0).toFixed(2)}"`);
+            renderTable();
+            updatePaginationButtons();
+            if (reset && customers.length === 0) totalCustomersCount = 0;
+            else if (reset && customers.length < perPage) totalCustomersCount = customers.length;
+        } catch (error) {
+            console.error('Load error:', error);
+            showToast('Error loading customers', 'error');
+            if (reset) { lastDoc = null; tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-500">Error loading customers</td></tr>'; }
+        } finally { isLoading = false; }
+    }
+
+    async function loadNextPage() {
+        if (!hasMore || isLoading) { if (!hasMore) showToast('No more customers', 'info'); return; }
+        await loadCustomers(false);
+    }
+    async function loadPrevPage() {
+        if (currentPage <= 1 || isLoading) return;
+        currentPage = 1;
+        lastDoc = null;
+        await loadCustomers(true);
+    }
+
+    function updatePaginationButtons() {
+        const container = document.getElementById('paginationControls');
+        if (!container) return;
+        let totalPages = Math.ceil(totalCustomersCount / perPage);
+        if (totalPages === 0 && allCustomers.length > 0) totalPages = Math.ceil(allCustomers.length / perPage);
+        const html = `
+            <button id="prevPageBtn" class="pagination-btn px-2 py-1 rounded-lg text-xs border border-gray-300 dark:border-gray-600 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-white'}" ${currentPage === 1 ? 'disabled' : ''}>« Prev</button>
+            <span class="px-2 py-1 text-xs text-gray-600 dark:text-gray-400">Page ${currentPage} ${totalPages > 0 ? `of ${totalPages}` : ''}</span>
+            <button id="nextPageBtn" class="pagination-btn px-2 py-1 rounded-lg text-xs border border-gray-300 dark:border-gray-600 ${!hasMore ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-white'}" ${!hasMore ? 'disabled' : ''}>Next »</button>
+        `;
+        container.innerHTML = html;
+        document.getElementById('prevPageBtn')?.addEventListener('click', (e) => { e.preventDefault(); loadPrevPage(); });
+        document.getElementById('nextPageBtn')?.addEventListener('click', (e) => { e.preventDefault(); loadNextPage(); });
+    }
+
+    // ----- search -----
+    async function searchCustomers(term) {
+        if (!term.trim()) { await loadCustomers(true); return; }
+        if (isLoading) return;
+        isLoading = true;
+        const tbody = document.getElementById('customersTableBody');
+        tbody.innerHTML = '<tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr>';
+        try {
+            const lower = term.toLowerCase();
+            const q = query(collection(db, 'customers'), orderBy('createdAt', 'desc'), limit(100));
+            const snap = await getDocs(q);
+            const results = [];
+            snap.forEach(doc => {
+                const c = { id: doc.id, ...doc.data() };
+                if (c.name?.toLowerCase().includes(lower) || c.phone?.includes(term) || c.address?.toLowerCase().includes(lower)) results.push(c);
             });
-            const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-            URL.revokeObjectURL(a.href);
-            showToast('Exported successfully', 'success');
-        }
-        
-        function closeCustomerModal() {
-            clearPhoneError();
-            document.getElementById('customerModal').classList.add('hidden');
-            document.getElementById('customerId').value = '';
-            document.getElementById('custName').value = '';
-            document.getElementById('custPhone').value = '';
-            document.getElementById('custAddress').value = '';
-            document.getElementById('custNotes').value = '';
-            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus text-primary mr-2"></i> Add Customer';
-        }
-        
-        // ==================== SEARCH HANDLER ====================
-        function handleSearchInput(e) {
-            if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
-            searchDebounceTimer = setTimeout(() => {
-                searchCustomers(e.target.value);
-            }, 300);
-        }
-        
-        function handlePerPageChange(e) {
-            perPage = parseInt(e.target.value);
-            loadCustomers(true);
-        }
-        
-        // ==================== SIDEBAR FUNCTIONS ====================
-        const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
-        function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.id = 'sidebarOverlay'; overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
-        function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); const overlay = document.getElementById('sidebarOverlay'); if (overlay) overlay.remove(); }
-        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
-        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
-        window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); } });
-        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
-        
-        // ==================== EVENT LISTENERS ====================
-        document.getElementById('addCustomerBtn')?.addEventListener('click', () => { closeCustomerModal(); document.getElementById('customerModal').classList.remove('hidden'); });
-        document.getElementById('saveCustomerBtn')?.addEventListener('click', saveCustomer);
-        document.getElementById('closeModalBtn')?.addEventListener('click', closeCustomerModal);
-        document.getElementById('cancelModalBtn')?.addEventListener('click', closeCustomerModal);
-        document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => document.getElementById('deleteModal').classList.add('hidden'));
-        document.getElementById('confirmDeleteBtn')?.addEventListener('click', deleteCustomer);
-        document.getElementById('exportBtn')?.addEventListener('click', exportToExcel);
-        document.getElementById('refreshBtn')?.addEventListener('click', () => { document.getElementById('searchInput').value = ''; loadCustomers(true); loadStats(); showToast('Refreshed'); });
-        document.getElementById('searchInput')?.addEventListener('input', handleSearchInput);
-        document.getElementById('darkModeToggle')?.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
-        document.getElementById('perPageSelect')?.addEventListener('change', handlePerPageChange);
-        
-        // Close modals
-        document.getElementById('customerModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('customerModal')) closeCustomerModal(); });
-        document.getElementById('deleteModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('deleteModal')) document.getElementById('deleteModal').classList.add('hidden'); });
-        document.getElementById('detailsModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('detailsModal')) document.getElementById('detailsModal').classList.add('hidden'); });
-        document.getElementById('closeDetailsModalBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
-        document.getElementById('closeDetailsModalFooterBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
-        
-        // Clear phone error when typing
-        document.getElementById('custPhone')?.addEventListener('input', clearPhoneError);
-        
-        // Logout
-        const logoutModal = document.getElementById('logoutModal'), logoutLink = document.getElementById('logoutLink'), cancelLogout = document.getElementById('cancelLogoutBtn'), confirmLogout = document.getElementById('confirmLogoutBtn');
-        const { logout } = await import('./js/auth.js');
-        if (logoutLink) logoutLink.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
-        if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
-        if (confirmLogout) confirmLogout.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
-        
-        // ==================== INITIALIZE ====================
-        loadStats();
-        loadCustomers(true);
-    </script>
+            allCustomers = results;
+            customerMap.clear();
+            results.forEach(c => customerMap.set(c.id, c));
+            currentPage = 1;
+            hasMore = false;
+            renderTable();
+            updatePaginationButtons();
+        } catch (error) { showToast('Search error', 'error'); } finally { isLoading = false; }
+    }
+
+    // ----- save customer -----
+    async function saveCustomer() {
+        const customerId = document.getElementById('customerId').value;
+        const phone = document.getElementById('custPhone').value.trim();
+        const name = document.getElementById('custName').value.trim();
+        const address = document.getElementById('custAddress').value;
+        const notes = document.getElementById('custNotes').value;
+        clearPhoneError();
+        if (!name || !phone) { showToast('Name and phone are required', 'error'); return; }
+        try {
+            const phoneCheck = await getDocs(query(collection(db, 'customers'), where('phone', '==', phone)));
+            if (!customerId && !phoneCheck.empty) { showPhoneError('Phone already registered!'); showToast('Phone exists', 'error'); return; }
+            if (customerId && !phoneCheck.empty) {
+                const existing = phoneCheck.docs[0];
+                if (existing.id !== customerId) { showPhoneError('Phone registered to another customer!'); showToast('Phone exists', 'error'); return; }
+            }
+            const data = { name, phone, address, notes, searchName: name.toLowerCase(), updatedAt: new Date().toISOString() };
+            if (customerId) {
+                await updateDoc(doc(db, 'customers', customerId), data);
+                showToast('Customer updated', 'success');
+            } else {
+                data.createdAt = new Date().toISOString();
+                data.invoiceValue = 0;
+                data.totalDue = 0;
+                await addDoc(collection(db, 'customers'), data);
+                showToast('Customer added', 'success');
+            }
+            closeCustomerModal();
+            await loadStats();
+            await loadCustomers(true);
+        } catch (error) { showToast('Error saving customer', 'error'); }
+    }
+
+    // ----- delete -----
+    async function deleteCustomer() {
+        if (!currentDeleteId) return;
+        try {
+            const transQuery = await getDocs(query(collection(db, 'transactions'), where('customerId', '==', currentDeleteId)));
+            const batch = writeBatch(db);
+            transQuery.forEach(d => batch.delete(doc(db, 'transactions', d.id)));
+            batch.delete(doc(db, 'customers', currentDeleteId));
+            await batch.commit();
+            showToast(`Deleted ${currentCustomerName}${transQuery.size ? ` + ${transQuery.size} txns` : ''}`, 'success');
+            document.getElementById('deleteModal').classList.add('hidden');
+            await loadStats();
+            await loadCustomers(true);
+        } catch (error) { showToast('Delete failed', 'error'); }
+    }
+
+    // ----- export -----
+    function exportToExcel() {
+        if (allCustomers.length === 0) { showToast('No data', 'error'); return; }
+        let csv = ['\uFEFF"SL","Name","Phone","Address","Invoice Value","Total Due"'];
+        allCustomers.forEach((c, i) => {
+            csv.push(`"${i+1}","${c.name}","${c.phone}","${c.address || ''}","${(c.invoiceValue||0).toFixed(2)}","${(c.totalDue||0).toFixed(2)}"`);
+        });
+        const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        showToast('Exported', 'success');
+    }
+
+    function closeCustomerModal() {
+        clearPhoneError();
+        document.getElementById('customerModal').classList.add('hidden');
+        document.getElementById('customerId').value = '';
+        document.getElementById('custName').value = '';
+        document.getElementById('custPhone').value = '';
+        document.getElementById('custAddress').value = '';
+        document.getElementById('custNotes').value = '';
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus text-primary mr-2"></i> Add Customer';
+    }
+
+    // ----- search handler -----
+    function handleSearchInput(e) {
+        if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => searchCustomers(e.target.value), 300);
+    }
+
+    // ----- sidebar -----
+    const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const ov = document.createElement('div'); ov.id = 'sidebarOverlay'; ov.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; ov.addEventListener('click', closeSidebar); document.body.appendChild(ov); } }
+    function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); document.getElementById('sidebarOverlay')?.remove(); }
+    menuToggle?.addEventListener('click', openSidebar);
+    closeSidebarBtn?.addEventListener('click', closeSidebar);
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); }
+    });
+    if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
+
+    // ----- event listeners -----
+    document.getElementById('addCustomerBtn')?.addEventListener('click', () => { closeCustomerModal(); document.getElementById('customerModal').classList.remove('hidden'); });
+    document.getElementById('saveCustomerBtn')?.addEventListener('click', saveCustomer);
+    document.getElementById('closeModalBtn')?.addEventListener('click', closeCustomerModal);
+    document.getElementById('cancelModalBtn')?.addEventListener('click', closeCustomerModal);
+    document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => document.getElementById('deleteModal').classList.add('hidden'));
+    document.getElementById('confirmDeleteBtn')?.addEventListener('click', deleteCustomer);
+    document.getElementById('exportBtn')?.addEventListener('click', exportToExcel);
+    document.getElementById('refreshBtn')?.addEventListener('click', () => { document.getElementById('searchInput').value = ''; loadCustomers(true); loadStats(); showToast('Refreshed'); });
+    document.getElementById('searchInput')?.addEventListener('input', handleSearchInput);
+    document.getElementById('darkModeToggle')?.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
+    document.getElementById('perPageSelect')?.addEventListener('change', (e) => { perPage = parseInt(e.target.value); loadCustomers(true); });
+
+    document.getElementById('customerModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('customerModal')) closeCustomerModal(); });
+    document.getElementById('deleteModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('deleteModal')) document.getElementById('deleteModal').classList.add('hidden'); });
+    document.getElementById('detailsModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('detailsModal')) document.getElementById('detailsModal').classList.add('hidden'); });
+    document.getElementById('closeDetailsModalBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
+    document.getElementById('closeDetailsModalFooterBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
+    document.getElementById('custPhone')?.addEventListener('input', clearPhoneError);
+
+    // logout
+    const logoutModal = document.getElementById('logoutModal'), logoutLink = document.getElementById('logoutLink'), cancelLogout = document.getElementById('cancelLogoutBtn'), confirmLogout = document.getElementById('confirmLogoutBtn');
+    const { logout } = await import('./js/auth.js');
+    if (logoutLink) logoutLink.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
+    if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
+    if (confirmLogout) confirmLogout.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
+
+    // footer year auto update
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+    // init
+    loadStats();
+    loadCustomers(true);
+</script>
 </body>
 </html>
