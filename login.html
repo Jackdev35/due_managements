@@ -136,7 +136,7 @@
             border: 2px solid rgba(255,255,255,0.3);
             border-radius: 50%;
             border-top-color: white;
-            animation: spin 0.8s linear inline;
+            animation: spin 0.8s linear infinite;
             display: inline-block;
         }
         
@@ -146,7 +146,6 @@
             box-shadow: 0 0 0 3px rgba(0,150,136,0.2);
         }
         
-        /* Full Circle Logo Style */
         .logo-circle {
             width: 100%;
             height: 100%;
@@ -156,7 +155,6 @@
             padding: 8px;
         }
         
-        /* Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -181,9 +179,34 @@
             border-top-color: #009688;
             animation: spin 1s linear infinite;
         }
+
+        /* Cross-tab sync prevention - lock icon */
+        .tab-lock-badge {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: #aaa;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 9999;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .tab-lock-badge i { color: #4db6ac; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen overflow-x-hidden">
+    
+    <!-- Tab Lock Badge -->
+    <div class="tab-lock-badge" id="tabLockBadge">
+        <i class="fas fa-lock"></i>
+        <span id="tabStatusText">Tab sync protected</span>
+    </div>
     
     <!-- Animated Background -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
@@ -325,7 +348,7 @@
         </div>
     </div>
     
-    <!-- Simple Loading Overlay -->
+    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay" style="display: none;">
         <div class="loading-spinner"></div>
         <div class="text-white text-lg font-semibold">Authenticating...</div>
@@ -341,7 +364,8 @@
             browserLocalPersistence, 
             browserSessionPersistence, 
             sendPasswordResetEmail,
-            onAuthStateChanged
+            onAuthStateChanged,
+            signOut
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         
         const firebaseConfig = {
@@ -357,9 +381,68 @@
         const auth = getAuth(app);
         
         // ============ CROSS-TAB SYNC PREVENTION ============
-        // Use sessionStorage to track if this tab is already redirecting
         const REDIRECT_KEY = 'is_redirecting';
         const REDIRECT_TIMESTAMP_KEY = 'redirect_timestamp';
+        const TAB_ID_KEY = 'tab_id';
+        const ACTIVE_TAB_KEY = 'active_tab_id';
+        
+        // Generate unique tab ID
+        function generateTabId() {
+            return 'tab_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Get or create tab ID
+        let tabId = sessionStorage.getItem(TAB_ID_KEY);
+        if (!tabId) {
+            tabId = generateTabId();
+            sessionStorage.setItem(TAB_ID_KEY, tabId);
+        }
+        
+        // Register this tab as active
+        function registerActiveTab() {
+            localStorage.setItem(ACTIVE_TAB_KEY, tabId);
+            // Update timestamp
+            localStorage.setItem('tab_last_active_' + tabId, Date.now().toString());
+        }
+        
+        // Check if this tab is the active one
+        function isActiveTab() {
+            const activeTab = localStorage.getItem(ACTIVE_TAB_KEY);
+            return activeTab === tabId;
+        }
+        
+        // Handle tab activation/deactivation
+        function setupTabSync() {
+            // Register on load
+            registerActiveTab();
+            
+            // Update on visibility change
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    registerActiveTab();
+                }
+            });
+            
+            // Listen for storage changes from other tabs
+            window.addEventListener('storage', (e) => {
+                if (e.key === ACTIVE_TAB_KEY) {
+                    // Another tab became active
+                    const isActive = isActiveTab();
+                    document.getElementById('tabStatusText').textContent = 
+                        isActive ? 'Tab is active' : 'Another tab is active';
+                    
+                    if (!isActive && auth.currentUser) {
+                        // This tab lost active status - prevent auto-redirect
+                        console.log('ℹ️ Another tab is active, preventing redirect');
+                    }
+                }
+            });
+            
+            // Also listen for page unload to clean up
+            window.addEventListener('beforeunload', () => {
+                // Don't unregister immediately - other tab will take over
+            });
+        }
         
         function isRedirecting() {
             return sessionStorage.getItem(REDIRECT_KEY) === 'true';
@@ -383,13 +466,103 @@
             const lastRedirect = sessionStorage.getItem(REDIRECT_TIMESTAMP_KEY);
             if (lastRedirect) {
                 const timeSince = Date.now() - parseInt(lastRedirect);
-                if (timeSince < 5000) { // 5 seconds cooldown
+                if (timeSince < 5000) {
                     console.log(`⏳ Recent redirect (${timeSince}ms ago), skipping...`);
                     return false;
                 }
             }
             
+            // Check if this tab is active
+            if (!isActiveTab()) {
+                console.log("ℹ️ Not active tab, skipping redirect");
+                return false;
+            }
+            
             return true;
+        }
+        
+        // Initialize tab sync
+        setupTabSync();
+        document.getElementById('tabStatusText').textContent = 'Tab sync active';
+        
+        // ============ INACTIVITY TIMER (20 MINUTES) ============
+        let inactivityTimer = null;
+        let dailyResetTimer = null;
+        const INACTIVITY_TIMEOUT = 20 * 60 * 1000; // 20 minutes
+        
+        function getTimeUntilMidnight() {
+            const now = new Date();
+            const midnight = new Date(now);
+            midnight.setHours(24, 0, 0, 0);
+            return midnight.getTime() - now.getTime();
+        }
+        
+        function resetInactivityTimer() {
+            if (inactivityTimer) {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = null;
+            }
+            
+            if (auth.currentUser) {
+                inactivityTimer = setTimeout(async () => {
+                    console.log("🕐 User inactive for 20 minutes, auto logging out...");
+                    try {
+                        await signOut(auth);
+                        showToast('Logged out due to 20 minutes of inactivity', 'warning');
+                        // Clear redirect flags
+                        setRedirecting(false);
+                        localStorage.removeItem(ACTIVE_TAB_KEY);
+                        window.location.href = 'login.html';
+                    } catch (error) {
+                        console.error("Auto logout error:", error);
+                    }
+                }, INACTIVITY_TIMEOUT);
+            }
+        }
+        
+        function setupDailyReset() {
+            // Clear existing timer
+            if (dailyResetTimer) {
+                clearTimeout(dailyResetTimer);
+                dailyResetTimer = null;
+            }
+            
+            if (auth.currentUser) {
+                const timeUntilMidnight = getTimeUntilMidnight();
+                console.log(`🕐 Daily reset in ${Math.round(timeUntilMidnight / 60000)} minutes`);
+                
+                dailyResetTimer = setTimeout(async () => {
+                    console.log("🕐 Midnight reached, auto logging out...");
+                    try {
+                        await signOut(auth);
+                        showToast('Session expired - daily reset at midnight', 'warning');
+                        // Clear redirect flags
+                        setRedirecting(false);
+                        localStorage.removeItem(ACTIVE_TAB_KEY);
+                        window.location.href = 'login.html';
+                    } catch (error) {
+                        console.error("Daily reset logout error:", error);
+                    }
+                }, timeUntilMidnight);
+            }
+        }
+        
+        function setupActivityListeners() {
+            const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'keydown'];
+            
+            events.forEach(event => {
+                window.addEventListener(event, () => {
+                    if (auth.currentUser) {
+                        resetInactivityTimer();
+                    }
+                });
+            });
+            
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && auth.currentUser) {
+                    resetInactivityTimer();
+                }
+            });
         }
         
         // ============ CHECK IF ALREADY LOGGED IN ============
@@ -406,6 +579,18 @@
             if (user) {
                 console.log("✅ User already logged in:", user.email);
                 
+                // Start inactivity timer
+                resetInactivityTimer();
+                
+                // Setup daily reset
+                setupDailyReset();
+                
+                // Setup activity listeners
+                if (!window._activityListenersSetup) {
+                    setupActivityListeners();
+                    window._activityListenersSetup = true;
+                }
+                
                 // Check if we should redirect
                 if (shouldRedirect()) {
                     console.log("🔄 Redirecting to dashboard...");
@@ -418,12 +603,20 @@
                     
                     window.location.replace('dashboard.html');
                 } else {
-                    console.log("⏳ Skipping redirect (cooldown active)");
+                    console.log("⏳ Skipping redirect (cooldown or not active tab)");
                 }
             } else {
-                console.log("ℹ️ User not logged in");
+               
                 // Clear redirect flag if user is not logged in
                 setRedirecting(false);
+                if (inactivityTimer) {
+                    clearTimeout(inactivityTimer);
+                    inactivityTimer = null;
+                }
+                if (dailyResetTimer) {
+                    clearTimeout(dailyResetTimer);
+                    dailyResetTimer = null;
+                }
             }
         });
         
@@ -491,7 +684,7 @@
                         brandLogo.src = logoOptions[currentIndex];
                         brandLogo.style.display = 'block';
                         if (fallbackIcon) fallbackIcon.style.display = 'none';
-                        console.log(`✅ Logo loaded: ${logoOptions[currentIndex]}`);
+                        
                     }
                 };
                 img.onerror = function() {
@@ -553,6 +746,18 @@
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 console.log("✅ Login successful:", userCredential.user.email);
+                
+                // Register this tab as active
+                registerActiveTab();
+                
+                // Start inactivity timer
+                resetInactivityTimer();
+                setupDailyReset();
+                
+                if (!window._activityListenersSetup) {
+                    setupActivityListeners();
+                    window._activityListenersSetup = true;
+                }
                 
                 // Show success message
                 window.showToast('Login successful! Redirecting...', 'success');
@@ -645,7 +850,7 @@
         resetEmailInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendResetBtn.click(); });
         passwordInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') loginForm.dispatchEvent(new Event('submit')); });
         
-        console.log('🔥 Login page loaded with cross-tab sync prevention!');
+        
     </script>
 </body>
 </html>

@@ -456,6 +456,19 @@
         #detailsContent::-webkit-scrollbar {
             display: none;
         }
+        
+        /* Bulk status info */
+        .bulk-status-info {
+            font-size: 0.7rem;
+            color: #6b7280;
+            padding: 6px 10px;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .dark .bulk-status-info {
+            background: #1e293b;
+            color: #94a3b8;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -716,7 +729,7 @@
         </div>
     </div>
     
-    <!-- Bulk Update Modal -->
+    <!-- Bulk Update Modal - ENHANCED with dynamic status options -->
     <div id="bulkUpdateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-all duration-300 p-3">
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl modal-animate overflow-hidden">
             <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
@@ -734,15 +747,15 @@
                         <span id="bulkSelectedCount" class="font-bold">0</span> warranties selected
                     </p>
                 </div>
+                <!-- Dynamic status info -->
+                <div id="bulkStatusInfo" class="bulk-status-info hidden">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    <span id="bulkStatusInfoText"></span>
+                </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">New Status <span class="text-red-500">*</span></label>
                     <select id="bulkUpdateStatus" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
                         <option value="">-- Select --</option>
-                        <option value="currier">🚚 Sent to Currier</option>
-                        <option value="currier_to_supplier">📦 Currier → Supplier</option>
-                        <option value="supplier_received">✅ Supplier Received</option>
-                        <option value="supplier_to_shop">🔄 Supplier → Shop</option>
-                        <option value="customer_delivered">🏠 Customer Delivered</option>
                     </select>
                 </div>
             </div>
@@ -828,6 +841,16 @@
             'customer_delivered': { class: 'customer_delivered', icon: 'fa-home', text: 'Customer Delivered', order: 6 }
         };
         
+        // Status flow - defines which status can go to which
+        const statusFlow = {
+            'pending': ['currier'],
+            'currier': ['currier_to_supplier'],
+            'currier_to_supplier': ['supplier_received'],
+            'supplier_received': ['supplier_to_shop'],
+            'supplier_to_shop': ['customer_delivered'],
+            'customer_delivered': [] // locked, no further status
+        };
+        
         const statusOrder = {
             'pending': 1,
             'currier': 2,
@@ -868,7 +891,21 @@
         }
         
         function canChangeStatus(currentStatus, newStatus) {
-            return statusOrder[newStatus] > statusOrder[currentStatus];
+            // Check if newStatus is in the allowed next statuses for currentStatus
+            const allowed = statusFlow[currentStatus] || [];
+            return allowed.includes(newStatus);
+        }
+        
+        function getNextStatuses(status) {
+            return statusFlow[status] || [];
+        }
+        
+        // Get common next statuses for multiple statuses (intersection)
+        function getCommonNextStatuses(statuses) {
+            if (statuses.length === 0) return [];
+            const allNextLists = statuses.map(s => getNextStatuses(s));
+            // Find intersection of all lists
+            return allNextLists.reduce((a, b) => a.filter(v => b.includes(v)));
         }
         
         function showSkeletonLoading() {
@@ -1128,21 +1165,21 @@
             const statusSelect = document.getElementById('updateStatus');
             statusSelect.innerHTML = '';
             
-            const nextStatuses = {
-                'pending': [{ value: 'currier', label: '🚚 Sent to Currier' }],
-                'currier': [{ value: 'currier_to_supplier', label: '📦 Currier → Supplier' }],
-                'currier_to_supplier': [{ value: 'supplier_received', label: '✅ Supplier Received' }],
-                'supplier_received': [{ value: 'supplier_to_shop', label: '🔄 Supplier → Shop' }],
-                'supplier_to_shop': [{ value: 'customer_delivered', label: '🏠 Customer Delivered' }]
-            };
-            
-            const options = nextStatuses[currentStatus] || [];
-            options.forEach(opt => {
-                const option = document.createElement('option');
-                option.value = opt.value;
-                option.textContent = opt.label;
-                statusSelect.appendChild(option);
-            });
+            // Get next statuses from flow
+            const nextStatuses = statusFlow[currentStatus] || [];
+            if (nextStatuses.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'No further status available';
+                statusSelect.appendChild(opt);
+            } else {
+                nextStatuses.forEach(status => {
+                    const option = document.createElement('option');
+                    option.value = status;
+                    option.textContent = statusConfig[status]?.text || status;
+                    statusSelect.appendChild(option);
+                });
+            }
             
             const newSerialGroup = document.getElementById('newSerialGroup');
             const newSerialInput = document.getElementById('newSerialNumber');
@@ -1255,22 +1292,14 @@
             }
         }
         
+        // ===== ENHANCED BULK UPDATE - Dynamic status options =====
         async function bulkUpdateStatus() {
             const newStatus = document.getElementById('bulkUpdateStatus').value;
             
             if (!newStatus) { showToast('Select a status', 'error'); return; }
             if (selectedIds.size === 0) { showToast('No warranties selected', 'error'); return; }
             
-            const hasSupplierReceived = [...selectedIds].some(id => {
-                const warranty = allWarranties.find(w => w.id === id);
-                return warranty && warranty.status === 'supplier_received' && newStatus === 'supplier_to_shop';
-            });
-            
-            if (hasSupplierReceived) {
-                showToast('New serial required for Supplier→Shop. Use individual update.', 'error');
-                return;
-            }
-            
+            // Validate each selected item can move to the new status
             const invalidIds = [];
             for (const id of selectedIds) {
                 const warranty = allWarranties.find(w => w.id === id);
@@ -1280,7 +1309,19 @@
             }
             
             if (invalidIds.length > 0) {
-                showToast(`Cannot update ${invalidIds.length} warranties. Status can only move forward.`, 'error');
+                showToast(`${invalidIds.length} items cannot be updated. Status can only move forward.`, 'error');
+                return;
+            }
+            
+            // Check if any selected item is in supplier_received and newStatus is supplier_to_shop
+            // This requires new serial number - handled per item, so we skip bulk for this case
+            const hasSupplierReceived = [...selectedIds].some(id => {
+                const warranty = allWarranties.find(w => w.id === id);
+                return warranty && warranty.status === 'supplier_received' && newStatus === 'supplier_to_shop';
+            });
+            
+            if (hasSupplierReceived) {
+                showToast('New serial required for Supplier→Shop. Use individual update.', 'error');
                 return;
             }
             
@@ -1293,7 +1334,7 @@
                     }));
                 }
                 await Promise.all(promises);
-                showToast(`${selectedIds.size} warranties updated!`, 'success');
+                showToast(`${selectedIds.size} warranties updated to ${statusConfig[newStatus]?.text || newStatus}!`, 'success');
                 document.getElementById('bulkUpdateModal').classList.add('hidden');
                 selectedIds.clear();
                 updateSelectionUI();
@@ -1381,9 +1422,69 @@
             document.body.classList.toggle('dark');
         });
         
+        // ===== ENHANCED BULK UPDATE BUTTON - Dynamic options =====
         bulkUpdateBtn?.addEventListener('click', () => {
-            document.getElementById('bulkSelectedCount').textContent = selectedIds.size;
-            document.getElementById('bulkUpdateStatus').value = '';
+            const selectedWarranties = [...selectedIds].map(id => 
+                allWarranties.find(w => w.id === id)
+            ).filter(Boolean);
+            
+            if (selectedWarranties.length === 0) {
+                showToast('No warranties selected', 'error');
+                return;
+            }
+            
+            // Get all unique statuses from selected warranties
+            const statuses = [...new Set(selectedWarranties.map(w => w.status))];
+            
+            const statusSelect = document.getElementById('bulkUpdateStatus');
+            statusSelect.innerHTML = '';
+            
+            let availableStatuses = [];
+            let infoText = '';
+            
+            if (statuses.length === 1) {
+                // All items have the same status
+                const currentStatus = statuses[0];
+                availableStatuses = getNextStatuses(currentStatus);
+                const statusName = statusConfig[currentStatus]?.text || currentStatus;
+                infoText = `All ${selectedWarranties.length} items are currently "${statusName}"`;
+            } else {
+                // Different statuses - find common next statuses
+                availableStatuses = getCommonNextStatuses(statuses);
+                const statusNames = statuses.map(s => statusConfig[s]?.text || s).join(', ');
+                infoText = `Selected items have different statuses: ${statusNames}`;
+            }
+            
+            // Add default option
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.textContent = availableStatuses.length > 0 ? '-- Select Status --' : 'No common next status available';
+            statusSelect.appendChild(defaultOpt);
+            
+            // Add available statuses
+            availableStatuses.forEach(status => {
+                const opt = document.createElement('option');
+                opt.value = status;
+                opt.textContent = statusConfig[status]?.text || status;
+                statusSelect.appendChild(opt);
+            });
+            
+            // Update info text
+            const infoElement = document.getElementById('bulkStatusInfo');
+            const infoTextElement = document.getElementById('bulkStatusInfoText');
+            
+            if (availableStatuses.length > 0) {
+                infoElement.classList.remove('hidden');
+                const availableText = availableStatuses.map(s => statusConfig[s]?.text || s).join(', ');
+                infoTextElement.textContent = `${infoText}. Can move to: ${availableText}`;
+                statusSelect.disabled = false;
+            } else {
+                infoElement.classList.remove('hidden');
+                infoTextElement.textContent = `${infoText}. No common next status available.`;
+                statusSelect.disabled = true;
+            }
+            
+            document.getElementById('bulkSelectedCount').textContent = selectedWarranties.length;
             document.getElementById('bulkUpdateModal').classList.remove('hidden');
         });
         

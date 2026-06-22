@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes" />
     <meta name="theme-color" content="#0f3b3a" />
-    <title>Customers | JackDev Due Managements</title>
+    <title>Customers · JackDev Due Managements</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" />
@@ -344,7 +344,6 @@
                 document.getElementById('totalCustomers').textContent = stats.totalCustomers || 0;
                 document.getElementById('activeCustomers').textContent = stats.totalCustomers || 0;
                 document.getElementById('totalDue').textContent = '৳' + (stats.totalDue || 0).toFixed(2);
-                // FIXED: invoice value = total due entry value from stats
                 document.getElementById('totalInvoiceValue').textContent = '৳' + (stats.totalInvoiceValue || 0).toFixed(2);
                 document.getElementById('totalCollections').textContent = '৳' + (stats.totalCollections || 0).toFixed(2);
                 totalCustomersCount = stats.totalCustomers || 0;
@@ -381,7 +380,7 @@
         } catch (error) { console.error('Stats error:', error); }
     }
 
-    // ----- render table -----
+    // ----- render table (A-Z sorting by name) -----
     function generateRowHTML(customer, sl) {
         const dueClass = (customer.totalDue || 0) >= 10000 ? 'text-red-600 font-bold' : (customer.totalDue || 0) >= 5000 ? 'text-orange-500 font-semibold' : 'text-green-600';
         return `
@@ -394,15 +393,20 @@
             <td class="px-3 py-2.5 text-center"><div class="flex items-center justify-center gap-1"><button class="edit-customer text-blue-500 hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-id="${customer.id}"><i class="fas fa-edit text-xs md:text-sm"></i></button><button class="delete-customer text-red-500 hover:text-red-700 p-1.5 rounded-lg transition-colors" data-id="${customer.id}" data-name="${escapeHtml(customer.name)}"><i class="fas fa-trash-alt text-xs md:text-sm"></i></button></div></td>
         `;
     }
+
     function renderTable() {
         const tbody = document.getElementById('customersTableBody');
         if (allCustomers.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-users text-3xl mb-2 opacity-50 block"></i>No customers found</td></tr>';
             return;
         }
+
+        // --- SORT A-Z by name (case-insensitive) ---
+        const sorted = [...allCustomers].sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
+
         const start = (currentPage - 1) * perPage;
-        const end = Math.min(start + perPage, allCustomers.length);
-        const paginated = allCustomers.slice(start, end);
+        const end = Math.min(start + perPage, sorted.length);
+        const paginated = sorted.slice(start, end);
         tbody.innerHTML = '';
         let sl = start + 1;
         for (const customer of paginated) {
@@ -618,7 +622,9 @@
     function exportToExcel() {
         if (allCustomers.length === 0) { showToast('No data', 'error'); return; }
         let csv = ['\uFEFF"SL","Name","Phone","Address","Invoice Value","Total Due"'];
-        allCustomers.forEach((c, i) => {
+        // sorted A-Z for export as well
+        const sorted = [...allCustomers].sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
+        sorted.forEach((c, i) => {
             csv.push(`"${i+1}","${c.name}","${c.phone}","${c.address || ''}","${(c.invoiceValue||0).toFixed(2)}","${(c.totalDue||0).toFixed(2)}"`);
         });
         const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
@@ -627,7 +633,7 @@
         a.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         URL.revokeObjectURL(a.href);
-        showToast('Exported', 'success');
+        showToast('Exported (A-Z sorted)', 'success');
     }
 
     function closeCustomerModal() {

@@ -5,26 +5,185 @@ import {
     onAuthStateChanged
 } from './firebase.js';
 
+// ============ CONFIGURATION ============
+const CONFIG = {
+    // Set to false to disable all console logs
+    ENABLE_LOGS: false,
+    // Set to true to show only important logs (errors, warnings)
+    ENABLE_IMPORTANT_LOGS_ONLY: true
+};
+
+// Custom logger - controls all console output
+const logger = {
+    log: (...args) => {
+        if (CONFIG.ENABLE_LOGS) {
+            console.log(...args);
+        }
+    },
+    info: (...args) => {
+        if (CONFIG.ENABLE_LOGS) {
+            console.info(...args);
+        }
+    },
+    warn: (...args) => {
+        if (CONFIG.ENABLE_LOGS || CONFIG.ENABLE_IMPORTANT_LOGS_ONLY) {
+            console.warn(...args);
+        }
+    },
+    error: (...args) => {
+        // Errors always show
+        console.error(...args);
+    }
+};
+
+// ============ CROSS-TAB SYNC PREVENTION ============
+const REDIRECT_KEY = 'is_redirecting';
+const REDIRECT_TIMESTAMP_KEY = 'redirect_timestamp';
+const TAB_ID_KEY = 'tab_id';
+const ACTIVE_TAB_KEY = 'active_tab_id';
+const AUTH_HANDLED_KEY = 'auth_handled';
+
+// Generate unique tab ID
+function generateTabId() {
+    return 'tab_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Get or create tab ID
+let tabId = sessionStorage.getItem(TAB_ID_KEY);
+if (!tabId) {
+    tabId = generateTabId();
+    sessionStorage.setItem(TAB_ID_KEY, tabId);
+}
+
+// Register this tab as active
+function registerActiveTab() {
+    localStorage.setItem(ACTIVE_TAB_KEY, tabId);
+    localStorage.setItem('tab_last_active_' + tabId, Date.now().toString());
+}
+
+// Check if this tab is the active one
+function isActiveTab() {
+    const activeTab = localStorage.getItem(ACTIVE_TAB_KEY);
+    return activeTab === tabId;
+}
+
+// Handle tab activation/deactivation
+function setupTabSync() {
+    // Register on load
+    registerActiveTab();
+    
+    // Update on visibility change
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            registerActiveTab();
+        }
+    });
+    
+    // Listen for storage changes from other tabs
+    window.addEventListener('storage', (e) => {
+        if (e.key === ACTIVE_TAB_KEY) {
+            // Another tab became active - silently handle
+            if (!isActiveTab() && auth.currentUser) {
+                // This tab lost active status - prevent auto-redirect
+                sessionStorage.setItem(REDIRECT_KEY, 'false');
+            }
+        }
+    });
+}
+
+function isRedirecting() {
+    return sessionStorage.getItem(REDIRECT_KEY) === 'true';
+}
+
+function setRedirecting(value) {
+    sessionStorage.setItem(REDIRECT_KEY, value ? 'true' : 'false');
+    if (value) {
+        sessionStorage.setItem(REDIRECT_TIMESTAMP_KEY, Date.now().toString());
+    }
+}
+
+function shouldRedirect() {
+    // If already redirecting, don't redirect again
+    if (isRedirecting()) {
+        return false;
+    }
+    
+    // Check if a redirect happened recently (within last 3 seconds)
+    const lastRedirect = sessionStorage.getItem(REDIRECT_TIMESTAMP_KEY);
+    if (lastRedirect) {
+        const timeSince = Date.now() - parseInt(lastRedirect);
+        if (timeSince < 3000) {
+            return false;
+        }
+    }
+    
+    // Check if this tab is active
+    if (!isActiveTab()) {
+        return false;
+    }
+    
+    return true;
+}
+
+// Initialize tab sync
+setupTabSync();
+
 // ============ INACTIVITY TIMER (20 MINUTES) ============
 let inactivityTimer = null;
-const INACTIVITY_TIMEOUT = 20 * 60 * 1000; // 20 minutes
+let dailyResetTimer = null;
+const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+
+function getTimeUntilMidnight() {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    return midnight.getTime() - now.getTime();
+}
 
 function resetInactivityTimer() {
     if (inactivityTimer) {
         clearTimeout(inactivityTimer);
+        inactivityTimer = null;
     }
     
     if (auth.currentUser) {
         inactivityTimer = setTimeout(async () => {
-            console.log("User inactive for 20 minutes, auto logging out...");
+            logger.log("🕐 User inactive for 10 minutes, auto logging out...");
             try {
                 await signOut(auth);
-                showToast('Logged out due to 20 minutes of inactivity', 'warning');
-                redirectToLogin();
+                showToast('Logged out due to 10 minutes of inactivity', 'warning');
+                sessionStorage.clear();
+                localStorage.removeItem(ACTIVE_TAB_KEY);
+                window.location.replace('login.html');
             } catch (error) {
-                console.error("Auto logout error:", error);
+                logger.error("Auto logout error:", error);
             }
         }, INACTIVITY_TIMEOUT);
+    }
+}
+
+function setupDailyReset() {
+    if (dailyResetTimer) {
+        clearTimeout(dailyResetTimer);
+        dailyResetTimer = null;
+    }
+    
+    if (auth.currentUser) {
+        const timeUntilMidnight = getTimeUntilMidnight();
+        // Silent - no log
+        
+        dailyResetTimer = setTimeout(async () => {
+            logger.log("🕐 Midnight reached, auto logging out...");
+            try {
+                await signOut(auth);
+                showToast('Session expired - daily reset at midnight', 'warning');
+                sessionStorage.clear();
+                localStorage.removeItem(ACTIVE_TAB_KEY);
+                window.location.replace('login.html');
+            } catch (error) {
+                logger.error("Daily reset logout error:", error);
+            }
+        }, timeUntilMidnight);
     }
 }
 
@@ -54,53 +213,87 @@ function isAuthPage() {
 
 // Helper function to redirect to login
 function redirectToLogin() {
-    if (!isAuthPage()) {
-        window.location.href = 'login.html';
+    if (!isAuthPage() && !isRedirecting()) {
+        setRedirecting(true);
+        localStorage.removeItem(ACTIVE_TAB_KEY);
+        setTimeout(() => {
+            window.location.replace('login.html');
+        }, 100);
     }
 }
 
 // Helper function to redirect to dashboard
 function redirectToDashboard() {
-    if (isAuthPage()) {
-        window.location.href = 'dashboard.html';
+    if (isAuthPage() && shouldRedirect()) {
+        setRedirecting(true);
+        setTimeout(() => {
+            window.location.replace('dashboard.html');
+        }, 100);
     }
 }
 
-// ============ INACTIVITY TIMER END ============
+// ============ AUTH STATE HANDLER ============
+let authStateChecked = false;
+let isInitialAuthCheck = true;
 
-// Check auth state - FIXED: No infinite redirect loop
-export function checkAuthState(redirectToLogin = true) {
+// Check auth state
+export function checkAuthState(redirectToLoginPage = true) {
     let isRedirecting = false;
     
     onAuthStateChanged(auth, (user) => {
-        // Prevent multiple redirects
-        if (isRedirecting) return;
+        // Prevent multiple executions
+        if (authStateChecked && !isInitialAuthCheck) {
+            return;
+        }
+        authStateChecked = true;
+        isInitialAuthCheck = false;
         
         if (user) {
-            // User is logged in
+            // User is logged in - silent (no log)
+            
+            // Register this tab as active
+            registerActiveTab();
+            
+            // Start inactivity timer
             resetInactivityTimer();
             
+            // Setup daily reset
+            setupDailyReset();
+            
+            // Setup activity listeners (only once)
             if (!window._activityListenersSetup) {
                 setupActivityListeners();
                 window._activityListenersSetup = true;
             }
             
-            // Only redirect if on login page
-            if (isAuthPage()) {
-                isRedirecting = true;
-                window.location.href = 'dashboard.html';
+            // Only redirect if on login page and this tab should redirect
+            if (isAuthPage() && shouldRedirect()) {
+                setRedirecting(true);
+                setTimeout(() => {
+                    window.location.replace('dashboard.html');
+                }, 100);
             }
         } else {
-            // User is NOT logged in
+            // User is NOT logged in - silent
+            
+            // Clear timers
             if (inactivityTimer) {
                 clearTimeout(inactivityTimer);
                 inactivityTimer = null;
             }
+            if (dailyResetTimer) {
+                clearTimeout(dailyResetTimer);
+                dailyResetTimer = null;
+            }
             
             // Only redirect if not on auth page and redirectToLogin is true
-            if (redirectToLogin && !isAuthPage() && !window.location.pathname.includes('clear-data.html')) {
-                isRedirecting = true;
-                window.location.href = 'login.html';
+            if (redirectToLoginPage && !isAuthPage() && 
+                !window.location.pathname.includes('clear-data.html') &&
+                !isRedirecting()) {
+                setRedirecting(true);
+                setTimeout(() => {
+                    window.location.replace('login.html');
+                }, 100);
             }
         }
     });
@@ -111,8 +304,12 @@ export async function login(email, password) {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         
+        // Register this tab as active
+        registerActiveTab();
+        
         // Start inactivity timer
         resetInactivityTimer();
+        setupDailyReset();
         
         if (!window._activityListenersSetup) {
             setupActivityListeners();
@@ -153,10 +350,18 @@ export async function logout() {
             clearTimeout(inactivityTimer);
             inactivityTimer = null;
         }
+        if (dailyResetTimer) {
+            clearTimeout(dailyResetTimer);
+            dailyResetTimer = null;
+        }
+        
+        // Clear all session data
+        sessionStorage.clear();
+        localStorage.removeItem(ACTIVE_TAB_KEY);
         
         await signOut(auth);
         showToast('Logged out successfully', 'success');
-        window.location.href = 'login.html';
+        window.location.replace('login.html');
     } catch (error) {
         showToast('Error logging out: ' + error.message, 'error');
     }
@@ -240,4 +445,14 @@ export function getCurrentUser() {
 // Check if user is logged in (synchronous)
 export function isLoggedIn() {
     return auth.currentUser !== null;
+}
+
+// Enable/disable logs dynamically
+export function setLoggingEnabled(enabled) {
+    CONFIG.ENABLE_LOGS = enabled;
+}
+
+// Enable/disable important logs only
+export function setImportantLogsOnly(enabled) {
+    CONFIG.ENABLE_IMPORTANT_LOGS_ONLY = enabled;
 }

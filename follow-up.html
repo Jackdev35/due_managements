@@ -36,16 +36,15 @@
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; }
         
-        /* Hide scrollbar in sidebar navigation - Same as ledger.html */
         .sidebar-nav-fixed {
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: none;
         }
         
         .nav-active {
@@ -86,6 +85,7 @@
         
         .quick-filter-btn { transition: all 0.2s ease; }
         .quick-filter-btn.active { background: #0f3b3a; color: white; }
+        .dark .quick-filter-btn.active { background: #1e6b68; }
         
         .table-scroll-hint { display: none; }
         @media (max-width: 768px) {
@@ -136,7 +136,6 @@
         .sidebar-open { overflow: hidden; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        /* Fixed Sidebar Structure - Same as ledger.html */
         .sidebar-fixed {
             display: flex;
             flex-direction: column;
@@ -154,11 +153,11 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: none;
         }
         
         .skeleton {
@@ -172,15 +171,33 @@
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
+
+        .status-badge-upcoming {
+            background: #fef3c7;
+            color: #d97706;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .status-badge-overdue {
+            background: #fee2e2;
+            color: #dc2626;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .dark .status-badge-upcoming { background: #451a03; color: #fbbf24; }
+        .dark .status-badge-overdue { background: #7f1d1d; color: #fca5a5; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     
     <div class="flex min-h-screen">
         
-        <!-- Sidebar - Fixed Structure (Same as ledger.html) -->
+        <!-- Sidebar -->
         <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
-            <!-- Header - Fixed at top (does not scroll) -->
             <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
@@ -198,7 +215,6 @@
                 </div>
             </div>
             
-            <!-- Navigation - Scrollable area (scrollbar hidden) -->
             <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
                 <nav class="space-y-1.5">
                     <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
@@ -255,7 +271,6 @@
                             <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
                                 <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
                             </a>
-                            
                         </div>
                     </div>
                     
@@ -266,9 +281,13 @@
                     <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
                     </a>
+                    
+                    <a href="activity-logs.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-history text-sm"></i></div>
+                        <span class="text-sm font-medium">Activity Logs</span>
+                    </a>
                 </nav>
                 
-                <!-- Logout Button - Now scrolls with menu -->
                 <div class="pt-4 mt-2 border-t border-white/10">
                     <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
                         <i class="fas fa-sign-out-alt text-sm w-5"></i>
@@ -297,10 +316,10 @@
             <div class="p-3 md:p-4">
                 
                 <!-- Stats Cards -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
                     <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
                         <div class="bg-purple-100 dark:bg-purple-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-tasks text-purple-600 dark:text-purple-400 text-sm"></i></div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total Tasks</h3>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total</h3>
                         <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalTasks">0</p>
                     </div>
                     <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
@@ -314,6 +333,11 @@
                         <p class="text-xl font-bold text-gray-800 dark:text-white" id="overdueTasks">0</p>
                     </div>
                     <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                        <div class="bg-green-100 dark:bg-green-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-calendar-check text-green-600 dark:text-green-400 text-sm"></i></div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Upcoming</h3>
+                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="upcomingTasks">0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
                         <div class="bg-blue-100 dark:bg-blue-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-calendar text-blue-600 dark:text-blue-400 text-sm"></i></div>
                         <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">This Month</h3>
                         <p class="text-xl font-bold text-gray-800 dark:text-white" id="monthlyTasks">0</p>
@@ -323,10 +347,12 @@
                 <!-- Quick Filters & Export -->
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <div class="flex flex-wrap gap-2">
-                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="all"><i class="fas fa-list mr-1"></i> All</button>
+                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all active" data-filter="all"><i class="fas fa-list mr-1"></i> All</button>
                         <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="today"><i class="fas fa-calendar-day mr-1"></i> Today</button>
                         <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="week"><i class="fas fa-calendar-week mr-1"></i> This Week</button>
                         <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="month"><i class="fas fa-calendar-alt mr-1"></i> This Month</button>
+                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-primary hover:text-white transition-all" data-filter="upcoming"><i class="fas fa-calendar-check mr-1"></i> Upcoming (5 days)</button>
+                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-primary hover:text-white transition-all" data-filter="overdue"><i class="fas fa-exclamation-circle mr-1"></i> Overdue</button>
                     </div>
                     <button id="exportFollowUpBtn" class="bg-success hover:bg-green-700 text-white font-medium px-4 py-1.5 rounded-lg text-sm flex items-center gap-2 btn-active"><i class="fas fa-download text-xs"></i> Export CSV</button>
                 </div>
@@ -341,10 +367,22 @@
                 <!-- Follow Up Table -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
                     <div class="overflow-x-auto">
-                        <table class="w-full min-w-[900px]">
+                        <table class="w-full min-w-[950px]">
                             <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                                <tr><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">SL</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Description</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Priority</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Follow Up Date</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Next Remarks</th><th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th> </thead>
-                            <tbody id="followUpTableBody" class="divide-y divide-gray-200 dark:divide-gray-700"><tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading follow ups...</p></tr></td></tbody>
+                                <tr>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">SL</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Description</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Priority</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Due Balance</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Follow Up Date</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="followUpTableBody" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading follow ups...</p></td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -364,7 +402,7 @@
         </main>
     </div>
     
-    <!-- Center Modal for Row Details -->
+    <!-- Details Modal -->
     <div id="detailsCenterModal" class="center-modal">
         <div class="center-modal-content">
             <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-info-circle text-primary mr-2"></i>Follow Up Details</h3><button id="closeCenterModalBtn" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div>
@@ -381,7 +419,7 @@
             <div class="p-5 space-y-4">
                 <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-user text-primary mr-1 text-xs"></i> Customer</label><p id="updateCustomerName" class="text-gray-800 dark:text-white font-semibold text-sm bg-gray-100 dark:bg-gray-700 p-2 rounded-lg"></p></div>
                 <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-calendar-week text-primary mr-1 text-xs"></i> New Expected Date <span class="text-red-500">*</span></label><input type="date" id="updateExpectedDate" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></div>
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-sticky-note text-primary mr-1 text-xs"></i> Next Remarks</label><textarea id="updateRemarks" rows="3" placeholder="Enter next follow up remarks..." class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea><p class="text-[10px] text-gray-400 mt-1">This will be saved as next remarks for future reference</p></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-sticky-note text-primary mr-1 text-xs"></i> Next Remarks</label><textarea id="updateRemarks" rows="3" placeholder="Enter next follow up remarks..." class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea></div>
             </div>
             <div class="flex justify-end gap-3 px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t"><button id="cancelUpdateBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 btn-active">Cancel</button><button id="saveUpdateBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-primary text-white shadow-md btn-active"><i class="fas fa-save mr-1"></i> Update</button></div>
         </div>
@@ -437,27 +475,41 @@
         
         let allFollowUps = [];
         let currentQuickFilter = 'all';
+        let customerMap = new Map(); // Store full customer data
         let customerNameMap = new Map();
         
         function showToast(message, type = 'success') { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`; t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`; c.appendChild(t); setTimeout(() => t.remove(), 2500); }
         function closeCenterModal() { document.getElementById('detailsCenterModal').classList.remove('open'); }
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
         
-        async function loadCustomerNames() {
+        function getTodayDate() {
+            return new Date().toISOString().split('T')[0];
+        }
+        
+        async function loadCustomerData() {
             try {
                 const customersSnap = await getDocs(collection(db, 'customers'));
+                customerMap.clear();
                 customerNameMap.clear();
                 customersSnap.forEach(doc => {
-                    customerNameMap.set(doc.id, doc.data().name);
+                    const data = doc.data();
+                    customerMap.set(doc.id, data);
+                    customerNameMap.set(doc.id, data.name);
                 });
             } catch (error) {
-                console.error('Error loading customer names:', error);
+                console.error('Error loading customer data:', error);
             }
         }
         
         function getCustomerName(customerId) {
             if (!customerId) return 'Unknown';
             return customerNameMap.get(customerId) || 'Unknown';
+        }
+        
+        function getCustomerDue(customerId) {
+            if (!customerId) return 0;
+            const customer = customerMap.get(customerId);
+            return customer ? (customer.totalDue || 0) : 0;
         }
         
         function calculatePriority(daysDifference) {
@@ -499,18 +551,27 @@
         
         async function loadFollowUps() {
             const tbody = document.getElementById('followUpTableBody');
-            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading follow ups...</p></td>';
+            tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading follow ups...</p></td>';
             
             try {
-                if (customerNameMap.size === 0) await loadCustomerNames();
+                // Load customer data first
+                await loadCustomerData();
                 
                 const dueEntriesSnap = await getDocs(collection(db, 'transactions'));
                 const followUps = [];
+                const today = getTodayDate();
                 
                 for (const docSnap of dueEntriesSnap.docs) {
                     const due = docSnap.data();
                     if (due.type === 'due') {
-                        let customerName = due.customerName || getCustomerName(due.customerId);
+                        const customerId = due.customerId;
+                        // Get REAL-TIME due balance from customer record
+                        const actualDueBalance = getCustomerDue(customerId);
+                        
+                        // If actual due balance is 0 or less, skip (payment cleared)
+                        if (actualDueBalance <= 0) continue;
+                        
+                        let customerName = due.customerName || getCustomerName(customerId);
                         
                         let description = due.remarks || '';
                         if (!description && due.products && due.products.length > 0) {
@@ -527,7 +588,7 @@
                         if (!followUpDate && due.createdAt) {
                             followUpDate = due.createdAt.toDate().toISOString().split('T')[0];
                         }
-                        if (!followUpDate) followUpDate = new Date().toISOString().split('T')[0];
+                        if (!followUpDate) followUpDate = today;
                         
                         const daysDiff = getDaysDifference(followUpDate);
                         const priority = calculatePriority(daysDiff);
@@ -536,6 +597,7 @@
                         followUps.push({
                             id: docSnap.id,
                             transactionId: docSnap.id,
+                            customerId: customerId,
                             customerName: customerName,
                             description: description,
                             expectedDate: followUpDate,
@@ -543,29 +605,54 @@
                             daysDiff: daysDiff,
                             currentRemarks: due.remarks || '',
                             nextRemarks: nextRemarks,
-                            customerId: due.customerId
+                            dueBalance: actualDueBalance // REAL-TIME due balance from customer
                         });
                     }
                 }
                 
-                followUps.sort((a, b) => a.expectedDate.localeCompare(b.expectedDate));
-                allFollowUps = followUps;
+                // Remove duplicates - keep only one entry per customer (the most recent one)
+                const uniqueFollowUps = [];
+                const seenCustomers = new Set();
+                // Sort by date descending so we keep the most recent
+                followUps.sort((a, b) => b.expectedDate.localeCompare(a.expectedDate));
+                for (const f of followUps) {
+                    if (!seenCustomers.has(f.customerId)) {
+                        seenCustomers.add(f.customerId);
+                        uniqueFollowUps.push(f);
+                    }
+                }
+                // Sort back by date ascending for display
+                uniqueFollowUps.sort((a, b) => a.expectedDate.localeCompare(b.expectedDate));
+                
+                allFollowUps = uniqueFollowUps;
                 applyFilters();
                 
             } catch (error) {
                 console.error('Error loading follow ups:', error);
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</span></td>';
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</span></td>';
             }
         }
         
         function applyFilters() {
             let filtered = [...allFollowUps];
-            if (currentQuickFilter !== 'all') {
+            
+            if (currentQuickFilter === 'upcoming') {
+                filtered = filtered.filter(f => {
+                    const daysDiff = getDaysDifference(f.expectedDate);
+                    return daysDiff >= 0 && daysDiff <= 5;
+                });
+            } else if (currentQuickFilter === 'overdue') {
+                filtered = filtered.filter(f => {
+                    const daysDiff = getDaysDifference(f.expectedDate);
+                    return daysDiff < 0;
+                });
+            } else if (currentQuickFilter !== 'all') {
                 const dateRange = getDateRangeFromFilter(currentQuickFilter);
                 if (dateRange) {
                     filtered = filtered.filter(f => f.expectedDate >= dateRange.startDate && f.expectedDate <= dateRange.endDate);
                 }
             }
+            
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             if (searchTerm) {
                 filtered = filtered.filter(f => f.customerName.toLowerCase().includes(searchTerm));
@@ -577,7 +664,10 @@
         function renderTable(followUps) {
             const tbody = document.getElementById('followUpTableBody');
             if (followUps.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No follow up records found</p></td>';
+                const message = currentQuickFilter === 'upcoming' ? 'No upcoming follow-ups in the next 5 days' :
+                               currentQuickFilter === 'overdue' ? 'No overdue follow-ups' :
+                               'No follow up records found (all payments cleared)';
+                tbody.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">${message}</p></td>`;
                 return;
             }
             
@@ -589,7 +679,15 @@
                 const priorityText = followUp.priority.text;
                 const daysLeft = followUp.daysDiff;
                 const dateStatus = daysLeft < 0 ? 'text-red-500' : daysLeft === 0 ? 'text-orange-500' : 'text-green-600';
-                const dateStatusText = daysLeft < 0 ? `(${Math.abs(daysLeft)} days overdue)` : daysLeft === 0 ? '(Today)' : `(${daysLeft} days left)`;
+                
+                let statusBadge = '';
+                if (daysLeft < 0) {
+                    statusBadge = `<span class="status-badge-overdue">Overdue (${Math.abs(daysLeft)}d)</span>`;
+                } else if (daysLeft <= 5) {
+                    statusBadge = `<span class="status-badge-upcoming">Upcoming (${daysLeft}d)</span>`;
+                } else {
+                    statusBadge = `<span class="text-gray-400 text-xs">Pending</span>`;
+                }
                 
                 const row = tbody.insertRow();
                 row.className = 'table-row-hover transition-colors cursor-pointer';
@@ -601,16 +699,16 @@
                 row.setAttribute('data-days', daysLeft);
                 row.setAttribute('data-current-remarks', followUp.currentRemarks);
                 row.setAttribute('data-next-remarks', followUp.nextRemarks);
-                
-                const nextRemarksDisplay = followUp.nextRemarks && followUp.nextRemarks !== '' ? followUp.nextRemarks : '-';
+                row.setAttribute('data-due-balance', followUp.dueBalance || 0);
                 
                 row.innerHTML = `
                     <td class="px-3 py-2.5 text-xs text-center font-medium">${sl++}</td>
                     <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(followUp.customerName)}</td>
-                    <td class="px-3 py-2.5 text-sm"><div class="text-xs text-gray-600 dark:text-gray-400 max-w-[250px] truncate" title="${escapeHtml(followUp.description)}">${escapeHtml(followUp.description)}</div></td>
+                    <td class="px-3 py-2.5 text-sm"><div class="text-xs text-gray-600 dark:text-gray-400 max-w-[200px] truncate" title="${escapeHtml(followUp.description)}">${escapeHtml(followUp.description)}</div></td>
                     <td class="px-3 py-2.5"><span class="px-2 py-1 rounded-full text-xs font-medium ${priorityClass}">${priorityText}</span></td>
-                    <td class="px-3 py-2.5 text-sm ${dateStatus}">${followUp.expectedDate}<span class="text-xs ml-1">${dateStatusText}</span></td>
-                    <td class="px-3 py-2.5 text-sm text-primary font-medium max-w-[200px] truncate" title="${escapeHtml(nextRemarksDisplay)}">${escapeHtml(nextRemarksDisplay)}</td>
+                    <td class="px-3 py-2.5 text-sm font-bold text-red-600 dark:text-red-400">৳${(followUp.dueBalance || 0).toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-sm ${dateStatus}">${followUp.expectedDate}</td>
+                    <td class="px-3 py-2.5">${statusBadge}</td>
                     <td class="px-3 py-2.5 text-center"><button class="update-followup text-primary hover:text-primary-dark p-1.5 rounded-lg transition-colors" data-id="${followUp.id}" data-customer="${escapeHtml(followUp.customerName)}" data-date="${followUp.expectedDate}" data-remarks="${escapeHtml(followUp.currentRemarks)}" data-next-remarks="${escapeHtml(followUp.nextRemarks)}" title="Update Follow Up"><i class="fas fa-edit text-sm"></i></button></td>
                 `;
             }
@@ -633,11 +731,13 @@
                     const daysLeft = parseInt(data.days);
                     const dateStatusText = daysLeft < 0 ? 'Overdue' : daysLeft === 0 ? 'Today' : 'Pending';
                     const dateStatusColor = daysLeft < 0 ? 'text-red-500' : daysLeft === 0 ? 'text-orange-500' : 'text-green-600';
+                    const dueBalance = parseFloat(data.dueBalance) || 0;
                     document.getElementById('centerModalContent').innerHTML = `
                         <div class="space-y-3">
                             <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Customer</span><span class="font-semibold text-sm">${escapeHtml(data.customer)}</span></div>
                             <div class="flex justify-between items-start pb-2 border-b"><span class="text-xs text-gray-500">Description</span><span class="text-sm text-right max-w-[220px]">${escapeHtml(data.description)}</span></div>
                             <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Priority</span><span class="text-sm font-semibold">${escapeHtml(data.priority)}</span></div>
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Due Balance</span><span class="text-sm font-bold text-red-600">৳${dueBalance.toFixed(2)}</span></div>
                             <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Follow Up Date</span><div class="text-right"><span class="text-sm font-semibold">${data.date}</span><span class="text-xs ${dateStatusColor} ml-1">(${dateStatusText})</span></div></div>
                             <div class="flex justify-between items-start pb-2 border-b"><span class="text-xs text-gray-500">Current Remarks</span><span class="text-sm text-right">${escapeHtml(data.currentRemarks) || '-'}</span></div>
                             <div class="flex justify-between items-start"><span class="text-xs text-gray-500">Next Remarks</span><span class="text-sm text-right text-primary font-medium">${escapeHtml(data.nextRemarks) || '-'}</span></div>
@@ -650,13 +750,17 @@
         
         function updateStats(followUps) {
             const total = followUps.length;
-            let pending = 0, overdue = 0, monthly = 0;
+            let pending = 0, overdue = 0, upcoming = 0, monthly = 0;
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
+            
             followUps.forEach(f => {
                 const daysDiff = getDaysDifference(f.expectedDate);
                 if (daysDiff < 0) overdue++;
                 else if (daysDiff >= 0) pending++;
+                
+                if (daysDiff >= 0 && daysDiff <= 5) upcoming++;
+                
                 const dateParts = f.expectedDate.split('-');
                 if (dateParts.length === 3) {
                     const month = parseInt(dateParts[1]) - 1;
@@ -667,6 +771,7 @@
             document.getElementById('totalTasks').textContent = total;
             document.getElementById('pendingTasks').textContent = pending;
             document.getElementById('overdueTasks').textContent = overdue;
+            document.getElementById('upcomingTasks').textContent = upcoming;
             document.getElementById('monthlyTasks').textContent = monthly;
         }
         
@@ -690,21 +795,36 @@
         
         function exportToCSV() {
             let exportData = [...allFollowUps];
-            if (currentQuickFilter !== 'all') {
+            
+            if (currentQuickFilter === 'upcoming') {
+                exportData = exportData.filter(f => {
+                    const daysDiff = getDaysDifference(f.expectedDate);
+                    return daysDiff >= 0 && daysDiff <= 5;
+                });
+            } else if (currentQuickFilter === 'overdue') {
+                exportData = exportData.filter(f => {
+                    const daysDiff = getDaysDifference(f.expectedDate);
+                    return daysDiff < 0;
+                });
+            } else if (currentQuickFilter !== 'all') {
                 const dateRange = getDateRangeFromFilter(currentQuickFilter);
-                if (dateRange) exportData = exportData.filter(f => f.expectedDate >= dateRange.startDate && f.expectedDate <= dateRange.endDate);
+                if (dateRange) {
+                    exportData = exportData.filter(f => f.expectedDate >= dateRange.startDate && f.expectedDate <= dateRange.endDate);
+                }
             }
+            
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             if (searchTerm) exportData = exportData.filter(f => f.customerName.toLowerCase().includes(searchTerm));
+            
             if (exportData.length === 0) { showToast('No data to export', 'error'); return; }
             
-            let csv = ['\uFEFF"SL","Customer","Description","Priority","Follow Up Date","Days Left","Status","Next Remarks"'];
+            let csv = ['\uFEFF"SL","Customer","Description","Priority","Due Balance","Follow Up Date","Days Left","Status","Next Remarks"'];
             let sl = 1;
             exportData.forEach(f => {
                 const daysDiff = getDaysDifference(f.expectedDate);
                 const statusText = daysDiff < 0 ? 'Overdue' : daysDiff === 0 ? 'Today' : 'Pending';
                 const daysText = daysDiff < 0 ? `${Math.abs(daysDiff)} days overdue` : `${daysDiff} days left`;
-                csv.push(`"${sl++}","${f.customerName.replace(/"/g, '""')}","${f.description.replace(/"/g, '""')}","${f.priority.text}","${f.expectedDate}","${daysText}","${statusText}","${(f.nextRemarks || '').replace(/"/g, '""')}"`);
+                csv.push(`"${sl++}","${f.customerName.replace(/"/g, '""')}","${f.description.replace(/"/g, '""')}","${f.priority.text}","${(f.dueBalance||0).toFixed(2)}","${f.expectedDate}","${daysText}","${statusText}","${(f.nextRemarks || '').replace(/"/g, '""')}"`);
             });
             const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
