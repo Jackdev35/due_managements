@@ -36,11 +36,16 @@
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; }
         
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-track { background: #1e293b; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .sidebar-nav-fixed {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar {
+            display: none;
+        }
         
         .nav-active {
             background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
@@ -117,7 +122,6 @@
             to { opacity: 1; }
         }
         
-        /* Fixed Sidebar Structure - No overlap issue */
         .sidebar-fixed {
             display: flex;
             flex-direction: column;
@@ -135,18 +139,11 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-width: thin;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         .sidebar-nav-fixed::-webkit-scrollbar {
-            width: 3px;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar-thumb {
-            background: rgba(212,175,55,0.5);
-            border-radius: 10px;
+            display: none;
         }
         
         .skeleton {
@@ -162,15 +159,185 @@
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
+
+        /* ============================================= */
+        /* CUSTOM SEARCHABLE SELECT STYLES               */
+        /* ============================================= */
+        .searchable-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        
+        .searchable-select-wrapper input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            padding-right: 40px;
+            font-size: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            background: white;
+            color: #1f2937;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            cursor: text;
+        }
+        
+        .dark .searchable-select-wrapper input[type="text"] {
+            background: #1f2937;
+            border-color: #4b5563;
+            color: #f1f5f9;
+        }
+        
+        .searchable-select-wrapper input[type="text"]:focus {
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.15);
+        }
+        
+        .dark .searchable-select-wrapper input[type="text"]:focus {
+            border-color: #1e6b68;
+            box-shadow: 0 0 0 3px rgba(30, 107, 104, 0.2);
+        }
+        
+        .searchable-select-wrapper .dropdown-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            pointer-events: none;
+            font-size: 14px;
+            transition: transform 0.2s ease;
+        }
+        
+        .searchable-select-wrapper .dropdown-icon.open {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        
+        .searchable-select-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+            max-height: 240px;
+            overflow-y: auto;
+            z-index: 60;
+            display: none;
+            padding: 4px 0;
+        }
+        
+        .dark .searchable-select-dropdown {
+            background: #1f2937;
+            border-color: #4b5563;
+        }
+        
+        .searchable-select-dropdown.show {
+            display: block;
+            animation: dropdownSlide 0.15s ease-out;
+        }
+        
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .searchable-select-dropdown .dropdown-item {
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #1f2937;
+            transition: background 0.15s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .dark .searchable-select-dropdown .dropdown-item {
+            color: #e5e7eb;
+            border-bottom-color: #374151;
+        }
+        
+        .searchable-select-dropdown .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .searchable-select-dropdown .dropdown-item:hover {
+            background: #f3f4f6;
+        }
+        
+        .dark .searchable-select-dropdown .dropdown-item:hover {
+            background: #374151;
+        }
+        
+        .searchable-select-dropdown .dropdown-item.active {
+            background: #e5e7eb;
+        }
+        
+        .dark .searchable-select-dropdown .dropdown-item.active {
+            background: #374151;
+        }
+        
+        .searchable-select-dropdown .dropdown-item .customer-name {
+            font-weight: 500;
+        }
+        
+        .searchable-select-dropdown .dropdown-item .customer-due {
+            font-size: 11px;
+            font-weight: 600;
+            color: #dc2626;
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: #fef2f2;
+            white-space: nowrap;
+        }
+        
+        .dark .searchable-select-dropdown .dropdown-item .customer-due {
+            color: #f87171;
+            background: #450a0a;
+        }
+        
+        .searchable-select-dropdown .dropdown-item .customer-due.zero {
+            color: #16a34a;
+            background: #f0fdf4;
+        }
+        
+        .dark .searchable-select-dropdown .dropdown-item .customer-due.zero {
+            color: #4ade80;
+            background: #052e16;
+        }
+        
+        .searchable-select-dropdown .no-results {
+            padding: 12px 14px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+        
+        .searchable-select-dropdown::-webkit-scrollbar {
+            width: 4px;
+        }
+        .searchable-select-dropdown::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .searchable-select-dropdown::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+        .dark .searchable-select-dropdown::-webkit-scrollbar-thumb {
+            background: #4b5563;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     
     <div class="flex min-h-screen">
         
-        <!-- Sidebar - Fixed Structure (No overlap issue) -->
+        <!-- Sidebar -->
         <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
-            <!-- Header - Fixed at top (does not scroll) -->
             <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
@@ -188,7 +355,6 @@
                 </div>
             </div>
             
-            <!-- Navigation - Scrollable area (scrolls independently) -->
             <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
                 <nav class="space-y-1.5">
                     <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
@@ -257,6 +423,10 @@
                         <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div>
                         <span class="text-sm font-medium">Customer Warranty</span>
                     </a>
+
+                    <a href="expenses.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Expenses</span>
+                    </a>
                     
                     <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div>
@@ -264,7 +434,6 @@
                     </a>
                 </nav>
                 
-                <!-- Logout Button - Now scrolls with menu -->
                 <div class="pt-4 mt-2 border-t border-white/10">
                     <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
                         <i class="fas fa-sign-out-alt text-sm w-5"></i>
@@ -303,9 +472,16 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-user text-primary mr-1"></i>Customer <span class="text-red-500">*</span></label>
-                                <select id="customerId" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50" required>
-                                    <option value="">-- Select Customer --</option>
-                                </select>
+                                
+                                <!-- Custom Searchable Select -->
+                                <div class="searchable-select-wrapper" id="customerSelectWrapper">
+                                    <input type="text" id="customerSearchInput" placeholder="Search by name or phone number..." autocomplete="off" spellcheck="false">
+                                    <i class="fas fa-chevron-down dropdown-icon" id="dropdownIcon"></i>
+                                    <input type="hidden" id="selectedCustomerId" value="">
+                                    <div class="searchable-select-dropdown" id="customerDropdown">
+                                        <!-- Items will be populated dynamically -->
+                                    </div>
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-calendar text-primary mr-1"></i>Payment Date <span class="text-red-500">*</span></label>
@@ -378,16 +554,43 @@
                     </div>
                     
                     <div class="overflow-x-auto">
-                        <table class="w-full min-w-[800px]">
+                        <table class="w-full min-w-[900px]">
                             <thead class="bg-gray-50 dark:bg-gray-700/50 border-b">
-                                <tr><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Date</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Customer</th><th class="px-3 py-3 text-right text-[10px] font-semibold uppercase">Amount</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Expected Date</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Remarks</th> </thead>
-                            <tbody id="collectionsTableBody" class="divide-y"><tr><td colspan="5" class="px-4 py-8 text-center"><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div></td></tbody>
+                                <tr>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold uppercase w-[50px]">#</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Date</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Customer</th>
+                                    <th class="px-3 py-3 text-right text-[10px] font-semibold uppercase">Amount</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Expected Date</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="collectionsTableBody" class="divide-y">
+                                <tr><td colspan="6" class="px-4 py-8 text-center">
+                                    <div class="skeleton" style="height: 40px; margin: 5px 0;"></div>
+                                    <div class="skeleton" style="height: 40px; margin: 5px 0;"></div>
+                                    <div class="skeleton" style="height: 40px; margin: 5px 0;"></div>
+                                </td></tr>
+                            </tbody>
                         </table>
                     </div>
                     
                     <div id="paginationControls" class="flex justify-center items-center gap-1 py-3 border-t"></div>
                 </div>
             </div>
+
+            <!-- Footer -->
+            <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                    <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span> 
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
+                    </p>
+                </div>
+            </footer>
         </main>
     </div>
     
@@ -409,7 +612,7 @@
     <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3">
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div><h3 class="text-lg font-semibold mb-2">Logout?</h3><p class="text-sm text-gray-500 mb-5">Are you sure you want to logout?</p><div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-gray-100">Cancel</button><button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-danger text-white">Logout</button></div></div>
     </div>
-    
+
     <!-- Auth Check Script -->
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
@@ -455,6 +658,9 @@
         let perPage = 50;
         let currentSearchTerm = '';
         let customerNameMap = new Map();
+        let customerDataMap = new Map();
+        let allCustomers = [];
+        let highlightedIndex = -1;
         
         function formatCreatedAt(createdAt) {
             if (!createdAt) return 'N/A';
@@ -483,22 +689,243 @@
         function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none'; }
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
         
+        // =============================================
+        // SEARCHABLE SELECT LOGIC
+        // =============================================
+        const customerSearchInput = document.getElementById('customerSearchInput');
+        const customerDropdown = document.getElementById('customerDropdown');
+        const selectedCustomerId = document.getElementById('selectedCustomerId');
+        const dropdownIcon = document.getElementById('dropdownIcon');
+        let isDropdownOpen = false;
+        let currentFilteredItems = [];
+        
+        function renderDropdown(items) {
+            currentFilteredItems = items;
+            if (items.length === 0) {
+                customerDropdown.innerHTML = `<div class="no-results">No customers found</div>`;
+                return;
+            }
+            
+            customerDropdown.innerHTML = '';
+            items.forEach((customer, index) => {
+                const div = document.createElement('div');
+                div.className = 'dropdown-item';
+                if (index === highlightedIndex) {
+                    div.classList.add('active');
+                }
+                const dueClass = customer.due <= 0 ? 'zero' : '';
+                div.innerHTML = `
+                    <span class="customer-name">${escapeHtml(customer.name)}</span>
+                    <span class="customer-due ${dueClass}">৳${customer.due.toFixed(2)}</span>
+                `;
+                div.dataset.id = customer.id;
+                div.dataset.index = index;
+                div.addEventListener('click', () => {
+                    selectCustomer(customer.id);
+                });
+                div.addEventListener('mouseenter', () => {
+                    highlightedIndex = index;
+                    updateHighlight();
+                });
+                customerDropdown.appendChild(div);
+            });
+        }
+        
+        function updateHighlight() {
+            const items = customerDropdown.querySelectorAll('.dropdown-item');
+            items.forEach((item, index) => {
+                if (index === highlightedIndex) {
+                    item.classList.add('active');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+        
+        function filterCustomers(searchTerm) {
+            const term = searchTerm.toLowerCase().trim();
+            if (!term) return allCustomers;
+            
+            return allCustomers.filter(c => 
+                c.name.toLowerCase().includes(term) || 
+                (c.phone && c.phone.includes(term))
+            );
+        }
+        
+        function selectCustomer(customerId) {
+            const customer = allCustomers.find(c => c.id === customerId);
+            if (!customer) return;
+            
+            selectedCustomerId.value = customerId;
+            customerSearchInput.value = customer.name;
+            customerDropdown.classList.remove('show');
+            dropdownIcon.classList.remove('open');
+            isDropdownOpen = false;
+            highlightedIndex = -1;
+            
+            // Load customer due
+            loadCustomerDue(customerId);
+        }
+        
+        function toggleDropdown(show) {
+            if (show === undefined) {
+                isDropdownOpen = !isDropdownOpen;
+            } else {
+                isDropdownOpen = show;
+            }
+            
+            if (isDropdownOpen) {
+                const searchTerm = customerSearchInput.value;
+                const filtered = filterCustomers(searchTerm);
+                highlightedIndex = -1;
+                renderDropdown(filtered);
+                customerDropdown.classList.add('show');
+                dropdownIcon.classList.add('open');
+            } else {
+                customerDropdown.classList.remove('show');
+                dropdownIcon.classList.remove('open');
+                highlightedIndex = -1;
+            }
+        }
+        
+        // Event listeners for searchable select
+        customerSearchInput.addEventListener('focus', () => {
+            if (customerSearchInput.value) {
+                const filtered = filterCustomers(customerSearchInput.value);
+                highlightedIndex = -1;
+                renderDropdown(filtered);
+                customerDropdown.classList.add('show');
+                dropdownIcon.classList.add('open');
+                isDropdownOpen = true;
+            } else {
+                toggleDropdown(true);
+            }
+        });
+        
+        customerSearchInput.addEventListener('input', (e) => {
+            const filtered = filterCustomers(customerSearchInput.value);
+            highlightedIndex = -1;
+            renderDropdown(filtered);
+            customerDropdown.classList.add('show');
+            dropdownIcon.classList.add('open');
+            isDropdownOpen = true;
+            
+            // Clear selection if input doesn't match any customer exactly
+            const matchedCustomer = filtered.find(c => c.name.toLowerCase() === customerSearchInput.value.toLowerCase());
+            if (!matchedCustomer && filtered.length !== 1) {
+                selectedCustomerId.value = '';
+                document.getElementById('dueAlert').classList.add('hidden');
+            }
+        });
+        
+        customerSearchInput.addEventListener('keydown', (e) => {
+            const visibleItems = customerDropdown.querySelectorAll('.dropdown-item');
+            const totalItems = visibleItems.length;
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (totalItems > 0) {
+                    highlightedIndex = (highlightedIndex + 1) % totalItems;
+                    updateHighlight();
+                    if (!isDropdownOpen) {
+                        toggleDropdown(true);
+                    }
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (totalItems > 0) {
+                    highlightedIndex = (highlightedIndex - 1 + totalItems) % totalItems;
+                    updateHighlight();
+                    if (!isDropdownOpen) {
+                        toggleDropdown(true);
+                    }
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (highlightedIndex >= 0 && highlightedIndex < totalItems) {
+                    const item = visibleItems[highlightedIndex];
+                    if (item) {
+                        const id = item.dataset.id;
+                        selectCustomer(id);
+                    }
+                } else if (totalItems === 1) {
+                    const item = visibleItems[0];
+                    if (item) {
+                        const id = item.dataset.id;
+                        selectCustomer(id);
+                    }
+                } else if (totalItems > 0) {
+                    const item = visibleItems[0];
+                    if (item) {
+                        const id = item.dataset.id;
+                        selectCustomer(id);
+                    }
+                }
+                toggleDropdown(false);
+                customerSearchInput.blur();
+            } else if (e.key === 'Escape') {
+                toggleDropdown(false);
+                customerSearchInput.blur();
+            } else if (e.key === 'Tab') {
+                toggleDropdown(false);
+            }
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const wrapper = document.getElementById('customerSelectWrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+                toggleDropdown(false);
+            }
+        });
+        
+        // Handle blur - auto-select if exact match
+        customerSearchInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                if (!selectedCustomerId.value && customerSearchInput.value) {
+                    const filtered = filterCustomers(customerSearchInput.value);
+                    if (filtered.length === 1) {
+                        selectCustomer(filtered[0].id);
+                    }
+                }
+            }, 200);
+        });
+        
+        // =============================================
+        // END SEARCHABLE SELECT LOGIC
+        // =============================================
+        
         async function loadCustomers() {
             try {
                 const querySnapshot = await getDocs(collection(db, 'customers'));
-                const select = document.getElementById('customerId');
-                if (!select) return;
-                select.innerHTML = '<option value="">-- Select Customer --</option>';
+                allCustomers = [];
                 customerNameMap.clear();
+                customerDataMap.clear();
+                
                 querySnapshot.forEach(docSnap => {
                     const customer = docSnap.data();
-                    customerNameMap.set(docSnap.id, customer.name);
-                    const option = document.createElement('option');
-                    option.value = docSnap.id;
-                    const dueText = (customer.totalDue || 0) > 0 ? ` (Due: ৳${(customer.totalDue || 0).toFixed(2)})` : '';
-                    option.textContent = `${customer.name}${dueText}`;
-                    select.appendChild(option);
+                    const customerId = docSnap.id;
+                    const due = customer.totalDue || 0;
+                    
+                    allCustomers.push({
+                        id: customerId,
+                        name: customer.name || 'Unknown',
+                        phone: customer.phone || 'N/A',
+                        due: due
+                    });
+                    
+                    customerNameMap.set(customerId, customer.name);
+                    customerDataMap.set(customerId, {
+                        name: customer.name || 'Unknown',
+                        phone: customer.phone || 'N/A',
+                        due: due
+                    });
                 });
+                
+                allCustomers.sort((a, b) => a.name.localeCompare(b.name));
+                renderDropdown(allCustomers);
+                
             } catch (error) {
                 console.error('Error loading customers:', error);
                 showToast('Error loading customers', 'error');
@@ -528,7 +955,7 @@
         
         async function loadAllCollections() {
             const tbody = document.getElementById('collectionsTableBody');
-            tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center"><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div></td>';
+            tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center"><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div></td>';
             
             try {
                 const querySnapshot = await getDocs(collection(db, 'transactions'));
@@ -574,7 +1001,7 @@
                 
             } catch (error) {
                 console.error('Error loading collections:', error);
-                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-red-500">Error loading data: ' + error.message + '</td>';
+                tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-red-500">Error loading data: ' + error.message + '</td>';
                 showToast('Error loading data: ' + error.message, 'error');
             }
         }
@@ -597,13 +1024,18 @@
             const totalPages = Math.ceil(filteredData.length / perPage);
             
             if (paginatedData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No collections found</p></td>';
+                tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No collections found</p></td>';
                 updatePaginationControls(totalPages);
                 return;
             }
             
             tbody.innerHTML = '';
-            for (const col of paginatedData) {
+            const serialStart = start + 1;
+            
+            for (let i = 0; i < paginatedData.length; i++) {
+                const col = paginatedData[i];
+                const serial = serialStart + i;
+                
                 const row = tbody.insertRow();
                 row.className = 'table-row-hover transition-colors cursor-pointer';
                 row.setAttribute('data-collection-id', col.id);
@@ -615,6 +1047,7 @@
                 row.setAttribute('data-collection-created', col.createdAt);
                 
                 row.innerHTML = `
+                    <td class="px-3 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400">${serial}</td>
                     <td class="px-3 py-2.5 text-xs whitespace-nowrap">${col.date}</td>
                     <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(col.customerName)}</td>
                     <td class="px-3 py-2.5 text-right text-sm font-bold text-green-600">৳${col.amount.toFixed(2)}</td>
@@ -681,8 +1114,10 @@
                 const term = currentSearchTerm.toLowerCase();
                 exportData = exportData.filter(c => c.customerName.toLowerCase().includes(term) || (c.remarks && c.remarks.toLowerCase().includes(term)));
             }
-            let csv = ['\uFEFF"Date","Customer","Amount (৳)","Expected Date","Remarks"'];
-            exportData.forEach(c => { csv.push(`"${c.date}","${c.customerName.replace(/"/g, '""')}","${c.amount.toFixed(2)}","${c.expectedDate || ''}","${c.remarks.replace(/"/g, '""')}"`); });
+            let csv = ['\uFEFF"SL","Date","Customer","Amount (৳)","Expected Date","Remarks"'];
+            exportData.forEach((c, index) => { 
+                csv.push(`"${index + 1}","${c.date}","${c.customerName.replace(/"/g, '""')}","${c.amount.toFixed(2)}","${c.expectedDate || ''}","${c.remarks.replace(/"/g, '""')}"`); 
+            });
             const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -697,7 +1132,7 @@
             event.preventDefault();
             if (isProcessing) return;
             
-            const customerId = document.getElementById('customerId').value;
+            const customerId = document.getElementById('selectedCustomerId').value;
             if (!customerId) { showToast('Please select a customer', 'error'); return; }
             
             const date = document.getElementById('collectionDate').value;
@@ -740,7 +1175,8 @@
                 document.getElementById('remarks').value = '';
                 document.getElementById('collectionDate').valueAsDate = new Date();
                 document.getElementById('expectedDate').value = '';
-                document.getElementById('customerId').value = '';
+                document.getElementById('selectedCustomerId').value = '';
+                document.getElementById('customerSearchInput').value = '';
                 document.getElementById('dueAlert').classList.add('hidden');
                 
                 await loadCustomers();
@@ -755,7 +1191,7 @@
             }
         }
         
-        document.getElementById('customerId')?.addEventListener('change', (e) => loadCustomerDue(e.target.value));
+        // Event Listeners
         document.getElementById('collectionForm')?.addEventListener('submit', submitCollection);
         document.getElementById('collectionDate').valueAsDate = new Date();
         document.getElementById('refreshBtn')?.addEventListener('click', () => { loadCustomers(); loadAllCollections(); showToast('Refreshed!'); });
@@ -779,8 +1215,9 @@
         if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
         if (confirmLogout) confirmLogout.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
         
-        loadCustomers();
-        loadAllCollections();
+        // Initialize
+        await loadCustomers();
+        await loadAllCollections();
     </script>
 </body>
 </html>

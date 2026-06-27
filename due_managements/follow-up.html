@@ -36,11 +36,16 @@
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; }
         
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-track { background: #1e293b; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .sidebar-nav-fixed {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar {
+            display: none;
+        }
         
         .nav-active {
             background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
@@ -71,15 +76,16 @@
         
         .btn-active:active { transform: scale(0.97); }
         
-        .priority-high { background: #fee2e2; color: #dc2626; font-weight: 600; }
-        .priority-medium { background: #fed7aa; color: #ea580c; font-weight: 600; }
-        .priority-low { background: #d1fae5; color: #059669; font-weight: 600; }
+        .priority-high { background: #fee2e2; color: #dc2626; }
+        .priority-medium { background: #fed7aa; color: #ea580c; }
+        .priority-low { background: #d1fae5; color: #059669; }
         .dark .priority-high { background: #7f1d1d; color: #fca5a5; }
         .dark .priority-medium { background: #7c2d12; color: #fdba74; }
         .dark .priority-low { background: #064e3b; color: #6ee7b7; }
         
         .quick-filter-btn { transition: all 0.2s ease; }
         .quick-filter-btn.active { background: #0f3b3a; color: white; }
+        .dark .quick-filter-btn.active { background: #1e6b68; }
         
         .table-scroll-hint { display: none; }
         @media (max-width: 768px) {
@@ -130,7 +136,6 @@
         .sidebar-open { overflow: hidden; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        /* Fixed Sidebar Structure - No overlap issue */
         .sidebar-fixed {
             display: flex;
             flex-direction: column;
@@ -148,18 +153,11 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-width: thin;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         .sidebar-nav-fixed::-webkit-scrollbar {
-            width: 3px;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar-thumb {
-            background: rgba(212,175,55,0.5);
-            border-radius: 10px;
+            display: none;
         }
         
         .skeleton {
@@ -173,15 +171,50 @@
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
+
+        .status-badge-upcoming {
+            background: #fef3c7;
+            color: #d97706;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .status-badge-overdue {
+            background: #fee2e2;
+            color: #dc2626;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .dark .status-badge-upcoming { background: #451a03; color: #fbbf24; }
+        .dark .status-badge-overdue { background: #7f1d1d; color: #fca5a5; }
+
+        /* Priority Icon Styles */
+        .priority-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 14px;
+        }
+        .priority-icon.high { background: #fee2e2; color: #dc2626; }
+        .priority-icon.medium { background: #fed7aa; color: #ea580c; }
+        .priority-icon.low { background: #d1fae5; color: #059669; }
+        .dark .priority-icon.high { background: #7f1d1d; color: #fca5a5; }
+        .dark .priority-icon.medium { background: #7c2d12; color: #fdba74; }
+        .dark .priority-icon.low { background: #064e3b; color: #6ee7b7; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     
     <div class="flex min-h-screen">
         
-        <!-- Sidebar - Fixed Structure -->
+        <!-- Sidebar -->
         <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
-            <!-- Header - Fixed at top -->
             <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
@@ -199,7 +232,6 @@
                 </div>
             </div>
             
-            <!-- Navigation - Scrollable area -->
             <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
                 <nav class="space-y-1.5">
                     <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
@@ -256,20 +288,25 @@
                             <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
                                 <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
                             </a>
-                            
                         </div>
                     </div>
                     
                     <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
                     </a>
-                    
+                    <a href="expenses.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Expenses</span>
+                    </a>
                     <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
                     </a>
+                    
+                    <a href="activity-logs.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-history text-sm"></i></div>
+                        <span class="text-sm font-medium">Activity Logs</span>
+                    </a>
                 </nav>
                 
-                <!-- Logout Button - Now scrolls with menu -->
                 <div class="pt-4 mt-2 border-t border-white/10">
                     <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
                         <i class="fas fa-sign-out-alt text-sm w-5"></i>
@@ -298,10 +335,10 @@
             <div class="p-3 md:p-4">
                 
                 <!-- Stats Cards -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
                     <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
                         <div class="bg-purple-100 dark:bg-purple-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-tasks text-purple-600 dark:text-purple-400 text-sm"></i></div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total Tasks</h3>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total</h3>
                         <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalTasks">0</p>
                     </div>
                     <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
@@ -315,6 +352,11 @@
                         <p class="text-xl font-bold text-gray-800 dark:text-white" id="overdueTasks">0</p>
                     </div>
                     <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                        <div class="bg-green-100 dark:bg-green-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-calendar-check text-green-600 dark:text-green-400 text-sm"></i></div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Upcoming</h3>
+                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="upcomingTasks">0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
                         <div class="bg-blue-100 dark:bg-blue-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-calendar text-blue-600 dark:text-blue-400 text-sm"></i></div>
                         <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">This Month</h3>
                         <p class="text-xl font-bold text-gray-800 dark:text-white" id="monthlyTasks">0</p>
@@ -324,10 +366,12 @@
                 <!-- Quick Filters & Export -->
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <div class="flex flex-wrap gap-2">
-                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="all"><i class="fas fa-list mr-1"></i> All</button>
+                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all active" data-filter="all"><i class="fas fa-list mr-1"></i> All</button>
                         <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="today"><i class="fas fa-calendar-day mr-1"></i> Today</button>
                         <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="week"><i class="fas fa-calendar-week mr-1"></i> This Week</button>
                         <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="month"><i class="fas fa-calendar-alt mr-1"></i> This Month</button>
+                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-primary hover:text-white transition-all" data-filter="upcoming"><i class="fas fa-calendar-check mr-1"></i> Upcoming (5 days)</button>
+                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-primary hover:text-white transition-all" data-filter="overdue"><i class="fas fa-exclamation-circle mr-1"></i> Overdue</button>
                     </div>
                     <button id="exportFollowUpBtn" class="bg-success hover:bg-green-700 text-white font-medium px-4 py-1.5 rounded-lg text-sm flex items-center gap-2 btn-active"><i class="fas fa-download text-xs"></i> Export CSV</button>
                 </div>
@@ -342,18 +386,42 @@
                 <!-- Follow Up Table -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
                     <div class="overflow-x-auto">
-                        <table class="w-full min-w-[900px]">
+                        <table class="w-full min-w-[950px]">
                             <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                                <tr><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">SL</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Description</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Priority</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Follow Up Date</th><th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Next Remarks</th><th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th> </thead>
-                            <tbody id="followUpTableBody" class="divide-y divide-gray-200 dark:divide-gray-700"><tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading follow ups...</p></tr></td></tbody>
+                                <tr>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">SL</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Description</th>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Priority</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Due Balance</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Follow Up Date</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="followUpTableBody" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading follow ups...</p></td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+            <!-- Footer -->
+            <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                    <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span> 
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
+                    </p>
+                </div>
+            </footer>
         </main>
     </div>
     
-    <!-- Center Modal for Row Details -->
+    <!-- Details Modal -->
     <div id="detailsCenterModal" class="center-modal">
         <div class="center-modal-content">
             <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-info-circle text-primary mr-2"></i>Follow Up Details</h3><button id="closeCenterModalBtn" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button></div>
@@ -370,7 +438,7 @@
             <div class="p-5 space-y-4">
                 <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-user text-primary mr-1 text-xs"></i> Customer</label><p id="updateCustomerName" class="text-gray-800 dark:text-white font-semibold text-sm bg-gray-100 dark:bg-gray-700 p-2 rounded-lg"></p></div>
                 <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-calendar-week text-primary mr-1 text-xs"></i> New Expected Date <span class="text-red-500">*</span></label><input type="date" id="updateExpectedDate" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50"></div>
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-sticky-note text-primary mr-1 text-xs"></i> Next Remarks</label><textarea id="updateRemarks" rows="3" placeholder="Enter next follow up remarks..." class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea><p class="text-[10px] text-gray-400 mt-1">This will be saved as next remarks for future reference</p></div>
+                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-sticky-note text-primary mr-1 text-xs"></i> Next Remarks</label><textarea id="updateRemarks" rows="3" placeholder="Enter next follow up remarks..." class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea></div>
             </div>
             <div class="flex justify-end gap-3 px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t"><button id="cancelUpdateBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 btn-active">Cancel</button><button id="saveUpdateBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-primary text-white shadow-md btn-active"><i class="fas fa-save mr-1"></i> Update</button></div>
         </div>
@@ -391,9 +459,9 @@
     </script>
     
     <script type="module">
-        import { db, collection, getDocs, doc, updateDoc, getDoc } from './js/firebase.js';
+        import { db, collection, getDocs, doc, updateDoc, getDoc, onSnapshot, query, where } from './js/firebase.js';
         
-        // Sidebar submenu toggle
+        // ─── SIDEBAR FUNCTIONS ───
         const warrantySubmenu = document.getElementById('warrantySubmenu');
         const warrantyLink = warrantySubmenu?.querySelector('a');
         if (warrantyLink) {
@@ -404,7 +472,6 @@
             });
         }
         
-        // Sidebar functions
         const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
         function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.id = 'sidebarOverlay'; overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
         function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); const overlay = document.getElementById('sidebarOverlay'); if (overlay) overlay.remove(); }
@@ -413,7 +480,6 @@
         window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); } });
         if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
         
-        // Submenu toggle for Due Entry
         const dueSubmenu = document.getElementById('dueSubmenu');
         const dueSubmenuLink = dueSubmenu?.querySelector('a');
         if (dueSubmenuLink) {
@@ -424,44 +490,92 @@
             });
         }
         
+        // ─── STATE ───
         let allFollowUps = [];
         let currentQuickFilter = 'all';
         let customerNameMap = new Map();
+        let customerDataMap = new Map();
+        let unsubscribeCustomers = null;
+
+        // ─── UTILITIES ───
+        function showToast(message, type = 'success') { 
+            const c = document.getElementById('toastContainer'); 
+            const t = document.createElement('div'); 
+            t.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : type === 'error' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'}`; 
+            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2 text-xs"></i>${message}`; 
+            c.appendChild(t); 
+            setTimeout(() => t.remove(), 2500); 
+        }
         
-        function showToast(message, type = 'success') { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`; t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`; c.appendChild(t); setTimeout(() => t.remove(), 2500); }
         function closeCenterModal() { document.getElementById('detailsCenterModal').classList.remove('open'); }
+        
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
         
-        async function loadCustomerNames() {
-            try {
-                const customersSnap = await getDocs(collection(db, 'customers'));
-                customerNameMap.clear();
-                customersSnap.forEach(doc => {
-                    customerNameMap.set(doc.id, doc.data().name);
-                });
-            } catch (error) {
-                console.error('Error loading customer names:', error);
-            }
-        }
+        function getTodayDate() { return new Date().toISOString().split('T')[0]; }
         
+        // ─── REAL-TIME CUSTOMER LISTENER ───
+        function setupCustomerListener() {
+            if (unsubscribeCustomers) {
+                unsubscribeCustomers();
+                unsubscribeCustomers = null;
+            }
+
+            console.log('🔄 Setting up real-time customer listener...');
+
+            unsubscribeCustomers = onSnapshot(
+                collection(db, 'customers'),
+                (snapshot) => {
+                    customerNameMap.clear();
+                    customerDataMap.clear();
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const id = doc.id;
+                        const name = data.name || 'Unknown';
+
+                        customerNameMap.set(id, name);
+                        customerDataMap.set(id, data);
+                    });
+
+                    console.log('🔄 Customers updated in Follow Up page:', customerNameMap.size);
+                    
+                    // Refresh the table with updated names
+                    refreshFollowUps();
+                },
+                (error) => {
+                    console.error('Customer listener error:', error);
+                    showToast('Error loading customers', 'error');
+                }
+            );
+        }
+
+        // ─── GET CUSTOMER NAME ───
         function getCustomerName(customerId) {
             if (!customerId) return 'Unknown';
-            return customerNameMap.get(customerId) || 'Unknown';
+            const name = customerNameMap.get(customerId);
+            return name || 'Unknown';
         }
-        
+
+        function getCustomerDue(customerId) {
+            if (!customerId) return 0;
+            const customer = customerDataMap.get(customerId);
+            return customer ? (customer.totalDue || 0) : 0;
+        }
+
+        // ─── PRIORITY CALCULATION ───
         function calculatePriority(daysDifference) {
-            if (daysDifference <= 3) return { level: 'low', text: '🟢 Low', class: 'priority-low' };
-            else if (daysDifference <= 7) return { level: 'medium', text: '🟠 Medium', class: 'priority-medium' };
-            else return { level: 'high', text: '🔴 High', class: 'priority-high' };
+            if (daysDifference <= 3) return { level: 'low', icon: 'fa-arrow-down', class: 'priority-icon low' };
+            else if (daysDifference <= 7) return { level: 'medium', icon: 'fa-minus', class: 'priority-icon medium' };
+            else return { level: 'high', icon: 'fa-arrow-up', class: 'priority-icon high' };
         }
-        
+
         function getDaysDifference(dateStr) {
             const today = new Date(); today.setHours(0, 0, 0, 0);
             const targetDate = new Date(dateStr); targetDate.setHours(0, 0, 0, 0);
             const diffTime = targetDate - today;
             return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         }
-        
+
         function getDateRangeFromFilter(filterType) {
             const today = new Date();
             let startDate = null, endDate = null;
@@ -485,76 +599,149 @@
             }
             return { startDate, endDate };
         }
-        
+
+        // ─── LOAD FOLLOW UPS ───
         async function loadFollowUps() {
             const tbody = document.getElementById('followUpTableBody');
-            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading follow ups...</p></td>';
+            tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading follow ups...</p></td>';
             
             try {
-                if (customerNameMap.size === 0) await loadCustomerNames();
-                
-                const dueEntriesSnap = await getDocs(collection(db, 'transactions'));
+                // First ensure we have customer data
+                if (customerNameMap.size === 0) {
+                    await new Promise(resolve => {
+                        const check = setInterval(() => {
+                            if (customerNameMap.size > 0) {
+                                clearInterval(check);
+                                resolve();
+                            }
+                        }, 100);
+                    });
+                }
+
+                const dueEntriesSnap = await getDocs(query(collection(db, 'transactions'), where('type', '==', 'due')));
                 const followUps = [];
+                const today = getTodayDate();
                 
                 for (const docSnap of dueEntriesSnap.docs) {
                     const due = docSnap.data();
-                    if (due.type === 'due') {
-                        let customerName = due.customerName || getCustomerName(due.customerId);
-                        
-                        let description = due.remarks || '';
-                        if (!description && due.products && due.products.length > 0) {
-                            description = due.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).join(', ');
-                            if (due.totalAmount) description += ` | ৳${due.totalAmount.toFixed(2)}`;
-                        } else if (due.directDueAmount) {
-                            description = `Direct Due: ৳${due.directDueAmount.toFixed(2)}`;
-                        } else if (due.productName) {
-                            description = due.productName;
-                        }
-                        if (!description) description = 'Due Entry';
-                        
-                        let followUpDate = due.expectedDate || due.date;
-                        if (!followUpDate && due.createdAt) {
-                            followUpDate = due.createdAt.toDate().toISOString().split('T')[0];
-                        }
-                        if (!followUpDate) followUpDate = new Date().toISOString().split('T')[0];
-                        
-                        const daysDiff = getDaysDifference(followUpDate);
-                        const priority = calculatePriority(daysDiff);
-                        const nextRemarks = due.nextRemarks || due.remarks || '';
-                        
-                        followUps.push({
-                            id: docSnap.id,
-                            transactionId: docSnap.id,
-                            customerName: customerName,
-                            description: description,
-                            expectedDate: followUpDate,
-                            priority: priority,
-                            daysDiff: daysDiff,
-                            currentRemarks: due.remarks || '',
-                            nextRemarks: nextRemarks,
-                            customerId: due.customerId
-                        });
+                    const customerId = due.customerId;
+                    
+                    // Get REAL-TIME due balance from customer record
+                    const actualDueBalance = getCustomerDue(customerId);
+                    
+                    // Skip if due balance is 0 or less (payment cleared)
+                    if (actualDueBalance <= 0) continue;
+                    
+                    // Get fresh customer name from real-time cache
+                    const customerName = getCustomerName(customerId);
+                    
+                    let description = due.remarks || '';
+                    if (!description && due.products && due.products.length > 0) {
+                        description = due.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).join(', ');
+                        if (due.totalAmount) description += ` | ৳${due.totalAmount.toFixed(2)}`;
+                    } else if (due.directDueAmount) {
+                        description = `Direct Due: ৳${due.directDueAmount.toFixed(2)}`;
+                    } else if (due.productName) {
+                        description = due.productName;
                     }
+                    if (!description) description = 'Due Entry';
+                    
+                    let followUpDate = due.expectedDate || due.date;
+                    if (!followUpDate && due.createdAt) {
+                        followUpDate = due.createdAt.toDate().toISOString().split('T')[0];
+                    }
+                    if (!followUpDate) followUpDate = today;
+                    
+                    const daysDiff = getDaysDifference(followUpDate);
+                    const priority = calculatePriority(daysDiff);
+                    const nextRemarks = due.nextRemarks || due.remarks || '';
+                    
+                    followUps.push({
+                        id: docSnap.id,
+                        transactionId: docSnap.id,
+                        customerId: customerId,
+                        customerName: customerName,
+                        description: description,
+                        expectedDate: followUpDate,
+                        priority: priority,
+                        daysDiff: daysDiff,
+                        currentRemarks: due.remarks || '',
+                        nextRemarks: nextRemarks,
+                        dueBalance: actualDueBalance
+                    });
                 }
                 
-                followUps.sort((a, b) => a.expectedDate.localeCompare(b.expectedDate));
-                allFollowUps = followUps;
+                // Remove duplicates - keep only one entry per customer (most recent)
+                const uniqueFollowUps = [];
+                const seenCustomers = new Set();
+                followUps.sort((a, b) => b.expectedDate.localeCompare(a.expectedDate));
+                for (const f of followUps) {
+                    if (!seenCustomers.has(f.customerId)) {
+                        seenCustomers.add(f.customerId);
+                        uniqueFollowUps.push(f);
+                    }
+                }
+                uniqueFollowUps.sort((a, b) => a.expectedDate.localeCompare(b.expectedDate));
+                
+                allFollowUps = uniqueFollowUps;
                 applyFilters();
                 
             } catch (error) {
                 console.error('Error loading follow ups:', error);
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</span></td>';
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
             }
         }
-        
+
+        // ─── REFRESH FOLLOW UPS WITH UPDATED NAMES ───
+        function refreshFollowUps() {
+            if (allFollowUps.length === 0) return;
+            
+            // Update customer names and due balances in the data
+            let updated = false;
+            allFollowUps = allFollowUps.map(f => {
+                const freshName = getCustomerName(f.customerId);
+                const freshDue = getCustomerDue(f.customerId);
+                
+                if (freshName !== 'Unknown' && f.customerName !== freshName) {
+                    f.customerName = freshName;
+                    updated = true;
+                }
+                if (f.dueBalance !== freshDue) {
+                    f.dueBalance = freshDue;
+                    updated = true;
+                }
+                return f;
+            });
+            
+            // Only re-render if something changed
+            if (updated) {
+                console.log('🔄 Refreshing follow ups with updated data');
+                applyFilters();
+                updateStats(allFollowUps);
+            }
+        }
+
+        // ─── APPLY FILTERS ───
         function applyFilters() {
             let filtered = [...allFollowUps];
-            if (currentQuickFilter !== 'all') {
+            
+            if (currentQuickFilter === 'upcoming') {
+                filtered = filtered.filter(f => {
+                    const daysDiff = getDaysDifference(f.expectedDate);
+                    return daysDiff >= 0 && daysDiff <= 5;
+                });
+            } else if (currentQuickFilter === 'overdue') {
+                filtered = filtered.filter(f => {
+                    const daysDiff = getDaysDifference(f.expectedDate);
+                    return daysDiff < 0;
+                });
+            } else if (currentQuickFilter !== 'all') {
                 const dateRange = getDateRangeFromFilter(currentQuickFilter);
                 if (dateRange) {
                     filtered = filtered.filter(f => f.expectedDate >= dateRange.startDate && f.expectedDate <= dateRange.endDate);
                 }
             }
+            
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             if (searchTerm) {
                 filtered = filtered.filter(f => f.customerName.toLowerCase().includes(searchTerm));
@@ -562,11 +749,15 @@
             renderTable(filtered);
             updateStats(allFollowUps);
         }
-        
+
+        // ─── RENDER TABLE ───
         function renderTable(followUps) {
             const tbody = document.getElementById('followUpTableBody');
             if (followUps.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No follow up records found</p></td>';
+                const message = currentQuickFilter === 'upcoming' ? 'No upcoming follow-ups in the next 5 days' :
+                               currentQuickFilter === 'overdue' ? 'No overdue follow-ups' :
+                               'No follow up records found (all payments cleared)';
+                tbody.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">${message}</p></td>`;
                 return;
             }
             
@@ -575,35 +766,49 @@
             
             for (const followUp of followUps) {
                 const priorityClass = followUp.priority.class;
-                const priorityText = followUp.priority.text;
+                const priorityIcon = followUp.priority.icon;
                 const daysLeft = followUp.daysDiff;
                 const dateStatus = daysLeft < 0 ? 'text-red-500' : daysLeft === 0 ? 'text-orange-500' : 'text-green-600';
-                const dateStatusText = daysLeft < 0 ? `(${Math.abs(daysLeft)} days overdue)` : daysLeft === 0 ? '(Today)' : `(${daysLeft} days left)`;
+                
+                let statusBadge = '';
+                if (daysLeft < 0) {
+                    statusBadge = `<span class="status-badge-overdue">Overdue (${Math.abs(daysLeft)}d)</span>`;
+                } else if (daysLeft <= 5) {
+                    statusBadge = `<span class="status-badge-upcoming">Upcoming (${daysLeft}d)</span>`;
+                } else {
+                    statusBadge = `<span class="text-gray-400 text-xs">Pending</span>`;
+                }
                 
                 const row = tbody.insertRow();
                 row.className = 'table-row-hover transition-colors cursor-pointer';
                 row.setAttribute('data-id', followUp.id);
                 row.setAttribute('data-customer', followUp.customerName);
                 row.setAttribute('data-description', followUp.description);
-                row.setAttribute('data-priority', priorityText);
+                row.setAttribute('data-priority', followUp.priority.level);
                 row.setAttribute('data-date', followUp.expectedDate);
                 row.setAttribute('data-days', daysLeft);
                 row.setAttribute('data-current-remarks', followUp.currentRemarks);
                 row.setAttribute('data-next-remarks', followUp.nextRemarks);
-                
-                const nextRemarksDisplay = followUp.nextRemarks && followUp.nextRemarks !== '' ? followUp.nextRemarks : '-';
+                row.setAttribute('data-due-balance', followUp.dueBalance || 0);
+                row.setAttribute('data-customer-id', followUp.customerId);
                 
                 row.innerHTML = `
                     <td class="px-3 py-2.5 text-xs text-center font-medium">${sl++}</td>
-                    <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(followUp.customerName)}</td>
-                    <td class="px-3 py-2.5 text-sm"><div class="text-xs text-gray-600 dark:text-gray-400 max-w-[250px] truncate" title="${escapeHtml(followUp.description)}">${escapeHtml(followUp.description)}</div></td>
-                    <td class="px-3 py-2.5"><span class="px-2 py-1 rounded-full text-xs font-medium ${priorityClass}">${priorityText}</span></td>
-                    <td class="px-3 py-2.5 text-sm ${dateStatus}">${followUp.expectedDate}<span class="text-xs ml-1">${dateStatusText}</span></td>
-                    <td class="px-3 py-2.5 text-sm text-primary font-medium max-w-[200px] truncate" title="${escapeHtml(nextRemarksDisplay)}">${escapeHtml(nextRemarksDisplay)}</td>
+                    <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white customer-name-cell">${escapeHtml(followUp.customerName)}</td>
+                    <td class="px-3 py-2.5 text-sm"><div class="text-xs text-gray-600 dark:text-gray-400 max-w-[200px] truncate" title="${escapeHtml(followUp.description)}">${escapeHtml(followUp.description)}</div></td>
+                    <td class="px-3 py-2.5 text-center">
+                        <span class="${priorityClass}" title="${followUp.priority.level.charAt(0).toUpperCase() + followUp.priority.level.slice(1)} Priority">
+                            <i class="fas ${priorityIcon}"></i>
+                        </span>
+                    </td>
+                    <td class="px-3 py-2.5 text-sm font-bold text-red-600 dark:text-red-400 due-balance-cell">৳${(followUp.dueBalance || 0).toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-sm ${dateStatus}">${followUp.expectedDate}</td>
+                    <td class="px-3 py-2.5">${statusBadge}</td>
                     <td class="px-3 py-2.5 text-center"><button class="update-followup text-primary hover:text-primary-dark p-1.5 rounded-lg transition-colors" data-id="${followUp.id}" data-customer="${escapeHtml(followUp.customerName)}" data-date="${followUp.expectedDate}" data-remarks="${escapeHtml(followUp.currentRemarks)}" data-next-remarks="${escapeHtml(followUp.nextRemarks)}" title="Update Follow Up"><i class="fas fa-edit text-sm"></i></button></td>
                 `;
             }
             
+            // ─── EVENT LISTENERS ───
             document.querySelectorAll('.update-followup').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -622,11 +827,27 @@
                     const daysLeft = parseInt(data.days);
                     const dateStatusText = daysLeft < 0 ? 'Overdue' : daysLeft === 0 ? 'Today' : 'Pending';
                     const dateStatusColor = daysLeft < 0 ? 'text-red-500' : daysLeft === 0 ? 'text-orange-500' : 'text-green-600';
+                    const dueBalance = parseFloat(data.dueBalance) || 0;
+                    const priorityLevel = data.priority || 'low';
+                    const priorityIcons = {
+                        high: 'fa-arrow-up',
+                        medium: 'fa-minus',
+                        low: 'fa-arrow-down'
+                    };
+                    const priorityIcon = priorityIcons[priorityLevel] || 'fa-minus';
+                    const priorityColors = {
+                        high: 'text-red-600',
+                        medium: 'text-orange-500',
+                        low: 'text-green-600'
+                    };
+                    const priorityColor = priorityColors[priorityLevel] || 'text-gray-600';
+                    
                     document.getElementById('centerModalContent').innerHTML = `
                         <div class="space-y-3">
                             <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Customer</span><span class="font-semibold text-sm">${escapeHtml(data.customer)}</span></div>
                             <div class="flex justify-between items-start pb-2 border-b"><span class="text-xs text-gray-500">Description</span><span class="text-sm text-right max-w-[220px]">${escapeHtml(data.description)}</span></div>
-                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Priority</span><span class="text-sm font-semibold">${escapeHtml(data.priority)}</span></div>
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Priority</span><span class="text-sm font-semibold ${priorityColor}"><i class="fas ${priorityIcon} mr-1"></i> ${priorityLevel.charAt(0).toUpperCase() + priorityLevel.slice(1)}</span></div>
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Due Balance</span><span class="text-sm font-bold text-red-600">৳${dueBalance.toFixed(2)}</span></div>
                             <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Follow Up Date</span><div class="text-right"><span class="text-sm font-semibold">${data.date}</span><span class="text-xs ${dateStatusColor} ml-1">(${dateStatusText})</span></div></div>
                             <div class="flex justify-between items-start pb-2 border-b"><span class="text-xs text-gray-500">Current Remarks</span><span class="text-sm text-right">${escapeHtml(data.currentRemarks) || '-'}</span></div>
                             <div class="flex justify-between items-start"><span class="text-xs text-gray-500">Next Remarks</span><span class="text-sm text-right text-primary font-medium">${escapeHtml(data.nextRemarks) || '-'}</span></div>
@@ -636,16 +857,21 @@
                 });
             });
         }
-        
+
+        // ─── UPDATE STATS ───
         function updateStats(followUps) {
             const total = followUps.length;
-            let pending = 0, overdue = 0, monthly = 0;
+            let pending = 0, overdue = 0, upcoming = 0, monthly = 0;
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
+            
             followUps.forEach(f => {
                 const daysDiff = getDaysDifference(f.expectedDate);
                 if (daysDiff < 0) overdue++;
                 else if (daysDiff >= 0) pending++;
+                
+                if (daysDiff >= 0 && daysDiff <= 5) upcoming++;
+                
                 const dateParts = f.expectedDate.split('-');
                 if (dateParts.length === 3) {
                     const month = parseInt(dateParts[1]) - 1;
@@ -656,9 +882,11 @@
             document.getElementById('totalTasks').textContent = total;
             document.getElementById('pendingTasks').textContent = pending;
             document.getElementById('overdueTasks').textContent = overdue;
+            document.getElementById('upcomingTasks').textContent = upcoming;
             document.getElementById('monthlyTasks').textContent = monthly;
         }
-        
+
+        // ─── UPDATE FOLLOW UP ───
         async function updateFollowUp() {
             const transactionId = document.getElementById('updateTransactionId').value;
             const newExpectedDate = document.getElementById('updateExpectedDate').value;
@@ -676,24 +904,40 @@
                 await loadFollowUps();
             } catch (error) { console.error('Update error:', error); showToast('Error updating follow up', 'error'); }
         }
-        
+
+        // ─── EXPORT CSV ───
         function exportToCSV() {
             let exportData = [...allFollowUps];
-            if (currentQuickFilter !== 'all') {
+            
+            if (currentQuickFilter === 'upcoming') {
+                exportData = exportData.filter(f => {
+                    const daysDiff = getDaysDifference(f.expectedDate);
+                    return daysDiff >= 0 && daysDiff <= 5;
+                });
+            } else if (currentQuickFilter === 'overdue') {
+                exportData = exportData.filter(f => {
+                    const daysDiff = getDaysDifference(f.expectedDate);
+                    return daysDiff < 0;
+                });
+            } else if (currentQuickFilter !== 'all') {
                 const dateRange = getDateRangeFromFilter(currentQuickFilter);
-                if (dateRange) exportData = exportData.filter(f => f.expectedDate >= dateRange.startDate && f.expectedDate <= dateRange.endDate);
+                if (dateRange) {
+                    exportData = exportData.filter(f => f.expectedDate >= dateRange.startDate && f.expectedDate <= dateRange.endDate);
+                }
             }
+            
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             if (searchTerm) exportData = exportData.filter(f => f.customerName.toLowerCase().includes(searchTerm));
+            
             if (exportData.length === 0) { showToast('No data to export', 'error'); return; }
             
-            let csv = ['\uFEFF"SL","Customer","Description","Priority","Follow Up Date","Days Left","Status","Next Remarks"'];
+            let csv = ['\uFEFF"SL","Customer","Description","Priority","Due Balance","Follow Up Date","Days Left","Status","Next Remarks"'];
             let sl = 1;
             exportData.forEach(f => {
                 const daysDiff = getDaysDifference(f.expectedDate);
                 const statusText = daysDiff < 0 ? 'Overdue' : daysDiff === 0 ? 'Today' : 'Pending';
                 const daysText = daysDiff < 0 ? `${Math.abs(daysDiff)} days overdue` : `${daysDiff} days left`;
-                csv.push(`"${sl++}","${f.customerName.replace(/"/g, '""')}","${f.description.replace(/"/g, '""')}","${f.priority.text}","${f.expectedDate}","${daysText}","${statusText}","${(f.nextRemarks || '').replace(/"/g, '""')}"`);
+                csv.push(`"${sl++}","${f.customerName.replace(/"/g, '""')}","${f.description.replace(/"/g, '""')}","${f.priority.level}","${(f.dueBalance||0).toFixed(2)}","${f.expectedDate}","${daysText}","${statusText}","${(f.nextRemarks || '').replace(/"/g, '""')}"`);
             });
             const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -704,8 +948,8 @@
             URL.revokeObjectURL(url);
             showToast('Follow up list exported!', 'success');
         }
-        
-        // Event Listeners
+
+        // ─── EVENT LISTENERS ───
         document.getElementById('refreshBtn').addEventListener('click', () => { loadFollowUps(); showToast('Refreshed!', 'success'); });
         document.getElementById('searchInput').addEventListener('input', () => applyFilters());
         document.getElementById('exportFollowUpBtn').addEventListener('click', exportToCSV);
@@ -729,16 +973,36 @@
         document.getElementById('closeCenterModalFooterBtn').addEventListener('click', closeCenterModal);
         document.getElementById('detailsCenterModal').addEventListener('click', (e) => { if (e.target === document.getElementById('detailsCenterModal')) closeCenterModal(); });
         
-        // Logout functionality
+        // ─── LOGOUT ───
         const logoutModal = document.getElementById('logoutModal'), logoutLink = document.getElementById('logoutLink'), cancelLogout = document.getElementById('cancelLogoutBtn'), confirmLogout = document.getElementById('confirmLogoutBtn');
         const { logout } = await import('./js/auth.js');
         if (logoutLink) logoutLink.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
         if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
         if (confirmLogout) confirmLogout.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
+
+        // ─── FOOTER YEAR ───
+        document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+        // ─── CLEANUP ───
+        window.addEventListener('beforeunload', () => {
+            if (unsubscribeCustomers) {
+                unsubscribeCustomers();
+                unsubscribeCustomers = null;
+            }
+        });
+
+        // ─── INIT ───
+        console.log('🚀 Initializing Follow Up page...');
         
-        // Initial load
-        loadFollowUps();
-        document.querySelector('.quick-filter-btn[data-filter="all"]')?.classList.add('active');
+        // Setup real-time customer listener first
+        setupCustomerListener();
+        
+        // Wait a moment for customer data to load, then load follow ups
+        setTimeout(async () => {
+            await loadFollowUps();
+            document.querySelector('.quick-filter-btn[data-filter="all"]')?.classList.add('active');
+            console.log('🚀 Follow Up page initialized with real-time customer updates');
+        }, 500);
     </script>
 </body>
 </html>

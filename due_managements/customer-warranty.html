@@ -6,6 +6,11 @@
     <meta name="theme-color" content="#0f3b3a">
     <title>Customer Warranty | JackDev Due Managements</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -31,177 +36,472 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
-        
+        /* ===== CUSTOMER PAGE STYLES ===== */
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
-        body { font-family: 'Inter', system-ui, sans-serif; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; }
         
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-track { background: #1e293b; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
         
-        .nav-active {
-            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
-            border-left: 3px solid #d4af37;
+        .nav-active { background:linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%); border-left:3px solid #d4af37; }
+        .dark .nav-active { background:linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%); }
+        
+        .stat-card { transition: all 0.2s ease; cursor: pointer; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12); }
+        .stat-card.active-stat { 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 25px -8px rgba(15,59,58,0.25);
+            border-color: #0f3b3a !important;
         }
-        .dark .nav-active {
-            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
-        }
+        .dark .stat-card.active-stat { border-color: #d4af37 !important; }
         
-        .stat-card {
+        .submenu-modern { max-height:0; overflow:hidden; transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
+        .submenu-modern.open { max-height:280px; }
+        
+        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
+        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
+        
+        @keyframes modalSlideUp { from { opacity:0; transform:translateY(20px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+        .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
+        
+        .table-row-hover { transition: background-color 0.15s ease; cursor: pointer; }
+        .table-row-hover:hover { background-color: rgba(15,59,58,0.08); }
+        .dark .table-row-hover:hover { background-color: rgba(30,107,104,0.15); }
+        
+        /* ===== COLORED CUSTOMER NAMES ===== */
+        .customer-name {
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            font-size: 0.875rem;
             transition: all 0.2s ease;
         }
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12);
-        }
+        .customer-name.color-1 { background: #dbeafe; color: #1e40af; }
+        .customer-name.color-2 { background: #d1fae5; color: #065f46; }
+        .customer-name.color-3 { background: #fef3c7; color: #92400e; }
+        .customer-name.color-4 { background: #fce7f3; color: #9d174d; }
+        .customer-name.color-5 { background: #e0e7ff; color: #3730a3; }
+        .customer-name.color-6 { background: #fde68a; color: #78350f; }
+        .customer-name.color-7 { background: #ddd6fe; color: #5b21b6; }
+        .customer-name.color-8 { background: #bfdbfe; color: #1e3a8a; }
+        .customer-name.color-9 { background: #a7f3d0; color: #065f46; }
+        .customer-name.color-10 { background: #fed7aa; color: #9a3412; }
+        .customer-name.color-11 { background: #fbcfe8; color: #831843; }
+        .customer-name.color-12 { background: #c7d2fe; color: #3730a3; }
         
-        .submenu-modern {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .submenu-modern.open {
-            max-height: 280px;
-        }
+        .dark .customer-name.color-1 { background: #1e3a5f; color: #93c5fd; }
+        .dark .customer-name.color-2 { background: #064e3b; color: #6ee7b7; }
+        .dark .customer-name.color-3 { background: #451a03; color: #fcd34d; }
+        .dark .customer-name.color-4 { background: #4c0519; color: #f9a8d4; }
+        .dark .customer-name.color-5 { background: #1e1b4b; color: #a5b4fc; }
+        .dark .customer-name.color-6 { background: #451a03; color: #fbbf24; }
+        .dark .customer-name.color-7 { background: #2e1065; color: #c4b5fd; }
+        .dark .customer-name.color-8 { background: #1e3a5f; color: #60a5fa; }
+        .dark .customer-name.color-9 { background: #064e3b; color: #34d399; }
+        .dark .customer-name.color-10 { background: #451a03; color: #fdba74; }
+        .dark .customer-name.color-11 { background: #4c0519; color: #f472b6; }
+        .dark .customer-name.color-12 { background: #1e1b4b; color: #818cf8; }
         
-        .has-submenu > a .chevron-icon {
-            transition: transform 0.2s ease;
-        }
-        .has-submenu.open > a .chevron-icon {
-            transform: rotate(180deg);
-        }
+        .table-scroll-hint { display:none; }
+        @media (max-width:768px) { .table-scroll-hint { display:flex; font-size:9px; padding:4px 8px; background:#f0fdf4; color:#166534; border-radius:20px; margin-bottom:8px; width:fit-content; } .dark .table-scroll-hint { background:#064e3b; color:#86efac; } }
         
-        @keyframes modalSlideUp {
-            from { opacity: 0; transform: translateY(20px) scale(0.96); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .modal-animate {
-            animation: modalSlideUp 0.2s ease-out forwards;
-        }
+        .btn-active:active { transform: scale(0.97); }
+        #sidebarOverlay { animation: fadeIn 0.2s ease-out; }
+        .sidebar-open { overflow:hidden; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
         
-        .btn-active:active {
-            transform: scale(0.97);
-        }
+        .sidebar-fixed { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+        .sidebar-header-fixed { flex-shrink:0; position:sticky; top:0; background:inherit; z-index:10; }
+        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
         
-        .status-badge {
+        /* Status Icons */
+        .status-icon-only {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 16px;
+            transition: all 0.25s ease;
+            position: relative;
+            cursor: default;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
-        .status-pending {
-            background: #fed7aa;
-            color: #9a3412;
-        }
-        .dark .status-pending {
-            background: #7c2d12;
-            color: #fdba74;
-        }
-        .status-received {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        .dark .status-received {
-            background: #064e3b;
-            color: #86efac;
-        }
-        .status-delivered {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-        .dark .status-delivered {
-            background: #1e3a5f;
-            color: #93c5fd;
-        }
+        .status-icon-only:hover { transform: scale(1.12); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+        .status-icon-only.pending { background: #FEF3C7; color: #D97706; }
+        .status-icon-only.currier { background: #DBEAFE; color: #2563EB; }
+        .status-icon-only.currier_to_supplier { background: #E0E7FF; color: #4338CA; }
+        .status-icon-only.supplier_received { background: #D1FAE5; color: #059669; }
+        .status-icon-only.supplier_to_shop { background: #FCE7F3; color: #DB2777; }
+        .status-icon-only.customer_delivered { background: #F3E8FF; color: #7E22CE; }
         
-        /* Filter Tab Styles */
-        .filter-tab {
-            transition: all 0.2s ease;
-        }
-        .filter-tab.active {
-            background: #0f3b3a;
+        .dark .status-icon-only.pending { background: #451A03; color: #FBBF24; }
+        .dark .status-icon-only.currier { background: #1E3A5F; color: #60A5FA; }
+        .dark .status-icon-only.currier_to_supplier { background: #1E1B4B; color: #818CF8; }
+        .dark .status-icon-only.supplier_received { background: #064E3B; color: #34D399; }
+        .dark .status-icon-only.supplier_to_shop { background: #4C0519; color: #F472B6; }
+        .dark .status-icon-only.customer_delivered { background: #3B0764; color: #A855F7; }
+        
+        .status-icon-only .tooltip-text {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: #1e293b;
             color: white;
-            border-color: #0f3b3a;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            z-index: 10;
+            pointer-events: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
         }
-        .dark .filter-tab.active {
-            background: #1e6b68;
-            border-color: #1e6b68;
+        .status-icon-only:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .status-icon-only .tooltip-text::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1e293b;
         }
         
-        .table-scroll-hint {
+        /* Action buttons */
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: rgba(15, 59, 58, 0.06);
+            position: relative;
+        }
+        .action-btn:hover { transform: scale(1.08); background: rgba(15, 59, 58, 0.15); }
+        .dark .action-btn { background: rgba(255, 255, 255, 0.06); }
+        .dark .action-btn:hover { background: rgba(255, 255, 255, 0.12); }
+        .action-btn .tooltip-text {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: #1e293b;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .action-btn:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .action-btn .tooltip-text::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #1e293b;
+        }
+        
+        /* Filter dropdowns */
+        .filter-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        .dark .filter-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+        
+        /* Pagination dropdown inline with filter */
+        .pagination-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        .dark .pagination-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        }
+        
+        /* ===== FILTER ROW - EQUAL WIDTH FIELDS ===== */
+        .filter-row {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        .filter-row input,
+        .filter-row select {
+            height: 40px;
+            font-size: 13px;
+            min-width: 150px;
+            width: 100%;
+        }
+        .filter-row .filter-icon {
+            font-size: 16px;
+        }
+        .filter-row .filter-label {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .filter-row .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex: 1 1 0;
+            min-width: 140px;
+        }
+        .filter-row .filter-group > * {
+            flex: 1;
+        }
+        .filter-row .filter-group .date-separator {
+            flex: 0 0 auto;
+            padding: 0 2px;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        /* Search bar - equal width */
+        .filter-row .search-wrap {
+            flex: 1 1 0;
+            min-width: 140px;
+        }
+        .filter-row .search-wrap input {
+            min-width: unset;
+            width: 100%;
+        }
+        
+        /* ===== TABLE SCROLLBAR REMOVED ===== */
+        .table-wrap {
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .table-wrap::-webkit-scrollbar {
             display: none;
         }
-        @media (max-width: 768px) {
-            .table-scroll-hint {
-                display: flex;
-                font-size: 9px;
-                padding: 4px 8px;
-                background: #f0fdf4;
-                color: #166534;
-                border-radius: 20px;
-                margin-bottom: 8px;
-                width: fit-content;
+        
+        /* invoice slip print styles */
+        #invoicePrintArea {
+            font-family: 'Inter', 'Courier New', monospace;
+            background: white;
+            padding: 30px 35px;
+            max-width: 700px;
+            margin: 0 auto;
+            border-radius: 12px;
+        }
+        .invoice-slip-header { text-align:center; border-bottom:2px dashed #0f3b3a; padding-bottom:14px; margin-bottom:14px; }
+        .invoice-slip-header h1 { color:#0f3b3a; font-size:22px; font-weight:700; letter-spacing:1px; }
+        .invoice-slip-header .sub-title { color:#4b5563; font-size:11px; font-weight:500; letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
+        .invoice-slip-header .slip-title { color:#6b7280; font-size:13px; font-weight:600; margin-top:4px; letter-spacing:1px; }
+        .invoice-divider { border:none; border-top:1px dashed #d1d5db; margin:10px 0; }
+        .invoice-receipt-info { display:flex; justify-content:space-between; align-items:flex-start; font-size:12px; padding:4px 0; }
+        .invoice-receipt-info .left-info { line-height:1.7; }
+        .invoice-receipt-info .right-info { text-align:right; line-height:1.7; }
+        .invoice-receipt-info strong { color:#374151; font-weight:600; }
+        .status-badge-invoice { display:inline-flex; align-items:center; gap:4px; padding:2px 12px; border-radius:20px; font-size:10px; font-weight:600; text-transform:uppercase; }
+        .status-badge-invoice.pending { background:#FEF3C7; color:#D97706; }
+        .status-badge-invoice.currier { background:#DBEAFE; color:#2563EB; }
+        .status-badge-invoice.currier_to_supplier { background:#E0E7FF; color:#4338CA; }
+        .status-badge-invoice.supplier_received { background:#D1FAE5; color:#059669; }
+        .status-badge-invoice.supplier_to_shop { background:#FCE7F3; color:#DB2777; }
+        .status-badge-invoice.customer_delivered { background:#F3E8FF; color:#7E22CE; }
+        .invoice-customer-section { background:#f8fafc; padding:12px 16px; border-radius:8px; margin:12px 0; font-size:12px; line-height:1.8; border-left:3px solid #0f3b3a; }
+        .dark .invoice-customer-section { background:#1e293b; border-left-color:#d4af37; }
+        .invoice-customer-section strong { color:#374151; font-weight:600; }
+        .dark .invoice-customer-section strong { color:#e2e8f0; }
+        .invoice-details-table { width:100%; border-collapse:collapse; font-size:12px; margin:10px 0; }
+        .invoice-details-table th { text-align:left; padding:6px 10px; font-weight:600; color:#374151; border-bottom:1px solid #d1d5db; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; }
+        .dark .invoice-details-table th { color:#e2e8f0; border-color:#4b5563; }
+        .invoice-details-table td { padding:6px 10px; border-bottom:1px solid #e5e7eb; }
+        .dark .invoice-details-table td { border-color:#374151; }
+        .invoice-details-table tr:last-child td { border-bottom:none; }
+        .invoice-details-table .label { color:#6b7280; font-weight:500; }
+        .dark .invoice-details-table .label { color:#9ca3af; }
+        .invoice-details-table .value { font-weight:500; color:#1f2937; }
+        .dark .invoice-details-table .value { color:#f1f5f9; }
+        .invoice-details-table .serial-value { font-family:'Courier New',monospace; font-size:11px; color:#0f3b3a; font-weight:600; }
+        .invoice-problem-section { background:#fef3c7; padding:10px 14px; border-radius:6px; margin:8px 0; font-size:12px; border-left:3px solid #d97706; }
+        .dark .invoice-problem-section { background:#451A03; border-left-color:#FBBF24; }
+        .invoice-problem-section strong { color:#92400e; }
+        .dark .invoice-problem-section strong { color:#FBBF24; }
+        .invoice-problem-section .problem-text { color:#78350f; margin-top:2px; }
+        .dark .invoice-problem-section .problem-text { color:#fdba74; }
+        .invoice-footer { text-align:center; border-top:2px dashed #d1d5db; padding-top:14px; margin-top:12px; }
+        .invoice-footer p { color:#6b7280; font-size:10px; margin:2px 0; }
+        .invoice-footer .contact { color:#0f3b3a; font-weight:600; font-size:11px; }
+        .dark .invoice-footer .contact { color:#d4af37; }
+        .invoice-footer .ref { color:#9ca3af; font-size:9px; margin-top:4px; }
+        
+        /* ===== DETAILS MODAL - WIDE & NO SCROLLBAR ===== */
+        #detailsModal .modal-content {
+            max-width: 650px !important;
+            width: 95% !important;
+            max-height: 85vh !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #detailsModal .modal-body {
+            flex: 1;
+            overflow-y: auto !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        #detailsModal .modal-body::-webkit-scrollbar {
+            display: none !important;
+        }
+        #detailsModal .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 20px;
+        }
+        @media (max-width: 500px) {
+            #detailsModal .details-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
             }
-            .dark .table-scroll-hint {
-                background: #064e3b;
-                color: #86efac;
-            }
         }
-        
-        .table-row-hover:hover {
-            background-color: rgba(15, 59, 58, 0.04);
-        }
-        .dark .table-row-hover:hover {
-            background-color: rgba(30, 107, 104, 0.1);
-        }
-        
-        #sidebarOverlay {
-            animation: fadeIn 0.2s ease-out;
-        }
-        .sidebar-open {
-            overflow: hidden;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        /* Fixed Sidebar Structure - No overlap issue */
-        .sidebar-fixed {
+        #detailsModal .detail-item {
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
-        .sidebar-header-fixed {
-            flex-shrink: 0;
-            position: sticky;
-            top: 0;
-            background: inherit;
-            z-index: 10;
+        .dark #detailsModal .detail-item {
+            border-bottom-color: rgba(255,255,255,0.06);
         }
-        .sidebar-nav-fixed {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: thin;
+        #detailsModal .detail-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9ca3af;
+            font-weight: 600;
         }
-        .sidebar-nav-fixed::-webkit-scrollbar {
-            width: 3px;
+        #detailsModal .detail-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            word-break: break-word;
+            margin-top: 2px;
         }
-        .sidebar-nav-fixed::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
+        .dark #detailsModal .detail-value {
+            color: #f1f5f9;
         }
-        .sidebar-nav-fixed::-webkit-scrollbar-thumb {
-            background: rgba(212,175,55,0.5);
-            border-radius: 10px;
+        #detailsModal .detail-value.serial {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #0f3b3a;
+        }
+        .dark #detailsModal .detail-value.serial {
+            color: #d4af37;
+        }
+        #detailsModal .detail-value .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        #detailsModal .detail-value .status-badge.pending { background: #FEF3C7; color: #D97706; }
+        #detailsModal .detail-value .status-badge.currier { background: #DBEAFE; color: #2563EB; }
+        #detailsModal .detail-value .status-badge.currier_to_supplier { background: #E0E7FF; color: #4338CA; }
+        #detailsModal .detail-value .status-badge.supplier_received { background: #D1FAE5; color: #059669; }
+        #detailsModal .detail-value .status-badge.supplier_to_shop { background: #FCE7F3; color: #DB2777; }
+        #detailsModal .detail-value .status-badge.customer_delivered { background: #F3E8FF; color: #7E22CE; }
+        .dark #detailsModal .detail-value .status-badge.pending { background: #451A03; color: #FBBF24; }
+        .dark #detailsModal .detail-value .status-badge.currier { background: #1E3A5F; color: #60A5FA; }
+        .dark #detailsModal .detail-value .status-badge.currier_to_supplier { background: #1E1B4B; color: #818CF8; }
+        .dark #detailsModal .detail-value .status-badge.supplier_received { background: #064E3B; color: #34D399; }
+        .dark #detailsModal .detail-value .status-badge.supplier_to_shop { background: #4C0519; color: #F472B6; }
+        .dark #detailsModal .detail-value .status-badge.customer_delivered { background: #3B0764; color: #A855F7; }
+        #detailsModal .detail-full {
+            grid-column: 1 / -1;
+        }
+        #detailsModal .problem-text-detail {
+            background: #fef3c7;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #78350f;
+            border-left: 3px solid #d97706;
+            margin-top: 4px;
+        }
+        .dark #detailsModal .problem-text-detail {
+            background: #451A03;
+            color: #fdba74;
+            border-left-color: #FBBF24;
+        }
+        /* Delivery time highlight */
+        #detailsModal .delivery-time {
+            background: linear-gradient(135deg, #d4af37, #f59e0b);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-block;
+        }
+        .dark #detailsModal .delivery-time {
+            color: #1f2937;
+        }
+        #detailsModal .delivery-time-wrapper {
+            background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(245,158,11,0.05));
+            border-radius: 8px;
+            padding: 10px 12px;
+            border: 1px solid rgba(212,175,55,0.2);
+        }
+        
+        @media print {
+            body * { visibility: hidden !important; }
+            #invoiceModal, #invoiceModal * { visibility: visible !important; }
+            #invoiceModal { position:fixed !important; left:0 !important; top:0 !important; width:100% !important; height:100% !important; background:white !important; backdrop-filter:none !important; z-index:9999 !important; display:block !important; padding:0 !important; margin:0 !important; overflow:auto !important; }
+            #invoiceModal .bg-black\/60, #invoiceModal .backdrop-blur-sm { background:white !important; backdrop-filter:none !important; display:block !important; padding:0 !important; }
+            #invoiceContent { display:block !important; max-height:none !important; overflow:visible !important; padding:0 !important; }
+            .no-print, #invoiceModal .no-print, #invoiceModal .invoice-print-btn { display:none !important; }
+            #invoicePrintArea { visibility:visible !important; position:relative !important; background:white !important; padding:30px 35px !important; max-width:100% !important; margin:0 auto !important; border-radius:0 !important; box-shadow:none !important; }
+            #invoicePrintArea * { visibility:visible !important; }
+            .dark .invoice-customer-section { background:#f8fafc !important; border-left-color:#0f3b3a !important; }
+            .dark .invoice-customer-section strong { color:#374151 !important; }
+            .dark .invoice-details-table th { color:#374151 !important; border-color:#d1d5db !important; }
+            .dark .invoice-details-table td { border-color:#e5e7eb !important; }
+            .dark .invoice-details-table .label { color:#6b7280 !important; }
+            .dark .invoice-details-table .value { color:#1f2937 !important; }
+            .dark .invoice-problem-section { background:#fef3c7 !important; border-left-color:#d97706 !important; }
+            .dark .invoice-problem-section strong { color:#92400e !important; }
+            .dark .invoice-problem-section .problem-text { color:#78350f !important; }
+            .dark .invoice-footer .contact { color:#0f3b3a !important; }
         }
     </style>
 </head>
@@ -209,9 +509,8 @@
     
     <div class="flex min-h-screen">
         
-        <!-- Sidebar - Fixed Structure (No overlap issue) -->
+        <!-- Sidebar -->
         <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
-            <!-- Header - Fixed at top (does not scroll) -->
             <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
@@ -229,83 +528,50 @@
                 </div>
             </div>
             
-            <!-- Navigation - Scrollable area (scrolls independently) -->
             <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
                 <nav class="space-y-1.5">
                     <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
                         <span class="text-sm font-medium">Dashboard</span>
                     </a>
-                    
                     <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
                         <span class="text-sm font-medium">Customers</span>
                     </a>
-                    
                     <div class="has-submenu" id="dueSubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div>
-                                <span class="text-sm font-medium">Due Entry</span>
-                            </div>
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
                             <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
                         </a>
                         <div class="submenu-modern pl-9 mt-1 space-y-1">
-                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
-                            </a>
-                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
-                            </a>
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a>
+                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a>
                         </div>
                     </div>
-                    
-                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div>
-                        <span class="text-sm font-medium">Collection</span>
-                    </a>
-                    
-                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div>
-                        <span class="text-sm font-medium">Ledger</span>
-                    </a>
-                    
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span></a>
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span></a>
                     <div class="has-submenu" id="warrantySubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                            <div class="flex items-center gap-3">
-                                <div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div>
-                                <span class="text-sm font-medium">Warranty</span>
-                            </div>
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
                             <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
                         </a>
                         <div class="submenu-modern pl-9 mt-1 space-y-1">
-                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
-                            </a>
-                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
-                            </a>
-                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
-                            </a>
-                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
-                            </a>
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span></a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span></a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span></a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span></a>
                         </div>
                     </div>
-                    
                     <a href="customer-warranty.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm text-accent"></i></div>
                         <span class="text-sm font-medium">Customer Warranty</span>
                     </a>
-                    
-                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div>
-                        <span class="text-sm font-medium">Backup & Restore</span>
+                    <a href="expenses.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Expenses</span>
                     </a>
+
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span></a>
                 </nav>
-                
-                <!-- Logout Button - Now scrolls with menu -->
                 <div class="pt-4 mt-2 border-t border-white/10">
                     <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
                         <i class="fas fa-sign-out-alt text-sm w-5"></i>
@@ -318,7 +584,6 @@
         <!-- Main Content -->
         <main class="flex-1 md:ml-64 min-h-screen w-full">
             
-            <!-- Top Header -->
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
                 <div class="px-3 py-2.5 flex justify-between items-center">
                     <div class="flex items-center gap-2">
@@ -346,110 +611,158 @@
             
             <div class="p-3 md:p-4">
                 
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                <!-- Stats Cards - Status Wise -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+                    <div class="stat-card bg-white dark:bg-gray-800 rounded-xl p-3 border-2 border-gray-200 dark:border-gray-700 shadow-sm" data-status="all">
                         <div class="bg-purple-100 dark:bg-purple-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2">
                             <i class="fas fa-shield-alt text-purple-600 dark:text-purple-400 text-sm"></i>
                         </div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Total Warranty</h3>
-                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalWarranty">0</p>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[9px] font-semibold uppercase tracking-wide">Total</h3>
+                        <p class="text-lg font-bold text-gray-800 dark:text-white" id="totalWarranty">0</p>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                    <div class="stat-card bg-white dark:bg-gray-800 rounded-xl p-3 border-2 border-gray-200 dark:border-gray-700 shadow-sm" data-status="pending">
+                        <div class="bg-amber-100 dark:bg-amber-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2">
+                            <i class="fas fa-clock text-amber-600 dark:text-amber-400 text-sm"></i>
+                        </div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[9px] font-semibold uppercase tracking-wide">Pending</h3>
+                        <p class="text-lg font-bold text-amber-600 dark:text-amber-400" id="pendingCount">0</p>
+                    </div>
+                    <div class="stat-card bg-white dark:bg-gray-800 rounded-xl p-3 border-2 border-gray-200 dark:border-gray-700 shadow-sm" data-status="currier">
+                        <div class="bg-indigo-100 dark:bg-indigo-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2">
+                            <i class="fas fa-truck text-indigo-600 dark:text-indigo-400 text-sm"></i>
+                        </div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[9px] font-semibold uppercase tracking-wide">Currier</h3>
+                        <p class="text-lg font-bold text-indigo-600 dark:text-indigo-400" id="currierCount">0</p>
+                    </div>
+                    <div class="stat-card bg-white dark:bg-gray-800 rounded-xl p-3 border-2 border-gray-200 dark:border-gray-700 shadow-sm" data-status="currier_to_supplier">
+                        <div class="bg-violet-100 dark:bg-violet-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2">
+                            <i class="fas fa-exchange-alt text-violet-600 dark:text-violet-400 text-sm"></i>
+                        </div>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[9px] font-semibold uppercase tracking-wide">C→S</h3>
+                        <p class="text-lg font-bold text-violet-600 dark:text-violet-400" id="currierToSupplierCount">0</p>
+                    </div>
+                    <div class="stat-card bg-white dark:bg-gray-800 rounded-xl p-3 border-2 border-gray-200 dark:border-gray-700 shadow-sm" data-status="supplier_received">
                         <div class="bg-green-100 dark:bg-green-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2">
-                            <i class="fas fa-check-circle text-green-600 dark:text-green-400 text-sm"></i>
+                            <i class="fas fa-warehouse text-green-600 dark:text-green-400 text-sm"></i>
                         </div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Ready to Deliver</h3>
-                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="readyToDeliver">0</p>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[9px] font-semibold uppercase tracking-wide">Received</h3>
+                        <p class="text-lg font-bold text-green-600 dark:text-green-400" id="receivedCount">0</p>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                    <div class="stat-card bg-white dark:bg-gray-800 rounded-xl p-3 border-2 border-gray-200 dark:border-gray-700 shadow-sm" data-status="customer_delivered">
                         <div class="bg-blue-100 dark:bg-blue-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2">
-                            <i class="fas fa-truck text-blue-600 dark:text-blue-400 text-sm"></i>
+                            <i class="fas fa-check-double text-blue-600 dark:text-blue-400 text-sm"></i>
                         </div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wide">Delivered</h3>
-                        <p class="text-xl font-bold text-gray-800 dark:text-white" id="deliveredWarranty">0</p>
+                        <h3 class="text-gray-500 dark:text-gray-400 text-[9px] font-semibold uppercase tracking-wide">Delivered</h3>
+                        <p class="text-lg font-bold text-blue-600 dark:text-blue-400" id="deliveredCount">0</p>
                     </div>
                 </div>
                 
-                <!-- Filter Tabs Section -->
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                    <div class="flex flex-wrap gap-2">
-                        <button data-filter="all" class="filter-tab active px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">All</button>
-                        <button data-filter="today" class="filter-tab px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">Today</button>
-                        <button data-filter="week" class="filter-tab px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">This Week</button>
-                        <button data-filter="month" class="filter-tab px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">This Month</button>
-                        <button data-filter="year" class="filter-tab px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-all">This Year</button>
+                <!-- Filter Row - Equal Width Fields -->
+                <div class="filter-row flex flex-wrap items-center gap-2 mb-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 px-3 py-3 shadow-sm">
+                    <div class="text-gray-400 dark:text-gray-500 filter-icon">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <span class="filter-label text-gray-600 dark:text-gray-400 whitespace-nowrap">Filter</span>
+                    
+                    <div class="filter-group">
+                        <input type="date" id="filterDateFrom" class="bg-gray-50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50" title="From Date">
                     </div>
                     
-                    <!-- Search Bar -->
-                    <div class="relative w-full sm:w-64">
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                        <input type="text" id="customerWarrantySearch" placeholder="Search by customer name or phone..." class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-800 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <span class="date-separator text-xs text-gray-400">to</span>
+                    
+                    <div class="filter-group">
+                        <input type="date" id="filterDateTo" class="bg-gray-50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50" title="To Date">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select id="filterStatus" class="filter-select bg-gray-50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="currier">With Currier</option>
+                            <option value="currier_to_supplier">Currier→Supplier</option>
+                            <option value="supplier_received">Supplier Received</option>
+                            <option value="supplier_to_shop">Supplier→Shop</option>
+                            <option value="customer_delivered">Customer Delivered</option>
+                        </select>
+                    </div>
+                    
+                    <div class="search-wrap relative">
+                        <i class="fas fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="text" id="customerWarrantySearch" placeholder="Search customer..." class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700/50 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    </div>
+                    
+                    <div class="flex items-center gap-1 ml-auto">
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Show</span>
+                        <select id="perPageSelect" class="pagination-select bg-gray-50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50 w-16">
+                            <option value="20">20</option>
+                            <option value="50" selected>50</option>
+                            <option value="100">100</option>
+                            <option value="200">200</option>
+                        </select>
                     </div>
                 </div>
                 
-                <!-- Scroll Hint -->
                 <div class="table-scroll-hint mb-2">
-                    <i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns → <span class="mx-2">|</span> <i class="fas fa-hand-pointer mr-1 text-[8px]"></i> Tap row for details
+                    <i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns → <span class="mx-2">|</span> <i class="fas fa-hand-pointer mr-1 text-[8px]"></i> Click row for details
                 </div>
                 
                 <!-- Customer Warranty Table -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
-                    <div class="overflow-x-auto">
-                        <table class="w-full min-w-[900px]">
+                    <div class="table-wrap overflow-x-auto">
+                        <table class="w-full min-w-[1100px]">
                             <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                 <tr>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider w-12">SL</th>
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Date</th>
-                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer Name</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer</th>
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Phone</th>
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Product</th>
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Serial No</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Currier</th>
                                     <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
                                     <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="customerWarrantyBody" class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading warranty records...</p></td></tr>
+                                <tr><td colspan="9" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading warranty records...</p></td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+
+            <!-- Footer -->
+            <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                    <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span> 
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
+                    </p>
+                </div>
+            </footer>
         </main>
     </div>
     
-    <!-- Delivery Modal -->
-    <div id="deliveryModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-all duration-300 p-3">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl modal-animate overflow-hidden">
-            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white">
-                    <i class="fas fa-hand-holding-heart text-primary mr-2"></i>Deliver to Customer
+    <!-- Invoice Modal -->
+    <div id="invoiceModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[150] hidden transition-all duration-300 p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full shadow-2xl modal-animate overflow-hidden">
+            <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 no-print">
+                <h3 class="text-base font-semibold text-gray-800 dark:text-white">
+                    <i class="fas fa-file-invoice text-primary mr-2"></i>Warranty Slip
                 </h3>
-                <button id="closeDeliveryModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            <input type="hidden" id="deliveryWarrantyId">
-            <div class="p-5 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        <i class="fas fa-calendar-check text-primary mr-1 text-xs"></i> Delivery Date <span class="text-red-500">*</span>
-                    </label>
-                    <input type="date" id="deliveryDate" class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        <i class="fas fa-sticky-note text-primary mr-1 text-xs"></i> Delivery Notes
-                    </label>
-                    <textarea id="deliveryNotes" rows="3" placeholder="Add delivery notes, recipient name, etc..." class="w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
+                <div class="flex items-center gap-2">
+                    <button id="printInvoiceBtn" class="invoice-print-btn px-4 py-2 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary-dark transition-all shadow-md">
+                        <i class="fas fa-print mr-2"></i> Print
+                    </button>
+                    <button id="closeInvoiceModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
                 </div>
             </div>
-            <div class="flex justify-end gap-3 px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
-                <button id="cancelDeliveryBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 btn-active">Cancel</button>
-                <button id="confirmDeliveryBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-primary text-white shadow-md btn-active">
-                    <i class="fas fa-check-circle mr-1"></i> Confirm Delivery
-                </button>
-            </div>
+            <div class="p-4 max-h-[75vh] overflow-y-auto" id="invoiceContent"></div>
         </div>
     </div>
     
@@ -471,41 +784,73 @@
         </div>
     </div>
     
-    <!-- Auth Check Script -->
     <script type="module">
-        import { checkAuthState, logout } from './js/auth.js';
-        checkAuthState(true);
-    </script>
-    
-    <script type="module">
-        import { db, collection, getDocs, query, orderBy, updateDoc, doc } from './js/firebase.js';
+        import { db, collection, getDocs, query, orderBy, updateDoc, doc, getDoc } from './js/firebase.js';
         
-        // Sidebar submenu toggle
-        const warrantySubmenu = document.getElementById('warrantySubmenu');
-        const warrantyLink = warrantySubmenu?.querySelector('a');
-        if (warrantyLink) {
-            warrantyLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                warrantySubmenu.classList.toggle('open');
-                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
+        // ===== STATUS CONFIG =====
+        const statusConfig = {
+            'pending': { class: 'pending', icon: 'fa-clock', text: 'Pending' },
+            'currier': { class: 'currier', icon: 'fa-truck', text: 'Currier' },
+            'currier_to_supplier': { class: 'currier_to_supplier', icon: 'fa-exchange-alt', text: 'Currier→Supplier' },
+            'supplier_received': { class: 'supplier_received', icon: 'fa-check-circle', text: 'Supplier Received' },
+            'supplier_to_shop': { class: 'supplier_to_shop', icon: 'fa-undo-alt', text: 'Supplier→Shop' },
+            'customer_delivered': { class: 'customer_delivered', icon: 'fa-home', text: 'Customer Delivered' }
+        };
+        
+        function getStatusIcon(status) {
+            const config = statusConfig[status] || statusConfig['pending'];
+            return `<span class="status-icon-only ${config.class}">
+                <i class="fas ${config.icon}"></i>
+                <span class="tooltip-text">${config.text}</span>
+            </span>`;
+        }
+        function getStatusText(status) {
+            const config = statusConfig[status] || statusConfig['pending'];
+            return config.text;
+        }
+        function getStatusClass(status) {
+            const config = statusConfig[status] || statusConfig['pending'];
+            return config.class;
         }
         
-        const dueSubmenu = document.getElementById('dueSubmenu');
-        const dueLink = dueSubmenu?.querySelector('a');
-        if (dueLink) {
-            dueLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                dueSubmenu.classList.toggle('open');
-                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
+        // ===== COLOR ASSIGNMENT FOR CUSTOMER NAMES =====
+        const colorClasses = [
+            'color-1', 'color-2', 'color-3', 'color-4', 'color-5', 
+            'color-6', 'color-7', 'color-8', 'color-9', 'color-10',
+            'color-11', 'color-12'
+        ];
+        const customerColorMap = new Map();
+        let colorIndex = 0;
+        
+        function getCustomerColor(customerName) {
+            if (!customerName) return 'color-1';
+            if (customerColorMap.has(customerName)) {
+                return customerColorMap.get(customerName);
+            }
+            const color = colorClasses[colorIndex % colorClasses.length];
+            colorIndex++;
+            customerColorMap.set(customerName, color);
+            return color;
         }
+        
+        // Sidebar submenu toggles
+        document.getElementById('warrantySubmenu')?.querySelector('a')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            const el = document.getElementById('warrantySubmenu');
+            el.classList.toggle('open');
+            el.querySelector('.submenu-modern')?.classList.toggle('open');
+        });
+        document.getElementById('dueSubmenu')?.querySelector('a')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            const el = document.getElementById('dueSubmenu');
+            el.classList.toggle('open');
+            el.querySelector('.submenu-modern')?.classList.toggle('open');
+        });
         
         // Sidebar toggle
         const sidebar = document.getElementById('sidebar');
         const menuToggle = document.getElementById('menuToggle');
         const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-        
         function openSidebar() {
             sidebar.classList.remove('-translate-x-full');
             document.body.classList.add('sidebar-open');
@@ -517,33 +862,39 @@
                 document.body.appendChild(overlay);
             }
         }
-        
         function closeSidebar() {
             sidebar.classList.add('-translate-x-full');
             document.body.classList.remove('sidebar-open');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (overlay) overlay.remove();
+            document.getElementById('sidebarOverlay')?.remove();
         }
-        
-        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
-        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
-        
+        menuToggle?.addEventListener('click', openSidebar);
+        closeSidebarBtn?.addEventListener('click', closeSidebar);
         window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768) {
-                sidebar.classList.remove('-translate-x-full');
-                document.getElementById('sidebarOverlay')?.remove();
-                document.body.classList.remove('sidebar-open');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-            }
+            if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); }
         });
-        
         if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
         else sidebar.classList.add('-translate-x-full');
         
-        let currentDeliveryId = null;
+        // State
         let allWarranties = [];
-        let currentFilter = 'all';
+        let supplierNameMap = new Map();
+        let perPage = 50;
+        let currentPage = 1;
+        let activeStatusFilter = 'all';
+        
+        async function getSupplierName(supplierId) {
+            if (!supplierId) return 'N/A';
+            if (supplierNameMap.has(supplierId)) return supplierNameMap.get(supplierId);
+            try {
+                const docSnap = await getDoc(doc(db, 'suppliers', supplierId));
+                if (docSnap.exists()) {
+                    const name = docSnap.data().name || 'Unknown Supplier';
+                    supplierNameMap.set(supplierId, name);
+                    return name;
+                }
+            } catch (e) { console.warn('Could not fetch supplier:', e); }
+            return 'Unknown Supplier';
+        }
         
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
@@ -556,122 +907,59 @@
             setTimeout(() => toast.remove(), 2500);
         }
         
-        function isToday(dateStr) {
-            const today = new Date();
-            const date = new Date(dateStr);
-            return date.toDateString() === today.toDateString();
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+            return null;
         }
         
-        function isThisWeek(dateStr) {
-            const date = new Date(dateStr);
-            const today = new Date();
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - today.getDay());
-            startOfWeek.setHours(0, 0, 0, 0);
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 6);
-            return date >= startOfWeek && date <= endOfWeek;
-        }
-        
-        function isThisMonth(dateStr) {
-            const date = new Date(dateStr);
-            const today = new Date();
-            return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-        }
-        
-        function isThisYear(dateStr) {
-            const date = new Date(dateStr);
-            const today = new Date();
-            return date.getFullYear() === today.getFullYear();
-        }
-        
-        function filterWarranties(warranties, filterType) {
-            if (filterType === 'all') return warranties;
-            return warranties.filter(w => {
-                const warrantyDate = w.warrantyDate;
-                if (!warrantyDate) return false;
-                switch(filterType) {
-                    case 'today': return isToday(warrantyDate);
-                    case 'week': return isThisWeek(warrantyDate);
-                    case 'month': return isThisMonth(warrantyDate);
-                    case 'year': return isThisYear(warrantyDate);
-                    default: return true;
+        // Update stat cards active state
+        function updateActiveStat(status) {
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.classList.remove('active-stat');
+                if (card.dataset.status === status) {
+                    card.classList.add('active-stat');
                 }
             });
         }
         
-        function exportToCSV() {
-            const searchTerm = document.getElementById('customerWarrantySearch').value.toLowerCase();
-            let filteredData = filterWarranties(allWarranties, currentFilter);
-            if (searchTerm) {
-                filteredData = filteredData.filter(w => 
-                    (w.customerName && w.customerName.toLowerCase().includes(searchTerm)) ||
-                    (w.customerPhone && w.customerPhone.includes(searchTerm))
-                );
-            }
-            
-            if (filteredData.length === 0) {
-                showToast('No data to export', 'error');
-                return;
-            }
-            
-            const headers = ['Date', 'Customer Name', 'Phone', 'Product', 'Serial Number', 'Status', 'Remarks', 'Delivery Date', 'Delivery Notes'];
-            const rows = filteredData.map(w => [
-                w.warrantyDate || 'N/A',
-                w.customerName || 'N/A',
-                w.customerPhone || 'N/A',
-                w.productName || 'N/A',
-                w.serialNumber || 'N/A',
-                w.status === 'pending' ? 'Pending' : w.status === 'received' ? 'Ready to Deliver' : 'Delivered',
-                w.remarks || 'N/A',
-                w.deliveredDate || 'N/A',
-                w.deliveryNotes || 'N/A'
-            ]);
-            
-            const csvContent = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.href = url;
-            link.setAttribute('download', `customer_warranty_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            showToast('Data exported successfully!', 'success');
-        }
-        
-        async function loadCustomerWarranties() {
-            const tbody = document.getElementById('customerWarrantyBody');
-            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading warranty records...</p></td>';
-            
-            try {
-                const q = query(collection(db, 'warranties'), orderBy('createdAt', 'desc'));
-                const querySnapshot = await getDocs(q);
-                allWarranties = [];
-                
-                for (const docSnap of querySnapshot.docs) {
-                    allWarranties.push({ id: docSnap.id, ...docSnap.data() });
-                }
-                
-                const total = allWarranties.length;
-                const readyToDeliver = allWarranties.filter(w => w.status === 'received').length;
-                const delivered = allWarranties.filter(w => w.status === 'delivered').length;
-                document.getElementById('totalWarranty').textContent = total;
-                document.getElementById('readyToDeliver').textContent = readyToDeliver;
-                document.getElementById('deliveredWarranty').textContent = delivered;
-                
-                applyFiltersAndRender();
-                
-            } catch (error) {
-                console.error('Error loading warranties:', error);
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td>';
-            }
-        }
-        
         function applyFiltersAndRender() {
             const searchTerm = document.getElementById('customerWarrantySearch').value.toLowerCase();
-            let filtered = filterWarranties(allWarranties, currentFilter);
+            const statusFilter = document.getElementById('filterStatus').value;
+            const fromDate = document.getElementById('filterDateFrom').value;
+            const toDate = document.getElementById('filterDateTo').value;
+            
+            activeStatusFilter = statusFilter;
+            updateActiveStat(statusFilter);
+            
+            let filtered = allWarranties;
+            
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(w => w.status === statusFilter);
+            }
+            
+            if (fromDate) {
+                const from = parseDate(fromDate);
+                if (from) {
+                    filtered = filtered.filter(w => {
+                        const wDate = w.warrantyDate ? parseDate(w.warrantyDate) : null;
+                        return wDate && wDate >= from;
+                    });
+                }
+            }
+            if (toDate) {
+                const to = parseDate(toDate);
+                if (to) {
+                    to.setHours(23,59,59,999);
+                    filtered = filtered.filter(w => {
+                        const wDate = w.warrantyDate ? parseDate(w.warrantyDate) : null;
+                        return wDate && wDate <= to;
+                    });
+                }
+            }
             
             if (searchTerm) {
                 filtered = filtered.filter(w => 
@@ -680,233 +968,472 @@
                 );
             }
             
-            renderTable(filtered);
+            const start = (currentPage - 1) * perPage;
+            const end = start + perPage;
+            const paginated = filtered.slice(start, end);
+            renderTable(paginated, filtered.length);
         }
         
-        function renderTable(filtered) {
+        function renderTable(filtered, totalCount = 0) {
             const tbody = document.getElementById('customerWarrantyBody');
-            
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No warranty records found</p></td>';
+                tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No warranty records found</p></td>';
                 return;
             }
-            
             tbody.innerHTML = '';
-            for (const warranty of filtered) {
-                const statusClass = warranty.status === 'pending' ? 'status-pending' : warranty.status === 'received' ? 'status-received' : 'status-delivered';
-                const statusText = warranty.status === 'pending' ? 'Pending' : warranty.status === 'received' ? 'Ready to Deliver' : 'Delivered';
-                const statusIcon = warranty.status === 'pending' ? 'fa-clock' : warranty.status === 'received' ? 'fa-check-circle' : 'fa-check-double';
+            
+            const startIndex = (currentPage - 1) * perPage;
+            
+            for (let i = 0; i < filtered.length; i++) {
+                const warranty = filtered[i];
+                const statusIcon = getStatusIcon(warranty.status);
+                const slNo = startIndex + i + 1;
+                
+                // Get color for customer name
+                const colorClass = getCustomerColor(warranty.customerName);
                 
                 const row = tbody.insertRow();
-                row.className = 'table-row-hover transition-colors cursor-pointer';
+                row.className = 'table-row-hover transition-colors';
                 row.setAttribute('data-warranty-id', warranty.id);
-                row.setAttribute('data-customer-name', warranty.customerName);
-                row.setAttribute('data-customer-phone', warranty.customerPhone || '-');
-                row.setAttribute('data-product-name', warranty.productName);
-                row.setAttribute('data-serial-number', warranty.serialNumber || '-');
-                row.setAttribute('data-warranty-date', warranty.warrantyDate || 'N/A');
-                row.setAttribute('data-status', statusText);
-                row.setAttribute('data-remarks', warranty.remarks || '-');
-                row.setAttribute('data-delivery-notes', warranty.deliveryNotes || '-');
-                row.setAttribute('data-delivered-date', warranty.deliveredDate || 'N/A');
-                
+                row.addEventListener('click', () => showDetailsModal(warranty));
                 row.innerHTML = `
+                    <td class="px-3 py-2.5 text-center text-sm font-semibold text-gray-500">${slNo}</td>
                     <td class="px-3 py-2.5 text-sm whitespace-nowrap">${escapeHtml(warranty.warrantyDate || 'N/A')}</td>
-                    <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(warranty.customerName)}</td>
+                    <td class="px-3 py-2.5">
+                        <span class="customer-name ${colorClass}">${escapeHtml(warranty.customerName)}</span>
+                    </td>
                     <td class="px-3 py-2.5 text-sm">${escapeHtml(warranty.customerPhone || '-')}</td>
                     <td class="px-3 py-2.5 text-sm">${escapeHtml(warranty.productName)}</td>
                     <td class="px-3 py-2.5 text-xs font-mono">${escapeHtml(warranty.serialNumber || '-')}</td>
+                    <td class="px-3 py-2.5 text-xs">${escapeHtml(warranty.currierName || '-')}</td>
+                    <td class="px-3 py-2.5 text-center">${statusIcon}</td>
                     <td class="px-3 py-2.5 text-center">
-                        <span class="status-badge ${statusClass}">
-                            <i class="fas ${statusIcon} text-[10px]"></i> ${statusText}
-                        </span>
-                    </td>
-                    <td class="px-3 py-2.5 text-center">
-                        ${warranty.status === 'received' ? 
-                            `<button class="deliver-warranty text-green-600 hover:text-green-800 p-1.5 rounded-lg transition-colors" data-id="${warranty.id}" title="Mark as Delivered">
-                                <i class="fas fa-hand-holding-heart text-sm"></i>
-                            </button>` : 
-                            warranty.status === 'delivered' ?
-                            `<span class="text-green-600 text-xs"><i class="fas fa-check-circle"></i> Completed</span>` :
-                            `<span class="text-gray-400 text-xs"><i class="fas fa-spinner fa-pulse"></i> Processing</span>`
-                        }
+                        <div class="flex items-center justify-center gap-1.5" onclick="event.stopPropagation();">
+                            <button class="action-btn invoice-btn text-primary hover:bg-primary/10" data-id="${warranty.id}" title="Generate Slip">
+                                <i class="fas fa-file-invoice text-sm"></i>
+                                <span class="tooltip-text">Generate Slip</span>
+                            </button>
+                        </div>
                     </td>
                 `;
             }
             
-            // Row click for details modal
-            document.querySelectorAll('#customerWarrantyBody tr').forEach(row => {
-                row.addEventListener('click', (e) => {
-                    if (e.target.closest('button')) return;
-                    const data = row.dataset;
-                    const detailsHtml = `
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                                <span class="text-xs text-gray-500">Warranty Date</span>
-                                <span class="font-semibold text-sm">${data.warrantyDate}</span>
-                            </div>
-                            <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                                <span class="text-xs text-gray-500">Customer Name</span>
-                                <span class="font-semibold text-sm">${escapeHtml(data.customerName)}</span>
-                            </div>
-                            <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                                <span class="text-xs text-gray-500">Phone</span>
-                                <span class="text-sm">${escapeHtml(data.customerPhone)}</span>
-                            </div>
-                            <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                                <span class="text-xs text-gray-500">Product</span>
-                                <span class="text-sm font-medium">${escapeHtml(data.productName)}</span>
-                            </div>
-                            <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                                <span class="text-xs text-gray-500">Serial Number</span>
-                                <span class="text-xs font-mono">${escapeHtml(data.serialNumber)}</span>
-                            </div>
-                            <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700">
-                                <span class="text-xs text-gray-500">Status</span>
-                                <span class="text-sm font-semibold">${escapeHtml(data.status)}</span>
-                            </div>
-                            <div class="flex justify-between items-start pb-2 border-b border-gray-200 dark:border-gray-700">
-                                <span class="text-xs text-gray-500">Remarks</span>
-                                <span class="text-sm text-right max-w-[200px]">${escapeHtml(data.remarks)}</span>
-                            </div>
-                            ${data.status === 'Delivered' ? `
-                            <div class="flex justify-between items-start pb-2 border-b border-gray-200 dark:border-gray-700">
-                                <span class="text-xs text-gray-500">Delivery Date</span>
-                                <span class="text-sm">${data.deliveredDate}</span>
-                            </div>
-                            <div class="flex justify-between items-start">
-                                <span class="text-xs text-gray-500">Delivery Notes</span>
-                                <span class="text-sm text-right max-w-[200px]">${escapeHtml(data.deliveryNotes)}</span>
-                            </div>
-                            ` : ''}
-                        </div>
-                    `;
-                    
-                    const detailsModal = document.createElement('div');
-                    detailsModal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[150] hidden transition-all duration-300 p-3';
-                    detailsModal.innerHTML = `
-                        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full shadow-2xl modal-animate overflow-hidden">
-                            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
-                                <h3 class="text-base font-semibold text-gray-800 dark:text-white">
-                                    <i class="fas fa-info-circle text-primary mr-2"></i>Warranty Details
-                                </h3>
-                                <button class="close-details-modal text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
-                                    <i class="fas fa-times text-xl"></i>
-                                </button>
-                            </div>
-                            <div class="p-5">${detailsHtml}</div>
-                            <div class="flex justify-end px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700">
-                                <button class="close-details-modal-footer px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 btn-active">Close</button>
-                            </div>
-                        </div>
-                    `;
-                    document.body.appendChild(detailsModal);
-                    detailsModal.classList.remove('hidden');
-                    
-                    const closeModal = () => {
-                        detailsModal.classList.add('hidden');
-                        setTimeout(() => detailsModal.remove(), 300);
-                    };
-                    detailsModal.querySelectorAll('.close-details-modal, .close-details-modal-footer').forEach(btn => {
-                        btn.addEventListener('click', closeModal);
-                    });
-                    detailsModal.addEventListener('click', (e) => { if (e.target === detailsModal) closeModal(); });
-                });
-            });
-            
-            document.querySelectorAll('.deliver-warranty').forEach(btn => {
+            document.querySelectorAll('.invoice-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    currentDeliveryId = btn.dataset.id;
-                    document.getElementById('deliveryModal').classList.remove('hidden');
-                    document.getElementById('deliveryDate').valueAsDate = new Date();
-                    document.getElementById('deliveryNotes').value = '';
+                    const id = btn.dataset.id;
+                    const warranty = allWarranties.find(w => w.id === id);
+                    if (warranty) showInvoiceModal(warranty);
                 });
             });
         }
         
-        async function confirmDelivery() {
-            const deliveryDate = document.getElementById('deliveryDate').value;
-            const deliveryNotes = document.getElementById('deliveryNotes').value;
-            
-            if (!deliveryDate) {
-                showToast('Please select delivery date', 'error');
-                return;
+        // ===== FORMAT DELIVERY TIME =====
+        function formatDeliveryTime(warranty) {
+            if (warranty.status === 'customer_delivered') {
+                if (warranty.deliveredDate) {
+                    try {
+                        let date = new Date(warranty.deliveredDate);
+                        if (!isNaN(date.getTime())) {
+                            return date.toLocaleString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true
+                            });
+                        }
+                    } catch (e) {}
+                }
+                
+                if (warranty.statusUpdatedAt) {
+                    try {
+                        let date;
+                        if (typeof warranty.statusUpdatedAt === 'object' && warranty.statusUpdatedAt.seconds) {
+                            date = new Date(warranty.statusUpdatedAt.seconds * 1000);
+                        } else {
+                            date = new Date(warranty.statusUpdatedAt);
+                        }
+                        if (!isNaN(date.getTime())) {
+                            return date.toLocaleString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true
+                            });
+                        }
+                    } catch (e) {}
+                }
+                
+                if (warranty.updatedAt) {
+                    try {
+                        let date;
+                        if (typeof warranty.updatedAt === 'object' && warranty.updatedAt.seconds) {
+                            date = new Date(warranty.updatedAt.seconds * 1000);
+                        } else {
+                            date = new Date(warranty.updatedAt);
+                        }
+                        if (!isNaN(date.getTime())) {
+                            return date.toLocaleString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true
+                            });
+                        }
+                    } catch (e) {}
+                }
             }
-            
-            try {
-                await updateDoc(doc(db, 'warranties', currentDeliveryId), {
-                    status: 'delivered',
-                    deliveredDate: deliveryDate,
-                    deliveryNotes: deliveryNotes,
-                    statusUpdatedAt: new Date().toISOString()
-                });
-                showToast('Warranty marked as delivered to customer successfully!', 'success');
-                document.getElementById('deliveryModal').classList.add('hidden');
-                loadCustomerWarranties();
-            } catch (error) {
-                console.error('Delivery error:', error);
-                showToast('Error updating delivery status', 'error');
-            }
+            return null;
         }
         
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
-        }
-        
-        // Event listeners
-        document.getElementById('exportBtn').addEventListener('click', exportToCSV);
-        document.getElementById('refreshBtn').addEventListener('click', () => {
-            loadCustomerWarranties();
-            showToast('Data refreshed!', 'success');
-        });
-        document.getElementById('customerWarrantySearch').addEventListener('input', () => applyFiltersAndRender());
-        document.getElementById('darkModeToggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            document.body.classList.toggle('dark');
-        });
-        
-        document.querySelectorAll('.filter-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                currentFilter = tab.dataset.filter;
-                applyFiltersAndRender();
+        // ===== DETAILS MODAL =====
+        function showDetailsModal(warranty) {
+            const statusClass = getStatusClass(warranty.status);
+            const statusText = getStatusText(warranty.status);
+            const deliveryTime = formatDeliveryTime(warranty);
+            
+            const existingModal = document.getElementById('detailsModal');
+            if (existingModal) existingModal.remove();
+            
+            const detailsModal = document.createElement('div');
+            detailsModal.id = 'detailsModal';
+            detailsModal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[160] transition-all duration-300 p-3';
+            
+            detailsModal.innerHTML = `
+                <div class="modal-content bg-white dark:bg-gray-800 rounded-2xl shadow-2xl modal-animate">
+                    <div class="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <i class="fas fa-shield-alt text-primary text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-800 dark:text-white">Warranty Details</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">#${warranty.warrantyId || warranty.id.slice(0, 12)}</p>
+                            </div>
+                        </div>
+                        <button class="close-details-modal text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-body px-6 py-4">
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-calendar-alt mr-1 text-[8px]"></i> Date</span>
+                                <span class="detail-value">${warranty.warrantyDate || 'N/A'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-info-circle mr-1 text-[8px]"></i> Status</span>
+                                <span class="detail-value">
+                                    <span class="status-badge ${statusClass}">
+                                        <i class="fas ${statusConfig[warranty.status]?.icon || 'fa-clock'}"></i> ${statusText}
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="detail-item detail-full">
+                                <span class="detail-label"><i class="fas fa-user mr-1 text-[8px]"></i> Customer</span>
+                                <span class="detail-value text-lg">${escapeHtml(warranty.customerName)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-phone mr-1 text-[8px]"></i> Phone</span>
+                                <span class="detail-value">${escapeHtml(warranty.customerPhone || '-')}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-box mr-1 text-[8px]"></i> Product</span>
+                                <span class="detail-value">${escapeHtml(warranty.productName)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-barcode mr-1 text-[8px]"></i> Serial Number</span>
+                                <span class="detail-value serial">${escapeHtml(warranty.serialNumber || '-')}</span>
+                            </div>
+                            ${warranty.newSerialNumber ? `
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-exchange-alt mr-1 text-[8px]"></i> New Serial</span>
+                                <span class="detail-value serial" style="color:#22c55e;">${escapeHtml(warranty.newSerialNumber)}</span>
+                            </div>` : ''}
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-building mr-1 text-[8px]"></i> Supplier</span>
+                                <span class="detail-value text-primary">${escapeHtml(warranty.supplierName)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-truck mr-1 text-[8px]"></i> Currier</span>
+                                <span class="detail-value">${escapeHtml(warranty.currierName || 'Not dispatched')}</span>
+                            </div>
+                            ${warranty.currierTracking ? `
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-search mr-1 text-[8px]"></i> Tracking</span>
+                                <span class="detail-value font-mono text-xs">${escapeHtml(warranty.currierTracking)}</span>
+                            </div>` : ''}
+                            ${warranty.supplierReceivedDate ? `
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="fas fa-warehouse mr-1 text-[8px]"></i> Supplier Received</span>
+                                <span class="detail-value">${warranty.supplierReceivedDate}</span>
+                            </div>` : ''}
+                            ${deliveryTime ? `
+                            <div class="detail-item detail-full delivery-time-wrapper">
+                                <span class="detail-label" style="color: #d4af37;"><i class="fas fa-clock mr-1 text-[8px]"></i> Delivery Date & Time</span>
+                                <span class="detail-value" style="font-size: 16px;">
+                                    <span class="delivery-time">
+                                        <i class="fas fa-check-circle mr-1"></i> ${deliveryTime}
+                                    </span>
+                                </span>
+                            </div>` : `
+                            ${warranty.status === 'customer_delivered' ? `
+                            <div class="detail-item detail-full delivery-time-wrapper">
+                                <span class="detail-label" style="color: #d4af37;"><i class="fas fa-clock mr-1 text-[8px]"></i> Delivery Date & Time</span>
+                                <span class="detail-value" style="font-size: 16px; color: #f59e0b;">
+                                    <i class="fas fa-hourglass-half mr-1"></i> Delivery time not recorded
+                                </span>
+                            </div>` : ''}`}
+                            ${warranty.problemDescription ? `
+                            <div class="detail-item detail-full">
+                                <span class="detail-label"><i class="fas fa-exclamation-triangle mr-1 text-[8px]"></i> Problem Description</span>
+                                <div class="problem-text-detail">${escapeHtml(warranty.problemDescription)}</div>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end gap-2 px-6 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+                        <button class="close-details-modal-footer px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 btn-active">
+                            Close
+                        </button>
+                        <button class="invoice-from-details px-5 py-2.5 text-sm font-medium rounded-xl bg-primary text-white hover:bg-primary-dark btn-active" data-id="${warranty.id}">
+                            <i class="fas fa-file-invoice mr-2"></i> Generate Slip
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(detailsModal);
+            detailsModal.classList.remove('hidden');
+            
+            const closeModal = () => { 
+                detailsModal.classList.add('hidden'); 
+                setTimeout(() => detailsModal.remove(), 300);
+            };
+            
+            detailsModal.querySelectorAll('.close-details-modal, .close-details-modal-footer').forEach(btn => {
+                btn.addEventListener('click', closeModal);
             });
-        });
-        
-        document.getElementById('confirmDeliveryBtn').addEventListener('click', confirmDelivery);
-        document.getElementById('closeDeliveryModalBtn').addEventListener('click', () => document.getElementById('deliveryModal').classList.add('hidden'));
-        document.getElementById('cancelDeliveryBtn').addEventListener('click', () => document.getElementById('deliveryModal').classList.add('hidden'));
-        
-        const deliveryModal = document.getElementById('deliveryModal');
-        if (deliveryModal) {
-            deliveryModal.addEventListener('click', (e) => {
-                if (e.target === deliveryModal) {
-                    deliveryModal.classList.add('hidden');
+            
+            detailsModal.addEventListener('click', (e) => {
+                if (e.target === detailsModal) closeModal();
+            });
+            
+            detailsModal.querySelector('.invoice-from-details')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = e.target.dataset.id;
+                const warranty = allWarranties.find(w => w.id === id);
+                if (warranty) {
+                    closeModal();
+                    setTimeout(() => showInvoiceModal(warranty), 300);
                 }
             });
         }
         
-        // Logout functionality
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+        }
+        
+        // ===== INVOICE / SLIP =====
+        function generateInvoiceHTML(warranty) {
+            const statusText = getStatusText(warranty.status);
+            const statusClass = getStatusClass(warranty.status);
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            const deliveryTime = formatDeliveryTime(warranty);
+            
+            return `
+                <div id="invoicePrintArea">
+                    <div class="invoice-slip-header">
+                        <h1>${escapeHtml(warranty.businessName || 'Elias Computer')}</h1>
+                        <div class="sub-title">Warranty Management System</div>
+                        <div class="slip-title">Warranty Receipt / Slip</div>
+                    </div>
+                    <hr class="invoice-divider">
+                    <div class="invoice-receipt-info">
+                        <div class="left-info">
+                            <strong>Receipt #:</strong> ${warranty.warrantyId || warranty.id.slice(0, 12)}<br>
+                            <strong>Date:</strong> ${dateStr}<br>
+                            <strong>Time:</strong> ${timeStr}
+                        </div>
+                        <div class="right-info">
+                            <span class="status-badge-invoice ${statusClass}">
+                                <i class="fas ${statusConfig[warranty.status]?.icon || 'fa-clock'}"></i> ${statusText}
+                            </span>
+                        </div>
+                    </div>
+                    <hr class="invoice-divider">
+                    <div class="invoice-customer-section">
+                        <div><strong>Customer:</strong> ${escapeHtml(warranty.customerName || 'N/A')}</div>
+                        <div><strong>Phone:</strong> ${escapeHtml(warranty.customerPhone || 'N/A')}</div>
+                        <div><strong>Currier:</strong> ${escapeHtml(warranty.currierName || 'Not dispatched yet')}</div>
+                        ${warranty.currierTracking ? `<div><strong>Tracking:</strong> ${escapeHtml(warranty.currierTracking)}</div>` : ''}
+                        ${deliveryTime ? `<div style="margin-top: 8px; padding: 8px 16px; background: linear-gradient(135deg, #d4af37, #f59e0b); color: white; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 13px;"><i class="fas fa-clock"></i> Delivered: ${deliveryTime}</div>` : ''}
+                        ${!deliveryTime && warranty.status === 'customer_delivered' ? `<div style="margin-top: 8px; padding: 6px 12px; background: #fef3c7; color: #92400e; border-radius: 6px; display: inline-block; font-size: 12px; border: 1px solid #f59e0b;"><i class="fas fa-hourglass-half"></i> Delivery time not recorded</div>` : ''}
+                    </div>
+                    <table class="invoice-details-table">
+                        <thead><tr><th style="width:40%;">Description</th><th style="width:60%;">Details</th></tr></thead>
+                        <tbody>
+                            <tr><td class="label">Warranty Date</td><td class="value">${warranty.warrantyDate || 'N/A'}</td></tr>
+                            <tr><td class="label">Product Name</td><td class="value">${escapeHtml(warranty.productName || 'N/A')}</td></tr>
+                            <tr><td class="label">Serial Number</td><td class="serial-value">${escapeHtml(warranty.serialNumber || 'N/A')}</td></tr>
+                            ${warranty.newSerialNumber ? `<tr><td class="label">New Serial (Replaced)</td><td class="serial-value" style="color:#22c55e;">${escapeHtml(warranty.newSerialNumber)}</td></tr>` : ''}
+                            <tr><td class="label">Supplier</td><td class="value">${escapeHtml(warranty.supplierName || 'N/A')}</td></tr>
+                            <tr><td class="label">Currier</td><td class="value">${escapeHtml(warranty.currierName || 'Not dispatched yet')}</td></tr>
+                            ${warranty.supplierReceivedDate ? `<tr><td class="label">Supplier Received</td><td class="value">${warranty.supplierReceivedDate}</td></tr>` : ''}
+                            ${deliveryTime ? `<tr><td class="label" style="font-weight: 700; color: #d4af37;">Delivery Date & Time</td><td class="value" style="font-weight: 700; color: #d4af37;">${deliveryTime}</td></tr>` : ''}
+                        </tbody>
+                    </table>
+                    ${warranty.problemDescription ? `
+                    <div class="invoice-problem-section">
+                        <strong><i class="fas fa-exclamation-triangle"></i> Problem Description</strong>
+                        <div class="problem-text">${escapeHtml(warranty.problemDescription)}</div>
+                    </div>` : ''}
+                    <div class="invoice-footer">
+                        <p>This is a computer generated receipt. Thank you for choosing JackDev.</p>
+                        <p class="contact"><i class="fas fa-phone"></i> For any query, please contact 01711-204628</p>
+                        <div class="ref">${dateStr} • Ref: ${warranty.warrantyId || warranty.id.slice(0, 8)}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showInvoiceModal(warranty) {
+            document.getElementById('invoiceContent').innerHTML = generateInvoiceHTML(warranty);
+            document.getElementById('invoiceModal').classList.remove('hidden');
+        }
+        
+        // ===== STAT CARD CLICK HANDLER =====
+        function setupStatCards() {
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const status = card.dataset.status;
+                    const statusSelect = document.getElementById('filterStatus');
+                    statusSelect.value = status;
+                    activeStatusFilter = status;
+                    updateActiveStat(status);
+                    applyFiltersAndRender();
+                });
+            });
+        }
+        
+        // Load data
+        async function loadCustomerWarranties() {
+            const tbody = document.getElementById('customerWarrantyBody');
+            tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading warranty records...</p></td>';
+            try {
+                const q = query(collection(db, 'warranties'), orderBy('createdAt', 'desc'));
+                const querySnapshot = await getDocs(q);
+                allWarranties = [];
+                const supplierIds = new Set();
+                for (const docSnap of querySnapshot.docs) {
+                    const data = docSnap.data();
+                    if (data.supplierId) supplierIds.add(data.supplierId);
+                }
+                for (const supplierId of supplierIds) {
+                    await getSupplierName(supplierId);
+                }
+                for (const docSnap of querySnapshot.docs) {
+                    const data = docSnap.data();
+                    allWarranties.push({ 
+                        id: docSnap.id, 
+                        ...data,
+                        supplierName: data.supplierId ? await getSupplierName(data.supplierId) : 'N/A'
+                    });
+                }
+                
+                // Update stat cards
+                document.getElementById('totalWarranty').textContent = allWarranties.length;
+                document.getElementById('pendingCount').textContent = allWarranties.filter(w => w.status === 'pending').length;
+                document.getElementById('currierCount').textContent = allWarranties.filter(w => w.status === 'currier').length;
+                document.getElementById('currierToSupplierCount').textContent = allWarranties.filter(w => w.status === 'currier_to_supplier').length;
+                document.getElementById('receivedCount').textContent = allWarranties.filter(w => w.status === 'supplier_received').length;
+                document.getElementById('deliveredCount').textContent = allWarranties.filter(w => w.status === 'customer_delivered').length;
+                
+                applyFiltersAndRender();
+                setupStatCards();
+            } catch (error) {
+                console.error('Error loading warranties:', error);
+                tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const searchTerm = document.getElementById('customerWarrantySearch').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            let filtered = allWarranties;
+            if (statusFilter !== 'all') filtered = filtered.filter(w => w.status === statusFilter);
+            if (searchTerm) filtered = filtered.filter(w => (w.customerName && w.customerName.toLowerCase().includes(searchTerm)) || (w.customerPhone && w.customerPhone.includes(searchTerm)));
+            if (filtered.length === 0) { showToast('No data to export', 'error'); return; }
+            const headers = ['Date','Customer Name','Phone','Product','Serial Number','Currier Name','Supplier','Status','Delivery Date & Time'];
+            const rows = filtered.map(w => [
+                w.warrantyDate||'N/A', 
+                w.customerName||'N/A', 
+                w.customerPhone||'N/A', 
+                w.productName||'N/A', 
+                w.serialNumber||'N/A', 
+                w.currierName||'N/A', 
+                w.supplierName||'N/A', 
+                getStatusText(w.status),
+                formatDeliveryTime(w) || 'N/A'
+            ]);
+            const csvContent = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `customer_warranty_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            showToast('Data exported successfully!', 'success');
+        });
+        
+        document.getElementById('refreshBtn').addEventListener('click', () => { loadCustomerWarranties(); showToast('Data refreshed!', 'success'); });
+        document.getElementById('customerWarrantySearch').addEventListener('input', applyFiltersAndRender);
+        document.getElementById('filterStatus').addEventListener('change', applyFiltersAndRender);
+        document.getElementById('filterDateFrom').addEventListener('change', applyFiltersAndRender);
+        document.getElementById('filterDateTo').addEventListener('change', applyFiltersAndRender);
+        document.getElementById('perPageSelect').addEventListener('change', (e) => {
+            perPage = parseInt(e.target.value);
+            currentPage = 1;
+            applyFiltersAndRender();
+        });
+        document.getElementById('darkModeToggle').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
+        
+        // Invoice modal events
+        document.getElementById('closeInvoiceModalBtn').addEventListener('click', () => document.getElementById('invoiceModal').classList.add('hidden'));
+        document.getElementById('printInvoiceBtn').addEventListener('click', () => {
+            const modal = document.getElementById('invoiceModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => window.print(), 300);
+        });
+        document.getElementById('invoiceModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('invoiceModal')) document.getElementById('invoiceModal').classList.add('hidden');
+        });
+        
+        // Logout
         const logoutModal = document.getElementById('logoutModal');
         const logoutLink = document.getElementById('logoutLink');
         const cancelLogout = document.getElementById('cancelLogoutBtn');
         const confirmLogout = document.getElementById('confirmLogoutBtn');
         const { logout } = await import('./js/auth.js');
+        logoutLink?.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
+        cancelLogout?.addEventListener('click', () => logoutModal.classList.add('hidden'));
+        confirmLogout?.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
         
-        if (logoutLink) {
-            logoutLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                logoutModal.classList.remove('hidden');
-            });
-        }
-        if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
-        if (confirmLogout) confirmLogout.addEventListener('click', async () => {
-            logoutModal.classList.add('hidden');
-            await logout();
-        });
+        // Footer year
+        document.getElementById('footerYear').textContent = new Date().getFullYear();
         
         // Initialize
         loadCustomerWarranties();

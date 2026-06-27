@@ -34,7 +34,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
         
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
-        body { font-family: 'Inter', system-ui, sans-serif; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; }
         
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
@@ -55,26 +55,16 @@
             overflow: hidden;
             transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .submenu-modern.open {
-            max-height: 280px;
-        }
+        .submenu-modern.open { max-height: 280px; }
         
-        .has-submenu > a .chevron-icon {
-            transition: transform 0.2s ease;
-        }
-        .has-submenu.open > a .chevron-icon {
-            transform: rotate(180deg);
-        }
+        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
+        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
         
         @keyframes modalSlideUp {
             from { opacity: 0; transform: translateY(20px) scale(0.96); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .modal-animate {
-            animation: modalSlideUp 0.2s ease-out forwards;
-        }
-        
-        .btn-active:active { transform: scale(0.97); }
+        .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
         
         .status-badge {
             display: inline-flex;
@@ -95,141 +85,305 @@
         .table-row-hover:hover { background-color: rgba(15, 59, 58, 0.04); }
         .dark .table-row-hover:hover { background-color: rgba(30, 107, 104, 0.1); }
         
-        .mobile-card-view {
-            display: none;
-        }
-        
-        @media (max-width: 768px) {
-            .desktop-table-view {
-                display: none;
-            }
-            .mobile-card-view {
-                display: block;
-            }
-            .mobile-stat-card {
-                padding: 12px;
-            }
-            .stat-value {
-                font-size: 1.25rem;
-            }
-        }
-        
-        .selected-warranty-row {
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .selected-warranty-row.selected {
-            background-color: rgba(15, 59, 58, 0.15);
-            border-left: 3px solid #d4af37;
-        }
-        .dark .selected-warranty-row.selected {
-            background-color: rgba(30, 107, 104, 0.3);
-        }
-        
-        /* Mobile Optimized Cards */
-        .dispatch-card {
-            background: white;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border: 1px solid #e5e7eb;
-        }
-        .dark .dispatch-card {
-            background: #1f2937;
-            border-color: #374151;
-        }
-        
         .warranty-card {
             background: white;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
             border: 1px solid #e5e7eb;
             transition: all 0.2s;
+            cursor: pointer;
         }
-        .dark .warranty-card {
-            background: #1f2937;
-            border-color: #374151;
-        }
+        .dark .warranty-card { background: #1f2937; border-color: #374151; }
         .warranty-card.selected {
-            border-left: 4px solid #d4af37;
-            background: rgba(15, 59, 58, 0.05);
+            border-left: 3px solid #d4af37;
+            background: rgba(15, 59, 58, 0.04);
         }
         
-        .floating-action-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 45;
+        /* Filter row styles */
+        .filter-input {
+            width: 100%;
+            padding: 6px 10px;
+            padding-left: 32px;
+            font-size: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            color: #1f2937;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .filter-input:focus {
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 2px rgba(15, 59, 58, 0.1);
+        }
+        .dark .filter-input {
+            background: #1f2937;
+            border-color: #4b5563;
+            color: #f1f5f9;
+        }
+        .dark .filter-input:focus {
+            border-color: #1e6b68;
+            box-shadow: 0 0 0 2px rgba(30, 107, 104, 0.15);
+        }
+        .filter-wrapper { position: relative; width: 100%; }
+        .filter-wrapper i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 12px; }
+        .filter-clear-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 12px;
             display: none;
+            padding: 2px;
+        }
+        .filter-clear-btn:hover { color: #ef4444; }
+        .filter-wrapper input.has-value + .filter-clear-btn { display: block; }
+        
+        .filter-select {
+            padding: 6px 10px;
+            font-size: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            color: #1f2937;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            min-width: 70px;
+        }
+        .filter-select:focus {
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 2px rgba(15, 59, 58, 0.1);
+        }
+        .dark .filter-select {
+            background: #1f2937;
+            border-color: #4b5563;
+            color: #f1f5f9;
+        }
+        .dark .filter-select:focus {
+            border-color: #1e6b68;
+            box-shadow: 0 0 0 2px rgba(30, 107, 104, 0.15);
+        }
+        .filter-select option {
+            background: white;
+            color: #1f2937;
+        }
+        .dark .filter-select option {
+            background: #1f2937;
+            color: #f1f5f9;
         }
         
-        @media (max-width: 768px) {
-            .floating-action-btn {
-                display: block;
-            }
+        .filter-label {
+            font-size: 12px;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+        .dark .filter-label {
+            color: #9ca3af;
         }
         
-        /* Invoice Print Styles */
-        @media print {
-            body * { visibility: hidden; }
-            #invoiceModal, #invoiceModal * { visibility: visible; }
-            #invoiceModal { position: fixed; top: 0; left: 0; width: 100%; background: white; display: block !important; z-index: 9999; }
-            #invoiceModal .modal-animate { animation: none; }
-            .no-print { display: none !important; }
-            .invoice-container { padding: 20px; }
+        .pagination-btn {
+            transition: all 0.2s ease;
+            padding: 4px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: white;
+            cursor: pointer;
+        }
+        .pagination-btn:hover:not(:disabled) {
+            background: #0f3b3a;
+            color: white;
+            transform: translateY(-1px);
+        }
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .dark .pagination-btn {
+            background: #1f2937;
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+        .dark .pagination-btn:hover:not(:disabled) {
+            background: #0f3b3a;
+            color: white;
         }
         
+        /* ==================== INVOICE STYLES ==================== */
         .invoice-container {
-            font-family: 'Inter', monospace;
-            max-width: 900px;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
-            padding: 30px;
-            border: 1px solid #ddd;
+            padding: 25px 30px;
+            color: #1a1a2e;
+            font-size: 10px;
+            line-height: 1.5;
         }
+        
         .invoice-header {
             text-align: center;
-            border-bottom: 2px solid #000;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            border-bottom: 3px solid #0f3b3a;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
         }
         .invoice-title {
-            font-size: 20px;
-            font-weight: bold;
+            font-size: 18px;
+            font-weight: 700;
             letter-spacing: 2px;
+            color: #0f3b3a;
         }
+        .invoice-subtitle {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+            color: #4a5568;
+        }
+        
+        .currier-section {
+            border: 1px solid #2d3748;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            background: #f7fafc;
+            border-radius: 6px;
+        }
+        .dark .currier-section {
+            background: #1a202c;
+            border-color: #4a5568;
+        }
+        .currier-info-block, .dispatch-info-block {
+            font-size: 9.5px;
+            line-height: 1.6;
+        }
+        .currier-info-block strong, .dispatch-info-block strong {
+            color: #0f3b3a;
+        }
+        .dispatch-info-block { text-align: right; }
+        
         .supplier-block {
-            margin-bottom: 20px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
             overflow: hidden;
+            break-inside: avoid;
+            border-radius: 6px;
+        }
+        .dark .supplier-block {
+            border-color: #4a5568;
         }
         .supplier-header {
-            background: #f0f0f0;
-            padding: 10px 15px;
-            font-weight: bold;
+            background: #edf2f7;
+            padding: 8px 12px;
+            font-weight: 700;
+            font-size: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #0f3b3a;
         }
+        .dark .supplier-header {
+            background: #2d3748;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+        
         .product-table {
             width: 100%;
-            font-size: 12px;
+            font-size: 9px;
             border-collapse: collapse;
         }
         .product-table th, .product-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
+            border: 1px solid #e2e8f0;
+            padding: 6px 8px;
             text-align: left;
+        }
+        .dark .product-table th, .dark .product-table td {
+            border-color: #4a5568;
+        }
+        .product-table th {
+            background: #f7fafc;
+            text-align: center;
+            font-weight: 700;
+            color: #0f3b3a;
+        }
+        .dark .product-table th {
+            background: #2d3748;
+            color: #e2e8f0;
+        }
+        .product-table td {
+            color: #1a202c;
+        }
+        .dark .product-table td {
+            color: #e2e8f0;
+        }
+        .product-table tr:nth-child(even) {
+            background: #f7fafc;
+        }
+        .dark .product-table tr:nth-child(even) {
+            background: #1a202c;
+        }
+        
+        .footer-text {
+            text-align: center;
+            font-size: 8px;
+            margin-top: 16px;
+            padding-top: 8px;
+            border-top: 2px solid #e2e8f0;
+            color: #4a5568;
+        }
+        .dark .footer-text {
+            border-top-color: #4a5568;
+            color: #9ca3af;
+        }
+        .separator-dashed {
+            border-top: 1px dashed #cbd5e0;
+            margin: 10px 0;
+        }
+        .dark .separator-dashed {
+            border-top-color: #4a5568;
+        }
+        
+        @media (max-width: 640px) {
+            .invoice-container { padding: 12px 15px; font-size: 8.5px; }
+            .currier-section { flex-direction: column; gap: 8px; }
+            .dispatch-info-block { text-align: left; }
+            .invoice-title { font-size: 14px; }
+            .product-table th, .product-table td { padding: 4px 5px; font-size: 7.5px; }
+        }
+        
+        /* Print Styles */
+        @media print {
+            body * { visibility: hidden !important; }
+            #invoiceModal, #invoiceModal * { visibility: visible !important; }
+            #invoiceModal { 
+                position: fixed !important; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+                height: 100%; 
+                background: white; 
+                display: block !important; 
+                z-index: 99999; 
+                margin: 0; 
+                padding: 0; 
+                overflow: visible !important; 
+            }
+            #invoiceModal .no-print { display: none !important; }
+            .invoice-container { margin: 0 auto !important; padding: 15px 20px !important; border: none !important; }
+            .supplier-block { break-inside: avoid; page-break-inside: avoid; }
+            .product-table th, .product-table td { border: 1px solid #000 !important; padding: 4px 6px !important; }
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+<body class="bg-gray-50 dark:bg-gray-900">
     
+    <!-- ==================== SIDEBAR SECTION ==================== -->
     <div class="flex min-h-screen">
-        
-        <!-- Sidebar -->
-        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-auto border-r border-white/5">
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-hidden border-r border-white/5">
             <div class="flex flex-col h-full">
                 <div class="px-5 py-5 border-b border-white/10 flex items-center justify-between sticky top-0 bg-inherit z-10">
                     <div class="flex items-center gap-2.5">
@@ -247,76 +401,40 @@
                 </div>
                 
                 <nav class="flex-1 px-3 py-5 space-y-1.5">
-                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div><span class="text-sm font-medium">Dashboard</span>
-                    </a>
-                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div><span class="text-sm font-medium">Customers</span>
-                    </a>
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div><span class="text-sm font-medium">Dashboard</span></a>
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div><span class="text-sm font-medium">Customers</span></a>
                     <div class="has-submenu" id="dueSubmenu">
-                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
-                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
-                        </a>
-                        <div class="submenu-modern pl-9 mt-1 space-y-1">
-                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
-                            </a>
-                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
-                            </a>
-                        </div>
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div><i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i></a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1"><a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a><a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a></div>
                     </div>
-                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span>
-                    </a>
-                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
-                    </a>
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span></a>
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span></a>
                     <div class="has-submenu open" id="warrantySubmenu">
-                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-white bg-white/5 transition">
-                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm text-accent"></i></div><span class="text-sm font-medium">Warranty</span></div>
-                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
-                        </a>
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-white bg-white/5 transition"><div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm text-accent"></i></div><span class="text-sm font-medium">Warranty</span></div><i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i></a>
                         <div class="submenu-modern open pl-9 mt-1 space-y-1">
-                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
-                            </a>
-                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
-                            </a>
-                            <a href="currier-dispatch.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition">
-                                <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
-                            </a>
-                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                                <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
-                            </a>
-                            
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span></a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span></a>
+                            <a href="currier-dispatch.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs"><i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span></a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span></a>
                         </div>
                     </div>
-                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
+                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span></a>
+                    
+                    <a href="expenses.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Expenses</span>
                     </a>
-                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
-                    </a>
+                    
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span></a>
                 </nav>
-                
                 <div class="px-3 py-4 border-t border-white/10 mt-auto">
-                    <div class="flex items-center justify-between mb-2 px-1">
-                        <span class="text-[9px] text-slate-500">v2.5.0 · pro</span>
-                        <div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center"><i class="fas fa-lock text-[8px] text-slate-400"></i></div>
-                    </div>
-                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition">
-                        <i class="fas fa-sign-out-alt text-sm w-5"></i><span class="text-sm font-medium">Logout</span>
-                    </a>
+                    <div class="flex items-center justify-between mb-2 px-1"><span class="text-[9px] text-slate-500">v2.5.0 · pro</span><div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center"><i class="fas fa-lock text-[8px] text-slate-400"></i></div></div>
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition"><i class="fas fa-sign-out-alt text-sm w-5"></i><span class="text-sm font-medium">Logout</span></a>
                 </div>
             </div>
         </aside>
         
-        <!-- Main Content -->
+        <!-- ==================== MAIN CONTENT ==================== -->
         <main class="flex-1 md:ml-64 min-h-screen w-full pb-20 md:pb-4">
-            
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
                 <div class="px-3 py-2.5 flex justify-between items-center">
                     <div class="flex items-center gap-2">
@@ -331,225 +449,741 @@
             </header>
             
             <div class="p-3 md:p-4">
-                
-                <!-- Mobile Tab Navigation -->
-                <div class="flex overflow-x-auto gap-2 mb-4 pb-1 md:hide-scrollbar">
+                <div class="flex overflow-x-auto gap-2 mb-4 pb-1">
                     <a href="warranty.html" class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-200 dark:bg-gray-700 hover:bg-primary hover:text-white transition">📦 Suppliers</a>
                     <a href="warranty-entry.html" class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-200 dark:bg-gray-700 hover:bg-primary hover:text-white transition">➕ Warranty Entry</a>
                     <a href="currier-dispatch.html" class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-primary text-white shadow-md">🚚 Currier Dispatch</a>
                     <a href="warranty-list.html" class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap bg-gray-200 dark:bg-gray-700 hover:bg-primary hover:text-white transition">📋 Warranty List</a>
                 </div>
                 
-                <!-- Stats Cards - Mobile Optimized -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 md:p-4 border shadow-sm mobile-stat-card">
-                        <div class="bg-blue-100 dark:bg-blue-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-shipping-fast text-blue-600 dark:text-blue-400 text-sm"></i></div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase">Total Dispatched</h3>
-                        <p class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white stat-value" id="totalDispatched">0</p>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 md:p-4 border shadow-sm mobile-stat-card">
-                        <div class="bg-purple-100 dark:bg-purple-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-box text-purple-600 dark:text-purple-400 text-sm"></i></div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase">Products Sent</h3>
-                        <p class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white stat-value" id="totalProductsSent">0</p>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 md:p-4 border shadow-sm mobile-stat-card">
-                        <div class="bg-green-100 dark:bg-green-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-check-circle text-green-600 dark:text-green-400 text-sm"></i></div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase">Delivered</h3>
-                        <p class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white stat-value" id="totalDelivered">0</p>
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 md:p-4 border shadow-sm mobile-stat-card">
-                        <div class="bg-amber-100 dark:bg-amber-900/30 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-truck text-amber-600 dark:text-amber-400 text-sm"></i></div>
-                        <h3 class="text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase">In Transit</h3>
-                        <p class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white stat-value" id="totalInTransit">0</p>
-                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm"><div class="bg-blue-100 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-shipping-fast text-blue-600 text-sm"></i></div><h3 class="text-gray-500 text-[10px] font-semibold uppercase">Total Dispatched</h3><p class="text-xl font-bold" id="totalDispatched">0</p></div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm"><div class="bg-purple-100 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-box text-purple-600 text-sm"></i></div><h3 class="text-gray-500 text-[10px] font-semibold uppercase">Products Sent</h3><p class="text-xl font-bold" id="totalProductsSent">0</p></div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm"><div class="bg-green-100 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-check-circle text-green-600 text-sm"></i></div><h3 class="text-gray-500 text-[10px] font-semibold uppercase">Delivered</h3><p class="text-xl font-bold" id="totalDelivered">0</p></div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm"><div class="bg-amber-100 w-8 h-8 rounded-lg flex items-center justify-center mb-2"><i class="fas fa-truck text-amber-600 text-sm"></i></div><h3 class="text-gray-500 text-[10px] font-semibold uppercase">In Transit</h3><p class="text-xl font-bold" id="totalInTransit">0</p></div>
                 </div>
                 
-                <!-- Date Selector -->
+                <!-- Select Date Section - Only From and To -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-5">
-                    <div class="px-4 md:px-5 py-3 md:py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
-                        <h3 class="text-sm md:text-base font-semibold"><i class="fas fa-calendar-alt text-primary mr-2"></i>Select Date</h3>
-                        <p class="text-[10px] text-gray-500">Choose a date to view pending warranty items</p>
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                        <h3 class="text-sm font-semibold"><i class="fas fa-calendar-alt text-primary mr-2"></i>Select Date Range</h3>
                     </div>
-                    <div class="p-4 md:p-5">
-                        <div class="flex flex-col sm:flex-row gap-3 items-end">
-                            <div class="flex-1 w-full">
-                                <label class="block text-xs font-medium mb-1.5">Select Date <span class="text-red-500">*</span></label>
-                                <input type="date" id="dispatchDate" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                    <div class="p-4">
+                        <div class="flex flex-wrap gap-3 items-end">
+                            <div class="flex-1 min-w-[160px]">
+                                <label class="block text-xs font-medium mb-1.5">From Date</label>
+                                <input type="date" id="fromDate" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
                             </div>
-                            <div class="w-full sm:w-auto">
-                                <button id="loadWarrantyBtn" class="w-full sm:w-auto bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-xl text-sm shadow-md btn-active">
-                                    <i class="fas fa-search mr-1"></i> Show Items
+                            <div class="flex-1 min-w-[160px]">
+                                <label class="block text-xs font-medium mb-1.5">To Date</label>
+                                <input type="date" id="toDate" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                            </div>
+                            <div class="flex-1 min-w-[120px]">
+                                <button id="loadWarrantyBtn" class="w-full bg-success text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-green-700 transition">
+                                    <i class="fas fa-search mr-2"></i>Show Items
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Warranty Items Section -->
                 <div id="warrantyItemsSection" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-5 hidden">
-                    <div class="px-4 md:px-5 py-3 md:py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
-                        <h3 class="text-sm md:text-base font-semibold"><i class="fas fa-clipboard-list text-primary mr-2"></i>Select Items</h3>
-                        <p class="text-[10px] text-gray-500">Choose warranty items to dispatch</p>
-                    </div>
-                    <div class="p-3 md:p-4">
-                        <div class="mb-3 flex justify-between items-center">
-                            <label class="flex items-center gap-2 text-sm">
-                                <input type="checkbox" id="selectAllWarranty" class="rounded"> Select All
-                            </label>
-                            <span class="text-xs text-gray-500" id="selectedCount">0 selected</span>
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-sm font-semibold"><i class="fas fa-clipboard-list text-primary mr-2"></i>Select Items</h3></div>
+                    <div class="p-4"><div class="mb-3 flex justify-between"><label class="flex items-center gap-2"><input type="checkbox" id="selectAllWarranty"> Select All</label><span id="selectedCount" class="text-xs">0 selected</span></div><div id="warrantyItemsList" class="space-y-2"></div></div>
+                </div>
+                
+                <!-- Currier Details Section -->
+                <div id="currierFormSection" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-5 hidden">
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b"><h3 class="text-sm font-semibold"><i class="fas fa-truck text-primary mr-2"></i>Currier Details</h3></div>
+                    <div class="p-4 space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium mb-1.5">Select Courier <span class="text-red-500">*</span></label>
+                            <select id="currierSelect" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                <option value="">-- Select a Courier --</option>
+                            </select>
                         </div>
-                        <div id="warrantyItemsList" class="space-y-2">
-                            <div class="text-center py-8 text-gray-500">Loading...</div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1.5">Currier Name</label>
+                            <input type="text" id="currierName" readonly placeholder="Will auto-fill from selection" class="w-full px-3 py-2.5 text-sm border rounded-xl bg-gray-100 dark:bg-gray-700 cursor-not-allowed">
                         </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1.5">Currier Phone</label>
+                            <input type="tel" id="currierPhone" readonly placeholder="Will auto-fill from selection" class="w-full px-3 py-2.5 text-sm border rounded-xl bg-gray-100 dark:bg-gray-700 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1.5">Currier Address</label>
+                            <input type="text" id="currierAddress" readonly placeholder="Will auto-fill from selection" class="w-full px-3 py-2.5 text-sm border rounded-xl bg-gray-100 dark:bg-gray-700 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium mb-1.5">Tracking Number</label>
+                            <input type="text" id="trackingNumber" placeholder="Tracking ID if available" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                        </div>
+                        <button id="createDispatchBtn" class="w-full bg-success hover:bg-green-700 text-white py-2.5 rounded-xl text-sm">Create Dispatch</button>
                     </div>
                 </div>
                 
-                <!-- Currier Information Form -->
-                <div id="currierFormSection" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-5 hidden">
-                    <div class="px-4 md:px-5 py-3 md:py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
-                        <h3 class="text-sm md:text-base font-semibold"><i class="fas fa-truck text-primary mr-2"></i>Currier Details</h3>
-                        <p class="text-[10px] text-gray-500">Enter currier information</p>
+                <!-- All Dispatches Table with Filter & Pagination -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex justify-between items-center flex-wrap gap-2">
+                        <h3 class="text-sm font-semibold"><i class="fas fa-list text-primary mr-2"></i>All Dispatches</h3>
+                        <button id="exportDispatchBtn" class="bg-success hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 transition">
+                            <i class="fas fa-download text-xs"></i> Export CSV
+                        </button>
                     </div>
-                    <div class="p-4 md:p-5">
-                        <div class="space-y-3">
-                            <div><label class="block text-xs font-medium mb-1.5">Currier Name <span class="text-red-500">*</span></label><input type="text" id="currierName" placeholder="e.g., Sundarban, SA Paribahan" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800"></div>
-                            <div><label class="block text-xs font-medium mb-1.5">Currier Phone</label><input type="tel" id="currierPhone" placeholder="Currier contact number" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800"></div>
-                            <div><label class="block text-xs font-medium mb-1.5">Currier Address</label><input type="text" id="currierAddress" placeholder="Currier office address" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800"></div>
-                            <div><label class="block text-xs font-medium mb-1.5">Tracking Number</label><input type="text" id="trackingNumber" placeholder="Tracking ID if available" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800"></div>
+                    
+                    <!-- Filter Row with Show dropdown and Search -->
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="filter-label">Show</span>
+                            <select id="perPageSelect" class="filter-select">
+                                <option value="20" selected>20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <span class="filter-label">entries</span>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">|</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                Showing <span id="pageStart">0</span> - <span id="pageEnd">0</span> of <span id="totalEntries">0</span>
+                            </span>
                         </div>
-                        <div class="flex justify-end mt-4">
-                            <button id="createDispatchBtn" class="w-full sm:w-auto bg-success hover:bg-green-700 text-white px-6 py-2.5 rounded-xl text-sm shadow-md btn-active">
-                                <i class="fas fa-save mr-1"></i> Create Dispatch
+                        <div class="relative w-full sm:w-64 filter-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="dispatchSearch" placeholder="Search by ID, currier..." class="filter-input">
+                            <span class="filter-clear-btn" id="clearSearchBtn"><i class="fas fa-times-circle"></i></span>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[900px]">
+                            <thead class="bg-gray-50 dark:bg-gray-700/50 border-b">
+                                <tr>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider w-[50px]">#</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Dispatch ID</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Supplier</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Products</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Currier</th>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dispatchTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center py-8 text-gray-400 text-sm">No dispatch records found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination Controls -->
+                    <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2">
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                            Page <span id="pageInfo">1</span> of <span id="totalPages">1</span>
+                        </div>
+                        <div class="flex gap-1">
+                            <button id="prevPageBtn" class="pagination-btn" disabled>
+                                <i class="fas fa-chevron-left text-[10px]"></i> Prev
+                            </button>
+                            <button id="nextPageBtn" class="pagination-btn" disabled>
+                                Next <i class="fas fa-chevron-right text-[10px]"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Dispatch List - Mobile Card View + Desktop Table -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
-                    <div class="px-4 md:px-5 py-3 md:py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                            <div><h3 class="text-sm md:text-base font-semibold"><i class="fas fa-list text-primary mr-2"></i>All Dispatches</h3><p class="text-[10px] text-gray-500">Records of products sent via currier</p></div>
-                            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                                <div class="relative flex-1 sm:w-64"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i><input type="text" id="dispatchSearch" placeholder="Search..." class="w-full pl-9 pr-3 py-2 text-sm border rounded-lg dark:bg-gray-800"></div>
-                                <button id="exportDispatchBtn" class="bg-success hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm flex items-center justify-center gap-1 btn-active"><i class="fas fa-download text-xs"></i><span class="hidden sm:inline"> Export</span></button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Desktop Table View -->
-                    <div class="desktop-table-view overflow-x-auto hidden md:block">
-                        <table class="w-full min-w-[900px]">
-                            <thead class="bg-gray-50 dark:bg-gray-700/50 border-b">
-                                <tr><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Dispatch ID</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Date</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Supplier</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Products</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Currier</th><th class="px-3 py-3 text-center text-[10px] font-semibold uppercase">Status</th><th class="px-3 py-3 text-center text-[10px] font-semibold uppercase">Actions</th></tr>
-                            </thead>
-                            <tbody id="dispatchTableBody"><tr><td colspan="7" class="text-center py-8">Loading...</td></tr></tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Mobile Card View -->
-                    <div id="dispatchMobileList" class="mobile-card-view p-3 space-y-3 md:hidden"></div>
-                </div>
             </div>
+
+            <!-- Footer -->
+            <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                    <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span> 
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
+                    </p>
+                </div>
+            </footer>
         </main>
     </div>
     
-    <!-- Floating Action Button for Mobile -->
-    <div class="floating-action-btn">
-        <button id="scrollTopBtn" class="bg-primary text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-primary-dark transition">
-            <i class="fas fa-arrow-up text-lg"></i>
-        </button>
-    </div>
-    
     <!-- Invoice Modal -->
-    <div id="invoiceModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3">
-        <div class="bg-white dark:bg-gray-800 rounded-xl max-w-5xl w-full shadow-2xl modal-animate overflow-hidden max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b no-print">
-                <h3 class="text-base font-semibold"><i class="fas fa-file-invoice text-primary mr-2"></i>Dispatch Invoice</h3>
+    <div id="invoiceModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3 overflow-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full shadow-2xl overflow-hidden max-h-[95vh] flex flex-col modal-animate">
+            <div class="flex justify-between items-center px-5 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 no-print sticky top-0 z-10">
+                <h3 class="font-semibold text-sm text-gray-800 dark:text-white">
+                    <i class="fas fa-file-invoice text-primary mr-2"></i>Dispatch Invoice
+                </h3>
                 <div class="flex gap-2">
-                    <button id="printInvoiceBtn" class="px-4 py-1.5 text-sm rounded-lg bg-primary text-white btn-active"><i class="fas fa-print mr-1"></i> Print</button>
-                    <button id="closeInvoiceModalBtn" class="px-4 py-1.5 text-sm rounded-lg bg-gray-200 dark:bg-gray-700 btn-active"><i class="fas fa-times"></i> Close</button>
+                    <button id="printInvoiceBtn" class="px-4 py-1.5 text-xs font-medium bg-primary text-white rounded-lg hover:bg-primary-dark transition shadow-sm">
+                        <i class="fas fa-print mr-1"></i> Print
+                    </button>
+                    <button id="closeInvoiceModalBtn" class="px-4 py-1.5 text-xs font-medium bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition">
+                        <i class="fas fa-times mr-1"></i> Close
+                    </button>
                 </div>
             </div>
-            <div id="invoiceContent" class="p-0 overflow-y-auto flex-1 bg-white"></div>
+            <div id="invoiceContent" class="overflow-y-auto flex-1 bg-white dark:bg-gray-900 p-0"></div>
         </div>
     </div>
     
-    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col gap-2"></div>
-    
-    <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3"><div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 flex items-center justify-center"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div><h3 class="text-lg font-semibold mb-2">Logout?</h3><p class="text-sm text-gray-500 mb-5">Are you sure?</p><div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-gray-100">Cancel</button><button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-red-500 text-white">Logout</button></div></div></div>
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+    <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[200]">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center max-w-sm w-full modal-animate">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <i class="fas fa-sign-out-alt text-orange-500 text-xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Are you sure you want to logout?</p>
+            <div class="flex gap-3 justify-center">
+                <button id="cancelLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition">Cancel</button>
+                <button id="confirmLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-red-500 text-white hover:bg-red-600 transition shadow-sm">Logout</button>
+            </div>
+        </div>
+    </div>
     
     <script type="module">
-        import { checkAuthState, logout } from '../js/auth.js';
-        import { db, collection, addDoc, getDocs, query, orderBy, where, doc, getDoc, updateDoc, writeBatch } from '../js/firebase.js';
-        
+        import { checkAuthState, logout } from './js/auth.js';
+        import { db, collection, addDoc, getDocs, query, orderBy, where, doc, getDoc, updateDoc, writeBatch } from './js/firebase.js';
         checkAuthState();
         
-        // Sidebar Logic
-        const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
-        function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.id = 'sidebarOverlay'; overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
-        function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); const overlay = document.getElementById('sidebarOverlay'); if (overlay) overlay.remove(); }
-        menuToggle?.addEventListener('click', openSidebar); closeSidebarBtn?.addEventListener('click', closeSidebar);
-        window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); } });
-        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
+        // DOM Elements
+        const currierSelect = document.getElementById('currierSelect');
+        const currierNameInput = document.getElementById('currierName');
+        const currierPhoneInput = document.getElementById('currierPhone');
+        const currierAddressInput = document.getElementById('currierAddress');
+        const trackingNumber = document.getElementById('trackingNumber');
+        const dispatchSearch = document.getElementById('dispatchSearch');
+        const perPageSelect = document.getElementById('perPageSelect');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
         
-        // Submenu toggles
-        const warrantySubmenu = document.getElementById('warrantySubmenu'), warrantyLink = warrantySubmenu?.querySelector('a');
-        if (warrantyLink) warrantyLink.addEventListener('click', (e) => { e.preventDefault(); warrantySubmenu.classList.toggle('open'); warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open'); });
-        const dueSubmenu = document.getElementById('dueSubmenu'), dueLink = dueSubmenu?.querySelector('a');
-        if (dueLink) dueLink.addEventListener('click', (e) => { e.preventDefault(); dueSubmenu.classList.toggle('open'); dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open'); });
+        let selectedWarrantyIds = new Set();
+        let pendingWarrantyItems = [];
+        let allDispatches = [];
+        let filteredDispatches = [];
+        let supplierCache = new Map();
+        let couriersList = [];
+        let currentPage = 1;
+        let pageSize = 20;
         
-        // Utility functions
-        function showToast(msg, type='success') { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium ${type==='success'?'bg-green-500 text-white':'bg-red-500 text-white'} animate-slide-up`; t.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'} mr-2 text-xs"></i>${msg}`; c.appendChild(t); setTimeout(()=>t.remove(),2500); }
-        function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
-        function generateDispatchId() { const now = new Date(); return `DSP-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}/${Math.floor(Math.random()*900)+100}`; }
+        function showToast(msg, type='success') { 
+            const c = document.getElementById('toastContainer'); 
+            const t = document.createElement('div'); 
+            t.className = `px-4 py-2 rounded-lg shadow text-sm ${type==='success'?'bg-green-500 text-white':'bg-red-500 text-white'}`; 
+            t.innerText = msg; 
+            c.appendChild(t); 
+            setTimeout(()=>t.remove(),3000); 
+        }
         
-        let allDispatches = [], pendingWarrantyItems = [], selectedWarrantyIds = new Set(), supplierCache = new Map();
+        function escapeHtml(str) { 
+            if(!str) return ''; 
+            return String(str).replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); 
+        }
         
-        async function loadDispatches() { try { const snap = await getDocs(query(collection(db, 'dispatches'), orderBy('dispatchDate', 'desc'))); allDispatches = snap.docs.map(d => ({ id:d.id, ...d.data() })); renderDispatches(); updateStats(); } catch(e) { console.error(e); } }
+        function generateDispatchId() { 
+            const now = new Date(); 
+            return `DSP-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${Math.floor(Math.random() * 900) + 100}`; 
+        }
         
-        function updateStats() { document.getElementById('totalDispatched').textContent = allDispatches.length; const totalProducts = allDispatches.reduce((sum,d)=>sum + (d.items?.length||0),0); document.getElementById('totalProductsSent').textContent = totalProducts; document.getElementById('totalDelivered').textContent = allDispatches.filter(d=>d.status==='delivered').length; document.getElementById('totalInTransit').textContent = allDispatches.filter(d=>d.status==='dispatched').length; }
+        // Modal close on outside click
+        function setupModalCloseOnOutside(modalId, closeBtnId) {
+            const modal = document.getElementById(modalId);
+            const closeBtn = document.getElementById(closeBtnId);
+            
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                        document.body.classList.remove('modal-open');
+                    }
+                });
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    document.body.classList.remove('modal-open');
+                });
+            }
+        }
         
-        function renderDispatches() { const term = document.getElementById('dispatchSearch')?.value.toLowerCase() || ''; const filtered = allDispatches.filter(d => d.currierName?.toLowerCase().includes(term) || d.dispatchId?.toLowerCase().includes(term) || d.items?.some(i=>i.supplierName?.toLowerCase().includes(term))); renderDesktopTable(filtered); renderMobileCards(filtered); }
+        // ============= SET DEFAULT DATE = TODAY =============
+        function setDefaultDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('fromDate').value = today;
+            document.getElementById('toDate').value = today;
+        }
         
-        function renderDesktopTable(dispatches) { const tbody = document.getElementById('dispatchTableBody'); if(dispatches.length===0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500">No dispatch records found</tbody>'; return; } tbody.innerHTML = dispatches.map(d => { const productsList = d.items.map(i=>i.productName).slice(0,2).join(', ') + (d.items.length>2 ? ` +${d.items.length-2} more` : ''); const statusClass = d.status === 'dispatched' ? 'status-dispatched' : 'status-pending'; const statusText = d.status === 'dispatched' ? 'Dispatched' : 'Delivered'; return `<tr class="table-row-hover"><td class="px-3 py-2.5 text-xs font-mono font-semibold text-primary">${d.dispatchId}</td><td class="px-3 py-2.5 text-sm whitespace-nowrap">${d.dispatchDate}</td><td class="px-3 py-2.5 text-sm">${escapeHtml(d.items[0]?.supplierName || 'N/A')}</td><td class="px-3 py-2.5 text-sm">${escapeHtml(productsList)}</td><td class="px-3 py-2.5 text-sm"><div><p class="font-medium">${escapeHtml(d.currierName)}</p>${d.trackingNumber ? `<p class="text-xs text-gray-500">Track: ${escapeHtml(d.trackingNumber)}</p>` : ''}</div></td><td class="px-3 py-2.5 text-center"><span class="status-badge ${statusClass}">${statusText}</span></td><td class="px-3 py-2.5 text-center"><button class="generate-invoice text-blue-500 hover:text-blue-700 p-1.5 rounded-lg" data-dispatch='${JSON.stringify(d)}'><i class="fas fa-file-invoice"></i></button></td></tr>`; }).join(''); attachInvoiceButtons(); }
+        // Load warranty by date range
+        async function loadWarrantyByDateRange() {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            
+            if(!fromDate || !toDate) { 
+                showToast('Please select both From and To dates', 'error'); 
+                return; 
+            }
+            
+            if(fromDate > toDate) {
+                showToast('From date cannot be greater than To date', 'error');
+                return;
+            }
+            
+            document.getElementById('warrantyItemsSection').classList.remove('hidden');
+            document.getElementById('currierFormSection').classList.add('hidden');
+            
+            const container = document.getElementById('warrantyItemsList');
+            container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</div>';
+            
+            try {
+                const q = query(
+                    collection(db, 'warranties'),
+                    where('warrantyDate', '>=', fromDate),
+                    where('warrantyDate', '<=', toDate)
+                );
+                
+                const querySnapshot = await getDocs(q);
+                pendingWarrantyItems = [];
+                
+                for(const docSnap of querySnapshot.docs) {
+                    const data = docSnap.data();
+                    const status = data.status || 'pending';
+                    
+                    if (status === 'pending' || status === 'received') {
+                        const w = { id: docSnap.id, ...data };
+                        
+                        if(w.supplierId) { 
+                            let s = supplierCache.get(w.supplierId); 
+                            if(!s) { 
+                                try {
+                                    const sd = await getDoc(doc(db,'suppliers',w.supplierId)); 
+                                    s = sd.exists() ? { name: sd.data().name, phone: sd.data().phone } : { name:'Unknown', phone:'N/A' }; 
+                                    supplierCache.set(w.supplierId,s); 
+                                } catch(e) {
+                                    s = { name:'Unknown', phone:'N/A' };
+                                }
+                            } 
+                            w.supplierName = s.name; 
+                            w.supplierPhone = s.phone; 
+                        }
+                        pendingWarrantyItems.push(w);
+                    }
+                }
+                renderWarrantyCards();
+            } catch(error) { 
+                console.error('Error loading warranties:', error);
+                container.innerHTML = `<div class="text-center py-8 text-red-500 text-sm">Error loading data</div>`; 
+                showToast('Error loading warranty items', 'error');
+            }
+        }
         
-        function renderMobileCards(dispatches) { const container = document.getElementById('dispatchMobileList'); if(dispatches.length===0) { container.innerHTML = '<div class="text-center py-8 text-gray-500">No dispatch records</div>'; return; } container.innerHTML = dispatches.map(d => { const statusClass = d.status === 'dispatched' ? 'status-dispatched' : 'status-pending'; const statusText = d.status === 'dispatched' ? 'Dispatched' : 'Delivered'; const productsHtml = d.items.map(i => `<div class="flex justify-between text-xs py-1 border-b last:border-0"><span class="font-medium">${escapeHtml(i.productName)}</span><span class="text-gray-500">${escapeHtml(i.serialNumber || '-')}</span></div>`).join(''); return `<div class="dispatch-card"><div class="flex justify-between items-start mb-2"><span class="text-xs font-mono font-bold text-primary">${d.dispatchId}</span><span class="status-badge ${statusClass} text-xs">${statusText}</span></div><div class="space-y-2 text-sm"><div class="flex justify-between"><span class="text-gray-500">Date:</span><span>${d.dispatchDate}</span></div><div class="flex justify-between"><span class="text-gray-500">Supplier:</span><span class="font-medium">${escapeHtml(d.items[0]?.supplierName || 'N/A')}</span></div><div class="flex justify-between"><span class="text-gray-500">Currier:</span><span>${escapeHtml(d.currierName)}</span></div><div class="mt-2"><div class="text-gray-500 text-xs mb-1">Products (${d.items.length}):</div><div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2">${productsHtml}</div></div>${d.trackingNumber ? `<div class="flex justify-between"><span class="text-gray-500">Tracking:</span><span class="text-xs">${escapeHtml(d.trackingNumber)}</span></div>` : ''}<button class="generate-invoice-mobile w-full mt-2 bg-primary/10 text-primary py-2 rounded-lg text-sm font-medium" data-dispatch='${JSON.stringify(d)}'><i class="fas fa-file-invoice mr-1"></i> View Invoice</button></div></div>`; }).join(''); document.querySelectorAll('.generate-invoice-mobile').forEach(btn => { btn.addEventListener('click', () => { const d = JSON.parse(btn.dataset.dispatch); showInvoiceModal(d); }); }); }
+        function renderWarrantyCards() {
+            const container = document.getElementById('warrantyItemsList');
+            if(pendingWarrantyItems.length === 0) { 
+                container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">No pending warranty items in this date range</div>'; 
+                return; 
+            }
+            selectedWarrantyIds.clear();
+            document.getElementById('selectedCount').innerText = '0 selected';
+            container.innerHTML = pendingWarrantyItems.map(w => `
+                <div class="warranty-card" data-id="${w.id}">
+                    <div class="flex items-start gap-2">
+                        <input type="checkbox" class="warranty-checkbox mt-1" data-id="${w.id}">
+                        <div>
+                            <div class="font-semibold text-sm">${escapeHtml(w.productName || 'Unknown Product')}</div>
+                            <div class="text-xs text-gray-500">Supplier: ${escapeHtml(w.supplierName || 'Unknown')} | Qty: ${w.quantity||1} | Date: ${escapeHtml(w.warrantyDate)}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.warranty-checkbox').forEach(cb => cb.addEventListener('change', (e) => { 
+                const id = cb.dataset.id; 
+                if(cb.checked) selectedWarrantyIds.add(id); 
+                else selectedWarrantyIds.delete(id); 
+                document.getElementById('selectedCount').innerText = `${selectedWarrantyIds.size} selected`; 
+                document.getElementById('currierFormSection').classList.toggle('hidden', selectedWarrantyIds.size === 0); 
+                if(selectedWarrantyIds.size > 0) loadCouriersForDropdown(); 
+            }));
+            
+            document.querySelectorAll('.warranty-card').forEach(card => card.addEventListener('click', (e) => { 
+                if(e.target.type !== 'checkbox') { 
+                    const cb = card.querySelector('.warranty-checkbox'); 
+                    if(cb) cb.click(); 
+                } 
+            }));
+            
+            document.getElementById('selectAllWarranty').onchange = (e) => { 
+                document.querySelectorAll('.warranty-checkbox').forEach(cb => { 
+                    cb.checked = e.target.checked; 
+                    const id = cb.dataset.id; 
+                    if(e.target.checked) selectedWarrantyIds.add(id); 
+                    else selectedWarrantyIds.delete(id); 
+                }); 
+                document.getElementById('selectedCount').innerText = `${selectedWarrantyIds.size} selected`; 
+                document.getElementById('currierFormSection').classList.toggle('hidden', selectedWarrantyIds.size === 0); 
+                if(selectedWarrantyIds.size > 0) loadCouriersForDropdown(); 
+            };
+        }
         
-        function attachInvoiceButtons() { document.querySelectorAll('.generate-invoice').forEach(btn => { btn.addEventListener('click', () => { const d = JSON.parse(btn.dataset.dispatch); showInvoiceModal(d); }); }); }
+        async function loadCouriersForDropdown() {
+            try {
+                const snap = await getDocs(collection(db, 'courierDetails'));
+                couriersList = [];
+                snap.forEach(d => couriersList.push({ id: d.id, name: d.data().courierName, phone: d.data().phone, address: d.data().address }));
+                currierSelect.innerHTML = '<option value="">-- Select a Courier --</option>';
+                couriersList.forEach(c => {
+                    const option = document.createElement('option');
+                    option.value = c.id;
+                    option.textContent = c.name;
+                    currierSelect.appendChild(option);
+                });
+            } catch (error) { console.error('Error loading couriers:', error); }
+        }
         
-        async function loadWarrantyByDate() { const date = document.getElementById('dispatchDate').value; if(!date) { showToast('Please select a date','error'); return; } document.getElementById('warrantyItemsSection').classList.remove('hidden'); document.getElementById('currierFormSection').classList.add('hidden'); const container = document.getElementById('warrantyItemsList'); container.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>'; try { const snap = await getDocs(query(collection(db, 'warranties'), where('warrantyDate', '==', date), where('status', 'in', ['pending', 'received']))); pendingWarrantyItems = []; for(const d of snap.docs) { const w = { id: d.id, ...d.data() }; if(w.supplierId) { let sData = supplierCache.get(w.supplierId); if(!sData) { const sDoc = await getDoc(doc(db, 'suppliers', w.supplierId)); sData = sDoc.exists() ? { name: sDoc.data().name, phone: sDoc.data().phone || 'N/A' } : { name: 'Unknown', phone: 'N/A' }; supplierCache.set(w.supplierId, sData); } w.supplierName = sData.name; w.supplierPhone = sData.phone; } pendingWarrantyItems.push(w); } renderWarrantyCards(); } catch(e) { console.error(e); container.innerHTML = '<div class="text-center py-8 text-red-500">Error loading data</div>'; } }
+        currierSelect.addEventListener('change', () => {
+            const selectedId = currierSelect.value;
+            if (!selectedId) {
+                currierNameInput.value = ''; currierPhoneInput.value = ''; currierAddressInput.value = '';
+                return;
+            }
+            const selected = couriersList.find(c => c.id === selectedId);
+            if (selected) {
+                currierNameInput.value = selected.name;
+                currierPhoneInput.value = selected.phone || '';
+                currierAddressInput.value = selected.address || '';
+            }
+        });
         
-        function renderWarrantyCards() { const container = document.getElementById('warrantyItemsList'); if(pendingWarrantyItems.length===0) { container.innerHTML = '<div class="text-center py-8 text-gray-500">No pending warranty items found for this date</div>'; document.getElementById('currierFormSection').classList.add('hidden'); return; } selectedWarrantyIds.clear(); updateSelectedCount(); container.innerHTML = pendingWarrantyItems.map(w => { const statusClass = w.status === 'pending' ? 'status-pending' : 'status-currier'; const statusText = w.status === 'pending' ? 'Pending' : 'Received'; return `<div class="warranty-card ${selectedWarrantyIds.has(w.id) ? 'selected' : ''}" data-id="${w.id}"><div class="flex items-start gap-3"><input type="checkbox" class="warranty-checkbox mt-1" data-id="${w.id}" ${selectedWarrantyIds.has(w.id) ? 'checked' : ''}><div class="flex-1"><div class="flex justify-between items-start mb-2"><span class="text-xs font-mono font-semibold text-primary">${w.warrantyId || w.id.slice(0,8)}</span><span class="status-badge ${statusClass} text-xs">${statusText}</span></div><div class="grid grid-cols-2 gap-2 text-xs"><div><span class="text-gray-500">Product:</span><br><span class="font-medium">${escapeHtml(w.productName)}</span></div><div><span class="text-gray-500">Serial:</span><br><span>${escapeHtml(w.serialNumber || '-')}</span></div><div class="col-span-2"><span class="text-gray-500">Problem:</span><br><span class="text-xs">${escapeHtml(w.problemDescription || '-')}</span></div><div><span class="text-gray-500">Supplier:</span><br><span>${escapeHtml(w.supplierName)}</span></div><div><span class="text-gray-500">Phone:</span><br><span>${escapeHtml(w.supplierPhone)}</span></div></div></div></div></div>`; }).join(''); document.querySelectorAll('.warranty-card').forEach(card => { card.addEventListener('click', (e) => { if(e.target.type !== 'checkbox') { const cb = card.querySelector('.warranty-checkbox'); if(cb) cb.click(); } }); }); document.querySelectorAll('.warranty-checkbox').forEach(cb => { cb.addEventListener('change', (e) => { e.stopPropagation(); const id = cb.dataset.id; if(cb.checked) selectedWarrantyIds.add(id); else selectedWarrantyIds.delete(id); const card = cb.closest('.warranty-card'); if(card) card.classList.toggle('selected', cb.checked); updateSelectedCount(); document.getElementById('currierFormSection').classList.toggle('hidden', selectedWarrantyIds.size === 0); }); }); document.getElementById('selectAllWarranty').onchange = (e) => { document.querySelectorAll('.warranty-checkbox').forEach(cb => { cb.checked = e.target.checked; const id = cb.dataset.id; if(e.target.checked) selectedWarrantyIds.add(id); else selectedWarrantyIds.delete(id); const card = cb.closest('.warranty-card'); if(card) card.classList.toggle('selected', e.target.checked); }); updateSelectedCount(); document.getElementById('currierFormSection').classList.toggle('hidden', selectedWarrantyIds.size === 0); }; }
+        async function loadDispatches() {
+            const tbody = document.getElementById('dispatchTableBody');
+            try {
+                const q = query(collection(db, 'dispatches'), orderBy('dispatchDate', 'desc'));
+                const querySnapshot = await getDocs(q);
+                allDispatches = [];
+                querySnapshot.forEach(docSnap => { allDispatches.push({ id: docSnap.id, ...docSnap.data() }); });
+                updateStats();
+                applyFilters();
+            } catch (error) { 
+                console.error(error); 
+                if(tbody) tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-500 text-sm">Error loading data</td></tr>';
+            }
+        }
         
-        function updateSelectedCount() { document.getElementById('selectedCount').textContent = `${selectedWarrantyIds.size} selected`; }
+        function applyFilters() {
+            const search = dispatchSearch?.value.toLowerCase().trim() || '';
+            
+            if (!search) {
+                filteredDispatches = [...allDispatches];
+            } else {
+                filteredDispatches = allDispatches.filter(d => 
+                    d.dispatchId?.toLowerCase().includes(search) || 
+                    d.currierName?.toLowerCase().includes(search) ||
+                    d.items?.some(i => i.productName?.toLowerCase().includes(search))
+                );
+            }
+            
+            currentPage = 1;
+            renderTable();
+        }
         
-        async function createDispatch() { if(selectedWarrantyIds.size === 0) { showToast('Please select at least one warranty item','error'); return; } const currierName = document.getElementById('currierName').value.trim(); if(!currierName) { showToast('Please enter currier name','error'); return; } const selectedItems = pendingWarrantyItems.filter(w => selectedWarrantyIds.has(w.id)); const dispatchId = generateDispatchId(); try { await addDoc(collection(db, 'dispatches'), { dispatchId, dispatchDate: document.getElementById('dispatchDate').value, currierName, currierPhone: document.getElementById('currierPhone').value, currierAddress: document.getElementById('currierAddress').value, trackingNumber: document.getElementById('trackingNumber').value, items: selectedItems.map(i=>({ id:i.id, warrantyId:i.warrantyId, productName:i.productName, serialNumber:i.serialNumber, problemDescription:i.problemDescription, supplierId:i.supplierId, supplierName:i.supplierName, supplierPhone:i.supplierPhone })), status: 'dispatched', createdAt: new Date().toISOString() }); const batch = writeBatch(db); for(const item of selectedItems) { const ref = doc(db, 'warranties', item.id); batch.update(ref, { status: 'currier', currierDispatched: true, dispatchDate: document.getElementById('dispatchDate').value, currierName }); } await batch.commit(); showToast(`Dispatch created! ID: ${dispatchId}`,'success'); document.getElementById('currierName').value = ''; document.getElementById('currierPhone').value = ''; document.getElementById('currierAddress').value = ''; document.getElementById('trackingNumber').value = ''; selectedWarrantyIds.clear(); document.getElementById('warrantyItemsSection').classList.add('hidden'); document.getElementById('currierFormSection').classList.add('hidden'); loadDispatches(); loadWarrantyByDate(); } catch(e) { showToast('Error creating dispatch','error'); console.error(e); } }
+        function renderTable() {
+            const tbody = document.getElementById('dispatchTableBody');
+            const totalEntries = filteredDispatches.length;
+            const totalPages = Math.ceil(totalEntries / pageSize) || 1;
+            const start = (currentPage - 1) * pageSize;
+            const end = Math.min(start + pageSize, totalEntries);
+            const pageData = filteredDispatches.slice(start, end);
+            
+            document.getElementById('pageStart').textContent = totalEntries ? start + 1 : 0;
+            document.getElementById('pageEnd').textContent = end;
+            document.getElementById('totalEntries').textContent = totalEntries;
+            document.getElementById('pageInfo').textContent = currentPage;
+            document.getElementById('totalPages').textContent = totalPages;
+            
+            document.getElementById('prevPageBtn').disabled = currentPage === 1;
+            document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+            
+            if(pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400 text-sm">No dispatch records found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = pageData.map((d, index) => {
+                const serial = start + index + 1;
+                const productNames = d.items?.map(i => i.productName).slice(0, 2).join(', ') || 'N/A';
+                const productCount = d.items?.length || 0;
+                const productDisplay = productCount > 2 ? `${productNames} +${productCount - 2}` : productNames;
+                
+                return `
+                <tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-700/50 table-row-hover transition-colors">
+                    <td class="px-3 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400">${serial}</td>
+                    <td class="px-3 py-2.5 text-xs font-mono font-bold text-primary">${escapeHtml(d.dispatchId)}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(d.dispatchDate)}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(d.items?.[0]?.supplierName || 'N/A')}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(productDisplay)}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(d.currierName)}</td>
+                    <td class="px-3 py-2.5 text-center">
+                        <button class="view-invoice-btn text-blue-500 hover:text-blue-700 p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition" data-dispatch='${JSON.stringify(d)}'>
+                            <i class="fas fa-file-invoice text-sm"></i>
+                        </button>
+                    </td>
+                </tr>
+            `}).join('');
+            
+            document.querySelectorAll('.view-invoice-btn').forEach(btn => btn.addEventListener('click', () => {
+                const dispatchData = JSON.parse(btn.dataset.dispatch);
+                showInvoiceModal(dispatchData);
+            }));
+        }
         
-        function showInvoiceModal(dispatch) { const items = dispatch.items; const grouped = new Map(); items.forEach(item => { if(!grouped.has(item.supplierName)) grouped.set(item.supplierName, { name: item.supplierName, phone: item.supplierPhone || 'N/A', products: [] }); grouped.get(item.supplierName).products.push(item); }); let sl=1; const supplierHtml = Array.from(grouped.entries()).map(([supplier, data]) => `<div class="supplier-block"><div class="supplier-header">${sl++}. ${escapeHtml(supplier)} / ${escapeHtml(data.phone)}</div><table class="product-table"><thead><tr><th>Product</th><th>Problem</th><th>Serial No</th><th>Warranty ID</th></tr></thead><tbody>${data.products.map(item => `<tr><td>${escapeHtml(item.productName)}</td><td>${escapeHtml(item.problemDescription || '-')}</td><td>${escapeHtml(item.serialNumber || '-')}</td><td>${item.warrantyId || item.id?.slice(0,8)}</td></tr>`).join('')}</tbody></table></div>`).join(''); document.getElementById('invoiceContent').innerHTML = `<div class="invoice-container"><div class="invoice-header"><div class="invoice-title">NEXUS DUE MANAGEMENTS</div><div class="invoice-subtitle">Currier Dispatch Invoice</div></div><div class="currier-section" style="border:1px solid #ccc; padding:15px; margin-bottom:20px; display:flex; justify-content:space-between; flex-wrap:wrap;"><div><strong>CURRIER INFORMATION</strong><br>Name: ${escapeHtml(dispatch.currierName)}<br>Phone: ${escapeHtml(dispatch.currierPhone || 'N/A')}<br>Address: ${escapeHtml(dispatch.currierAddress || 'N/A')}</div><div style="text-align:right;"><strong>DISPATCH ID:</strong> ${dispatch.dispatchId}<br><strong>Date:</strong> ${dispatch.dispatchDate}</div></div><div><strong>PRODUCTS (${items.length} items)</strong><br><div class="separator" style="border-top:1px dashed #999; margin:10px 0;"></div>${supplierHtml}</div><div class="footer-text" style="text-align:center; font-size:9px; margin-top:20px; padding-top:12px; border-top:1px solid #ccc;">Generated by Nexus Due System</div></div>`; document.getElementById('invoiceModal').classList.remove('hidden'); }
+        function updateStats() {
+            document.getElementById('totalDispatched').textContent = allDispatches.length;
+            document.getElementById('totalProductsSent').textContent = allDispatches.reduce((s,d)=>s+(d.items?.length||0),0);
+            document.getElementById('totalDelivered').textContent = allDispatches.filter(d => d.status === 'delivered').length;
+            document.getElementById('totalInTransit').textContent = allDispatches.filter(d => d.status === 'dispatched').length;
+        }
         
-        function filterDispatches() { renderDispatches(); }
-        function exportToCSV() { if(allDispatches.length===0) { showToast('No data','error'); return; } let csv = ['\uFEFF"Dispatch ID","Date","Supplier","Products","Currier Name","Tracking","Status"']; allDispatches.forEach(d => { const suppliers = [...new Set(d.items.map(i=>i.supplierName))].join('; '); const products = d.items.map(i=>i.productName).join('; '); csv.push(`"${d.dispatchId}","${d.dispatchDate}","${suppliers}","${products}","${d.currierName}","${d.trackingNumber||''}","${d.status}"`); }); const blob = new Blob([csv.join('\n')],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.download=`dispatches_${new Date().toISOString().split('T')[0]}.csv`; a.href=URL.createObjectURL(blob); a.click(); URL.revokeObjectURL(a.href); showToast('Exported!','success'); }
+        async function createDispatch() {
+            if(selectedWarrantyIds.size === 0) { showToast('Select items','error'); return; }
+            const selectedCourierId = currierSelect.value;
+            if(!selectedCourierId) { showToast('Select a courier from dropdown','error'); return; }
+            const selectedCourier = couriersList.find(c => c.id === selectedCourierId);
+            const selectedItems = pendingWarrantyItems.filter(w => selectedWarrantyIds.has(w.id));
+            const dispatchId = generateDispatchId();
+            const dispatchDate = document.getElementById('fromDate').value || new Date().toISOString().split('T')[0];
+            
+            await addDoc(collection(db,'dispatches'), { 
+                dispatchId, dispatchDate, 
+                currierName: selectedCourier.name, 
+                currierPhone: selectedCourier.phone || '', 
+                currierAddress: selectedCourier.address || '', 
+                trackingNumber: trackingNumber.value, 
+                items: selectedItems.map(i=>({ id:i.id, productName:i.productName, quantity:i.quantity||1, serialNumber:i.serialNumber, problemDescription:i.problemDescription, supplierName:i.supplierName, supplierPhone:i.supplierPhone, warrantyId:i.warrantyId })), 
+                status:'dispatched', createdAt:new Date().toISOString() 
+            });
+            
+            const batch = writeBatch(db);
+            for(const item of selectedItems) batch.update(doc(db,'warranties',item.id), { status:'currier', currierDispatched:true, dispatchDate, currierName:selectedCourier.name });
+            await batch.commit();
+            
+            showToast(`Dispatch ${dispatchId} created`);
+            document.getElementById('warrantyItemsSection').classList.add('hidden');
+            document.getElementById('currierFormSection').classList.add('hidden');
+            currierSelect.value = '';
+            currierNameInput.value = '';
+            currierPhoneInput.value = '';
+            currierAddressInput.value = '';
+            trackingNumber.value = '';
+            selectedWarrantyIds.clear();
+            await loadDispatches();
+        }
         
-        // Event Listeners
-        document.getElementById('loadWarrantyBtn')?.addEventListener('click', loadWarrantyByDate);
+        function showInvoiceModal(dispatch) {
+            const items = dispatch.items || [];
+            const supplierMap = new Map();
+            items.forEach(item => {
+                const key = item.supplierName || 'Unknown Supplier';
+                if(!supplierMap.has(key)) supplierMap.set(key, { name: key, phone: item.supplierPhone || 'N/A', products: [] });
+                supplierMap.get(key).products.push(item);
+            });
+            let supplierIndex = 1;
+            let suppliersHtml = '';
+            for(const [supplier, data] of supplierMap) {
+                suppliersHtml += `
+                    <div class="supplier-block">
+                        <div class="supplier-header">${supplierIndex++}. ${escapeHtml(data.name)} / ${escapeHtml(data.phone)}</div>
+                        <table class="product-table">
+                            <thead><tr><th>Product</th><th>Problem</th><th>Serial No</th><th>Quantity</th><th>Warranty ID</th></tr></thead>
+                            <tbody>
+                                ${data.products.map(prod => `
+                                    <tr>
+                                        <td>${escapeHtml(prod.productName)}</td>
+                                        <td>${escapeHtml(prod.problemDescription || '-')}</td>
+                                        <td>${escapeHtml(prod.serialNumber || '-')}</td>
+                                        <td class="text-center">${prod.quantity || 1} pcs</td>
+                                        <td>${escapeHtml(prod.warrantyId || prod.id?.slice(0,12) || '-')}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            const totalItems = items.length;
+            const totalQty = items.reduce((s, i) => s + (i.quantity || 1), 0);
+            const invoiceHtml = `
+                <div class="invoice-container">
+                    <div class="invoice-header">
+                        <div class="invoice-title">EC Sales & Service </div>
+                        <div class="invoice-subtitle">Currier Dispatch Invoice</div>
+                    </div>
+                    <div class="currier-section">
+                        <div class="currier-info-block">
+                            <strong>CURRIER INFORMATION</strong><br>
+                            Name: ${escapeHtml(dispatch.currierName)}<br>
+                            Phone: ${escapeHtml(dispatch.currierPhone || 'N/A')}<br>
+                            Address: ${escapeHtml(dispatch.currierAddress || 'N/A')}
+                        </div>
+                        <div class="dispatch-info-block">
+                            <strong>DISPATCH ID:</strong> ${escapeHtml(dispatch.dispatchId)}<br>
+                            <strong>Dispatch Date:</strong> ${escapeHtml(dispatch.dispatchDate)}<br>
+                            ${dispatch.trackingNumber ? `<strong>Tracking:</strong> ${escapeHtml(dispatch.trackingNumber)}` : ''}
+                        </div>
+                    </div>
+                    <div class="separator-dashed"></div>
+                    <div><strong>PRODUCTS (${totalItems} items, Total Quantity: ${totalQty} pcs)</strong></div>
+                    <div class="separator-dashed"></div>
+                    ${suppliersHtml}
+                    <div class="separator-dashed"></div>
+                    <div class="footer-text">
+                        --------------------------------------------------<br>
+                        Generated by JackDev Due System | Valid for record keeping<br>
+                    </div>
+                </div>
+            `;
+            document.getElementById('invoiceContent').innerHTML = invoiceHtml;
+            document.getElementById('invoiceModal').classList.remove('hidden');
+            document.body.classList.add('modal-open');
+        }
+        
+        // ============= EXPORT CSV =============
+        function exportCSV() {
+            if (filteredDispatches.length === 0) {
+                showToast('No data to export', 'error');
+                return;
+            }
+            
+            let csvRows = ['"SL","Dispatch ID","Date","Supplier","Products","Currier","Status"'];
+            
+            filteredDispatches.forEach((d, index) => {
+                const productNames = d.items?.map(i => i.productName).join('; ') || 'N/A';
+                const supplierName = d.items?.[0]?.supplierName || 'N/A';
+                csvRows.push(`"${index + 1}","${d.dispatchId}","${d.dispatchDate}","${supplierName.replace(/"/g, '""')}","${productNames.replace(/"/g, '""')}","${d.currierName.replace(/"/g, '""')}","${d.status || 'dispatched'}"`);
+            });
+            
+            const csv = csvRows.join('\n');
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dispatches_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Exported ${filteredDispatches.length} entries`);
+        }
+        
+        // ============= EVENT LISTENERS =============
+        
+        // Load Warranty Button
+        document.getElementById('loadWarrantyBtn')?.addEventListener('click', loadWarrantyByDateRange);
+        
+        // Create Dispatch
         document.getElementById('createDispatchBtn')?.addEventListener('click', createDispatch);
-        document.getElementById('dispatchDate').valueAsDate = new Date();
-        document.getElementById('refreshBtn')?.addEventListener('click', () => { loadDispatches(); showToast('Refreshed!'); });
-        document.getElementById('darkModeToggle')?.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
-        document.getElementById('dispatchSearch')?.addEventListener('input', filterDispatches);
-        document.getElementById('exportDispatchBtn')?.addEventListener('click', exportToCSV);
-        document.getElementById('closeInvoiceModalBtn')?.addEventListener('click', () => document.getElementById('invoiceModal').classList.add('hidden'));
-        document.getElementById('printInvoiceBtn')?.addEventListener('click', () => window.print());
-        document.getElementById('scrollTopBtn')?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
         
-        // Logout
-        const logoutModal = document.getElementById('logoutModal'), logoutLink = document.getElementById('logoutLink'), cancelLogout = document.getElementById('cancelLogoutBtn'), confirmLogout = document.getElementById('confirmLogoutBtn');
-        if(logoutLink) logoutLink.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
-        if(cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
-        if(confirmLogout) confirmLogout.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
+        // Refresh
+        document.getElementById('refreshBtn')?.addEventListener('click', () => { 
+            loadDispatches(); 
+            loadCouriersForDropdown(); 
+            showToast('Refreshed'); 
+        });
         
+        // Search
+        dispatchSearch?.addEventListener('input', applyFilters);
+        
+        // Clear Search
+        clearSearchBtn?.addEventListener('click', () => {
+            dispatchSearch.value = '';
+            dispatchSearch.classList.remove('has-value');
+            applyFilters();
+        });
+        
+        // Per Page Change
+        perPageSelect?.addEventListener('change', (e) => {
+            pageSize = parseInt(e.target.value);
+            currentPage = 1;
+            renderTable();
+        });
+        
+        // Pagination
+        document.getElementById('prevPageBtn')?.addEventListener('click', () => {
+            if (currentPage > 1) { currentPage--; renderTable(); }
+        });
+        
+        document.getElementById('nextPageBtn')?.addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredDispatches.length / pageSize);
+            if (currentPage < totalPages) { currentPage++; renderTable(); }
+        });
+        
+        // Export Button
+        document.getElementById('exportDispatchBtn')?.addEventListener('click', exportCSV);
+        
+        // Print Invoice
+        document.getElementById('printInvoiceBtn')?.addEventListener('click', () => { 
+            setTimeout(() => window.print(), 100); 
+        });
+        
+        // Close Invoice Modal
+        document.getElementById('closeInvoiceModalBtn')?.addEventListener('click', () => {
+            document.getElementById('invoiceModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+        
+        // Dark Mode
+        document.getElementById('darkModeToggle')?.addEventListener('click', () => { 
+            document.documentElement.classList.toggle('dark'); 
+            document.body.classList.toggle('dark'); 
+        });
+        
+        // Set default dates to today
+        setDefaultDates();
+        
+        // Setup modal close on outside click
+        setupModalCloseOnOutside('invoiceModal', 'closeInvoiceModalBtn');
+        setupModalCloseOnOutside('logoutModal', 'cancelLogoutBtn');
+        
+        // Sidebar Logic
+        const sidebar = document.getElementById('sidebar');
+        document.getElementById('menuToggle')?.addEventListener('click', () => { 
+            sidebar.classList.remove('-translate-x-full'); 
+            document.body.insertAdjacentHTML('beforeend','<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 md:hidden" onclick="document.getElementById(\'sidebar\').classList.add(\'-translate-x-full\');this.remove()"></div>'); 
+        });
+        document.getElementById('closeSidebarBtn')?.addEventListener('click', () => { 
+            sidebar.classList.add('-translate-x-full'); 
+            document.getElementById('sidebarOverlay')?.remove(); 
+        });
+        if(window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); 
+        else sidebar.classList.add('-translate-x-full');
+        
+        document.querySelectorAll('.has-submenu').forEach(m => { 
+            const a = m.querySelector('a'); 
+            a?.addEventListener('click', (e) => { 
+                e.preventDefault(); 
+                m.classList.toggle('open'); 
+                m.querySelector('.submenu-modern')?.classList.toggle('open'); 
+            }); 
+        });
+        
+        document.getElementById('logoutLink')?.addEventListener('click', (e) => { 
+            e.preventDefault(); 
+            document.getElementById('logoutModal').classList.remove('hidden'); 
+            document.body.classList.add('modal-open');
+        });
+        document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => {
+            document.getElementById('logoutModal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+        document.getElementById('confirmLogoutBtn')?.addEventListener('click', async () => { 
+            document.getElementById('logoutModal').classList.add('hidden'); 
+            document.body.classList.remove('modal-open');
+            await logout(); 
+        });
+        
+        // Initialize
         loadDispatches();
+        loadCouriersForDropdown();
+        
+        // Auto-load today's items
+        setTimeout(() => loadWarrantyByDateRange(), 500);
     </script>
 </body>
 </html>

@@ -146,7 +146,6 @@
             box-shadow: 0 0 0 3px rgba(0,150,136,0.2);
         }
         
-        /* Full Circle Logo Style */
         .logo-circle {
             width: 100%;
             height: 100%;
@@ -156,7 +155,6 @@
             padding: 8px;
         }
         
-        /* Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -166,11 +164,15 @@
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
             z-index: 10001;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             gap: 20px;
+        }
+        
+        .loading-overlay.show {
+            display: flex;
         }
         
         .loading-spinner {
@@ -181,9 +183,33 @@
             border-top-color: #009688;
             animation: spin 1s linear infinite;
         }
+
+        .tab-lock-badge {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: #aaa;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 9999;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .tab-lock-badge i { color: #4db6ac; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen overflow-x-hidden">
+    
+    <!-- Tab Lock Badge -->
+    <div class="tab-lock-badge" id="tabLockBadge">
+        <i class="fas fa-lock"></i>
+        <span id="tabStatusText">Tab sync protected</span>
+    </div>
     
     <!-- Animated Background -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
@@ -198,7 +224,7 @@
     <div class="min-h-screen flex items-center justify-center px-4 py-8 relative z-10">
         <div class="w-full max-w-md animate-fade-up">
             
-            <!-- Brand Section with Full Circle Logo -->
+            <!-- Brand Section -->
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-primary to-primary-dark shadow-2xl mb-5 animate-logo-glow relative group cursor-pointer">
                     <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
@@ -325,8 +351,8 @@
         </div>
     </div>
     
-    <!-- Simple Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner"></div>
         <div class="text-white text-lg font-semibold">Authenticating...</div>
         <div class="text-purple-300 text-sm">Please wait</div>
@@ -334,7 +360,16 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            setPersistence, 
+            browserLocalPersistence, 
+            browserSessionPersistence, 
+            sendPasswordResetEmail,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyAceLr1Q3ivackOnYBozmNyXM87CAySHoM",
@@ -348,13 +383,295 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        // Check if user is already logged in
+        // ============ XSS PROTECTION (সবার আগে) ============
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ============ RATE LIMITING (সবার আগে) ============
+        const MAX_LOGIN_ATTEMPTS = 5;
+        const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
+        const loginAttempts = new Map();
+        
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('device_id');
+            if (!deviceId) {
+                deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('device_id', deviceId);
+            }
+            return deviceId;
+        }
+        
+        function checkRateLimit(email) {
+            const deviceId = getDeviceId();
+            const key = `${deviceId}_${email}`;
+            
+            // Check if locked out
+            const lockoutKey = `lockout_${key}`;
+            const lockoutTime = localStorage.getItem(lockoutKey);
+            if (lockoutTime) {
+                const timeLeft = parseInt(lockoutTime) - Date.now();
+                if (timeLeft > 0) {
+                    const minutesLeft = Math.ceil(timeLeft / 60000);
+                    return { 
+                        allowed: false, 
+                        message: `Too many failed attempts. Please try again in ${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}.` 
+                    };
+                } else {
+                    localStorage.removeItem(lockoutKey);
+                    loginAttempts.delete(key);
+                }
+            }
+            
+            const attempts = loginAttempts.get(key) || 0;
+            if (attempts >= MAX_LOGIN_ATTEMPTS) {
+                localStorage.setItem(lockoutKey, (Date.now() + LOCKOUT_DURATION).toString());
+                return { 
+                    allowed: false, 
+                    message: `Too many failed attempts. Please try again in 15 minutes.` 
+                };
+            }
+            
+            return { allowed: true, attempts: attempts };
+        }
+        
+        function incrementLoginAttempts(email) {
+            const deviceId = getDeviceId();
+            const key = `${deviceId}_${email}`;
+            const attempts = loginAttempts.get(key) || 0;
+            loginAttempts.set(key, attempts + 1);
+            
+            if (loginAttempts.size > 100) {
+                const keys = Array.from(loginAttempts.keys());
+                for (let i = 0; i < keys.length - 100; i++) {
+                    loginAttempts.delete(keys[i]);
+                }
+            }
+        }
+        
+        function resetLoginAttempts(email) {
+            const deviceId = getDeviceId();
+            const key = `${deviceId}_${email}`;
+            loginAttempts.delete(key);
+            const lockoutKey = `lockout_${key}`;
+            localStorage.removeItem(lockoutKey);
+        }
+        
+        // ============ CROSS-TAB SYNC PREVENTION ============
+        const REDIRECT_KEY = 'is_redirecting';
+        const REDIRECT_TIMESTAMP_KEY = 'redirect_timestamp';
+        const TAB_ID_KEY = 'tab_id';
+        const ACTIVE_TAB_KEY = 'active_tab_id';
+        
+        function generateTabId() {
+            return 'tab_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        let tabId = sessionStorage.getItem(TAB_ID_KEY);
+        if (!tabId) {
+            tabId = generateTabId();
+            sessionStorage.setItem(TAB_ID_KEY, tabId);
+        }
+        
+        function registerActiveTab() {
+            localStorage.setItem(ACTIVE_TAB_KEY, tabId);
+            localStorage.setItem('tab_last_active_' + tabId, Date.now().toString());
+        }
+        
+        function isActiveTab() {
+            const activeTab = localStorage.getItem(ACTIVE_TAB_KEY);
+            return activeTab === tabId;
+        }
+        
+        function setupTabSync() {
+            registerActiveTab();
+            
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    registerActiveTab();
+                }
+            });
+            
+            window.addEventListener('storage', (e) => {
+                if (e.key === ACTIVE_TAB_KEY) {
+                    const isActive = isActiveTab();
+                    document.getElementById('tabStatusText').textContent = 
+                        isActive ? 'Tab is active' : 'Another tab is active';
+                    
+                    if (!isActive && auth.currentUser) {
+                        console.log('ℹ️ Another tab is active, preventing redirect');
+                    }
+                }
+            });
+            
+            window.addEventListener('beforeunload', () => {});
+        }
+        
+        function isRedirecting() {
+            return sessionStorage.getItem(REDIRECT_KEY) === 'true';
+        }
+        
+        function setRedirecting(value) {
+            sessionStorage.setItem(REDIRECT_KEY, value ? 'true' : 'false');
+            if (value) {
+                sessionStorage.setItem(REDIRECT_TIMESTAMP_KEY, Date.now().toString());
+            }
+        }
+        
+        function shouldRedirect() {
+            if (isRedirecting()) {
+                console.log("⏳ Already redirecting, skipping...");
+                return false;
+            }
+            
+            const lastRedirect = sessionStorage.getItem(REDIRECT_TIMESTAMP_KEY);
+            if (lastRedirect) {
+                const timeSince = Date.now() - parseInt(lastRedirect);
+                if (timeSince < 5000) {
+                    console.log(`⏳ Recent redirect (${timeSince}ms ago), skipping...`);
+                    return false;
+                }
+            }
+            
+            if (!isActiveTab()) {
+                console.log("ℹ️ Not active tab, skipping redirect");
+                return false;
+            }
+            
+            return true;
+        }
+        
+        setupTabSync();
+        document.getElementById('tabStatusText').textContent = 'Tab sync active';
+        
+        // ============ INACTIVITY TIMER ============
+        let inactivityTimer = null;
+        let dailyResetTimer = null;
+        const INACTIVITY_TIMEOUT = 20 * 60 * 1000;
+        
+        function getTimeUntilMidnight() {
+            const now = new Date();
+            const midnight = new Date(now);
+            midnight.setHours(24, 0, 0, 0);
+            return midnight.getTime() - now.getTime();
+        }
+        
+        function resetInactivityTimer() {
+            if (inactivityTimer) {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = null;
+            }
+            
+            if (auth.currentUser) {
+                inactivityTimer = setTimeout(async () => {
+                    console.log("🕐 User inactive for 20 minutes, auto logging out...");
+                    try {
+                        await signOut(auth);
+                        showToast('Logged out due to 20 minutes of inactivity', 'warning');
+                        setRedirecting(false);
+                        localStorage.removeItem(ACTIVE_TAB_KEY);
+                        window.location.href = 'login.html';
+                    } catch (error) {
+                        console.error("Auto logout error:", error);
+                    }
+                }, INACTIVITY_TIMEOUT);
+            }
+        }
+        
+        function setupDailyReset() {
+            if (dailyResetTimer) {
+                clearTimeout(dailyResetTimer);
+                dailyResetTimer = null;
+            }
+            
+            if (auth.currentUser) {
+                const timeUntilMidnight = getTimeUntilMidnight();
+                console.log(`🕐 Daily reset in ${Math.round(timeUntilMidnight / 60000)} minutes`);
+                
+                dailyResetTimer = setTimeout(async () => {
+                    console.log("🕐 Midnight reached, auto logging out...");
+                    try {
+                        await signOut(auth);
+                        showToast('Session expired - daily reset at midnight', 'warning');
+                        setRedirecting(false);
+                        localStorage.removeItem(ACTIVE_TAB_KEY);
+                        window.location.href = 'login.html';
+                    } catch (error) {
+                        console.error("Daily reset logout error:", error);
+                    }
+                }, timeUntilMidnight);
+            }
+        }
+        
+        function setupActivityListeners() {
+            const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'keydown'];
+            
+            events.forEach(event => {
+                window.addEventListener(event, () => {
+                    if (auth.currentUser) {
+                        resetInactivityTimer();
+                    }
+                });
+            });
+            
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && auth.currentUser) {
+                    resetInactivityTimer();
+                }
+            });
+        }
+        
+        // ============ CHECK IF ALREADY LOGGED IN ============
+        let authStateChecked = false;
+        
         onAuthStateChanged(auth, (user) => {
+            if (authStateChecked) {
+                //console.log("⏳ Auth state already checked, skipping...");
+                return;
+            }
+            authStateChecked = true;
+            
             if (user) {
-                window.location.href = 'dashboard.html';
+                //console.log("✅ User already logged in:", user.email);
+                console.log("✅ User already logged in");
+                
+                resetInactivityTimer();
+                setupDailyReset();
+                
+                if (!window._activityListenersSetup) {
+                    setupActivityListeners();
+                    window._activityListenersSetup = true;
+                }
+                
+                if (shouldRedirect()) {
+                    //console.log("🔄 Redirecting to dashboard...");
+                    setRedirecting(true);
+                    
+                    setTimeout(() => {
+                        setRedirecting(false);
+                    }, 3000);
+                    
+                    window.location.replace('dashboard.html');
+                } else {
+                    //console.log("⏳ Skipping redirect (cooldown or not active tab)");
+                }
+            } else {
+                setRedirecting(false);
+                if (inactivityTimer) {
+                    clearTimeout(inactivityTimer);
+                    inactivityTimer = null;
+                }
+                if (dailyResetTimer) {
+                    clearTimeout(dailyResetTimer);
+                    dailyResetTimer = null;
+                }
             }
         });
         
+        // ============ TOAST & MESSAGE FUNCTIONS (XSS Protected) ============
         window.showToast = function(message, type = 'info') {
             const existingToasts = document.querySelectorAll('.toast');
             existingToasts.forEach(toast => toast.remove());
@@ -362,7 +679,7 @@
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             let icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
-            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${escapeHtml(message)}</span>`;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 4000);
         };
@@ -372,7 +689,7 @@
             if (!container) return;
             const bgColor = type === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-300' : 'bg-red-500/20 border-red-500/50 text-red-300';
             const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-            container.innerHTML = `<div class="p-3 rounded-xl border ${bgColor} text-sm flex items-center gap-2 animate-fade-up"><i class="fas ${icon}"></i><span>${message}</span></div>`;
+            container.innerHTML = `<div class="p-3 rounded-xl border ${bgColor} text-sm flex items-center gap-2 animate-fade-up"><i class="fas ${icon}"></i><span>${escapeHtml(message)}</span></div>`;
             setTimeout(() => { if (container.innerHTML) container.innerHTML = ''; }, 5000);
         }
         
@@ -419,7 +736,6 @@
                         brandLogo.src = logoOptions[currentIndex];
                         brandLogo.style.display = 'block';
                         if (fallbackIcon) fallbackIcon.style.display = 'none';
-                        console.log(`✅ Logo loaded: ${logoOptions[currentIndex]}`);
                     }
                 };
                 img.onerror = function() {
@@ -434,9 +750,10 @@
         
         document.addEventListener('DOMContentLoaded', () => {
             loadBrandLogo();
+            setRedirecting(false);
         });
         
-        // Login Form Submit
+        // ============ LOGIN FORM SUBMIT (With Rate Limiting) ============
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
         const emailInput = document.getElementById('email');
@@ -467,21 +784,52 @@
                 return;
             }
             
-            // Show loading overlay
-            loadingOverlay.style.display = 'flex';
-            loginBtn.disabled = true;
+            // ============ RATE LIMITING CHECK ============
+            const rateLimit = checkRateLimit(email);
+            if (!rateLimit.allowed) {
+                showMessage('messageContainer', rateLimit.message, 'error');
+                shakeElement(loginBtn);
+                return;
+            }
             
-            // Set persistence
+            // Show loading overlay
+            loadingOverlay.classList.add('show');
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<div class="spinner"></div><span>Signing in...</span>';
+            
             const persistence = remember ? browserLocalPersistence : browserSessionPersistence;
             await setPersistence(auth, persistence);
             
             try {
-                await signInWithEmailAndPassword(auth, email, password);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                //console.log("✅ Login successful:", userCredential.user.email);
+                console.log("✅ Login successful");
+                // ============ RESET ATTEMPTS ON SUCCESS ============
+                resetLoginAttempts(email);
+                
+                registerActiveTab();
+                resetInactivityTimer();
+                setupDailyReset();
+                
+                if (!window._activityListenersSetup) {
+                    setupActivityListeners();
+                    window._activityListenersSetup = true;
+                }
+                
                 window.showToast('Login successful! Redirecting...', 'success');
+                setRedirecting(true);
+                
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
+                    window.location.replace('dashboard.html');
+                }, 500);
+                
             } catch (error) {
+                //console.error("❌ Login error:", error.code, error.message);
+                console.error("❌ Login error:", error.code, error.message);
+                
+                // ============ INCREMENT ATTEMPTS ON FAILURE ============
+                incrementLoginAttempts(email);
+                
                 let errorMessage = '';
                 switch (error.code) {
                     case 'auth/invalid-credential':
@@ -495,19 +843,27 @@
                     case 'auth/invalid-email':
                         errorMessage = 'Invalid email format.';
                         break;
+                    case 'auth/user-disabled':
+                        errorMessage = 'This account has been disabled. Contact administrator.';
+                        break;
                     default:
                         errorMessage = 'Login failed. Please try again.';
                 }
                 showMessage('messageContainer', errorMessage, 'error');
                 window.showToast(errorMessage, 'error');
                 shakeElement(loginBtn);
-            } finally {
-                loadingOverlay.style.display = 'none';
+                
+                loginBtn.innerHTML = '<i class="fas fa-arrow-right-to-bracket group-hover:translate-x-1 transition-transform"></i><span>Sign In</span>';
                 loginBtn.disabled = false;
+                loadingOverlay.classList.remove('show');
+                setRedirecting(false);
             }
         });
         
-        // Forgot Password Modal
+        // ============ FORGOT PASSWORD ============
+        let lastResetRequest = 0;
+        const RESET_COOLDOWN = 60000; // 1 minute
+        
         const forgotModal = document.getElementById('forgotModal');
         const forgotLink = document.getElementById('forgotPasswordLink');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -532,11 +888,22 @@
                 shakeElement(resetEmailInput);
                 return;
             }
+            
+            // ============ RATE LIMITING FOR RESET ============
+            const now = Date.now();
+            if (now - lastResetRequest < RESET_COOLDOWN) {
+                const waitTime = Math.ceil((RESET_COOLDOWN - (now - lastResetRequest)) / 1000);
+                showMessage('resetMessageContainer', `Please wait ${waitTime} seconds before requesting another reset email.`, 'warning');
+                return;
+            }
+            lastResetRequest = now;
+            
             sendResetBtn.disabled = true;
             sendResetBtn.innerHTML = '<div class="spinner"></div><span>Sending...</span>';
+            
             try {
                 await sendPasswordResetEmail(auth, email);
-                showMessage('resetMessageContainer', `Password reset link sent to ${email}!`, 'success');
+                showMessage('resetMessageContainer', `Password reset link sent to ${escapeHtml(email)}!`, 'success');
                 window.showToast('Password reset email sent!', 'success');
                 setTimeout(() => closeModal(), 3000);
             } catch (error) {
@@ -551,7 +918,7 @@
         resetEmailInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendResetBtn.click(); });
         passwordInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') loginForm.dispatchEvent(new Event('submit')); });
         
-        console.log('🔥 Simple login page loaded!');
+        
     </script>
 </body>
 </html>

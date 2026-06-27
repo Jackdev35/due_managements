@@ -1,169 +1,230 @@
-import { 
-    db, 
-    collection, 
-    getDocs, 
-    query, 
-    where, 
-    orderBy, 
-    limit 
+import {
+  db,
+  doc,
+  getDoc,
+  collection,
+  query,
+  orderBy,
+  limit,
+  getDocs
 } from './firebase.js';
 
-// Load dashboard data
+/* ==============================
+   CACHE KEYS
+============================== */
+const CACHE_KEYS = {
+  DASHBOARD: "dash_stats_cache",
+  MONTHLY: "dash_monthly_cache",
+  RECENT: "dash_recent_cache"
+};
+
+/* ==============================
+   CHART INSTANCES
+============================== */
+let dueChart = null;
+let collectionChart = null;
+
+/* ==============================
+   MAIN DASHBOARD (ULTRA FAST)
+============================== */
 export async function loadDashboard() {
-    showLoading(true);
-    
-    try {
-        // Get customers
-        const customersSnap = await getDocs(collection(db, 'customers'));
-        const totalCustomers = customersSnap.size;
-        
-        // Calculate total due
-        let totalDue = 0;
-        customersSnap.forEach(doc => {
-            totalDue += (doc.data().totalDue || 0);
-        });
-        
-        // Get today's date
-        const today = new Date().toISOString().split('T')[0];
-        
-        // Get today's collections
-        const todayTransSnap = await getDocs(query(
-            collection(db, 'transactions'),
-            where('date', '==', today),
-            where('type', '==', 'collection')
-        ));
-        let todayCollection = 0;
-        todayTransSnap.forEach(t => {
-            todayCollection += (t.data().collectionAmount || 0);
-        });
-        
-        // Get total collections
-        const allTransSnap = await getDocs(collection(db, 'transactions'));
-        let totalCollections = 0;
-        allTransSnap.forEach(t => {
-            if (t.data().type === 'collection') {
-                totalCollections += (t.data().collectionAmount || 0);
-            }
-        });
-        
-        // Update stats
-        document.getElementById('totalCustomers').textContent = totalCustomers;
-        document.getElementById('totalDue').textContent = '৳' + totalDue.toFixed(2);
-        document.getElementById('totalCollections').textContent = '৳' + totalCollections.toFixed(2);
-        document.getElementById('todayCollection').textContent = '৳' + todayCollection.toFixed(2);
-        
-        // Load recent transactions
-        await loadRecentTransactions();
-        
-        // Load charts
-        await loadCharts();
-        
-    } catch (error) {
-        console.error('Error loading dashboard:', error);
-        showToast('Error loading dashboard data', 'error');
+  showLoading(true);
+
+  try {
+    // ⚡ STEP 1: LOAD FROM CACHE FIRST
+    const cachedStats = getCache(CACHE_KEYS.DASHBOARD);
+
+    let stats;
+
+    if (cachedStats) {
+      stats = cachedStats;
+    } else {
+      // ⚡ STEP 2: FIREBASE READ (ONLY IF CACHE MISS)
+      const snap = await getDoc(doc(db, "stats", "dashboard"));
+
+      stats = snap.exists()
+        ? snap.data()
+        : {
+            totalCustomers: 0,
+            totalDue: 0,
+            totalCollections: 0,
+            todayCollection: 0
+          };
+
+      setCache(CACHE_KEYS.DASHBOARD, stats);
     }
-    
-    showLoading(false);
+
+    // ⚡ FAST UI UPDATE
+    setText("totalCustomers", stats.totalCustomers);
+    setText("totalDue", formatMoney(stats.totalDue));
+    setText("totalCollections", formatMoney(stats.totalCollections));
+    setText("todayCollection", formatMoney(stats.todayCollection));
+
+    // ⚡ PARALLEL LOAD (FAST EXECUTION)
+    await Promise.all([
+      loadRecentTransactions(),
+      loadCharts()
+    ]);
+
+  } catch (err) {
+    console.error(err);
+    showToast("Dashboard load failed", "error");
+  }
+
+  showLoading(false);
 }
 
-// Load recent transactions
+/* ==============================
+   RECENT TRANSACTIONS (CACHE + LIMIT)
+============================== */
 async function loadRecentTransactions() {
-    const recentTrans = await getDocs(query(
-        collection(db, 'transactions'),
-        orderBy('date', 'desc'),
-        limit(10)
-    ));
-    
-    const tbody = document.getElementById('recentTransactions');
-    tbody.innerHTML = '';
-    
-    recentTrans.forEach(doc => {
-        const trans = doc.data();
-        const row = tbody.insertRow();
-        row.insertCell(0).textContent = trans.date;
-        row.insertCell(1).textContent = trans.type === 'due' ? 'Due Added' : 'Collection';
-        row.insertCell(2).textContent = trans.type === 'due' ? 
-            '৳' + (trans.dueAmount || 0).toFixed(2) : 
-            '৳' + (trans.collectionAmount || 0).toFixed(2);
-    });
+  const cached = getCache(CACHE_KEYS.RECENT);
+
+  let data;
+
+  if (cached) {
+    data = cached;
+  } else {
+    const q = query(
+      collection(db, "transactions"),
+      orderBy("timestamp", "desc"),
+      limit(10)
+    );
+
+    const snap = await getDocs(q);
+
+    data = snap.docs.map(d => d.data());
+
+    setCache(CACHE_KEYS.RECENT, data);
+  }
+
+  const tbody = document.getElementById("recentTransactions");
+  if (!tbody) return;
+
+  tbody.innerHTML = data.map(t => `
+    <tr>
+      <td>${t.date || "-"}</td>
+      <td>${formatType(t.type)}</td>
+      <td>${formatMoney(t.amount || 0)}</td>
+    </tr>
+  `).join("");
 }
 
-// Load charts
+/* ==============================
+   CHARTS (CACHE + MIN READ)
+============================== */
 async function loadCharts() {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const dueData = new Array(12).fill(0);
-    const collectionData = new Array(12).fill(0);
-    
-    const allTrans = await getDocs(collection(db, 'transactions'));
-    
-    allTrans.forEach(doc => {
-        const trans = doc.data();
-        if (trans.date) {
-            const month = new Date(trans.date).getMonth();
-            if (trans.type === 'due') {
-                dueData[month] += (trans.dueAmount || 0);
-            } else if (trans.type === 'collection') {
-                collectionData[month] += (trans.collectionAmount || 0);
-            }
-        }
+  const cached = getCache(CACHE_KEYS.MONTHLY);
+
+  let data;
+
+  if (cached) {
+    data = cached;
+  } else {
+    const snap = await getDoc(doc(db, "stats", "monthly"));
+    data = snap.exists() ? snap.data() : {};
+    setCache(CACHE_KEYS.MONTHLY, data);
+  }
+
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  const dueData = [];
+  const collectionData = [];
+
+  for (let i = 0; i < 12; i++) {
+    dueData.push(data[i]?.due || 0);
+    collectionData.push(data[i]?.collection || 0);
+  }
+
+  // destroy old charts
+  if (dueChart) dueChart.destroy();
+  if (collectionChart) collectionChart.destroy();
+
+  const dueCtx = document.getElementById("dueChart");
+  const collectionCtx = document.getElementById("collectionChart");
+
+  if (dueCtx) {
+    dueChart = new Chart(dueCtx.getContext("2d"), {
+      type: "bar",
+      data: {
+        labels: months,
+        datasets: [{
+          label: "Due",
+          data: dueData,
+          backgroundColor: "#ef4444"
+        }]
+      }
     });
-    
-    // Create due chart
-    const dueCtx = document.getElementById('dueChart').getContext('2d');
-    new Chart(dueCtx, {
-        type: 'bar',
-        data: {
-            labels: months,
-            datasets: [{
-                label: 'Due Added',
-                data: dueData,
-                backgroundColor: '#ef4444',
-                borderRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' }
-            }
-        }
+  }
+
+  if (collectionCtx) {
+    collectionChart = new Chart(collectionCtx.getContext("2d"), {
+      type: "bar",
+      data: {
+        labels: months,
+        datasets: [{
+          label: "Collection",
+          data: collectionData,
+          backgroundColor: "#10b981"
+        }]
+      }
     });
-    
-    // Create collection chart
-    const collectionCtx = document.getElementById('collectionChart').getContext('2d');
-    new Chart(collectionCtx, {
-        type: 'bar',
-        data: {
-            labels: months,
-            datasets: [{
-                label: 'Collections',
-                data: collectionData,
-                backgroundColor: '#10b981',
-                borderRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' }
-            }
-        }
-    });
+  }
 }
 
-// Utility functions
-function showLoading(show) {
-    const loader = document.getElementById('loadingOverlay');
-    if (loader) {
-        loader.style.display = show ? 'flex' : 'none';
+/* ==============================
+   CACHE SYSTEM (LOCAL STORAGE)
+============================== */
+function setCache(key, data) {
+  localStorage.setItem(key, JSON.stringify({
+    data,
+    time: Date.now()
+  }));
+}
+
+function getCache(key, maxAge = 1000 * 60 * 5) { // 5 min cache
+  const raw = localStorage.getItem(key);
+  if (!raw) return null;
+
+  try {
+    const parsed = JSON.parse(raw);
+
+    if (Date.now() - parsed.time > maxAge) {
+      localStorage.removeItem(key);
+      return null;
     }
+
+    return parsed.data;
+  } catch {
+    return null;
+  }
 }
 
-function showToast(message, type) {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+/* ==============================
+   UTILS
+============================== */
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function formatMoney(v) {
+  return "৳" + Number(v || 0).toFixed(2);
+}
+
+function formatType(t) {
+  return t === "due" ? "Due Added" : "Collection";
+}
+
+function showLoading(show) {
+  const el = document.getElementById("loadingOverlay");
+  if (el) el.style.display = show ? "flex" : "none";
+}
+
+function showToast(msg, type = "success") {
+  const div = document.createElement("div");
+  div.className = `toast ${type}`;
+  div.innerHTML = msg;
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 3000);
 }

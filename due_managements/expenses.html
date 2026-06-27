@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0f3b3a">
+    <title>Expenses | JackDev Due Managements</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0f3b3a',
+                        'primary-light': '#1e6b68',
+                        'primary-dark': '#092c2b',
+                        accent: '#d4af37',
+                        danger: '#e53e3e',
+                        success: '#2c7a4d',
+                        warning: '#dd6b20',
+                        info: '#3182ce',
+                    },
+                    fontFamily: { 'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+        * { transition: background-color 0.2s, border-color 0.2s; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; }
+        
+        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
+        .nav-active { background:linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%); border-left:3px solid #d4af37; }
+        .dark .nav-active { background:linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%); }
+        .submenu-modern { max-height:0; overflow:hidden; transition:max-height 0.28s; }
+        .submenu-modern.open { max-height:350px; }
+        .has-submenu>a .chevron-icon { transition:transform 0.2s; }
+        .has-submenu.open>a .chevron-icon { transform:rotate(180deg); }
+        
+        @keyframes modalSlideUp { from { opacity:0; transform:translateY(20px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+        .modal-animate { animation:modalSlideUp 0.2s ease-out forwards; }
+        .btn-active:active { transform:scale(0.97); }
+        .stat-card { transition:all 0.2s; }
+        .stat-card:hover { transform:translateY(-3px); box-shadow:0 12px 22px -12px rgba(0,0,0,0.12); }
+        .sidebar-fixed { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+        .sidebar-header-fixed { flex-shrink:0; position:sticky; top:0; background:inherit; z-index:10; }
+        
+        .filter-input { padding:6px 10px; padding-left:32px; font-size:12px; border:1px solid #d1d5db; border-radius:8px; background:white; color:#1f2937; outline:none; transition:border-color 0.2s, box-shadow 0.2s; width:100%; }
+        .filter-input:focus { border-color:#0f3b3a; box-shadow:0 0 0 2px rgba(15,59,58,0.1); }
+        .dark .filter-input { background:#1f2937; border-color:#4b5563; color:#f1f5f9; }
+        .dark .filter-input:focus { border-color:#1e6b68; box-shadow:0 0 0 2px rgba(30,107,104,0.15); }
+        .filter-wrapper { position:relative; width:100%; }
+        .filter-wrapper i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:12px; }
+        .filter-clear-btn { position:absolute; right:8px; top:50%; transform:translateY(-50%); color:#9ca3af; cursor:pointer; font-size:12px; display:none; padding:2px; }
+        .filter-clear-btn:hover { color:#ef4444; }
+        .filter-wrapper input.has-value + .filter-clear-btn { display:block; }
+        
+        .filter-select { padding:6px 10px; font-size:12px; border:1px solid #d1d5db; border-radius:8px; background:white; color:#1f2937; outline:none; cursor:pointer; min-width:70px; }
+        .filter-select:focus { border-color:#0f3b3a; box-shadow:0 0 0 2px rgba(15,59,58,0.1); }
+        .dark .filter-select { background:#1f2937; border-color:#4b5563; color:#f1f5f9; }
+        .filter-label { font-size:12px; color:#6b7280; white-space:nowrap; }
+        .dark .filter-label { color:#9ca3af; }
+        
+        .pagination-btn { transition:all 0.2s; padding:4px 12px; font-size:12px; border-radius:6px; border:1px solid #d1d5db; background:white; cursor:pointer; }
+        .pagination-btn:hover:not(:disabled) { background:#0f3b3a; color:white; transform:translateY(-1px); }
+        .pagination-btn:disabled { opacity:0.5; cursor:not-allowed; }
+        .dark .pagination-btn { background:#1f2937; border-color:#4b5563; color:#e5e7eb; }
+        .dark .pagination-btn:hover:not(:disabled) { background:#0f3b3a; color:white; }
+        .table-row-hover:hover { background-color:rgba(15,59,58,0.04); }
+        .dark .table-row-hover:hover { background-color:rgba(30,107,104,0.1); }
+        
+        .expense-category-badge { display:inline-block; padding:2px 10px; border-radius:12px; font-size:10px; font-weight:600; }
+        .expense-rent { background:#dbeafe; color:#1e40af; }
+        .expense-electricity { background:#fef3c7; color:#92400e; }
+        .expense-staff { background:#d1fae5; color:#065f46; }
+        .expense-other { background:#e5e7eb; color:#374151; }
+        .dark .expense-rent { background:#1e3a5f; color:#93c5fd; }
+        .dark .expense-electricity { background:#78350f; color:#fcd34d; }
+        .dark .expense-staff { background:#064e3b; color:#6ee7b7; }
+        .dark .expense-other { background:#374151; color:#9ca3af; }
+        
+        .tab-btn {
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+        }
+        .tab-btn.active {
+            background: #0f3b3a;
+            color: white;
+            box-shadow: 0 4px 12px rgba(15,59,58,0.2);
+        }
+        .tab-btn:not(.active) { color: #6b7280; }
+        .tab-btn:not(.active):hover { background: #e5e7eb; }
+        .dark .tab-btn:not(.active) { color: #9ca3af; }
+        .dark .tab-btn:not(.active):hover { background: #374151; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: modalSlideUp 0.3s ease-out; }
+
+        .salary-ledger-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .salary-ledger-item:last-child { border-bottom: none; }
+        .dark .salary-ledger-item { border-bottom-color: #374151; }
+        .salary-ledger-item .date { font-size: 11px; color: #6b7280; }
+        .dark .salary-ledger-item .date { color: #9ca3af; }
+        .salary-ledger-item .amount { font-weight: 600; }
+        .salary-ledger-item .amount.positive { color: #16a34a; }
+        .salary-ledger-item .amount.negative { color: #dc2626; }
+        .salary-ledger-item .month-badge {
+            display: inline-block;
+            padding: 1px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .dark .salary-ledger-item .month-badge {
+            background: #374151;
+            color: #e5e7eb;
+        }
+
+        .modal-overlay {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            padding: 16px;
+        }
+        .modal-overlay .modal-content {
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-overlay .modal-content.no-scroll {
+            overflow-y: visible;
+            max-height: none;
+        }
+
+        .category-field-transition {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+            opacity: 0;
+            margin: 0;
+        }
+        .category-field-transition.open {
+            max-height: 80px;
+            opacity: 1;
+            margin-top: 12px;
+        }
+
+        .salary-modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .salary-modal-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .dark .category-item { border-bottom-color: #374151; }
+        .category-item:last-child { border-bottom: none; }
+        .category-item .cat-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 border-r border-white/5 sidebar-fixed">
+            <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
+                        </div>
+                        <div class="leading-tight">
+                            <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
+                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
+                        </div>
+                    </div>
+                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
+                <nav class="space-y-1.5">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                        <span class="text-sm font-medium">Dashboard</span>
+                    </a>
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customers</span>
+                    </a>
+                    <div class="has-submenu" id="dueSubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a>
+                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a>
+                        </div>
+                    </div>
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span>
+                    </a>
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
+                    </a>
+                    <div class="has-submenu" id="warrantySubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span></a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span></a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span></a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span></a>
+                        </div>
+                    </div>
+                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
+                    </a>
+                    <!-- Single Expenses Menu Item -->
+                    <a href="expenses.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-money-bill-wave text-sm text-accent"></i></div>
+                        <span class="text-sm font-medium">Expenses</span>
+                    </a>
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
+                    </a>
+                </nav>
+                <div class="pt-4 mt-2 border-t border-white/10">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition">
+                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                        <span class="text-sm font-medium">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 min-h-screen w-full">
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+                <div class="px-3 py-2.5 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg"><i class="fas fa-bars text-lg"></i></button>
+                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-money-bill-wave text-primary mr-2"></i>Expenses</h2>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt text-sm"></i></button>
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-moon dark:hidden text-sm"></i><i class="fas fa-sun hidden dark:inline-block text-sm"></i></button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-3 md:p-4">
+                <!-- Stats Cards - 6 Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
+                        <div class="bg-blue-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-coins text-blue-600 text-sm"></i></div>
+                        <p class="text-gray-500 text-[9px] font-semibold uppercase">Total Expenses</p>
+                        <p class="text-lg font-bold" id="totalExpenses">৳0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
+                        <div class="bg-green-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-calendar-check text-green-600 text-sm"></i></div>
+                        <p class="text-gray-500 text-[9px] font-semibold uppercase">This Month</p>
+                        <p class="text-lg font-bold" id="monthlyExpenses">৳0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
+                        <div class="bg-purple-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-users text-purple-600 text-sm"></i></div>
+                        <p class="text-gray-500 text-[9px] font-semibold uppercase">Total Staff</p>
+                        <p class="text-lg font-bold" id="totalStaff">0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
+                        <div class="bg-red-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-exclamation-triangle text-red-600 text-sm"></i></div>
+                        <p class="text-gray-500 text-[9px] font-semibold uppercase">Salary Due</p>
+                        <p class="text-lg font-bold text-red-600" id="salaryDue">৳0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
+                        <div class="bg-amber-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-building text-amber-600 text-sm"></i></div>
+                        <p class="text-gray-500 text-[9px] font-semibold uppercase">Office Expenses</p>
+                        <p class="text-lg font-bold text-amber-600" id="officeExpenses">৳0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
+                        <div class="bg-teal-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-hand-holding-usd text-teal-600 text-sm"></i></div>
+                        <p class="text-gray-500 text-[9px] font-semibold uppercase">Staff Paid</p>
+                        <p class="text-lg font-bold text-teal-600" id="staffPaid">৳0</p>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex gap-2 mb-5 overflow-x-auto pb-1">
+                    <button class="tab-btn active" data-tab="staff">👨‍💼 Staff Salaries</button>
+                    <button class="tab-btn" data-tab="office">🏢 Office Expenses</button>
+                    <button class="tab-btn" data-tab="summary">📊 Summary</button>
+                </div>
+
+                <!-- Tab: Staff Salaries -->
+                <div id="tab-staff" class="tab-content active">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-4">
+                        <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                            <h3 class="text-sm font-semibold"><i class="fas fa-user-plus text-primary mr-2"></i>Add New Staff</h3>
+                        </div>
+                        <form id="staffForm" class="p-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Staff Name <span class="text-red-500">*</span></label>
+                                    <input type="text" id="staffName" placeholder="Enter name" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Phone</label>
+                                    <input type="tel" id="staffPhone" placeholder="Enter phone" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Position</label>
+                                    <input type="text" id="staffPosition" placeholder="e.g., Manager" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Monthly Salary <span class="text-red-500">*</span></label>
+                                    <input type="number" id="staffSalary" placeholder="Amount" step="0.01" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Join Date</label>
+                                    <input type="date" id="staffJoinDate" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                </div>
+                                <div class="flex items-end">
+                                    <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 btn-active">
+                                        <i class="fas fa-save"></i> Add Staff
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Staff List -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                        <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex justify-between items-center flex-wrap gap-2">
+                            <h3 class="text-sm font-semibold"><i class="fas fa-list text-primary mr-2"></i>Staff List</h3>
+                            <button id="exportStaffBtn" class="bg-success hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 transition btn-active">
+                                <i class="fas fa-download text-xs"></i> Export CSV
+                            </button>
+                        </div>
+
+                        <div class="px-4 py-3 border-b flex flex-col sm:flex-row justify-between items-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <span class="filter-label">Show</span>
+                                <select id="staffPerPage" class="filter-select">
+                                    <option value="10" selected>10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <span class="filter-label">entries</span>
+                                <span class="text-xs text-gray-400 ml-2">|</span>
+                                <span class="text-xs text-gray-500">Showing <span id="staffPageStart">0</span> - <span id="staffPageEnd">0</span> of <span id="staffTotalEntries">0</span></span>
+                            </div>
+                            <div class="relative w-full sm:w-64 filter-wrapper">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="staffSearch" placeholder="Search staff..." class="filter-input">
+                                <span class="filter-clear-btn" id="clearStaffSearch"><i class="fas fa-times-circle"></i></span>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[1000px]">
+                                <thead class="bg-gray-50 dark:bg-gray-700/50 border-b">
+                                    <tr>
+                                        <th class="px-3 py-3 text-center text-[10px] font-semibold uppercase w-[50px]">#</th>
+                                        <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Name</th>
+                                        <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Phone</th>
+                                        <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Position</th>
+                                        <th class="px-3 py-3 text-right text-[10px] font-semibold uppercase">Salary</th>
+                                        <th class="px-3 py-3 text-right text-[10px] font-semibold uppercase">Paid</th>
+                                        <th class="px-3 py-3 text-right text-[10px] font-semibold uppercase">Due</th>
+                                        <th class="px-3 py-3 text-center text-[10px] font-semibold uppercase">Status</th>
+                                        <th class="px-3 py-3 text-center text-[10px] font-semibold uppercase" style="min-width:110px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staffTableBody">
+                                    <tr><td colspan="9" class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="px-4 py-3 border-t flex justify-between items-center flex-wrap gap-2">
+                            <div class="text-xs text-gray-500">Page <span id="staffPageInfo">1</span> of <span id="staffTotalPages">1</span></div>
+                            <div class="flex gap-1">
+                                <button id="staffPrevPage" class="pagination-btn" disabled><i class="fas fa-chevron-left text-[10px]"></i> Prev</button>
+                                <button id="staffNextPage" class="pagination-btn" disabled>Next <i class="fas fa-chevron-right text-[10px]"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Office Expenses -->
+                <div id="tab-office" class="tab-content">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-4">
+                        <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex justify-between items-center flex-wrap gap-2">
+                            <h3 class="text-sm font-semibold"><i class="fas fa-plus-circle text-primary mr-2"></i>Add Office Expense</h3>
+                            <button id="manageCategoriesBtn" class="bg-info hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 transition btn-active">
+                                <i class="fas fa-tags"></i> Manage Categories
+                            </button>
+                        </div>
+                        <form id="expenseForm" class="p-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Category <span class="text-red-500">*</span></label>
+                                    <select id="expenseCategory" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                        <option value="rent">🏢 Office Rent</option>
+                                        <option value="electricity">⚡ Electricity Bill</option>
+                                        <option value="staff">👨‍💼 Staff Salary</option>
+                                        <option value="other">📋 Other Expenses</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Amount <span class="text-red-500">*</span></label>
+                                    <input type="number" id="expenseAmount" placeholder="Enter amount" step="0.01" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Date <span class="text-red-500">*</span></label>
+                                    <input type="date" id="expenseDate" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Description</label>
+                                    <input type="text" id="expenseDescription" placeholder="Brief description" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                </div>
+                            </div>
+                            <div class="category-field-transition" id="otherCategoryField">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-medium mb-1.5">Custom Category Name <span class="text-red-500">*</span></label>
+                                        <input type="text" id="otherCategoryName" placeholder="e.g., Stationery, Repair, etc." class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sm:col-span-4 mt-3">
+                                <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 btn-active">
+                                    <i class="fas fa-save"></i> Add Expense
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Expenses List -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                        <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex justify-between items-center flex-wrap gap-2">
+                            <h3 class="text-sm font-semibold"><i class="fas fa-list text-primary mr-2"></i>All Expenses</h3>
+                            <button id="exportExpenseBtn" class="bg-success hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 transition btn-active">
+                                <i class="fas fa-download text-xs"></i> Export CSV
+                            </button>
+                        </div>
+
+                        <div class="px-4 py-3 border-b flex flex-col sm:flex-row justify-between items-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <span class="filter-label">Show</span>
+                                <select id="expensePerPage" class="filter-select">
+                                    <option value="10" selected>10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <span class="filter-label">entries</span>
+                                <span class="text-xs text-gray-400 ml-2">|</span>
+                                <span class="text-xs text-gray-500">Showing <span id="expensePageStart">0</span> - <span id="expensePageEnd">0</span> of <span id="expenseTotalEntries">0</span></span>
+                            </div>
+                            <div class="relative w-full sm:w-64 filter-wrapper">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="expenseSearch" placeholder="Search expenses..." class="filter-input">
+                                <span class="filter-clear-btn" id="clearExpenseSearch"><i class="fas fa-times-circle"></i></span>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[850px]">
+                                <thead class="bg-gray-50 dark:bg-gray-700/50 border-b">
+                                    <tr>
+                                        <th class="px-3 py-3 text-center text-[10px] font-semibold uppercase w-[50px]">#</th>
+                                        <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Date</th>
+                                        <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Category</th>
+                                        <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Description</th>
+                                        <th class="px-3 py-3 text-right text-[10px] font-semibold uppercase">Amount</th>
+                                        <th class="px-3 py-3 text-center text-[10px] font-semibold uppercase">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expenseTableBody">
+                                    <tr><td colspan="6" class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="px-4 py-3 border-t flex justify-between items-center flex-wrap gap-2">
+                            <div class="text-xs text-gray-500">Page <span id="expensePageInfo">1</span> of <span id="expenseTotalPages">1</span></div>
+                            <div class="flex gap-1">
+                                <button id="expensePrevPage" class="pagination-btn" disabled><i class="fas fa-chevron-left text-[10px]"></i> Prev</button>
+                                <button id="expenseNextPage" class="pagination-btn" disabled>Next <i class="fas fa-chevron-right text-[10px]"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Summary -->
+                <div id="tab-summary" class="tab-content">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <!-- Staff Summary -->
+                        <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                            <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                                <h3 class="text-sm font-semibold"><i class="fas fa-users text-primary mr-2"></i>Staff Summary</h3>
+                            </div>
+                            <div class="p-4">
+                                <div id="staffSummaryContent">
+                                    <div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Office Expenses Summary -->
+                        <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                            <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                                <h3 class="text-sm font-semibold"><i class="fas fa-building text-primary mr-2"></i>Office Expenses Summary</h3>
+                            </div>
+                            <div class="p-4">
+                                <div id="expenseSummaryContent">
+                                    <div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Salary Ledger -->
+                        <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                            <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex justify-between items-center flex-wrap gap-2">
+                                <h3 class="text-sm font-semibold"><i class="fas fa-book text-primary mr-2"></i>Salary Ledger</h3>
+                                <div class="flex items-center gap-2">
+                                    <select id="ledgerStaffSelect" class="filter-select text-sm px-3 py-1.5 min-w-[200px]">
+                                        <option value="">-- Select Staff --</option>
+                                    </select>
+                                    <button id="viewLedgerBtn" class="bg-primary hover:bg-primary-dark text-white px-4 py-1.5 rounded-lg text-sm transition btn-active">
+                                        <i class="fas fa-eye mr-1"></i> View
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="p-4 max-h-[400px] overflow-y-auto">
+                                <div id="salaryLedgerContent">
+                                    <div class="text-center py-8 text-gray-400 text-sm">Select a staff member to view salary ledger</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pie Chart & Recent Activity -->
+                        <div class="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <!-- Pie Chart -->
+                            <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                                <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                                    <h3 class="text-sm font-semibold"><i class="fas fa-chart-pie text-primary mr-2"></i>Expense Distribution</h3>
+                                </div>
+                                <div class="p-4">
+                                    <div class="chart-container">
+                                        <canvas id="expensePieChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Activity with Description -->
+                            <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                                <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                                    <h3 class="text-sm font-semibold"><i class="fas fa-clock text-primary mr-2"></i>Recent Activity</h3>
+                                </div>
+                                <div class="p-4 max-h-[400px] overflow-y-auto">
+                                    <div id="recentActivityContent">
+                                        <div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                    <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span>
+                        <span class="text-gray-300 dark:border-gray-600">|</span>
+                        <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                    </p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Salary Payment Modal - No Scroll, 2 Column Layout -->
+    <div id="salaryModal" class="modal-overlay hidden">
+        <div class="modal-content no-scroll bg-white dark:bg-gray-800 rounded-xl shadow-2xl modal-animate">
+            <div class="flex justify-between items-center px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="font-semibold text-gray-800 dark:text-white"><i class="fas fa-money-bill-wave text-primary mr-2"></i>Pay Salary</h3>
+                <button onclick="closeSalaryModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="salaryForm" class="p-5 space-y-4">
+                <input type="hidden" id="salaryStaffId">
+                <div class="salary-modal-grid">
+                    <div class="full-width">
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Staff Name</label>
+                        <input type="text" id="salaryStaffName" readonly class="w-full px-3 py-2.5 text-sm border rounded-xl bg-gray-100 dark:bg-gray-700 cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Monthly Salary</label>
+                        <input type="text" id="salaryMonthlyAmount" readonly class="w-full px-3 py-2.5 text-sm border rounded-xl bg-gray-100 dark:bg-gray-700 cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Remaining Due</label>
+                        <input type="text" id="salaryRemainingDue" readonly class="w-full px-3 py-2.5 text-sm border rounded-xl bg-gray-100 dark:bg-gray-700 cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Amount to Pay <span class="text-red-500">*</span></label>
+                        <input type="number" id="salaryPayAmount" placeholder="Enter amount" step="0.01" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Month <span class="text-red-500">*</span></label>
+                        <input type="month" id="salaryMonth" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Payment Date <span class="text-red-500">*</span></label>
+                        <input type="date" id="salaryPaymentDate" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                    </div>
+                    <div class="full-width">
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Remarks</label>
+                        <input type="text" id="salaryRemarks" placeholder="Payment notes..." class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-success hover:bg-green-700 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
+                    <i class="fas fa-check-circle"></i> Pay Salary
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Staff Modal -->
+    <div id="editStaffModal" class="modal-overlay hidden">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl modal-animate">
+            <div class="flex justify-between items-center px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="font-semibold text-gray-800 dark:text-white"><i class="fas fa-edit text-primary mr-2"></i>Edit Staff</h3>
+                <button onclick="closeEditStaffModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="editStaffForm" class="p-5 space-y-4">
+                <input type="hidden" id="editStaffId">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Staff Name <span class="text-red-500">*</span></label>
+                    <input type="text" id="editStaffName" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Phone</label>
+                    <input type="tel" id="editStaffPhone" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Position</label>
+                    <input type="text" id="editStaffPosition" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Monthly Salary <span class="text-red-500">*</span></label>
+                    <input type="number" id="editStaffSalary" step="0.01" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                </div>
+                <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i> Update Staff
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Expense Modal -->
+    <div id="editExpenseModal" class="modal-overlay hidden">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl modal-animate">
+            <div class="flex justify-between items-center px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="font-semibold text-gray-800 dark:text-white"><i class="fas fa-edit text-primary mr-2"></i>Edit Expense</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="editExpenseForm" class="p-5 space-y-4">
+                <input type="hidden" id="editExpenseId">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Category <span class="text-red-500">*</span></label>
+                    <select id="editExpenseCategory" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                        <option value="rent">🏢 Office Rent</option>
+                        <option value="electricity">⚡ Electricity Bill</option>
+                        <option value="staff">👨‍💼 Staff Salary</option>
+                        <option value="other">📋 Other Expenses</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Amount <span class="text-red-500">*</span></label>
+                    <input type="number" id="editExpenseAmount" step="0.01" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Date <span class="text-red-500">*</span></label>
+                    <input type="date" id="editExpenseDate" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
+                    <input type="text" id="editExpenseDescription" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                </div>
+                <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i> Update Expense
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Categories Modal -->
+    <div id="manageCategoriesModal" class="modal-overlay hidden">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl modal-animate">
+            <div class="flex justify-between items-center px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="font-semibold text-gray-800 dark:text-white"><i class="fas fa-tags text-primary mr-2"></i>Manage Categories</h3>
+                <button onclick="closeCategoriesModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-5">
+                <div class="mb-4">
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Add New Category</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="newCategoryName" placeholder="Enter category name" class="flex-1 px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                        <button id="addCategoryBtn" class="bg-primary hover:bg-primary-dark text-white px-4 py-2.5 rounded-xl text-sm font-medium transition flex items-center gap-2">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Custom Categories</p>
+                    <div id="categoryList" class="max-h-[250px] overflow-y-auto">
+                        <div class="text-center py-4 text-gray-400 text-sm">No custom categories added yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="confirmationModal" class="modal-overlay hidden">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 text-center modal-animate max-w-sm">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <i class="fas fa-exclamation-triangle text-orange-500 text-xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 dark:text-white mb-2" id="confirmationTitle">Confirm Action</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4" id="confirmationMessage">Are you sure you want to perform this action?</p>
+            <div class="flex gap-3 justify-center">
+                <button id="confirmationCancelBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition">Cancel</button>
+                <button id="confirmationConfirmBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-red-500 text-white hover:bg-red-600 transition">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+    <div id="logoutModal" class="modal-overlay hidden">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 text-center modal-animate max-w-sm">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <i class="fas fa-sign-out-alt text-orange-500 text-xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Are you sure you want to logout?</p>
+            <div class="flex gap-3 justify-center">
+                <button id="cancelLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition">Cancel</button>
+                <button id="confirmLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-red-500 text-white hover:bg-red-600 transition">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkAuthState, logout } from './js/auth.js';
+        import { db, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, Timestamp, getDoc } from './js/firebase.js';
+        checkAuthState();
+
+        // ==================== STATE ====================
+        let allStaff = [];
+        let filteredStaff = [];
+        let staffPage = 1;
+        let staffPageSize = 10;
+
+        let allExpenses = [];
+        let filteredExpenses = [];
+        let expensePage = 1;
+        let expensePageSize = 10;
+
+        let customCategories = ['Stationery', 'Repair', 'Transport', 'Meals'];
+        let pieChartInstance = null;
+
+        const defaultCategories = {
+            rent: { label: 'Office Rent', icon: '🏢', class: 'expense-rent' },
+            electricity: { label: 'Electricity Bill', icon: '⚡', class: 'expense-electricity' },
+            staff: { label: 'Staff Salary', icon: '👨‍💼', class: 'expense-staff' },
+            other: { label: 'Other Expenses', icon: '📋', class: 'expense-other' }
+        };
+
+        // ==================== UTILITIES ====================
+        function showToast(msg, type='success') {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = `px-4 py-2 rounded-lg shadow text-sm ${type==='success'?'bg-green-500 text-white':'bg-red-500 text-white'}`;
+            t.innerText = msg;
+            c.appendChild(t);
+            setTimeout(()=>t.remove(), 3000);
+        }
+
+        function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+
+        function getTodayDate() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        // ==================== CONFIRMATION MODAL ====================
+        function showConfirmationModal(title, message, onConfirm) {
+            const modal = document.getElementById('confirmationModal');
+            document.getElementById('confirmationTitle').textContent = title;
+            document.getElementById('confirmationMessage').textContent = message;
+            modal.classList.remove('hidden');
+
+            const cancelBtn = document.getElementById('confirmationCancelBtn');
+            const confirmBtn = document.getElementById('confirmationConfirmBtn');
+
+            // Remove old listeners by cloning and replacing
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+            newCancelBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+
+            newConfirmBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                if (typeof onConfirm === 'function') onConfirm();
+            });
+
+            // Close on overlay click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        }
+
+        // ==================== TABS ====================
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+                if(btn.dataset.tab === 'summary') {
+                    setTimeout(updatePieChart, 300);
+                }
+            });
+        });
+
+        // ==================== CATEGORY MANAGEMENT ====================
+        function loadCustomCategories() {
+            const saved = localStorage.getItem('customCategories');
+            if(saved) {
+                try {
+                    customCategories = JSON.parse(saved);
+                } catch(e) {
+                    customCategories = ['Stationery', 'Repair', 'Transport', 'Meals'];
+                }
+            }
+            renderCategoryList();
+            updateCategoryDropdowns();
+        }
+
+        function saveCustomCategories() {
+            localStorage.setItem('customCategories', JSON.stringify(customCategories));
+            renderCategoryList();
+            updateCategoryDropdowns();
+        }
+
+        function renderCategoryList() {
+            const container = document.getElementById('categoryList');
+            if(customCategories.length === 0) {
+                container.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">No custom categories added yet</div>';
+                return;
+            }
+            container.innerHTML = customCategories.map((cat, index) => `
+                <div class="category-item">
+                    <span class="cat-name">${escapeHtml(cat)}</span>
+                    <button class="delete-category-btn text-red-500 hover:text-red-700 p-1 rounded-lg hover:bg-red-50 transition" data-index="${index}" title="Delete category">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.delete-category-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const index = parseInt(btn.dataset.index);
+                    showConfirmationModal(
+                        'Delete Category',
+                        `Are you sure you want to delete the category "${customCategories[index]}"?`,
+                        () => {
+                            customCategories.splice(index, 1);
+                            saveCustomCategories();
+                            showToast('Category deleted');
+                        }
+                    );
+                });
+            });
+        }
+
+        function updateCategoryDropdowns() {
+            const selects = ['expenseCategory', 'editExpenseCategory'];
+            selects.forEach(id => {
+                const select = document.getElementById(id);
+                if(!select) return;
+                const currentValue = select.value;
+                const defaultOptions = ['rent', 'electricity', 'staff', 'other'];
+                const options = select.querySelectorAll('option');
+                options.forEach(opt => {
+                    if(!defaultOptions.includes(opt.value) && opt.value !== '') {
+                        opt.remove();
+                    }
+                });
+                customCategories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.textContent = `📌 ${cat}`;
+                    select.appendChild(opt);
+                });
+                if(currentValue && customCategories.includes(currentValue)) {
+                    select.value = currentValue;
+                }
+            });
+        }
+
+        document.getElementById('manageCategoriesBtn').addEventListener('click', () => {
+            document.getElementById('manageCategoriesModal').classList.remove('hidden');
+            loadCustomCategories();
+        });
+
+        window.closeCategoriesModal = function() {
+            document.getElementById('manageCategoriesModal').classList.add('hidden');
+        };
+
+        document.getElementById('addCategoryBtn').addEventListener('click', () => {
+            const input = document.getElementById('newCategoryName');
+            const name = input.value.trim();
+            if(!name) {
+                showToast('Please enter a category name', 'error');
+                return;
+            }
+            if(customCategories.includes(name)) {
+                showToast('Category already exists', 'error');
+                return;
+            }
+            customCategories.push(name);
+            saveCustomCategories();
+            input.value = '';
+            showToast('Category added!');
+        });
+
+        document.getElementById('newCategoryName').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') {
+                document.getElementById('addCategoryBtn').click();
+            }
+        });
+
+        // ==================== CATEGORY FIELD TOGGLE ====================
+        document.getElementById('expenseCategory').addEventListener('change', function() {
+            const field = document.getElementById('otherCategoryField');
+            if (this.value === 'other') {
+                field.classList.add('open');
+            } else {
+                field.classList.remove('open');
+                document.getElementById('otherCategoryName').value = '';
+            }
+        });
+
+        // ==================== STAFF FUNCTIONS ====================
+        async function loadStaff() {
+            try {
+                const q = query(collection(db, 'staff'), orderBy('createdAt', 'desc'));
+                const snap = await getDocs(q);
+                allStaff = [];
+                snap.forEach(d => {
+                    const data = d.data();
+                    const paid = data.paidAmount || 0;
+                    const salary = data.salary || 0;
+                    allStaff.push({
+                        id: d.id,
+                        name: data.name || 'Unknown',
+                        phone: data.phone || '',
+                        position: data.position || '',
+                        salary: salary,
+                        paidAmount: paid,
+                        dueAmount: salary - paid,
+                        joinDate: data.joinDate || '',
+                        status: data.status || 'active',
+                        salaryHistory: data.salaryHistory || []
+                    });
+                });
+                applyStaffFilters();
+                updateStats();
+                updateLedgerDropdown();
+            } catch (error) {
+                console.error('Error loading staff:', error);
+                document.getElementById('staffTableBody').innerHTML = '<tr><td colspan="9" class="text-center py-8 text-red-500 text-sm">Error loading data</td></tr>';
+            }
+        }
+
+        function applyStaffFilters() {
+            const search = document.getElementById('staffSearch').value.toLowerCase().trim();
+            if (!search) {
+                filteredStaff = [...allStaff];
+            } else {
+                filteredStaff = allStaff.filter(s => 
+                    s.name.toLowerCase().includes(search) ||
+                    s.position.toLowerCase().includes(search) ||
+                    s.phone.includes(search)
+                );
+            }
+            staffPage = 1;
+            renderStaffTable();
+        }
+
+        function renderStaffTable() {
+            const totalEntries = filteredStaff.length;
+            const totalPages = Math.ceil(totalEntries / staffPageSize) || 1;
+            const start = (staffPage - 1) * staffPageSize;
+            const end = Math.min(start + staffPageSize, totalEntries);
+            const pageData = filteredStaff.slice(start, end);
+
+            document.getElementById('staffPageStart').textContent = totalEntries ? start + 1 : 0;
+            document.getElementById('staffPageEnd').textContent = end;
+            document.getElementById('staffTotalEntries').textContent = totalEntries;
+            document.getElementById('staffPageInfo').textContent = staffPage;
+            document.getElementById('staffTotalPages').textContent = totalPages;
+            document.getElementById('staffPrevPage').disabled = staffPage === 1;
+            document.getElementById('staffNextPage').disabled = staffPage >= totalPages;
+
+            const tbody = document.getElementById('staffTableBody');
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-400 text-sm">No staff found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = pageData.map((s, index) => {
+                const serial = start + index + 1;
+                const statusColor = s.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+                const statusText = s.status === 'active' ? 'Active' : 'Inactive';
+                const payDisabled = s.status === 'inactive' || s.dueAmount <= 0;
+
+                return `
+                <tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-700/50 table-row-hover transition-colors">
+                    <td class="px-3 py-2.5 text-center text-xs font-medium text-gray-500">${serial}</td>
+                    <td class="px-3 py-2.5 text-sm font-semibold">${escapeHtml(s.name)}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(s.phone || '-')}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(s.position || '-')}</td>
+                    <td class="px-3 py-2.5 text-right text-sm font-semibold">৳${s.salary.toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-right text-sm text-green-600">৳${s.paidAmount.toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-right text-sm text-red-600 font-bold">৳${s.dueAmount.toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusColor}">${statusText}</span></td>
+                    <td class="px-3 py-2.5 text-center">
+                        <button class="pay-salary-btn text-green-600 hover:text-green-800 p-1.5 rounded-lg hover:bg-green-50 transition" data-id="${s.id}" data-name="${escapeHtml(s.name)}" data-salary="${s.salary}" data-due="${s.dueAmount}" ${payDisabled ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''} title="${s.status === 'inactive' ? 'Staff inactive' : s.dueAmount <= 0 ? 'No due' : 'Pay salary'}">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </button>
+                        <button class="edit-staff-btn text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50 transition" data-id="${s.id}" title="Edit Staff">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-staff-btn text-red-600 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-50 transition" data-id="${s.id}" title="Delete Staff">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        <button class="toggle-status-btn text-${s.status === 'active' ? 'red' : 'green'}-600 hover:text-${s.status === 'active' ? 'red' : 'green'}-800 p-1.5 rounded-lg hover:bg-${s.status === 'active' ? 'red' : 'green'}-50 transition" data-id="${s.id}" data-status="${s.status}" title="${s.status === 'active' ? 'Deactivate' : 'Activate'}">
+                            <i class="fas ${s.status === 'active' ? 'fa-user-slash' : 'fa-user-check'}"></i>
+                        </button>
+                    </td>
+                </tr>
+            `}).join('');
+
+            document.querySelectorAll('.pay-salary-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (btn.disabled) return;
+                    openSalaryModal(btn.dataset.id);
+                });
+            });
+
+            document.querySelectorAll('.edit-staff-btn').forEach(btn => {
+                btn.addEventListener('click', () => openEditStaffModal(btn.dataset.id));
+            });
+
+            document.querySelectorAll('.delete-staff-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const staffId = btn.dataset.id;
+                    const staff = allStaff.find(s => s.id === staffId);
+                    showConfirmationModal(
+                        'Delete Staff',
+                        `Are you sure you want to delete "${staff?.name || 'this staff'}"? This action cannot be undone.`,
+                        async () => {
+                            await deleteDoc(doc(db, 'staff', staffId));
+                            showToast('Staff deleted');
+                            loadStaff();
+                        }
+                    );
+                });
+            });
+
+            document.querySelectorAll('.toggle-status-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.dataset.id;
+                    const currentStatus = btn.dataset.status;
+                    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+                    const staff = allStaff.find(s => s.id === id);
+                    showConfirmationModal(
+                        `${newStatus === 'active' ? 'Activate' : 'Deactivate'} Staff`,
+                        `Are you sure you want to ${newStatus} "${staff?.name || 'this staff'}"?`,
+                        async () => {
+                            await updateDoc(doc(db, 'staff', id), { status: newStatus });
+                            showToast(`Staff ${newStatus === 'active' ? 'activated' : 'deactivated'}`);
+                            loadStaff();
+                        }
+                    );
+                });
+            });
+        }
+
+        // ==================== EXPENSE FUNCTIONS ====================
+        async function loadExpenses() {
+            try {
+                const q = query(collection(db, 'expenses'), orderBy('date', 'desc'));
+                const snap = await getDocs(q);
+                allExpenses = [];
+                snap.forEach(d => {
+                    const data = d.data();
+                    allExpenses.push({
+                        id: d.id,
+                        category: data.category || 'other',
+                        customCategory: data.customCategory || '',
+                        amount: data.amount || 0,
+                        date: data.date || '',
+                        description: data.description || '',
+                        createdAt: data.createdAt || ''
+                    });
+                });
+                applyExpenseFilters();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading expenses:', error);
+                document.getElementById('expenseTableBody').innerHTML = '<tr><td colspan="6" class="text-center py-8 text-red-500 text-sm">Error loading data</td></tr>';
+            }
+        }
+
+        function applyExpenseFilters() {
+            const search = document.getElementById('expenseSearch').value.toLowerCase().trim();
+            if (!search) {
+                filteredExpenses = [...allExpenses];
+            } else {
+                filteredExpenses = allExpenses.filter(e => 
+                    e.category.toLowerCase().includes(search) ||
+                    e.customCategory.toLowerCase().includes(search) ||
+                    e.description.toLowerCase().includes(search) ||
+                    e.date.includes(search)
+                );
+            }
+            expensePage = 1;
+            renderExpenseTable();
+        }
+
+        function renderExpenseTable() {
+            const totalEntries = filteredExpenses.length;
+            const totalPages = Math.ceil(totalEntries / expensePageSize) || 1;
+            const start = (expensePage - 1) * expensePageSize;
+            const end = Math.min(start + expensePageSize, totalEntries);
+            const pageData = filteredExpenses.slice(start, end);
+
+            document.getElementById('expensePageStart').textContent = totalEntries ? start + 1 : 0;
+            document.getElementById('expensePageEnd').textContent = end;
+            document.getElementById('expenseTotalEntries').textContent = totalEntries;
+            document.getElementById('expensePageInfo').textContent = expensePage;
+            document.getElementById('expenseTotalPages').textContent = totalPages;
+            document.getElementById('expensePrevPage').disabled = expensePage === 1;
+            document.getElementById('expenseNextPage').disabled = expensePage >= totalPages;
+
+            const tbody = document.getElementById('expenseTableBody');
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400 text-sm">No expenses found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = pageData.map((e, index) => {
+                const serial = start + index + 1;
+                const isCustom = e.category !== 'rent' && e.category !== 'electricity' && e.category !== 'staff' && e.category !== 'other';
+                let displayCategory = isCustom ? e.category : (e.customCategory || defaultCategories[e.category]?.label || e.category);
+                let categoryClass = isCustom || e.customCategory ? 'expense-other' : (defaultCategories[e.category]?.class || 'expense-other');
+                
+                return `
+                <tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-700/50 table-row-hover transition-colors">
+                    <td class="px-3 py-2.5 text-center text-xs font-medium text-gray-500">${serial}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(e.date)}</td>
+                    <td class="px-3 py-2.5 text-sm"><span class="expense-category-badge ${categoryClass}">${escapeHtml(displayCategory)}</span></td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(e.description || '-')}</td>
+                    <td class="px-3 py-2.5 text-right text-sm font-bold text-red-600">৳${e.amount.toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-center">
+                        <button class="edit-expense-btn text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50 transition" data-id="${e.id}" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-expense-btn text-red-600 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-50 transition" data-id="${e.id}" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `}).join('');
+
+            document.querySelectorAll('.edit-expense-btn').forEach(btn => {
+                btn.addEventListener('click', () => openEditModal(btn.dataset.id));
+            });
+
+            document.querySelectorAll('.delete-expense-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const expenseId = btn.dataset.id;
+                    const expense = allExpenses.find(e => e.id === expenseId);
+                    showConfirmationModal(
+                        'Delete Expense',
+                        `Are you sure you want to delete this expense of ৳${expense?.amount.toFixed(2) || ''}?`,
+                        async () => {
+                            await deleteDoc(doc(db, 'expenses', expenseId));
+                            showToast('Expense deleted');
+                            loadExpenses();
+                        }
+                    );
+                });
+            });
+        }
+
+        // ==================== UPDATE STATS ====================
+        function updateStats() {
+            const totalExp = allExpenses.reduce((sum, e) => sum + e.amount, 0);
+            const totalSalaryPaid = allStaff.reduce((sum, s) => sum + s.paidAmount, 0);
+            const totalSalaryDue = allStaff.reduce((sum, s) => sum + s.dueAmount, 0);
+            const total = totalExp + totalSalaryPaid;
+            
+            const month = new Date().toISOString().slice(0, 7);
+            const monthly = allExpenses.filter(e => e.date.startsWith(month)).reduce((sum, e) => sum + e.amount, 0) + 
+                           allStaff.filter(s => s.salaryHistory?.some(h => h.month === month)).reduce((sum, s) => {
+                               const m = s.salaryHistory?.filter(h => h.month === month);
+                               return sum + (m ? m.reduce((acc, cur) => acc + cur.amount, 0) : 0);
+                           }, 0);
+            
+            const officeExp = allExpenses.reduce((sum, e) => sum + e.amount, 0);
+            
+            document.getElementById('totalExpenses').textContent = `৳${total.toFixed(2)}`;
+            document.getElementById('monthlyExpenses').textContent = `৳${monthly.toFixed(2)}`;
+            document.getElementById('totalStaff').textContent = allStaff.length;
+            document.getElementById('salaryDue').textContent = `৳${totalSalaryDue.toFixed(2)}`;
+            document.getElementById('officeExpenses').textContent = `৳${officeExp.toFixed(2)}`;
+            document.getElementById('staffPaid').textContent = `৳${totalSalaryPaid.toFixed(2)}`;
+        }
+
+        // ==================== LEDGER DROPDOWN ====================
+        function updateLedgerDropdown() {
+            const select = document.getElementById('ledgerStaffSelect');
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">-- Select Staff --</option>';
+            allStaff.forEach(s => {
+                const option = document.createElement('option');
+                option.value = s.id;
+                option.textContent = `${s.name} (${s.position || 'No Position'})`;
+                select.appendChild(option);
+            });
+            if (currentValue && allStaff.some(s => s.id === currentValue)) {
+                select.value = currentValue;
+            }
+        }
+
+        // ==================== VIEW LEDGER ====================
+        document.getElementById('viewLedgerBtn').addEventListener('click', () => {
+            const staffId = document.getElementById('ledgerStaffSelect').value;
+            if (!staffId) {
+                showToast('Please select a staff member', 'error');
+                return;
+            }
+            const staff = allStaff.find(s => s.id === staffId);
+            if (!staff) {
+                showToast('Staff not found', 'error');
+                return;
+            }
+            renderSalaryLedger(staff);
+        });
+
+        function renderSalaryLedger(staff) {
+            const container = document.getElementById('salaryLedgerContent');
+            
+            if (!staff.salaryHistory || staff.salaryHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400 text-sm">
+                        <i class="fas fa-inbox text-3xl mb-2 block opacity-40"></i>
+                        No salary payments recorded for ${escapeHtml(staff.name)}
+                    </div>
+                `;
+                return;
+            }
+
+            const history = [...staff.salaryHistory].sort((a, b) => b.month.localeCompare(a.month));
+            const totalPaid = history.reduce((sum, h) => sum + h.amount, 0);
+            const monthNames = {
+                '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+                '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+                '09': 'September', '10': 'October', '11': 'November', '12': 'December'
+            };
+
+            let html = `
+                <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-base">${escapeHtml(staff.name)}</div>
+                        <div class="text-xs text-gray-500">${escapeHtml(staff.position || 'No Position')}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-gray-500">Total Salary Paid</div>
+                        <div class="text-xl font-bold text-green-600">৳${totalPaid.toFixed(2)}</div>
+                    </div>
+                </div>
+                <div class="space-y-1">
+            `;
+
+            history.forEach((h, index) => {
+                const [year, month] = h.month.split('-');
+                const monthName = monthNames[month] || month;
+                const date = h.paidDate || 'N/A';
+                const amount = h.amount || 0;
+                const remarks = h.remarks || '';
+
+                html += `
+                    <div class="salary-ledger-item">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3">
+                                <span class="date">${date}</span>
+                                <span class="month-badge">${monthName} ${year}</span>
+                                ${remarks ? `<span class="text-xs text-gray-400 ml-2">${escapeHtml(remarks)}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="amount positive">+ ৳${amount.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+                <div class="mt-3 p-2 bg-gray-100 dark:bg-gray-700/30 rounded-lg flex justify-between items-center">
+                    <span class="text-sm font-semibold">Total Payments</span>
+                    <span class="text-sm font-bold text-green-600">${history.length} payments</span>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // ==================== PIE CHART ====================
+        function updatePieChart() {
+            const ctx = document.getElementById('expensePieChart').getContext('2d');
+            
+            const categoryMap = {};
+            allExpenses.forEach(e => {
+                const key = e.customCategory || defaultCategories[e.category]?.label || e.category;
+                categoryMap[key] = (categoryMap[key] || 0) + e.amount;
+            });
+
+            allStaff.forEach(s => {
+                if(s.paidAmount > 0) {
+                    const key = '👨‍💼 Staff Salaries';
+                    categoryMap[key] = (categoryMap[key] || 0) + s.paidAmount;
+                }
+            });
+
+            const labels = Object.keys(categoryMap);
+            const data = Object.values(categoryMap);
+            const colors = [
+                '#0f3b3a', '#d4af37', '#2c7a4d', '#e53e3e', '#3182ce', 
+                '#dd6b20', '#805ad5', '#38a169', '#d69e2e', '#ed64a6'
+            ];
+
+            if(pieChartInstance) {
+                pieChartInstance.destroy();
+            }
+
+            if(data.length === 0) {
+                pieChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['No Data'],
+                        datasets: [{
+                            data: [1],
+                            backgroundColor: ['#e5e7eb'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { 
+                                display: true,
+                                position: 'bottom',
+                                labels: { font: { size: 10 } }
+                            }
+                        }
+                    }
+                });
+                return;
+            }
+
+            pieChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, data.length),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            display: true,
+                            position: 'bottom',
+                            labels: { 
+                                font: { size: 10 },
+                                padding: 10,
+                                boxWidth: 12
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `৳${context.parsed.toFixed(2)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==================== SALARY MODAL ====================
+        function openSalaryModal(staffId) {
+            const staff = allStaff.find(s => s.id === staffId);
+            if (!staff) return;
+            document.getElementById('salaryStaffId').value = staffId;
+            document.getElementById('salaryStaffName').value = staff.name;
+            document.getElementById('salaryMonthlyAmount').value = `৳${staff.salary.toFixed(2)}`;
+            document.getElementById('salaryRemainingDue').value = `৳${staff.dueAmount.toFixed(2)}`;
+            document.getElementById('salaryPayAmount').value = Math.min(staff.dueAmount, staff.salary);
+            document.getElementById('salaryMonth').value = new Date().toISOString().slice(0, 7);
+            document.getElementById('salaryPaymentDate').value = getTodayDate();
+            document.getElementById('salaryRemarks').value = '';
+            document.getElementById('salaryModal').classList.remove('hidden');
+        }
+
+        window.closeSalaryModal = function() {
+            document.getElementById('salaryModal').classList.add('hidden');
+        };
+
+        document.getElementById('salaryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const staffId = document.getElementById('salaryStaffId').value;
+            const payAmount = parseFloat(document.getElementById('salaryPayAmount').value);
+            const month = document.getElementById('salaryMonth').value;
+            const paymentDate = document.getElementById('salaryPaymentDate').value;
+            const remarks = document.getElementById('salaryRemarks').value;
+
+            if (!payAmount || payAmount <= 0) {
+                showToast('Please enter a valid amount', 'error');
+                return;
+            }
+
+            const staff = allStaff.find(s => s.id === staffId);
+            if (payAmount > staff.dueAmount) {
+                showToast(`Amount cannot exceed remaining due (৳${staff.dueAmount.toFixed(2)})`, 'error');
+                return;
+            }
+
+            if (!paymentDate) {
+                showToast('Please select payment date', 'error');
+                return;
+            }
+
+            try {
+                const staffRef = doc(db, 'staff', staffId);
+                const staffSnap = await getDoc(staffRef);
+                const data = staffSnap.data();
+                const currentPaid = data.paidAmount || 0;
+                const newPaid = currentPaid + payAmount;
+                const salary = data.salary || 0;
+                const history = data.salaryHistory || [];
+                history.push({
+                    month: month,
+                    amount: payAmount,
+                    paidDate: paymentDate,
+                    remarks: remarks || ''
+                });
+
+                await updateDoc(staffRef, {
+                    paidAmount: newPaid,
+                    dueAmount: salary - newPaid,
+                    salaryHistory: history,
+                    lastPaymentDate: paymentDate
+                });
+
+                showToast(`Salary payment of ৳${payAmount.toFixed(2)} recorded!`);
+                closeSalaryModal();
+                loadStaff();
+                updatePieChart();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        // ==================== EDIT STAFF MODAL ====================
+        function openEditStaffModal(staffId) {
+            const staff = allStaff.find(s => s.id === staffId);
+            if (!staff) return;
+            document.getElementById('editStaffId').value = staffId;
+            document.getElementById('editStaffName').value = staff.name;
+            document.getElementById('editStaffPhone').value = staff.phone || '';
+            document.getElementById('editStaffPosition').value = staff.position || '';
+            document.getElementById('editStaffSalary').value = staff.salary;
+            document.getElementById('editStaffModal').classList.remove('hidden');
+        }
+
+        window.closeEditStaffModal = function() {
+            document.getElementById('editStaffModal').classList.add('hidden');
+        };
+
+        document.getElementById('editStaffForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editStaffId').value;
+            const name = document.getElementById('editStaffName').value.trim();
+            const phone = document.getElementById('editStaffPhone').value.trim();
+            const position = document.getElementById('editStaffPosition').value.trim();
+            const salary = parseFloat(document.getElementById('editStaffSalary').value);
+
+            if (!name || !salary) {
+                showToast('Please fill required fields', 'error');
+                return;
+            }
+
+            try {
+                const staffRef = doc(db, 'staff', id);
+                const staffSnap = await getDoc(staffRef);
+                const data = staffSnap.data();
+                const currentPaid = data.paidAmount || 0;
+                const dueAmount = salary - currentPaid;
+
+                await updateDoc(staffRef, {
+                    name,
+                    phone: phone || '',
+                    position: position || '',
+                    salary: salary,
+                    dueAmount: dueAmount > 0 ? dueAmount : 0
+                });
+                showToast('Staff updated successfully!');
+                closeEditStaffModal();
+                loadStaff();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        // ==================== EDIT EXPENSE MODAL ====================
+        function openEditModal(id) {
+            const expense = allExpenses.find(e => e.id === id);
+            if (!expense) return;
+            document.getElementById('editExpenseId').value = id;
+            document.getElementById('editExpenseCategory').value = expense.category;
+            document.getElementById('editExpenseAmount').value = expense.amount;
+            document.getElementById('editExpenseDate').value = expense.date;
+            document.getElementById('editExpenseDescription').value = expense.description || '';
+            document.getElementById('editExpenseModal').classList.remove('hidden');
+        }
+
+        window.closeEditModal = function() {
+            document.getElementById('editExpenseModal').classList.add('hidden');
+        };
+
+        document.getElementById('editExpenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editExpenseId').value;
+            const category = document.getElementById('editExpenseCategory').value;
+            const amount = parseFloat(document.getElementById('editExpenseAmount').value);
+            const date = document.getElementById('editExpenseDate').value;
+            const description = document.getElementById('editExpenseDescription').value.trim();
+
+            try {
+                await updateDoc(doc(db, 'expenses', id), {
+                    category,
+                    amount,
+                    date,
+                    description: description || ''
+                });
+                showToast('Expense updated!');
+                closeEditModal();
+                loadExpenses();
+                updatePieChart();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        // ==================== FORM SUBMISSIONS ====================
+        document.getElementById('staffForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('staffName').value.trim();
+            const phone = document.getElementById('staffPhone').value.trim();
+            const position = document.getElementById('staffPosition').value.trim();
+            const salary = parseFloat(document.getElementById('staffSalary').value);
+            const joinDate = document.getElementById('staffJoinDate').value;
+
+            if (!name || !salary) {
+                showToast('Please fill required fields', 'error');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, 'staff'), {
+                    name,
+                    phone: phone || '',
+                    position: position || '',
+                    salary: salary,
+                    paidAmount: 0,
+                    dueAmount: salary,
+                    joinDate: joinDate || getTodayDate(),
+                    status: 'active',
+                    salaryHistory: [],
+                    createdAt: Timestamp.now()
+                });
+                showToast('Staff added successfully!');
+                document.getElementById('staffForm').reset();
+                loadStaff();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const category = document.getElementById('expenseCategory').value;
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const date = document.getElementById('expenseDate').value;
+            const description = document.getElementById('expenseDescription').value.trim();
+            const customCategory = document.getElementById('otherCategoryName').value.trim();
+
+            if (!amount || !date) {
+                showToast('Please fill required fields', 'error');
+                return;
+            }
+
+            const isCustom = category !== 'rent' && category !== 'electricity' && category !== 'staff' && category !== 'other';
+            let finalCategory = category;
+            let finalCustomCategory = '';
+
+            if (category === 'other') {
+                if (!customCategory) {
+                    showToast('Please enter a custom category name', 'error');
+                    return;
+                }
+                finalCustomCategory = customCategory;
+            } else if (isCustom) {
+                finalCategory = category;
+            }
+
+            try {
+                await addDoc(collection(db, 'expenses'), {
+                    category: finalCategory,
+                    customCategory: finalCustomCategory,
+                    amount: amount,
+                    date: date,
+                    description: description || '',
+                    createdAt: Timestamp.now()
+                });
+                showToast('Expense added successfully!');
+                document.getElementById('expenseForm').reset();
+                document.getElementById('expenseDate').value = getTodayDate();
+                document.getElementById('otherCategoryField').classList.remove('open');
+                loadExpenses();
+                updatePieChart();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        // ==================== EXPORT CSV ====================
+        function exportStaffCSV() {
+            if (filteredStaff.length === 0) { showToast('No data to export', 'error'); return; }
+            let rows = ['"SL","Name","Phone","Position","Salary","Paid","Due","Status"'];
+            filteredStaff.forEach((s, i) => {
+                rows.push(`"${i+1}","${s.name.replace(/"/g,'""')}","${s.phone}","${s.position}","${s.salary.toFixed(2)}","${s.paidAmount.toFixed(2)}","${s.dueAmount.toFixed(2)}","${s.status}"`);
+            });
+            const blob = new Blob(['\uFEFF' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `staff_${getTodayDate()}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Exported ${filteredStaff.length} staff`);
+        }
+
+        function exportExpenseCSV() {
+            if (filteredExpenses.length === 0) { showToast('No data to export', 'error'); return; }
+            let rows = ['"SL","Date","Category","Description","Amount"'];
+            filteredExpenses.forEach((e, i) => {
+                const cat = e.customCategory || defaultCategories[e.category]?.label || e.category;
+                rows.push(`"${i+1}","${e.date}","${cat}","${e.description.replace(/"/g,'""')}","${e.amount.toFixed(2)}"`);
+            });
+            const blob = new Blob(['\uFEFF' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `expenses_${getTodayDate()}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Exported ${filteredExpenses.length} expenses`);
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        document.getElementById('exportStaffBtn').addEventListener('click', exportStaffCSV);
+        document.getElementById('exportExpenseBtn').addEventListener('click', exportExpenseCSV);
+
+        document.getElementById('staffSearch').addEventListener('input', applyStaffFilters);
+        document.getElementById('clearStaffSearch').addEventListener('click', () => {
+            const input = document.getElementById('staffSearch');
+            input.value = '';
+            input.classList.remove('has-value');
+            applyStaffFilters();
+        });
+
+        document.getElementById('expenseSearch').addEventListener('input', applyExpenseFilters);
+        document.getElementById('clearExpenseSearch').addEventListener('click', () => {
+            const input = document.getElementById('expenseSearch');
+            input.value = '';
+            input.classList.remove('has-value');
+            applyExpenseFilters();
+        });
+
+        document.getElementById('staffPerPage').addEventListener('change', (e) => {
+            staffPageSize = parseInt(e.target.value);
+            staffPage = 1;
+            renderStaffTable();
+        });
+
+        document.getElementById('expensePerPage').addEventListener('change', (e) => {
+            expensePageSize = parseInt(e.target.value);
+            expensePage = 1;
+            renderExpenseTable();
+        });
+
+        document.getElementById('staffPrevPage').addEventListener('click', () => {
+            if (staffPage > 1) { staffPage--; renderStaffTable(); }
+        });
+        document.getElementById('staffNextPage').addEventListener('click', () => {
+            const total = Math.ceil(filteredStaff.length / staffPageSize);
+            if (staffPage < total) { staffPage++; renderStaffTable(); }
+        });
+
+        document.getElementById('expensePrevPage').addEventListener('click', () => {
+            if (expensePage > 1) { expensePage--; renderExpenseTable(); }
+        });
+        document.getElementById('expenseNextPage').addEventListener('click', () => {
+            const total = Math.ceil(filteredExpenses.length / expensePageSize);
+            if (expensePage < total) { expensePage++; renderExpenseTable(); }
+        });
+
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            loadStaff();
+            loadExpenses();
+            showToast('Refreshed');
+            setTimeout(updatePieChart, 500);
+        });
+
+        document.getElementById('darkModeToggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+            setTimeout(updatePieChart, 300);
+        });
+
+        document.getElementById('expenseDate').value = getTodayDate();
+
+        // ==================== SIDEBAR ====================
+        const sidebar = document.getElementById('sidebar');
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            document.body.insertAdjacentHTML('beforeend', '<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 md:hidden" onclick="document.getElementById(\'sidebar\').classList.add(\'-translate-x-full\');this.remove()"></div>');
+        });
+        document.getElementById('closeSidebarBtn').addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            document.getElementById('sidebarOverlay')?.remove();
+        });
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
+        else sidebar.classList.add('-translate-x-full');
+
+        document.querySelectorAll('.has-submenu').forEach(m => {
+            const a = m.querySelector('a');
+            a?.addEventListener('click', (e) => {
+                e.preventDefault();
+                m.classList.toggle('open');
+                m.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        });
+
+        // ==================== LOGOUT ====================
+        document.getElementById('logoutLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('logoutModal').classList.remove('hidden');
+        });
+        document.getElementById('cancelLogoutBtn').addEventListener('click', () => {
+            document.getElementById('logoutModal').classList.add('hidden');
+        });
+        document.getElementById('confirmLogoutBtn').addEventListener('click', async () => {
+            document.getElementById('logoutModal').classList.add('hidden');
+            await logout();
+        });
+
+        // ==================== INIT ====================
+        document.getElementById('footerYear').textContent = new Date().getFullYear();
+        loadCustomCategories();
+        await loadStaff();
+        await loadExpenses();
+        setTimeout(updatePieChart, 500);
+
+        // Load summary tab content
+        setTimeout(() => {
+            document.getElementById('staffSummaryContent').innerHTML = `
+                <div class="space-y-2">
+                    <div class="flex justify-between py-2 border-b"><span class="text-sm">Total Staff</span><span class="font-bold">${allStaff.length}</span></div>
+                    <div class="flex justify-between py-2 border-b"><span class="text-sm">Active Staff</span><span class="font-bold text-green-600">${allStaff.filter(s => s.status === 'active').length}</span></div>
+                    <div class="flex justify-between py-2 border-b"><span class="text-sm">Total Salary Paid</span><span class="font-bold text-blue-600">৳${allStaff.reduce((sum, s) => sum + s.paidAmount, 0).toFixed(2)}</span></div>
+                    <div class="flex justify-between py-2"><span class="text-sm">Total Salary Due</span><span class="font-bold text-red-600">৳${allStaff.reduce((sum, s) => sum + s.dueAmount, 0).toFixed(2)}</span></div>
+                </div>
+            `;
+
+            const expenseCategories = {};
+            allExpenses.forEach(e => {
+                const cat = e.customCategory || defaultCategories[e.category]?.label || e.category;
+                expenseCategories[cat] = (expenseCategories[cat] || 0) + e.amount;
+            });
+
+            let expenseSummaryHtml = '<div class="space-y-2">';
+            Object.entries(expenseCategories).forEach(([cat, amount]) => {
+                expenseSummaryHtml += `<div class="flex justify-between py-2 border-b"><span class="text-sm">${cat}</span><span class="font-bold">৳${amount.toFixed(2)}</span></div>`;
+            });
+            const totalExp = allExpenses.reduce((sum, e) => sum + e.amount, 0);
+            expenseSummaryHtml += `<div class="flex justify-between py-2"><span class="text-sm font-semibold">Total</span><span class="font-bold text-blue-600">৳${totalExp.toFixed(2)}</span></div>`;
+            expenseSummaryHtml += '</div>';
+            document.getElementById('expenseSummaryContent').innerHTML = expenseSummaryHtml;
+
+            // Recent Activity with Description
+            const recent = [];
+            allStaff.forEach(s => {
+                if (s.salaryHistory?.length) {
+                    s.salaryHistory.forEach(h => {
+                        recent.push({
+                            date: h.paidDate || 'N/A',
+                            type: '💰 Salary Paid',
+                            name: s.name,
+                            description: `Salary payment for ${s.name} (${h.month})`,
+                            amount: h.amount,
+                            month: h.month
+                        });
+                    });
+                }
+            });
+            allExpenses.slice(0, 15).forEach(e => {
+                const cat = e.customCategory || defaultCategories[e.category]?.label || e.category;
+                recent.push({
+                    date: e.date,
+                    type: `🏢 ${cat}`,
+                    name: e.description || 'Office Expense',
+                    description: `${cat} expense${e.description ? ': ' + e.description : ''}`,
+                    amount: e.amount
+                });
+            });
+            recent.sort((a, b) => b.date.localeCompare(a.date));
+            const recentData = recent.slice(0, 20);
+
+            if (recentData.length === 0) {
+                document.getElementById('recentActivityContent').innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">No recent activity</div>';
+            } else {
+                document.getElementById('recentActivityContent').innerHTML = recentData.map(r => `
+                    <div class="flex justify-between items-center py-2 border-b last:border-b-0">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-500">${r.date}</span>
+                                <span class="text-sm font-medium">${r.type}</span>
+                            </div>
+                            <div class="text-xs text-gray-500 truncate">${escapeHtml(r.description)}</div>
+                        </div>
+                        <span class="text-sm font-bold ${r.type.includes('Salary') ? 'text-green-600' : 'text-red-600'} ml-2">${r.type.includes('Salary') ? '+' : '-'} ৳${r.amount.toFixed(2)}</span>
+                    </div>
+                `).join('');
+            }
+        }, 500);
+    </script>
+</body>
+</html>
