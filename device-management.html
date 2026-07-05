@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0f3b3a">
+    <title>Device Management | JackDev</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0f3b3a',
+                        'primary-light': '#1e6b68',
+                        'primary-dark': '#092c2b',
+                        accent: '#d4af37',
+                        danger: '#e53e3e',
+                        success: '#2c7a4d',
+                        warning: '#dd6b20',
+                        info: '#3182ce',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+        
+        * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        .nav-active {
+            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
+            border-left: 3px solid #d4af37;
+        }
+        .dark .nav-active {
+            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
+        }
+        
+        .submenu-modern {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .submenu-modern.open { max-height: 280px; }
+        
+        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
+        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
+        
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-active { background: #22c55e; box-shadow: 0 0 10px rgba(34,197,94,0.4); }
+        .status-inactive { background: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.3); }
+        .status-idle { background: #f59e0b; box-shadow: 0 0 10px rgba(245,158,11,0.4); }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .pulsing { animation: pulse 2s ease-in-out infinite; }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .refresh-btn.spinning { animation: spin 1s linear infinite; }
+        
+        .device-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .device-icon.desktop { background: #dbeafe; color: #2563eb; }
+        .device-icon.laptop { background: #e0e7ff; color: #4f46e5; }
+        .device-icon.mobile { background: #fce7f3; color: #db2777; }
+        .device-icon.tablet { background: #fef3c7; color: #d97706; }
+        .device-icon.unknown { background: #e5e7eb; color: #6b7280; }
+        
+        .dark .device-icon.desktop { background: #1e3a5f; color: #60a5fa; }
+        .dark .device-icon.laptop { background: #1e1b4b; color: #818cf8; }
+        .dark .device-icon.mobile { background: #4c1d3a; color: #f472b6; }
+        .dark .device-icon.tablet { background: #451a03; color: #fbbf24; }
+        .dark .device-icon.unknown { background: #374151; color: #9ca3af; }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .toast.success { background: #10b981; color: white; }
+        .toast.error { background: #ef4444; color: white; }
+        .toast.warning { background: #f59e0b; color: white; }
+        .toast.info { background: #3b82f6; color: white; }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 90%;
+            padding: 24px;
+            animation: modalSlideUp 0.3s ease;
+        }
+        .dark .modal-box { background: #1f2937; color: white; }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-current { background: #dbeafe; color: #2563eb; }
+        .dark .badge-current { background: #1e3a5f; color: #60a5fa; }
+        
+        .clean-btn { transition: all 0.3s ease; }
+        .clean-btn:hover { transform: scale(1.05); }
+        
+        .flag-icon { font-size: 20px; line-height: 1; }
+        
+        .country-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #f1f5f9;
+            color: #334155;
+        }
+        .dark .country-badge { background: #374151; color: #e2e8f0; }
+        
+        .ip-code {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            background: #f1f5f9;
+            padding: 2px 10px;
+            border-radius: 6px;
+            color: #475569;
+        }
+        .dark .ip-code { background: #374151; color: #e2e8f0; }
+        
+        .table-header {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .dark .table-header { background: #1f2937; border-bottom: 1px solid #374151; }
+        
+        .table-row { border-bottom: 1px solid #f1f5f9; }
+        .table-row:hover { background: #fafbfc; }
+        .table-row.current { background: #eff6ff; }
+        .dark .table-row { border-bottom: 1px solid #374151; }
+        .dark .table-row:hover { background: #1f2937; }
+        .dark .table-row.current { background: #0f2a3f; }
+        
+        .live-clock {
+            font-size: 12px;
+            font-weight: 500;
+            color: #6b7280;
+            letter-spacing: 0.3px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: rgba(15, 59, 58, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            min-width: 80px;
+        }
+        .dark .live-clock { color: #9ca3af; background: rgba(30, 107, 104, 0.12); }
+        .live-clock i { font-size: 10px; color: #0f3b3a; }
+        .dark .live-clock i { color: #d4af37; }
+        .clock-time { font-variant-numeric: tabular-nums; }
+        .clock-ampm { font-size: 9px; font-weight: 600; color: #0f3b3a; margin-left: 1px; }
+        .dark .clock-ampm { color: #d4af37; }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== SIDEBAR SECTION ==================== -->
+    <div class="flex min-h-screen">
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-hidden border-r border-white/5">
+            <div class="flex flex-col h-full">
+                <div class="px-5 py-5 border-b border-white/10 flex items-center justify-between sticky top-0 bg-inherit z-10">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
+                        </div>
+                        <div class="leading-tight">
+                            <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
+                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
+                        </div>
+                    </div>
+                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+                
+                <nav class="flex-1 px-3 py-5 space-y-1.5 overflow-y-auto sidebar-nav-fixed">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                        <span class="text-sm font-medium">Dashboard</span>
+                    </a>
+                    
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customers</span>
+                    </a>
+                    
+                    <div class="has-submenu" id="dueSubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs">
+                                <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
+                            </a>
+                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs">
+                                <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div>
+                        <span class="text-sm font-medium">Collection</span>
+                    </a>
+                    
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div>
+                        <span class="text-sm font-medium">Ledger</span>
+                    </a>
+                    
+                    <div class="has-submenu" id="warrantySubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs">
+                                <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
+                            </a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs">
+                                <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
+                            </a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs">
+                                <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
+                            </a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs">
+                                <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customer Warranty</span>
+                    </a>
+                    
+                    <a href="expenses.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div>
+                        <span class="text-sm font-medium">Expenses</span>
+                    </a>
+                    
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div>
+                        <span class="text-sm font-medium">Backup & Restore</span>
+                    </a>
+                    
+                    <!-- Device Management - Active -->
+                    <a href="device-management.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-devices text-sm text-accent"></i></div>
+                        <span class="text-sm font-medium">Device Management</span>
+                        <span class="ml-auto text-[9px] bg-white/10 px-1.5 py-0.5 rounded-full text-accent">Live</span>
+                    </a>
+                </nav>
+                
+                <div class="px-3 py-4 border-t border-white/10 mt-auto">
+                    <div class="flex items-center justify-between mb-2 px-1">
+                        <span class="text-[9px] text-slate-500">v2.5.0 · pro</span>
+                        <div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center">
+                            <i class="fas fa-lock text-[8px] text-slate-400"></i>
+                        </div>
+                    </div>
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition">
+                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                        <span class="text-sm font-medium">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ============ MAIN CONTENT ============ -->
+        <main class="flex-1 md:ml-64 min-h-screen w-full pb-20 md:pb-4">
+            <!-- TOPBAR -->
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+                <div class="px-3 py-2.5 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
+                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
+                            <i class="fas fa-devices text-primary mr-2"></i>Device Management
+                        </h2>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <div class="live-clock hidden sm:flex">
+                            <i class="far fa-clock"></i>
+                            <span class="clock-time" id="clockDisplay">--:--:--</span>
+                            <span class="clock-ampm" id="ampmDisplay">AM</span>
+                        </div>
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition refresh-btn">
+                            <i class="fas fa-sync-alt text-sm"></i>
+                        </button>
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                            <i class="fas fa-moon dark:hidden text-sm"></i>
+                            <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ============ PAGE CONTENT ============ -->
+            <div class="p-3 md:p-4">
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Total Devices</p>
+                                <p class="text-xl font-bold text-gray-800 dark:text-white" id="totalDevicesCount">0</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                                <i class="fas fa-laptop text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Active Now</p>
+                                <p class="text-xl font-bold text-green-600 dark:text-green-400" id="activeDevicesCount">0</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center">
+                                <i class="fas fa-circle text-green-600 dark:text-green-400 text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Idle</p>
+                                <p class="text-xl font-bold text-amber-600 dark:text-amber-400" id="idleDevicesCount">0</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
+                                <i class="fas fa-pause-circle text-amber-600 dark:text-amber-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Inactive</p>
+                                <p class="text-xl font-bold text-red-600 dark:text-red-400" id="inactiveDevicesCount">0</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
+                                <i class="fas fa-circle text-red-600 dark:text-red-400 text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Devices Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex justify-between items-center flex-wrap gap-2">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-list text-primary"></i>
+                            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Active Devices</h3>
+                            <span class="text-xs text-gray-400" id="deviceCount">0 devices</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs text-gray-400" id="lastUpdated">Last updated: Just now</span>
+                            <button id="cleanBtn" class="px-3 py-1.5 text-xs rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition flex items-center gap-2">
+                                <i class="fas fa-broom"></i> Clean
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="table-header">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">#</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Device</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">IP Address</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Location</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Active</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="devicesTableBody">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div id="emptyState" class="text-center py-12 hidden">
+                        <i class="fas fa-devices text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                        <p class="text-gray-500 dark:text-gray-400">No active devices found</p>
+                        <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Login from another device to see it here</p>
+                    </div>
+                </div>
+
+                <!-- Current Device Info -->
+                <div class="mt-4 bg-white dark:bg-gray-800 rounded-xl p-4 border shadow-sm">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                <i class="fas fa-laptop text-primary text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Current Device</p>
+                                <p class="text-sm font-medium text-gray-800 dark:text-white" id="currentDeviceId">Loading...</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">
+                                <i class="far fa-clock mr-1"></i> 
+                                <span id="currentDeviceStatus">Active</span>
+                            </span>
+                            <span class="text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-map-marker-alt mr-1 text-primary"></i>
+                                <span id="currentDeviceLocation">Loading...</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                    <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span> 
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
+                    </p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="text-center">
+                <div class="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-sign-out-alt text-red-600 dark:text-red-400 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Logout Device?</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                    Are you sure you want to logout this device?
+                    <br>
+                    <span id="modalDeviceName" class="font-medium text-gray-700 dark:text-gray-300"></span>
+                </p>
+                <div class="flex gap-3 justify-center">
+                    <button id="cancelLogoutBtn" class="px-4 py-2 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition text-gray-700 dark:text-gray-300">
+                        Cancel
+                    </button>
+                    <button id="confirmLogoutBtn" class="px-4 py-2 text-sm rounded-lg bg-red-600 hover:bg-red-700 transition text-white flex items-center gap-2">
+                        <i class="fas fa-sign-out-alt"></i> Logout Device
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ SCRIPTS ============ -->
+
+    <!-- Auth Check -->
+    <script type="module">
+        import { checkAuthState, requireAuth, getCurrentUser, hideAuthLoading } from './js/auth.js';
+        
+        console.log('🚀 Device Management loading...');
+        
+        (async function init() {
+            try {
+                await checkAuthState(true);
+                if (!await requireAuth()) {
+                    console.warn('❌ Not authenticated');
+                    return;
+                }
+                const user = getCurrentUser();
+                if (user) console.log('✅ Welcome:', user.email);
+                hideAuthLoading();
+                console.log('✅ Device Management ready');
+            } catch (error) {
+                console.error('❌ Auth error:', error);
+                hideAuthLoading();
+                window.location.replace('login.html');
+            }
+        })();
+    </script>
+
+    <!-- Main Script -->
+    <script type="module">
+        import { auth } from './js/firebase.js';
+        import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+        // ============ DOM ELEMENTS ============
+        const tbody = document.getElementById('devicesTableBody');
+        const emptyState = document.getElementById('emptyState');
+        const totalDevicesCount = document.getElementById('totalDevicesCount');
+        const activeDevicesCount = document.getElementById('activeDevicesCount');
+        const idleDevicesCount = document.getElementById('idleDevicesCount');
+        const inactiveDevicesCount = document.getElementById('inactiveDevicesCount');
+        const deviceCount = document.getElementById('deviceCount');
+        const lastUpdated = document.getElementById('lastUpdated');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const cleanBtn = document.getElementById('cleanBtn');
+        const currentDeviceId = document.getElementById('currentDeviceId');
+        const currentDeviceStatus = document.getElementById('currentDeviceStatus');
+        const currentDeviceLocation = document.getElementById('currentDeviceLocation');
+        
+        // Modal elements
+        const logoutModal = document.getElementById('logoutModal');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+        const modalDeviceName = document.getElementById('modalDeviceName');
+        let selectedDeviceId = null;
+
+        // ============ SIDEBAR TOGGLES ============
+        document.querySelectorAll('.has-submenu > a').forEach(trigger => {
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                const parent = trigger.closest('.has-submenu');
+                parent.classList.toggle('open');
+                parent.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        });
+
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            if (window.innerWidth < 768) {
+                let overlay = document.getElementById('mobileOverlay');
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.id = 'mobileOverlay';
+                    overlay.className = 'fixed inset-0 bg-black/40 z-40 md:hidden';
+                    overlay.onclick = closeSidebar;
+                    document.body.appendChild(overlay);
+                }
+            }
+        }
+
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            document.getElementById('mobileOverlay')?.remove();
+        }
+
+        menuToggle?.addEventListener('click', openSidebar);
+        closeSidebarBtn?.addEventListener('click', closeSidebar);
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('-translate-x-full');
+                document.getElementById('mobileOverlay')?.remove();
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
+        else sidebar.classList.add('-translate-x-full');
+
+        // ============ DARK MODE ============
+        document.getElementById('darkModeToggle')?.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+        });
+
+        // ============ LIVE CLOCK ============
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const hoursStr = String(hours).padStart(2, '0');
+            document.getElementById('clockDisplay').textContent = `${hoursStr}:${minutes}:${seconds}`;
+            document.getElementById('ampmDisplay').textContent = ampm;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // ============ IP & LOCATION ============
+        const locationCache = new Map();
+
+        async function getClientInfo() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                return {
+                    ip: data.ip || '127.0.0.1',
+                    city: data.city || 'Unknown',
+                    region: data.region || 'Unknown',
+                    country: data.country_name || 'Unknown',
+                    countryCode: data.country_code || 'XX',
+                    flag: data.country_code ? getCountryFlag(data.country_code) : '🌍',
+                    isp: data.org || 'Unknown'
+                };
+            } catch (error) {
+                return { ip: '127.0.0.1', city: 'Local', region: 'Local', country: 'Local', countryCode: 'XX', flag: '🏠', isp: 'Local' };
+            }
+        }
+
+        function getCountryFlag(countryCode) {
+            const flags = {
+                'BD': '🇧🇩', 'US': '🇺🇸', 'GB': '🇬🇧', 'IN': '🇮🇳',
+                'CA': '🇨🇦', 'AU': '🇦🇺', 'DE': '🇩🇪', 'FR': '🇫🇷',
+                'JP': '🇯🇵', 'CN': '🇨🇳', 'RU': '🇷🇺', 'BR': '🇧🇷',
+                'PK': '🇵🇰', 'NG': '🇳🇬', 'EG': '🇪🇬', 'SA': '🇸🇦',
+                'AE': '🇦🇪', 'SG': '🇸🇬', 'MY': '🇲🇾', 'PH': '🇵🇭',
+                'VN': '🇻🇳', 'TH': '🇹🇭', 'ID': '🇮🇩', 'KR': '🇰🇷'
+            };
+            return flags[countryCode] || '🌍';
+        }
+
+        async function getIPLocation(ip) {
+            if (locationCache.has(ip)) return locationCache.get(ip);
+            try {
+                const response = await fetch(`https://ipapi.co/${ip}/json/`);
+                const data = await response.json();
+                const location = {
+                    ip: data.ip || ip,
+                    city: data.city || 'Unknown',
+                    region: data.region || 'Unknown',
+                    country: data.country_name || 'Unknown',
+                    countryCode: data.country_code || 'XX',
+                    flag: getCountryFlag(data.country_code),
+                    isp: data.org || 'Unknown'
+                };
+                locationCache.set(ip, location);
+                return location;
+            } catch (error) {
+                return { ip: ip, city: 'Unknown', country: 'Unknown', countryCode: 'XX', flag: '🌍' };
+            }
+        }
+
+        // ============ DEVICE FUNCTIONS ============
+        function getSessionDeviceId() {
+            let deviceId = sessionStorage.getItem('device_session_id');
+            if (!deviceId) {
+                const fingerprint = getDeviceFingerprint();
+                deviceId = `session_${fingerprint}`;
+                sessionStorage.setItem('device_session_id', deviceId);
+                localStorage.setItem('device_session_id', deviceId);
+            }
+            return deviceId;
+        }
+
+        function getDeviceFingerprint() {
+            const components = [
+                navigator.userAgent,
+                navigator.language,
+                navigator.platform,
+                screen.width + 'x' + screen.height,
+                navigator.hardwareConcurrency || 0,
+                navigator.deviceMemory || 0,
+                Intl.DateTimeFormat().resolvedOptions().timeZone
+            ];
+            const str = components.join('|||');
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return 'fp_' + Math.abs(hash).toString(36);
+        }
+
+        function getUniqueDeviceId() {
+            let deviceId = sessionStorage.getItem('device_session_id');
+            if (!deviceId) {
+                deviceId = localStorage.getItem('device_session_id');
+            }
+            if (!deviceId) {
+                const fingerprint = getDeviceFingerprint();
+                deviceId = `session_${fingerprint}`;
+                sessionStorage.setItem('device_session_id', deviceId);
+                localStorage.setItem('device_session_id', deviceId);
+            }
+            return deviceId;
+        }
+
+        function detectDeviceType() {
+            const ua = navigator.userAgent;
+            if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(ua)) {
+                if (/iPad|Tablet/i.test(ua)) return { type: 'tablet', icon: 'fa-tablet-alt', label: 'Tablet' };
+                return { type: 'mobile', icon: 'fa-mobile-alt', label: 'Mobile' };
+            }
+            if (/Windows/i.test(ua)) {
+                if (/Windows NT 10.0/i.test(ua)) return { type: 'desktop', icon: 'fa-desktop', label: 'Windows 10/11' };
+                if (/Windows NT 6.1/i.test(ua)) return { type: 'desktop', icon: 'fa-desktop', label: 'Windows 7' };
+                return { type: 'desktop', icon: 'fa-desktop', label: 'Windows PC' };
+            }
+            if (/Macintosh|Mac OS X/i.test(ua)) {
+                if (/MacBook/i.test(ua)) return { type: 'laptop', icon: 'fa-laptop', label: 'MacBook' };
+                return { type: 'laptop', icon: 'fa-laptop', label: 'Mac' };
+            }
+            if (/Linux/i.test(ua)) {
+                if (/Android/i.test(ua)) return { type: 'mobile', icon: 'fa-mobile-alt', label: 'Android' };
+                return { type: 'desktop', icon: 'fa-desktop', label: 'Linux' };
+            }
+            if (/CrOS/i.test(ua)) return { type: 'laptop', icon: 'fa-laptop', label: 'Chromebook' };
+            return { type: 'unknown', icon: 'fa-question-circle', label: 'Unknown Device' };
+        }
+
+        function getDeviceName() {
+            const ua = navigator.userAgent;
+            if (/Windows NT 10.0/i.test(ua)) return 'Windows 10/11 PC';
+            if (/Windows NT 6.1/i.test(ua)) return 'Windows 7 PC';
+            if (/Windows/i.test(ua)) return 'Windows PC';
+            if (/Mac OS X 10_15/i.test(ua)) return 'macOS Catalina';
+            if (/Mac OS X 10_14/i.test(ua)) return 'macOS Mojave';
+            if (/Mac OS X/i.test(ua)) return 'Mac';
+            if (/Macintosh/i.test(ua)) return 'Macintosh';
+            if (/Ubuntu/i.test(ua)) return 'Ubuntu Linux';
+            if (/Debian/i.test(ua)) return 'Debian Linux';
+            if (/Fedora/i.test(ua)) return 'Fedora Linux';
+            if (/Linux/i.test(ua)) return 'Linux PC';
+            if (/CrOS/i.test(ua)) return 'Chromebook';
+            if (/iPhone/i.test(ua)) return 'iPhone';
+            if (/iPad/i.test(ua)) return 'iPad';
+            if (/Android/i.test(ua)) {
+                const match = ua.match(/Android (\d+\.\d+)/);
+                return match ? `Android ${match[1]}` : 'Android Phone';
+            }
+            return 'Desktop';
+        }
+
+        let deviceSaved = sessionStorage.getItem('device_saved') === 'true';
+        let clientInfo = null;
+
+        async function saveDeviceInfo() {
+            if (deviceSaved) return;
+            
+            const deviceId = getSessionDeviceId();
+            const fingerprint = getDeviceFingerprint();
+            const deviceType = detectDeviceType();
+            const deviceName = getDeviceName();
+            
+            if (!clientInfo) clientInfo = await getClientInfo();
+            
+            const deviceInfo = {
+                deviceName, deviceType: deviceType.label, deviceIcon: deviceType.icon,
+                fingerprint, timestamp: Date.now(),
+                userAgent: navigator.userAgent.slice(0, 200),
+                sessionId: deviceId,
+                savedAt: new Date().toISOString(),
+                ip: clientInfo.ip, city: clientInfo.city,
+                region: clientInfo.region, country: clientInfo.country,
+                countryCode: clientInfo.countryCode, flag: clientInfo.flag,
+                isp: clientInfo.isp
+            };
+            
+            localStorage.setItem(`device_info_${deviceId}`, JSON.stringify(deviceInfo));
+            localStorage.setItem(`tab_last_active_${deviceId}`, Date.now().toString());
+            localStorage.setItem(`fingerprint_${fingerprint}`, deviceId);
+            deviceSaved = true;
+            sessionStorage.setItem('device_saved', 'true');
+            return deviceInfo;
+        }
+
+        function updateDeviceActivity() {
+            const deviceId = getSessionDeviceId();
+            localStorage.setItem(`tab_last_active_${deviceId}`, Date.now().toString());
+        }
+
+        async function getDevicesFromStorage() {
+            const devices = [];
+            const now = Date.now();
+            const currentDeviceId = getSessionDeviceId();
+            
+            const keys = Object.keys(localStorage);
+            const deviceKeys = keys.filter(key => key.startsWith('tab_last_active_'));
+            const deviceMap = new Map();
+            
+            for (const key of deviceKeys) {
+                const deviceId = key.replace('tab_last_active_', '');
+                const lastActive = parseInt(localStorage.getItem(key));
+                const isCurrent = deviceId === currentDeviceId;
+                
+                if (!isCurrent && (now - lastActive) > 86400000) {
+                    localStorage.removeItem(`tab_last_active_${deviceId}`);
+                    localStorage.removeItem(`device_info_${deviceId}`);
+                    continue;
+                }
+                
+                let deviceName = 'Unknown', deviceType = 'Unknown', deviceIcon = 'fa-question-circle';
+                let ip = '127.0.0.1', city = 'Unknown', country = 'Unknown', flag = '🌍';
+                
+                const infoKey = `device_info_${deviceId}`;
+                const storedInfo = localStorage.getItem(infoKey);
+                
+                if (storedInfo) {
+                    try {
+                        const info = JSON.parse(storedInfo);
+                        deviceName = info.deviceName || 'Unknown';
+                        deviceType = info.deviceType || 'Unknown';
+                        deviceIcon = info.deviceIcon || 'fa-question-circle';
+                        ip = info.ip || '127.0.0.1';
+                        city = info.city || 'Unknown';
+                        country = info.country || 'Unknown';
+                        flag = info.flag || '🌍';
+                    } catch (e) {}
+                }
+                
+                if (isCurrent) {
+                    const type = detectDeviceType();
+                    deviceName = getDeviceName();
+                    deviceType = type.label;
+                    deviceIcon = type.icon;
+                    if (!clientInfo) clientInfo = await getClientInfo();
+                    ip = clientInfo.ip;
+                    city = clientInfo.city;
+                    country = clientInfo.country;
+                    flag = clientInfo.flag;
+                }
+                
+                const timeSince = now - lastActive;
+                const status = timeSince < 60000 ? 'active' : timeSince < 300000 ? 'idle' : 'inactive';
+                const keyId = deviceId.startsWith('session_') ? deviceId : `session_${deviceId}`;
+                
+                if (!deviceMap.has(keyId) || isCurrent) {
+                    deviceMap.set(keyId, {
+                        id: deviceId, name: deviceName, type: deviceType, icon: deviceIcon,
+                        ip: ip, city: city, country: country, flag: flag,
+                        lastActive: lastActive, status: status, isCurrent: isCurrent,
+                        location: `${flag} ${country}${city !== 'Unknown' ? ` (${city})` : ''}`
+                    });
+                }
+            }
+            
+            const devicesArray = Array.from(deviceMap.values());
+            devicesArray.sort((a, b) => {
+                if (a.isCurrent) return -1;
+                if (b.isCurrent) return 1;
+                return b.lastActive - a.lastActive;
+            });
+            return devicesArray;
+        }
+
+        // ============ FORMAT FUNCTIONS ============
+        function formatTimeAgo(timestamp) {
+            const diff = Date.now() - timestamp;
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+            return `${Math.floor(diff / 86400000)}d ago`;
+        }
+
+        function formatTime(timestamp) {
+            return new Date(timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        function getStatusInfo(status) {
+            const map = {
+                'active': { dot: 'status-active', text: 'text-green-600 dark:text-green-400', label: 'Active', pulsing: 'pulsing' },
+                'idle': { dot: 'status-idle', text: 'text-amber-600 dark:text-amber-400', label: 'Idle', pulsing: '' },
+                'inactive': { dot: 'status-inactive', text: 'text-red-600 dark:text-red-400', label: 'Inactive', pulsing: '' }
+            };
+            return map[status] || map['inactive'];
+        }
+
+        // ============ RENDER TABLE ============
+        async function renderDevices() {
+            const devices = await getDevicesFromStorage();
+            
+            totalDevicesCount.textContent = devices.length;
+            deviceCount.textContent = `${devices.length} device${devices.length > 1 ? 's' : ''}`;
+            
+            const active = devices.filter(d => d.status === 'active').length;
+            const idle = devices.filter(d => d.status === 'idle').length;
+            const inactive = devices.filter(d => d.status === 'inactive').length;
+            
+            activeDevicesCount.textContent = active;
+            idleDevicesCount.textContent = idle;
+            inactiveDevicesCount.textContent = inactive;
+            
+            const current = devices.find(d => d.isCurrent);
+            if (current) {
+                currentDeviceId.textContent = current.name;
+                currentDeviceStatus.textContent = current.status === 'active' ? '🟢 Active' : 
+                                                  current.status === 'idle' ? '🟡 Idle' : '🔴 Inactive';
+                currentDeviceLocation.textContent = current.location || 'Unknown';
+            }
+            
+            if (devices.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+            
+            let html = '';
+            for (const device of devices) {
+                const statusInfo = getStatusInfo(device.status);
+                const isCurrent = device.isCurrent;
+                const deviceTypeClass = device.type.toLowerCase();
+                
+                html += `
+                    <tr class="table-row ${isCurrent ? 'current' : ''}">
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            ${devices.indexOf(device) + 1}
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <div class="flex items-center gap-3">
+                                <div class="device-icon ${deviceTypeClass}">
+                                    <i class="fas ${device.icon}"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800 dark:text-white flex items-center gap-2">
+                                        ${device.name}
+                                        ${isCurrent ? '<span class="badge badge-current text-xs">Current</span>' : ''}
+                                    </p>
+                                    <p class="text-xs text-gray-400">${device.type}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <code class="ip-code">${device.ip}</code>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <span class="country-badge">
+                                <span class="flag-icon">${device.flag}</span>
+                                ${device.country}
+                                ${device.city !== 'Unknown' ? `(${device.city})` : ''}
+                            </span>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                            <div>${formatTime(device.lastActive)}</div>
+                            <div class="text-xs text-gray-400">${formatTimeAgo(device.lastActive)}</div>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <div class="flex items-center gap-2">
+                                <span class="status-dot ${statusInfo.dot} ${statusInfo.pulsing}"></span>
+                                <span class="text-sm font-medium ${statusInfo.text}">${statusInfo.label}</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-center">
+                            ${!isCurrent ? `
+                                <button class="logout-device-btn text-gray-400 hover:text-red-600 transition text-lg p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg" 
+                                        data-device-id="${device.id}" 
+                                        data-device-name="${device.name}">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </button>
+                            ` : `
+                                <span class="text-xs text-gray-400">Current</span>
+                            `}
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            tbody.innerHTML = html;
+            lastUpdated.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+            
+            document.querySelectorAll('.logout-device-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const deviceId = this.dataset.deviceId;
+                    const deviceName = this.dataset.deviceName;
+                    showLogoutModal(deviceId, deviceName);
+                });
+            });
+        }
+
+        // ============ LOGOUT MODAL ============
+        function showLogoutModal(deviceId, deviceName) {
+            selectedDeviceId = deviceId;
+            modalDeviceName.textContent = `"${deviceName}"`;
+            logoutModal.classList.add('show');
+        }
+
+        function hideLogoutModal() {
+            logoutModal.classList.remove('show');
+            selectedDeviceId = null;
+        }
+
+        cancelLogoutBtn.addEventListener('click', hideLogoutModal);
+        logoutModal.addEventListener('click', (e) => {
+            if (e.target === logoutModal) hideLogoutModal();
+        });
+
+        confirmLogoutBtn.addEventListener('click', async function() {
+            if (!selectedDeviceId) return;
+            const deviceId = selectedDeviceId;
+            hideLogoutModal();
+            
+            try {
+                localStorage.removeItem(`tab_last_active_${deviceId}`);
+                localStorage.removeItem(`device_info_${deviceId}`);
+                
+                const currentDeviceId = getSessionDeviceId();
+                if (deviceId === currentDeviceId) {
+                    await signOut(auth);
+                    showToast('Logged out from current device', 'success');
+                    setTimeout(() => {
+                        window.location.replace('login.html');
+                    }, 500);
+                    return;
+                }
+                
+                showToast('Device logged out successfully', 'success');
+                renderDevices();
+            } catch (error) {
+                showToast('Failed to logout device', 'error');
+            }
+        });
+
+        // ============ CLEAN ============
+        cleanBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clean all old device entries?')) {
+                const keys = Object.keys(localStorage);
+                const deviceKeys = keys.filter(key => 
+                    key.startsWith('tab_last_active_') || 
+                    key.startsWith('device_info_') ||
+                    key.startsWith('fingerprint_')
+                );
+                const currentId = getSessionDeviceId();
+                deviceKeys.forEach(key => {
+                    if (!key.includes(currentId)) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                deviceSaved = false;
+                sessionStorage.removeItem('device_saved');
+                showToast('Cleaned old device entries', 'success');
+                setTimeout(async () => {
+                    await saveDeviceInfo();
+                    renderDevices();
+                }, 500);
+            }
+        });
+
+        // ============ TOAST ============
+        function showToast(message, type = 'info') {
+            const existingToasts = document.querySelectorAll('.toast');
+            existingToasts.forEach(toast => toast.remove());
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            toast.innerHTML = `${icons[type] || 'ℹ️'} ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // ============ REFRESH ============
+        function refreshData() {
+            refreshBtn.classList.add('spinning');
+            updateDeviceActivity();
+            renderDevices();
+            setTimeout(() => {
+                refreshBtn.classList.remove('spinning');
+            }, 500);
+        }
+
+        refreshBtn.addEventListener('click', refreshData);
+        setInterval(refreshData, 60000);
+
+        // ============ INIT ============
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.replace('login.html');
+                return;
+            }
+            
+            clientInfo = await getClientInfo();
+            await saveDeviceInfo();
+            updateDeviceActivity();
+            renderDevices();
+            document.getElementById('footerYear').textContent = new Date().getFullYear();
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                updateDeviceActivity();
+                refreshData();
+            }
+        });
+
+        console.log('📱 Device Management loaded with Sidebar + Topbar');
+    </script>
+
+</body>
+</html>

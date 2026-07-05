@@ -76,9 +76,9 @@
         
         .btn-active:active { transform: scale(0.97); }
         
-        .priority-high { background: #fee2e2; color: #dc2626; font-weight: 600; }
-        .priority-medium { background: #fed7aa; color: #ea580c; font-weight: 600; }
-        .priority-low { background: #d1fae5; color: #059669; font-weight: 600; }
+        .priority-high { background: #fee2e2; color: #dc2626; }
+        .priority-medium { background: #fed7aa; color: #ea580c; }
+        .priority-low { background: #d1fae5; color: #059669; }
         .dark .priority-high { background: #7f1d1d; color: #fca5a5; }
         .dark .priority-medium { background: #7c2d12; color: #fdba74; }
         .dark .priority-low { background: #064e3b; color: #6ee7b7; }
@@ -190,6 +190,23 @@
         }
         .dark .status-badge-upcoming { background: #451a03; color: #fbbf24; }
         .dark .status-badge-overdue { background: #7f1d1d; color: #fca5a5; }
+
+        /* Priority Icon Styles */
+        .priority-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 14px;
+        }
+        .priority-icon.high { background: #fee2e2; color: #dc2626; }
+        .priority-icon.medium { background: #fed7aa; color: #ea580c; }
+        .priority-icon.low { background: #d1fae5; color: #059669; }
+        .dark .priority-icon.high { background: #7f1d1d; color: #fca5a5; }
+        .dark .priority-icon.medium { background: #7c2d12; color: #fdba74; }
+        .dark .priority-icon.low { background: #064e3b; color: #6ee7b7; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -239,6 +256,9 @@
                             <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
                                 <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
                             </a>
+                            <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                            <i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span>
+                            </a>
                             <a href="follow-up.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition">
                                 <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
                             </a>
@@ -277,7 +297,9 @@
                     <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
                     </a>
-                    
+                    <a href="expenses.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Expenses</span>
+                    </a>
                     <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
                     </a>
@@ -373,7 +395,7 @@
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">SL</th>
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer</th>
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Description</th>
-                                    <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Priority</th>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Priority</th>
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Due Balance</th>
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Follow Up Date</th>
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
@@ -440,9 +462,9 @@
     </script>
     
     <script type="module">
-        import { db, collection, getDocs, doc, updateDoc, getDoc } from './js/firebase.js';
+        import { db, collection, getDocs, doc, updateDoc, getDoc, onSnapshot, query, where } from './js/firebase.js';
         
-        // Sidebar submenu toggle
+        // ─── SIDEBAR FUNCTIONS ───
         const warrantySubmenu = document.getElementById('warrantySubmenu');
         const warrantyLink = warrantySubmenu?.querySelector('a');
         if (warrantyLink) {
@@ -453,7 +475,6 @@
             });
         }
         
-        // Sidebar functions
         const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
         function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.id = 'sidebarOverlay'; overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
         function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); const overlay = document.getElementById('sidebarOverlay'); if (overlay) overlay.remove(); }
@@ -462,7 +483,6 @@
         window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); } });
         if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
         
-        // Submenu toggle for Due Entry
         const dueSubmenu = document.getElementById('dueSubmenu');
         const dueSubmenuLink = dueSubmenu?.querySelector('a');
         if (dueSubmenuLink) {
@@ -473,58 +493,92 @@
             });
         }
         
+        // ─── STATE ───
         let allFollowUps = [];
         let currentQuickFilter = 'all';
-        let customerMap = new Map(); // Store full customer data
         let customerNameMap = new Map();
+        let customerDataMap = new Map();
+        let unsubscribeCustomers = null;
+
+        // ─── UTILITIES ───
+        function showToast(message, type = 'success') { 
+            const c = document.getElementById('toastContainer'); 
+            const t = document.createElement('div'); 
+            t.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : type === 'error' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'}`; 
+            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2 text-xs"></i>${message}`; 
+            c.appendChild(t); 
+            setTimeout(() => t.remove(), 2500); 
+        }
         
-        function showToast(message, type = 'success') { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`; t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`; c.appendChild(t); setTimeout(() => t.remove(), 2500); }
         function closeCenterModal() { document.getElementById('detailsCenterModal').classList.remove('open'); }
+        
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
         
-        function getTodayDate() {
-            return new Date().toISOString().split('T')[0];
-        }
+        function getTodayDate() { return new Date().toISOString().split('T')[0]; }
         
-        async function loadCustomerData() {
-            try {
-                const customersSnap = await getDocs(collection(db, 'customers'));
-                customerMap.clear();
-                customerNameMap.clear();
-                customersSnap.forEach(doc => {
-                    const data = doc.data();
-                    customerMap.set(doc.id, data);
-                    customerNameMap.set(doc.id, data.name);
-                });
-            } catch (error) {
-                console.error('Error loading customer data:', error);
+        // ─── REAL-TIME CUSTOMER LISTENER ───
+        function setupCustomerListener() {
+            if (unsubscribeCustomers) {
+                unsubscribeCustomers();
+                unsubscribeCustomers = null;
             }
+
+            console.log('🔄 Setting up real-time customer listener...');
+
+            unsubscribeCustomers = onSnapshot(
+                collection(db, 'customers'),
+                (snapshot) => {
+                    customerNameMap.clear();
+                    customerDataMap.clear();
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const id = doc.id;
+                        const name = data.name || 'Unknown';
+
+                        customerNameMap.set(id, name);
+                        customerDataMap.set(id, data);
+                    });
+
+                    console.log('🔄 Customers updated in Follow Up page:', customerNameMap.size);
+                    
+                    // Refresh the table with updated names
+                    refreshFollowUps();
+                },
+                (error) => {
+                    console.error('Customer listener error:', error);
+                    showToast('Error loading customers', 'error');
+                }
+            );
         }
-        
+
+        // ─── GET CUSTOMER NAME ───
         function getCustomerName(customerId) {
             if (!customerId) return 'Unknown';
-            return customerNameMap.get(customerId) || 'Unknown';
+            const name = customerNameMap.get(customerId);
+            return name || 'Unknown';
         }
-        
+
         function getCustomerDue(customerId) {
             if (!customerId) return 0;
-            const customer = customerMap.get(customerId);
+            const customer = customerDataMap.get(customerId);
             return customer ? (customer.totalDue || 0) : 0;
         }
-        
+
+        // ─── PRIORITY CALCULATION ───
         function calculatePriority(daysDifference) {
-            if (daysDifference <= 3) return { level: 'low', text: '🟢 Low', class: 'priority-low' };
-            else if (daysDifference <= 7) return { level: 'medium', text: '🟠 Medium', class: 'priority-medium' };
-            else return { level: 'high', text: '🔴 High', class: 'priority-high' };
+            if (daysDifference <= 3) return { level: 'low', icon: 'fa-arrow-down', class: 'priority-icon low' };
+            else if (daysDifference <= 7) return { level: 'medium', icon: 'fa-minus', class: 'priority-icon medium' };
+            else return { level: 'high', icon: 'fa-arrow-up', class: 'priority-icon high' };
         }
-        
+
         function getDaysDifference(dateStr) {
             const today = new Date(); today.setHours(0, 0, 0, 0);
             const targetDate = new Date(dateStr); targetDate.setHours(0, 0, 0, 0);
             const diffTime = targetDate - today;
             return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         }
-        
+
         function getDateRangeFromFilter(filterType) {
             const today = new Date();
             let startDate = null, endDate = null;
@@ -548,72 +602,81 @@
             }
             return { startDate, endDate };
         }
-        
+
+        // ─── LOAD FOLLOW UPS ───
         async function loadFollowUps() {
             const tbody = document.getElementById('followUpTableBody');
             tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading follow ups...</p></td>';
             
             try {
-                // Load customer data first
-                await loadCustomerData();
-                
-                const dueEntriesSnap = await getDocs(collection(db, 'transactions'));
+                // First ensure we have customer data
+                if (customerNameMap.size === 0) {
+                    await new Promise(resolve => {
+                        const check = setInterval(() => {
+                            if (customerNameMap.size > 0) {
+                                clearInterval(check);
+                                resolve();
+                            }
+                        }, 100);
+                    });
+                }
+
+                const dueEntriesSnap = await getDocs(query(collection(db, 'transactions'), where('type', '==', 'due')));
                 const followUps = [];
                 const today = getTodayDate();
                 
                 for (const docSnap of dueEntriesSnap.docs) {
                     const due = docSnap.data();
-                    if (due.type === 'due') {
-                        const customerId = due.customerId;
-                        // Get REAL-TIME due balance from customer record
-                        const actualDueBalance = getCustomerDue(customerId);
-                        
-                        // If actual due balance is 0 or less, skip (payment cleared)
-                        if (actualDueBalance <= 0) continue;
-                        
-                        let customerName = due.customerName || getCustomerName(customerId);
-                        
-                        let description = due.remarks || '';
-                        if (!description && due.products && due.products.length > 0) {
-                            description = due.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).join(', ');
-                            if (due.totalAmount) description += ` | ৳${due.totalAmount.toFixed(2)}`;
-                        } else if (due.directDueAmount) {
-                            description = `Direct Due: ৳${due.directDueAmount.toFixed(2)}`;
-                        } else if (due.productName) {
-                            description = due.productName;
-                        }
-                        if (!description) description = 'Due Entry';
-                        
-                        let followUpDate = due.expectedDate || due.date;
-                        if (!followUpDate && due.createdAt) {
-                            followUpDate = due.createdAt.toDate().toISOString().split('T')[0];
-                        }
-                        if (!followUpDate) followUpDate = today;
-                        
-                        const daysDiff = getDaysDifference(followUpDate);
-                        const priority = calculatePriority(daysDiff);
-                        const nextRemarks = due.nextRemarks || due.remarks || '';
-                        
-                        followUps.push({
-                            id: docSnap.id,
-                            transactionId: docSnap.id,
-                            customerId: customerId,
-                            customerName: customerName,
-                            description: description,
-                            expectedDate: followUpDate,
-                            priority: priority,
-                            daysDiff: daysDiff,
-                            currentRemarks: due.remarks || '',
-                            nextRemarks: nextRemarks,
-                            dueBalance: actualDueBalance // REAL-TIME due balance from customer
-                        });
+                    const customerId = due.customerId;
+                    
+                    // Get REAL-TIME due balance from customer record
+                    const actualDueBalance = getCustomerDue(customerId);
+                    
+                    // Skip if due balance is 0 or less (payment cleared)
+                    if (actualDueBalance <= 0) continue;
+                    
+                    // Get fresh customer name from real-time cache
+                    const customerName = getCustomerName(customerId);
+                    
+                    let description = due.remarks || '';
+                    if (!description && due.products && due.products.length > 0) {
+                        description = due.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).join(', ');
+                        if (due.totalAmount) description += ` | ৳${due.totalAmount.toFixed(2)}`;
+                    } else if (due.directDueAmount) {
+                        description = `Direct Due: ৳${due.directDueAmount.toFixed(2)}`;
+                    } else if (due.productName) {
+                        description = due.productName;
                     }
+                    if (!description) description = 'Due Entry';
+                    
+                    let followUpDate = due.expectedDate || due.date;
+                    if (!followUpDate && due.createdAt) {
+                        followUpDate = due.createdAt.toDate().toISOString().split('T')[0];
+                    }
+                    if (!followUpDate) followUpDate = today;
+                    
+                    const daysDiff = getDaysDifference(followUpDate);
+                    const priority = calculatePriority(daysDiff);
+                    const nextRemarks = due.nextRemarks || due.remarks || '';
+                    
+                    followUps.push({
+                        id: docSnap.id,
+                        transactionId: docSnap.id,
+                        customerId: customerId,
+                        customerName: customerName,
+                        description: description,
+                        expectedDate: followUpDate,
+                        priority: priority,
+                        daysDiff: daysDiff,
+                        currentRemarks: due.remarks || '',
+                        nextRemarks: nextRemarks,
+                        dueBalance: actualDueBalance
+                    });
                 }
                 
-                // Remove duplicates - keep only one entry per customer (the most recent one)
+                // Remove duplicates - keep only one entry per customer (most recent)
                 const uniqueFollowUps = [];
                 const seenCustomers = new Set();
-                // Sort by date descending so we keep the most recent
                 followUps.sort((a, b) => b.expectedDate.localeCompare(a.expectedDate));
                 for (const f of followUps) {
                     if (!seenCustomers.has(f.customerId)) {
@@ -621,7 +684,6 @@
                         uniqueFollowUps.push(f);
                     }
                 }
-                // Sort back by date ascending for display
                 uniqueFollowUps.sort((a, b) => a.expectedDate.localeCompare(b.expectedDate));
                 
                 allFollowUps = uniqueFollowUps;
@@ -629,10 +691,40 @@
                 
             } catch (error) {
                 console.error('Error loading follow ups:', error);
-                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</span></td>';
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
             }
         }
-        
+
+        // ─── REFRESH FOLLOW UPS WITH UPDATED NAMES ───
+        function refreshFollowUps() {
+            if (allFollowUps.length === 0) return;
+            
+            // Update customer names and due balances in the data
+            let updated = false;
+            allFollowUps = allFollowUps.map(f => {
+                const freshName = getCustomerName(f.customerId);
+                const freshDue = getCustomerDue(f.customerId);
+                
+                if (freshName !== 'Unknown' && f.customerName !== freshName) {
+                    f.customerName = freshName;
+                    updated = true;
+                }
+                if (f.dueBalance !== freshDue) {
+                    f.dueBalance = freshDue;
+                    updated = true;
+                }
+                return f;
+            });
+            
+            // Only re-render if something changed
+            if (updated) {
+                console.log('🔄 Refreshing follow ups with updated data');
+                applyFilters();
+                updateStats(allFollowUps);
+            }
+        }
+
+        // ─── APPLY FILTERS ───
         function applyFilters() {
             let filtered = [...allFollowUps];
             
@@ -660,7 +752,8 @@
             renderTable(filtered);
             updateStats(allFollowUps);
         }
-        
+
+        // ─── RENDER TABLE ───
         function renderTable(followUps) {
             const tbody = document.getElementById('followUpTableBody');
             if (followUps.length === 0) {
@@ -676,7 +769,7 @@
             
             for (const followUp of followUps) {
                 const priorityClass = followUp.priority.class;
-                const priorityText = followUp.priority.text;
+                const priorityIcon = followUp.priority.icon;
                 const daysLeft = followUp.daysDiff;
                 const dateStatus = daysLeft < 0 ? 'text-red-500' : daysLeft === 0 ? 'text-orange-500' : 'text-green-600';
                 
@@ -694,25 +787,31 @@
                 row.setAttribute('data-id', followUp.id);
                 row.setAttribute('data-customer', followUp.customerName);
                 row.setAttribute('data-description', followUp.description);
-                row.setAttribute('data-priority', priorityText);
+                row.setAttribute('data-priority', followUp.priority.level);
                 row.setAttribute('data-date', followUp.expectedDate);
                 row.setAttribute('data-days', daysLeft);
                 row.setAttribute('data-current-remarks', followUp.currentRemarks);
                 row.setAttribute('data-next-remarks', followUp.nextRemarks);
                 row.setAttribute('data-due-balance', followUp.dueBalance || 0);
+                row.setAttribute('data-customer-id', followUp.customerId);
                 
                 row.innerHTML = `
                     <td class="px-3 py-2.5 text-xs text-center font-medium">${sl++}</td>
-                    <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(followUp.customerName)}</td>
+                    <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white customer-name-cell">${escapeHtml(followUp.customerName)}</td>
                     <td class="px-3 py-2.5 text-sm"><div class="text-xs text-gray-600 dark:text-gray-400 max-w-[200px] truncate" title="${escapeHtml(followUp.description)}">${escapeHtml(followUp.description)}</div></td>
-                    <td class="px-3 py-2.5"><span class="px-2 py-1 rounded-full text-xs font-medium ${priorityClass}">${priorityText}</span></td>
-                    <td class="px-3 py-2.5 text-sm font-bold text-red-600 dark:text-red-400">৳${(followUp.dueBalance || 0).toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-center">
+                        <span class="${priorityClass}" title="${followUp.priority.level.charAt(0).toUpperCase() + followUp.priority.level.slice(1)} Priority">
+                            <i class="fas ${priorityIcon}"></i>
+                        </span>
+                    </td>
+                    <td class="px-3 py-2.5 text-sm font-bold text-red-600 dark:text-red-400 due-balance-cell">৳${(followUp.dueBalance || 0).toFixed(2)}</td>
                     <td class="px-3 py-2.5 text-sm ${dateStatus}">${followUp.expectedDate}</td>
                     <td class="px-3 py-2.5">${statusBadge}</td>
                     <td class="px-3 py-2.5 text-center"><button class="update-followup text-primary hover:text-primary-dark p-1.5 rounded-lg transition-colors" data-id="${followUp.id}" data-customer="${escapeHtml(followUp.customerName)}" data-date="${followUp.expectedDate}" data-remarks="${escapeHtml(followUp.currentRemarks)}" data-next-remarks="${escapeHtml(followUp.nextRemarks)}" title="Update Follow Up"><i class="fas fa-edit text-sm"></i></button></td>
                 `;
             }
             
+            // ─── EVENT LISTENERS ───
             document.querySelectorAll('.update-followup').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -732,11 +831,25 @@
                     const dateStatusText = daysLeft < 0 ? 'Overdue' : daysLeft === 0 ? 'Today' : 'Pending';
                     const dateStatusColor = daysLeft < 0 ? 'text-red-500' : daysLeft === 0 ? 'text-orange-500' : 'text-green-600';
                     const dueBalance = parseFloat(data.dueBalance) || 0;
+                    const priorityLevel = data.priority || 'low';
+                    const priorityIcons = {
+                        high: 'fa-arrow-up',
+                        medium: 'fa-minus',
+                        low: 'fa-arrow-down'
+                    };
+                    const priorityIcon = priorityIcons[priorityLevel] || 'fa-minus';
+                    const priorityColors = {
+                        high: 'text-red-600',
+                        medium: 'text-orange-500',
+                        low: 'text-green-600'
+                    };
+                    const priorityColor = priorityColors[priorityLevel] || 'text-gray-600';
+                    
                     document.getElementById('centerModalContent').innerHTML = `
                         <div class="space-y-3">
                             <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Customer</span><span class="font-semibold text-sm">${escapeHtml(data.customer)}</span></div>
                             <div class="flex justify-between items-start pb-2 border-b"><span class="text-xs text-gray-500">Description</span><span class="text-sm text-right max-w-[220px]">${escapeHtml(data.description)}</span></div>
-                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Priority</span><span class="text-sm font-semibold">${escapeHtml(data.priority)}</span></div>
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Priority</span><span class="text-sm font-semibold ${priorityColor}"><i class="fas ${priorityIcon} mr-1"></i> ${priorityLevel.charAt(0).toUpperCase() + priorityLevel.slice(1)}</span></div>
                             <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Due Balance</span><span class="text-sm font-bold text-red-600">৳${dueBalance.toFixed(2)}</span></div>
                             <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Follow Up Date</span><div class="text-right"><span class="text-sm font-semibold">${data.date}</span><span class="text-xs ${dateStatusColor} ml-1">(${dateStatusText})</span></div></div>
                             <div class="flex justify-between items-start pb-2 border-b"><span class="text-xs text-gray-500">Current Remarks</span><span class="text-sm text-right">${escapeHtml(data.currentRemarks) || '-'}</span></div>
@@ -747,7 +860,8 @@
                 });
             });
         }
-        
+
+        // ─── UPDATE STATS ───
         function updateStats(followUps) {
             const total = followUps.length;
             let pending = 0, overdue = 0, upcoming = 0, monthly = 0;
@@ -774,7 +888,8 @@
             document.getElementById('upcomingTasks').textContent = upcoming;
             document.getElementById('monthlyTasks').textContent = monthly;
         }
-        
+
+        // ─── UPDATE FOLLOW UP ───
         async function updateFollowUp() {
             const transactionId = document.getElementById('updateTransactionId').value;
             const newExpectedDate = document.getElementById('updateExpectedDate').value;
@@ -792,7 +907,8 @@
                 await loadFollowUps();
             } catch (error) { console.error('Update error:', error); showToast('Error updating follow up', 'error'); }
         }
-        
+
+        // ─── EXPORT CSV ───
         function exportToCSV() {
             let exportData = [...allFollowUps];
             
@@ -824,7 +940,7 @@
                 const daysDiff = getDaysDifference(f.expectedDate);
                 const statusText = daysDiff < 0 ? 'Overdue' : daysDiff === 0 ? 'Today' : 'Pending';
                 const daysText = daysDiff < 0 ? `${Math.abs(daysDiff)} days overdue` : `${daysDiff} days left`;
-                csv.push(`"${sl++}","${f.customerName.replace(/"/g, '""')}","${f.description.replace(/"/g, '""')}","${f.priority.text}","${(f.dueBalance||0).toFixed(2)}","${f.expectedDate}","${daysText}","${statusText}","${(f.nextRemarks || '').replace(/"/g, '""')}"`);
+                csv.push(`"${sl++}","${f.customerName.replace(/"/g, '""')}","${f.description.replace(/"/g, '""')}","${f.priority.level}","${(f.dueBalance||0).toFixed(2)}","${f.expectedDate}","${daysText}","${statusText}","${(f.nextRemarks || '').replace(/"/g, '""')}"`);
             });
             const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -835,8 +951,8 @@
             URL.revokeObjectURL(url);
             showToast('Follow up list exported!', 'success');
         }
-        
-        // Event Listeners
+
+        // ─── EVENT LISTENERS ───
         document.getElementById('refreshBtn').addEventListener('click', () => { loadFollowUps(); showToast('Refreshed!', 'success'); });
         document.getElementById('searchInput').addEventListener('input', () => applyFilters());
         document.getElementById('exportFollowUpBtn').addEventListener('click', exportToCSV);
@@ -860,16 +976,36 @@
         document.getElementById('closeCenterModalFooterBtn').addEventListener('click', closeCenterModal);
         document.getElementById('detailsCenterModal').addEventListener('click', (e) => { if (e.target === document.getElementById('detailsCenterModal')) closeCenterModal(); });
         
-        // Logout functionality
+        // ─── LOGOUT ───
         const logoutModal = document.getElementById('logoutModal'), logoutLink = document.getElementById('logoutLink'), cancelLogout = document.getElementById('cancelLogoutBtn'), confirmLogout = document.getElementById('confirmLogoutBtn');
         const { logout } = await import('./js/auth.js');
         if (logoutLink) logoutLink.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
         if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
         if (confirmLogout) confirmLogout.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
+
+        // ─── FOOTER YEAR ───
+        document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+        // ─── CLEANUP ───
+        window.addEventListener('beforeunload', () => {
+            if (unsubscribeCustomers) {
+                unsubscribeCustomers();
+                unsubscribeCustomers = null;
+            }
+        });
+
+        // ─── INIT ───
+        console.log('🚀 Initializing Follow Up page...');
         
-        // Initial load
-        loadFollowUps();
-        document.querySelector('.quick-filter-btn[data-filter="all"]')?.classList.add('active');
+        // Setup real-time customer listener first
+        setupCustomerListener();
+        
+        // Wait a moment for customer data to load, then load follow ups
+        setTimeout(async () => {
+            await loadFollowUps();
+            document.querySelector('.quick-filter-btn[data-filter="all"]')?.classList.add('active');
+            console.log('🚀 Follow Up page initialized with real-time customer updates');
+        }, 500);
     </script>
 </body>
 </html>

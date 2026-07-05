@@ -111,6 +111,10 @@
                     </a>
                     <div class="submenu-modern pl-9 mt-1 space-y-1">
                         <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a>
+                        <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                            <i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span>
+                            </a>
+
                         <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a>
                     </div>
                 </div>
@@ -129,6 +133,11 @@
                     </div>
                 </div>
                 <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span></a>
+                
+                <a href="expenses.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Expenses</span>
+                </a>
+
                 <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span></a>
             </nav>
             <div class="pt-4 mt-2 border-t border-white/10">
@@ -218,7 +227,7 @@
             <!-- Customers Table -->
             <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
                 <div class="overflow-x-auto">
-                    <table class="w-full min-w-[750px]">
+                    <table class="w-full min-w-[900px]">
                         <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                             <tr>
                                 <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">SL</th>
@@ -227,15 +236,16 @@
                                 <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">Address</th>
                                 <th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Invoice</th>
                                 <th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Due</th>
+                                <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Last Update</th>
                                 <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="customersTableBody">
-                            <tr><td colspan="7"><div class="skeleton"></div></tr>
-                            <tr><td colspan="7"><div class="skeleton"></div></tr>
-                            <tr><td colspan="7"><div class="skeleton"></div></tr>
-                            <tr><td colspan="7"><div class="skeleton"></div></tr>
-                            <tr><td colspan="7"><div class="skeleton"></div></tr>
+                            <tr><td colspan="8"><div class="skeleton"></div></tr>
+                            <tr><td colspan="8"><div class="skeleton"></div></tr>
+                            <tr><td colspan="8"><div class="skeleton"></div></tr>
+                            <tr><td colspan="8"><div class="skeleton"></div></tr>
+                            <tr><td colspan="8"><div class="skeleton"></div></tr>
                         </tbody>
                     </table>
                 </div>
@@ -313,6 +323,8 @@
     // ----- state -----
     let currentPage = 1, perPage = 50, currentSearchTerm = '', searchDebounceTimer = null, currentDeleteId = null, currentCustomerName = '', isLoading = false, hasMore = true, lastDoc = null, totalCustomersCount = 0;
     let allCustomers = [], customerMap = new Map();
+    // Map to store last due entry date for each customer (dynamically loaded)
+    let customerLastDueMap = new Map();
 
     // ----- helpers -----
     function showToast(message, type = 'success') {
@@ -380,9 +392,37 @@
         } catch (error) { console.error('Stats error:', error); }
     }
 
+    // ----- Load last due entry date for each customer -----
+    async function loadCustomerLastDueDates() {
+        try {
+            const transactionsSnap = await getDocs(collection(db, 'transactions'));
+            const dueMap = new Map();
+            
+            transactionsSnap.forEach(doc => {
+                const data = doc.data();
+                if (data.type === 'due' && data.customerId && data.date) {
+                    const existing = dueMap.get(data.customerId);
+                    if (!existing || data.date > existing) {
+                        dueMap.set(data.customerId, data.date);
+                    }
+                }
+            });
+            
+            customerLastDueMap = dueMap;
+            console.log('📅 Loaded last due dates for', customerLastDueMap.size, 'customers');
+        } catch (error) {
+            console.error('Error loading last due dates:', error);
+        }
+    }
+
     // ----- render table (A-Z sorting by name) -----
     function generateRowHTML(customer, sl) {
         const dueClass = (customer.totalDue || 0) >= 10000 ? 'text-red-600 font-bold' : (customer.totalDue || 0) >= 5000 ? 'text-orange-500 font-semibold' : 'text-green-600';
+        // Get last due entry date from the map
+        const lastDueDateStr = customerLastDueMap.get(customer.id) || customer.lastDueEntryDate || null;
+        const lastUpdateDate = lastDueDateStr 
+            ? new Date(lastDueDateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+            : '-';
         return `
             <td class="px-3 py-2.5 text-sm font-medium text-center">${sl}</td>
             <td class="px-3 py-2.5"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">${(customer.name?.charAt(0) || '?').toUpperCase()}</div><span class="font-medium text-xs md:text-sm">${escapeHtml(customer.name)}</span></div></td>
@@ -390,6 +430,7 @@
             <td class="px-3 py-2.5 text-xs md:text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">${escapeHtml(customer.address) || '-'}</td>
             <td class="px-3 py-2.5 text-right text-purple-600 font-semibold text-xs md:text-sm">৳${(customer.invoiceValue || 0).toFixed(2)}</td>
             <td class="px-3 py-2.5 text-right ${dueClass} text-xs md:text-sm">৳${(customer.totalDue || 0).toFixed(2)}</td>
+            <td class="px-3 py-2.5 text-center text-xs text-gray-500 dark:text-gray-400">${lastUpdateDate}</td>
             <td class="px-3 py-2.5 text-center"><div class="flex items-center justify-center gap-1"><button class="edit-customer text-blue-500 hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-id="${customer.id}"><i class="fas fa-edit text-xs md:text-sm"></i></button><button class="delete-customer text-red-500 hover:text-red-700 p-1.5 rounded-lg transition-colors" data-id="${customer.id}" data-name="${escapeHtml(customer.name)}"><i class="fas fa-trash-alt text-xs md:text-sm"></i></button></div></td>
         `;
     }
@@ -397,7 +438,7 @@
     function renderTable() {
         const tbody = document.getElementById('customersTableBody');
         if (allCustomers.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-users text-3xl mb-2 opacity-50 block"></i>No customers found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-users text-3xl mb-2 opacity-50 block"></i>No customers found</td></tr>';
             return;
         }
 
@@ -452,6 +493,10 @@
     }
     function showDetailsModal(customer) {
         const content = document.getElementById('detailsContent');
+        const lastDueDateStr = customerLastDueMap.get(customer.id) || customer.lastDueEntryDate || null;
+        const lastUpdateDate = lastDueDateStr 
+            ? new Date(lastDueDateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+            : 'N/A';
         content.innerHTML = `
             <div class="space-y-3">
                 <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Name</span><span class="font-semibold text-sm">${escapeHtml(customer.name)}</span></div>
@@ -459,6 +504,7 @@
                 <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Address</span><span class="text-sm text-right">${escapeHtml(customer.address || '-')}</span></div>
                 <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Invoice Value</span><span class="font-semibold text-purple-600">৳${(customer.invoiceValue || 0).toFixed(2)}</span></div>
                 <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Total Due</span><span class="font-semibold">৳${(customer.totalDue || 0).toFixed(2)}</span></div>
+                <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Last Update</span><span class="text-sm">${lastUpdateDate}</span></div>
                 <div class="flex justify-between items-center pb-2 border-b border-gray-200 dark:border-gray-700"><span class="text-xs text-gray-500">Notes</span><span class="text-sm text-right">${escapeHtml(customer.notes || '-')}</span></div>
                 <div class="flex justify-between items-center"><span class="text-xs text-gray-500">Created</span><span class="text-xs">${customer.createdAt ? new Date(customer.createdAt).toLocaleDateString() : 'N/A'}</span></div>
             </div>
@@ -481,7 +527,7 @@
         if (isLoading) return;
         isLoading = true;
         const tbody = document.getElementById('customersTableBody');
-        tbody.innerHTML = `<tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8"><div class="skeleton"></div></tr><tr><td colspan="8"><div class="skeleton"></div></tr><tr><td colspan="8"><div class="skeleton"></div></tr><tr><td colspan="8"><div class="skeleton"></div></tr><tr><td colspan="8"><div class="skeleton"></div></tr>`;
         try {
             let q;
             if (!reset && lastDoc) {
@@ -491,7 +537,14 @@
             }
             const snapshot = await getDocs(q);
             const customers = [];
-            snapshot.forEach(doc => customers.push({ id: doc.id, ...doc.data() }));
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                customers.push({ 
+                    id: doc.id, 
+                    ...data,
+                    lastDueEntryDate: data.lastDueEntryDate || null
+                });
+            });
             if (reset) {
                 allCustomers = customers;
                 customerMap.clear();
@@ -513,7 +566,7 @@
         } catch (error) {
             console.error('Load error:', error);
             showToast('Error loading customers', 'error');
-            if (reset) { lastDoc = null; tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-500">Error loading customers</td></tr>'; }
+            if (reset) { lastDoc = null; tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-red-500">Error loading customers</td></tr>'; }
         } finally { isLoading = false; }
     }
 
@@ -549,14 +602,15 @@
         if (isLoading) return;
         isLoading = true;
         const tbody = document.getElementById('customersTableBody');
-        tbody.innerHTML = '<tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr><tr><td colspan="7"><div class="skeleton"></div></tr>';
+        tbody.innerHTML = '<tr><td colspan="8"><div class="skeleton"></div></tr><tr><td colspan="8"><div class="skeleton"></div></tr><tr><td colspan="8"><div class="skeleton"></div></tr><tr><td colspan="8"><div class="skeleton"></div></tr><tr><td colspan="8"><div class="skeleton"></div></tr>';
         try {
             const lower = term.toLowerCase();
             const q = query(collection(db, 'customers'), orderBy('createdAt', 'desc'), limit(100));
             const snap = await getDocs(q);
             const results = [];
             snap.forEach(doc => {
-                const c = { id: doc.id, ...doc.data() };
+                const data = doc.data();
+                const c = { id: doc.id, ...data };
                 if (c.name?.toLowerCase().includes(lower) || c.phone?.includes(term) || c.address?.toLowerCase().includes(lower)) results.push(c);
             });
             allCustomers = results;
@@ -585,7 +639,14 @@
                 const existing = phoneCheck.docs[0];
                 if (existing.id !== customerId) { showPhoneError('Phone registered to another customer!'); showToast('Phone exists', 'error'); return; }
             }
-            const data = { name, phone, address, notes, searchName: name.toLowerCase(), updatedAt: new Date().toISOString() };
+            const data = { 
+                name, 
+                phone, 
+                address, 
+                notes, 
+                searchName: name.toLowerCase(), 
+                updatedAt: new Date().toISOString() 
+            };
             if (customerId) {
                 await updateDoc(doc(db, 'customers', customerId), data);
                 showToast('Customer updated', 'success');
@@ -593,12 +654,14 @@
                 data.createdAt = new Date().toISOString();
                 data.invoiceValue = 0;
                 data.totalDue = 0;
+                data.lastDueEntryDate = null;
                 await addDoc(collection(db, 'customers'), data);
                 showToast('Customer added', 'success');
             }
             closeCustomerModal();
             await loadStats();
             await loadCustomers(true);
+            await loadCustomerLastDueDates(); // Refresh the map
         } catch (error) { showToast('Error saving customer', 'error'); }
     }
 
@@ -615,25 +678,50 @@
             document.getElementById('deleteModal').classList.add('hidden');
             await loadStats();
             await loadCustomers(true);
+            await loadCustomerLastDueDates(); // Refresh the map
         } catch (error) { showToast('Delete failed', 'error'); }
     }
 
-    // ----- export -----
-    function exportToExcel() {
-        if (allCustomers.length === 0) { showToast('No data', 'error'); return; }
-        let csv = ['\uFEFF"SL","Name","Phone","Address","Invoice Value","Total Due"'];
-        // sorted A-Z for export as well
-        const sorted = [...allCustomers].sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
-        sorted.forEach((c, i) => {
-            csv.push(`"${i+1}","${c.name}","${c.phone}","${c.address || ''}","${(c.invoiceValue||0).toFixed(2)}","${(c.totalDue||0).toFixed(2)}"`);
-        });
-        const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
-        URL.revokeObjectURL(a.href);
-        showToast('Exported (A-Z sorted)', 'success');
+    // ----- export (ALL customers, not filtered) -----
+    async function exportToExcel() {
+        try {
+            showToast('Preparing export...', 'info');
+            // Fetch ALL customers from Firebase
+            const snap = await getDocs(collection(db, 'customers'));
+            const allCustomersList = [];
+            snap.forEach(doc => {
+                const data = doc.data();
+                allCustomersList.push({ id: doc.id, ...data });
+            });
+            
+            if (allCustomersList.length === 0) { 
+                showToast('No data to export', 'error'); 
+                return; 
+            }
+            
+            // Sort A-Z by name
+            const sorted = [...allCustomersList].sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
+            
+            let csv = ['\uFEFF"SL","Name","Phone","Address","Invoice Value","Total Due","Last Update"'];
+            sorted.forEach((c, i) => {
+                const lastDueDateStr = customerLastDueMap.get(c.id) || c.lastDueEntryDate || null;
+                const lastUpdateDate = lastDueDateStr 
+                    ? new Date(lastDueDateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+                    : '-';
+                csv.push(`"${i+1}","${c.name || ''}","${c.phone || ''}","${c.address || ''}","${(c.invoiceValue||0).toFixed(2)}","${(c.totalDue||0).toFixed(2)}","${lastUpdateDate}"`);
+            });
+            
+            const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `all_customers_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast(`Exported ${sorted.length} customers`, 'success');
+        } catch (error) {
+            console.error('Export error:', error);
+            showToast('Export failed', 'error');
+        }
     }
 
     function closeCustomerModal() {
@@ -672,7 +760,13 @@
     document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => document.getElementById('deleteModal').classList.add('hidden'));
     document.getElementById('confirmDeleteBtn')?.addEventListener('click', deleteCustomer);
     document.getElementById('exportBtn')?.addEventListener('click', exportToExcel);
-    document.getElementById('refreshBtn')?.addEventListener('click', () => { document.getElementById('searchInput').value = ''; loadCustomers(true); loadStats(); showToast('Refreshed'); });
+    document.getElementById('refreshBtn')?.addEventListener('click', async () => { 
+        document.getElementById('searchInput').value = ''; 
+        await loadCustomers(true); 
+        await loadStats(); 
+        await loadCustomerLastDueDates();
+        showToast('Refreshed'); 
+    });
     document.getElementById('searchInput')?.addEventListener('input', handleSearchInput);
     document.getElementById('darkModeToggle')?.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
     document.getElementById('perPageSelect')?.addEventListener('change', (e) => { perPage = parseInt(e.target.value); loadCustomers(true); });
@@ -695,8 +789,9 @@
     document.getElementById('footerYear').textContent = new Date().getFullYear();
 
     // init
-    loadStats();
-    loadCustomers(true);
+    await loadStats();
+    await loadCustomerLastDueDates(); // Load last due dates first
+    await loadCustomers(true);
 </script>
 </body>
 </html>

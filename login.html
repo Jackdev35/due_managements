@@ -164,11 +164,15 @@
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
             z-index: 10001;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             gap: 20px;
+        }
+        
+        .loading-overlay.show {
+            display: flex;
         }
         
         .loading-spinner {
@@ -180,7 +184,6 @@
             animation: spin 1s linear infinite;
         }
 
-        /* Cross-tab sync prevention - lock icon */
         .tab-lock-badge {
             position: fixed;
             bottom: 20px;
@@ -221,7 +224,7 @@
     <div class="min-h-screen flex items-center justify-center px-4 py-8 relative z-10">
         <div class="w-full max-w-md animate-fade-up">
             
-            <!-- Brand Section with Full Circle Logo -->
+            <!-- Brand Section -->
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-primary to-primary-dark shadow-2xl mb-5 animate-logo-glow relative group cursor-pointer">
                     <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
@@ -349,7 +352,7 @@
     </div>
     
     <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner"></div>
         <div class="text-white text-lg font-semibold">Authenticating...</div>
         <div class="text-purple-300 text-sm">Please wait</div>
@@ -380,68 +383,131 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
+        // ============ XSS PROTECTION (সবার আগে) ============
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ============ RATE LIMITING (সবার আগে) ============
+        const MAX_LOGIN_ATTEMPTS = 5;
+        const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
+        const loginAttempts = new Map();
+        
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('device_id');
+            if (!deviceId) {
+                deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('device_id', deviceId);
+            }
+            return deviceId;
+        }
+        
+        function checkRateLimit(email) {
+            const deviceId = getDeviceId();
+            const key = `${deviceId}_${email}`;
+            
+            // Check if locked out
+            const lockoutKey = `lockout_${key}`;
+            const lockoutTime = localStorage.getItem(lockoutKey);
+            if (lockoutTime) {
+                const timeLeft = parseInt(lockoutTime) - Date.now();
+                if (timeLeft > 0) {
+                    const minutesLeft = Math.ceil(timeLeft / 60000);
+                    return { 
+                        allowed: false, 
+                        message: `Too many failed attempts. Please try again in ${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}.` 
+                    };
+                } else {
+                    localStorage.removeItem(lockoutKey);
+                    loginAttempts.delete(key);
+                }
+            }
+            
+            const attempts = loginAttempts.get(key) || 0;
+            if (attempts >= MAX_LOGIN_ATTEMPTS) {
+                localStorage.setItem(lockoutKey, (Date.now() + LOCKOUT_DURATION).toString());
+                return { 
+                    allowed: false, 
+                    message: `Too many failed attempts. Please try again in 15 minutes.` 
+                };
+            }
+            
+            return { allowed: true, attempts: attempts };
+        }
+        
+        function incrementLoginAttempts(email) {
+            const deviceId = getDeviceId();
+            const key = `${deviceId}_${email}`;
+            const attempts = loginAttempts.get(key) || 0;
+            loginAttempts.set(key, attempts + 1);
+            
+            if (loginAttempts.size > 100) {
+                const keys = Array.from(loginAttempts.keys());
+                for (let i = 0; i < keys.length - 100; i++) {
+                    loginAttempts.delete(keys[i]);
+                }
+            }
+        }
+        
+        function resetLoginAttempts(email) {
+            const deviceId = getDeviceId();
+            const key = `${deviceId}_${email}`;
+            loginAttempts.delete(key);
+            const lockoutKey = `lockout_${key}`;
+            localStorage.removeItem(lockoutKey);
+        }
+        
         // ============ CROSS-TAB SYNC PREVENTION ============
         const REDIRECT_KEY = 'is_redirecting';
         const REDIRECT_TIMESTAMP_KEY = 'redirect_timestamp';
         const TAB_ID_KEY = 'tab_id';
         const ACTIVE_TAB_KEY = 'active_tab_id';
         
-        // Generate unique tab ID
         function generateTabId() {
             return 'tab_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
         
-        // Get or create tab ID
         let tabId = sessionStorage.getItem(TAB_ID_KEY);
         if (!tabId) {
             tabId = generateTabId();
             sessionStorage.setItem(TAB_ID_KEY, tabId);
         }
         
-        // Register this tab as active
         function registerActiveTab() {
             localStorage.setItem(ACTIVE_TAB_KEY, tabId);
-            // Update timestamp
             localStorage.setItem('tab_last_active_' + tabId, Date.now().toString());
         }
         
-        // Check if this tab is the active one
         function isActiveTab() {
             const activeTab = localStorage.getItem(ACTIVE_TAB_KEY);
             return activeTab === tabId;
         }
         
-        // Handle tab activation/deactivation
         function setupTabSync() {
-            // Register on load
             registerActiveTab();
             
-            // Update on visibility change
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) {
                     registerActiveTab();
                 }
             });
             
-            // Listen for storage changes from other tabs
             window.addEventListener('storage', (e) => {
                 if (e.key === ACTIVE_TAB_KEY) {
-                    // Another tab became active
                     const isActive = isActiveTab();
                     document.getElementById('tabStatusText').textContent = 
                         isActive ? 'Tab is active' : 'Another tab is active';
                     
                     if (!isActive && auth.currentUser) {
-                        // This tab lost active status - prevent auto-redirect
                         console.log('ℹ️ Another tab is active, preventing redirect');
                     }
                 }
             });
             
-            // Also listen for page unload to clean up
-            window.addEventListener('beforeunload', () => {
-                // Don't unregister immediately - other tab will take over
-            });
+            window.addEventListener('beforeunload', () => {});
         }
         
         function isRedirecting() {
@@ -456,13 +522,11 @@
         }
         
         function shouldRedirect() {
-            // If already redirecting, don't redirect again
             if (isRedirecting()) {
                 console.log("⏳ Already redirecting, skipping...");
                 return false;
             }
             
-            // Check if a redirect happened recently (within last 5 seconds)
             const lastRedirect = sessionStorage.getItem(REDIRECT_TIMESTAMP_KEY);
             if (lastRedirect) {
                 const timeSince = Date.now() - parseInt(lastRedirect);
@@ -472,7 +536,6 @@
                 }
             }
             
-            // Check if this tab is active
             if (!isActiveTab()) {
                 console.log("ℹ️ Not active tab, skipping redirect");
                 return false;
@@ -481,14 +544,13 @@
             return true;
         }
         
-        // Initialize tab sync
         setupTabSync();
         document.getElementById('tabStatusText').textContent = 'Tab sync active';
         
-        // ============ INACTIVITY TIMER (20 MINUTES) ============
+        // ============ INACTIVITY TIMER ============
         let inactivityTimer = null;
         let dailyResetTimer = null;
-        const INACTIVITY_TIMEOUT = 20 * 60 * 1000; // 20 minutes
+        const INACTIVITY_TIMEOUT = 20 * 60 * 1000;
         
         function getTimeUntilMidnight() {
             const now = new Date();
@@ -509,7 +571,6 @@
                     try {
                         await signOut(auth);
                         showToast('Logged out due to 20 minutes of inactivity', 'warning');
-                        // Clear redirect flags
                         setRedirecting(false);
                         localStorage.removeItem(ACTIVE_TAB_KEY);
                         window.location.href = 'login.html';
@@ -521,7 +582,6 @@
         }
         
         function setupDailyReset() {
-            // Clear existing timer
             if (dailyResetTimer) {
                 clearTimeout(dailyResetTimer);
                 dailyResetTimer = null;
@@ -536,7 +596,6 @@
                     try {
                         await signOut(auth);
                         showToast('Session expired - daily reset at midnight', 'warning');
-                        // Clear redirect flags
                         setRedirecting(false);
                         localStorage.removeItem(ACTIVE_TAB_KEY);
                         window.location.href = 'login.html';
@@ -569,45 +628,37 @@
         let authStateChecked = false;
         
         onAuthStateChanged(auth, (user) => {
-            // Prevent multiple executions
             if (authStateChecked) {
-                console.log("⏳ Auth state already checked, skipping...");
+                //console.log("⏳ Auth state already checked, skipping...");
                 return;
             }
             authStateChecked = true;
             
             if (user) {
-                console.log("✅ User already logged in:", user.email);
+                //console.log("✅ User already logged in:", user.email);
+                console.log("✅ User already logged in");
                 
-                // Start inactivity timer
                 resetInactivityTimer();
-                
-                // Setup daily reset
                 setupDailyReset();
                 
-                // Setup activity listeners
                 if (!window._activityListenersSetup) {
                     setupActivityListeners();
                     window._activityListenersSetup = true;
                 }
                 
-                // Check if we should redirect
                 if (shouldRedirect()) {
-                    console.log("🔄 Redirecting to dashboard...");
+                    //console.log("🔄 Redirecting to dashboard...");
                     setRedirecting(true);
                     
-                    // Clear redirect flag after navigation
                     setTimeout(() => {
                         setRedirecting(false);
                     }, 3000);
                     
                     window.location.replace('dashboard.html');
                 } else {
-                    console.log("⏳ Skipping redirect (cooldown or not active tab)");
+                    //console.log("⏳ Skipping redirect (cooldown or not active tab)");
                 }
             } else {
-               
-                // Clear redirect flag if user is not logged in
                 setRedirecting(false);
                 if (inactivityTimer) {
                     clearTimeout(inactivityTimer);
@@ -620,6 +671,7 @@
             }
         });
         
+        // ============ TOAST & MESSAGE FUNCTIONS (XSS Protected) ============
         window.showToast = function(message, type = 'info') {
             const existingToasts = document.querySelectorAll('.toast');
             existingToasts.forEach(toast => toast.remove());
@@ -627,7 +679,7 @@
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             let icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
-            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${escapeHtml(message)}</span>`;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 4000);
         };
@@ -637,7 +689,7 @@
             if (!container) return;
             const bgColor = type === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-300' : 'bg-red-500/20 border-red-500/50 text-red-300';
             const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-            container.innerHTML = `<div class="p-3 rounded-xl border ${bgColor} text-sm flex items-center gap-2 animate-fade-up"><i class="fas ${icon}"></i><span>${message}</span></div>`;
+            container.innerHTML = `<div class="p-3 rounded-xl border ${bgColor} text-sm flex items-center gap-2 animate-fade-up"><i class="fas ${icon}"></i><span>${escapeHtml(message)}</span></div>`;
             setTimeout(() => { if (container.innerHTML) container.innerHTML = ''; }, 5000);
         }
         
@@ -684,7 +736,6 @@
                         brandLogo.src = logoOptions[currentIndex];
                         brandLogo.style.display = 'block';
                         if (fallbackIcon) fallbackIcon.style.display = 'none';
-                        
                     }
                 };
                 img.onerror = function() {
@@ -699,11 +750,10 @@
         
         document.addEventListener('DOMContentLoaded', () => {
             loadBrandLogo();
-            // Clear redirect flag on page load
             setRedirecting(false);
         });
         
-        // Login Form Submit
+        // ============ LOGIN FORM SUBMIT (With Rate Limiting) ============
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
         const emailInput = document.getElementById('email');
@@ -734,23 +784,30 @@
                 return;
             }
             
+            // ============ RATE LIMITING CHECK ============
+            const rateLimit = checkRateLimit(email);
+            if (!rateLimit.allowed) {
+                showMessage('messageContainer', rateLimit.message, 'error');
+                shakeElement(loginBtn);
+                return;
+            }
+            
             // Show loading overlay
-            loadingOverlay.style.display = 'flex';
+            loadingOverlay.classList.add('show');
             loginBtn.disabled = true;
             loginBtn.innerHTML = '<div class="spinner"></div><span>Signing in...</span>';
             
-            // Set persistence
             const persistence = remember ? browserLocalPersistence : browserSessionPersistence;
             await setPersistence(auth, persistence);
             
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                console.log("✅ Login successful:", userCredential.user.email);
+                //console.log("✅ Login successful:", userCredential.user.email);
+                console.log("✅ Login successful");
+                // ============ RESET ATTEMPTS ON SUCCESS ============
+                resetLoginAttempts(email);
                 
-                // Register this tab as active
                 registerActiveTab();
-                
-                // Start inactivity timer
                 resetInactivityTimer();
                 setupDailyReset();
                 
@@ -759,19 +816,19 @@
                     window._activityListenersSetup = true;
                 }
                 
-                // Show success message
                 window.showToast('Login successful! Redirecting...', 'success');
-                
-                // Set redirect flag before redirecting
                 setRedirecting(true);
                 
-                // Redirect to dashboard
                 setTimeout(() => {
                     window.location.replace('dashboard.html');
                 }, 500);
                 
             } catch (error) {
+                //console.error("❌ Login error:", error.code, error.message);
                 console.error("❌ Login error:", error.code, error.message);
+                
+                // ============ INCREMENT ATTEMPTS ON FAILURE ============
+                incrementLoginAttempts(email);
                 
                 let errorMessage = '';
                 switch (error.code) {
@@ -796,17 +853,17 @@
                 window.showToast(errorMessage, 'error');
                 shakeElement(loginBtn);
                 
-                // Reset button
                 loginBtn.innerHTML = '<i class="fas fa-arrow-right-to-bracket group-hover:translate-x-1 transition-transform"></i><span>Sign In</span>';
                 loginBtn.disabled = false;
-                loadingOverlay.style.display = 'none';
-                
-                // Clear redirect flag on error
+                loadingOverlay.classList.remove('show');
                 setRedirecting(false);
             }
         });
         
-        // Forgot Password Modal
+        // ============ FORGOT PASSWORD ============
+        let lastResetRequest = 0;
+        const RESET_COOLDOWN = 60000; // 1 minute
+        
         const forgotModal = document.getElementById('forgotModal');
         const forgotLink = document.getElementById('forgotPasswordLink');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -831,11 +888,22 @@
                 shakeElement(resetEmailInput);
                 return;
             }
+            
+            // ============ RATE LIMITING FOR RESET ============
+            const now = Date.now();
+            if (now - lastResetRequest < RESET_COOLDOWN) {
+                const waitTime = Math.ceil((RESET_COOLDOWN - (now - lastResetRequest)) / 1000);
+                showMessage('resetMessageContainer', `Please wait ${waitTime} seconds before requesting another reset email.`, 'warning');
+                return;
+            }
+            lastResetRequest = now;
+            
             sendResetBtn.disabled = true;
             sendResetBtn.innerHTML = '<div class="spinner"></div><span>Sending...</span>';
+            
             try {
                 await sendPasswordResetEmail(auth, email);
-                showMessage('resetMessageContainer', `Password reset link sent to ${email}!`, 'success');
+                showMessage('resetMessageContainer', `Password reset link sent to ${escapeHtml(email)}!`, 'success');
                 window.showToast('Password reset email sent!', 'success');
                 setTimeout(() => closeModal(), 3000);
             } catch (error) {

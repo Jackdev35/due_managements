@@ -330,6 +330,225 @@
         .dark .searchable-select-dropdown::-webkit-scrollbar-thumb {
             background: #4b5563;
         }
+
+        /* Summary Cards Styles */
+        .summary-stat {
+            text-align: center;
+            padding: 16px 12px;
+            border-radius: 12px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+        .dark .summary-stat {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        .summary-stat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -8px rgba(0,0,0,0.12);
+        }
+        .summary-stat .number {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .summary-stat .label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+        .dark .summary-stat .label {
+            color: #9ca3af;
+        }
+        .summary-stat .number.total { color: #0f3b3a; }
+        .dark .summary-stat .number.total { color: #d4af37; }
+        .summary-stat .number.monthly { color: #2563eb; }
+        .summary-stat .number.weekly { color: #7c3aed; }
+        .summary-stat .number.daily { color: #16a34a; }
+        .summary-stat .count {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+        .icon-wrapper-sm {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin: 0 auto 6px;
+        }
+        .icon-bg-teal { background: #ccfbf1; color: #0d9488; }
+        .dark .icon-bg-teal { background: #042f2e; color: #5eead4; }
+        .icon-bg-blue { background: #dbeafe; color: #2563eb; }
+        .dark .icon-bg-blue { background: #1e3a5f; color: #60a5fa; }
+        .icon-bg-purple { background: #ede9fe; color: #7c3aed; }
+        .dark .icon-bg-purple { background: #2e1065; color: #a78bfa; }
+        .icon-bg-green { background: #d1fae5; color: #16a34a; }
+        .dark .icon-bg-green { background: #052e16; color: #4ade80; }
+
+        /* Date Range Filter Styles - Compact */
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+        }
+        .filter-row .filter-label {
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .dark .filter-row .filter-label {
+            color: #9ca3af;
+        }
+        .filter-row .date-range-input {
+            padding: 5px 8px;
+            font-size: 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            color: #1f2937;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 130px;
+        }
+        .filter-row .date-range-input:focus {
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 2px rgba(15, 59, 58, 0.1);
+        }
+        .dark .filter-row .date-range-input {
+            background: #1f2937;
+            border-color: #4b5563;
+            color: #f1f5f9;
+        }
+        .dark .filter-row .date-range-input:focus {
+            border-color: #1e6b68;
+            box-shadow: 0 0 0 2px rgba(30, 107, 104, 0.15);
+        }
+        .filter-row .filter-select {
+            padding: 5px 10px;
+            font-size: 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            color: #1f2937;
+            outline: none;
+            cursor: pointer;
+            min-width: 110px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .filter-row .filter-select:focus {
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 2px rgba(15, 59, 58, 0.1);
+        }
+        .dark .filter-row .filter-select {
+            background: #1f2937;
+            border-color: #4b5563;
+            color: #f1f5f9;
+        }
+        .dark .filter-row .filter-select:focus {
+            border-color: #1e6b68;
+            box-shadow: 0 0 0 2px rgba(30, 107, 104, 0.15);
+        }
+        .filter-row .filter-btn {
+            padding: 5px 14px;
+            font-size: 11px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .filter-row .filter-btn-primary {
+            background: #0f3b3a;
+            color: white;
+        }
+        .filter-row .filter-btn-primary:hover {
+            background: #092c2b;
+        }
+        .filter-row .filter-btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .filter-row .filter-btn-secondary:hover {
+            background: #d1d5db;
+        }
+        .dark .filter-row .filter-btn-secondary {
+            background: #374151;
+            color: #e5e7eb;
+        }
+        .dark .filter-row .filter-btn-secondary:hover {
+            background: #4b5563;
+        }
+        .filter-row .filter-btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+        .filter-row .filter-btn-danger:hover {
+            background: #b91c1c;
+        }
+        .filter-row .filter-status {
+            font-size: 10px;
+            color: #6b7280;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+        .dark .filter-row .filter-status {
+            color: #9ca3af;
+        }
+        .filter-row .filter-status strong {
+            color: #0f3b3a;
+            font-weight: 600;
+        }
+        .dark .filter-row .filter-status strong {
+            color: #d4af37;
+        }
+        .filter-row .separator {
+            color: #d1d5db;
+            font-size: 12px;
+        }
+        .dark .filter-row .separator {
+            color: #4b5563;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 640px) {
+            .filter-row {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .filter-row .date-range-input {
+                width: 100px;
+                font-size: 10px;
+                padding: 4px 6px;
+            }
+            .filter-row .filter-select {
+                font-size: 10px;
+                padding: 4px 8px;
+                min-width: 90px;
+            }
+            .filter-row .filter-btn {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            .filter-row .filter-status {
+                font-size: 9px;
+                margin-left: 0;
+                width: 100%;
+                text-align: center;
+            }
+            .filter-row .filter-label {
+                font-size: 10px;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -379,6 +598,9 @@
                             <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
                                 <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
                             </a>
+                            <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                            <i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span>
+                            </a>
                             <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
                                 <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
                             </a>
@@ -422,6 +644,10 @@
                     <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div>
                         <span class="text-sm font-medium">Customer Warranty</span>
+                    </a>
+
+                    <a href="expenses.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Expenses</span>
                     </a>
                     
                     <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
@@ -478,9 +704,6 @@
                                         <!-- Items will be populated dynamically -->
                                     </div>
                                 </div>
-                                
-                                <!-- Customer Details Preview - REMOVED -->
-                                <!-- The preview div has been completely removed -->
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-calendar text-primary mr-1"></i>Payment Date <span class="text-red-500">*</span></label>
@@ -519,6 +742,34 @@
                         </button>
                     </form>
                 </div>
+
+                <!-- Collection Summary Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                    <div class="summary-stat">
+                        <div class="icon-wrapper-sm icon-bg-teal"><i class="fas fa-coins"></i></div>
+                        <div class="number total" id="totalCollectionDisplay">৳0.00</div>
+                        <div class="label">Total Collection</div>
+                        <div class="count" id="totalCollectionCount">0 entries</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="icon-wrapper-sm icon-bg-blue"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="number monthly" id="monthlyCollectionDisplay">৳0.00</div>
+                        <div class="label">Monthly Collection</div>
+                        <div class="count" id="monthlyCollectionCount">0 entries</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="icon-wrapper-sm icon-bg-purple"><i class="fas fa-calendar-week"></i></div>
+                        <div class="number weekly" id="weeklyCollectionDisplay">৳0.00</div>
+                        <div class="label">Weekly Collection</div>
+                        <div class="count" id="weeklyCollectionCount">0 entries</div>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="icon-wrapper-sm icon-bg-green"><i class="fas fa-calendar-day"></i></div>
+                        <div class="number daily" id="dailyCollectionDisplay">৳0.00</div>
+                        <div class="label">Today's Collection</div>
+                        <div class="count" id="dailyCollectionCount">0 entries</div>
+                    </div>
+                </div>
                 
                 <!-- Collections Table Section -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
@@ -532,6 +783,33 @@
                         </button>
                     </div>
                     
+                    <!-- Compact Filter Row -->
+                    <div class="filter-row bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
+                        <span class="filter-label"><i class="fas fa-filter mr-1"></i>Filter:</span>
+                        
+                        <input type="date" id="filterFromDate" class="date-range-input" placeholder="From">
+                        <span class="separator">to</span>
+                        <input type="date" id="filterToDate" class="date-range-input" placeholder="To">
+                        
+                        <select id="quickFilterSelect" class="filter-select">
+                            <option value="">All Entries</option>
+                            <option value="today">📅 Today</option>
+                            <option value="week">📆 This Week</option>
+                            <option value="month">📊 This Month</option>
+                        </select>
+                        
+                        <button id="applyDateFilterBtn" class="filter-btn filter-btn-primary btn-active">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button id="resetDateFilterBtn" class="filter-btn filter-btn-secondary btn-active">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        
+                        <span class="filter-status" id="filterStatus">
+                            <i class="fas fa-info-circle mr-1"></i> <span id="filterStatusText">Showing all</span>
+                        </span>
+                    </div>
+                    
                     <div class="p-3 border-b flex flex-col sm:flex-row justify-between items-center gap-3">
                         <div class="flex items-center gap-2">
                             <span class="text-xs text-gray-500 dark:text-gray-400">Show</span>
@@ -541,6 +819,10 @@
                                 <option value="100">100</option>
                             </select>
                             <span class="text-xs text-gray-500 dark:text-gray-400">entries</span>
+                            <span class="text-xs text-gray-400 ml-2">|</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                Showing <span id="filteredStart">0</span> - <span id="filteredEnd">0</span> of <span id="filteredTotal">0</span>
+                            </span>
                         </div>
                         <div class="relative w-full sm:w-64">
                             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
@@ -553,10 +835,24 @@
                     </div>
                     
                     <div class="overflow-x-auto">
-                        <table class="w-full min-w-[800px]">
+                        <table class="w-full min-w-[900px]">
                             <thead class="bg-gray-50 dark:bg-gray-700/50 border-b">
-                                <tr><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Date</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Customer</th><th class="px-3 py-3 text-right text-[10px] font-semibold uppercase">Amount</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Expected Date</th><th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Remarks</th> </thead>
-                            <tbody id="collectionsTableBody" class="divide-y"><tr><td colspan="5" class="px-4 py-8 text-center"><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div></td></tbody>
+                                <tr>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold uppercase w-[50px]">#</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Date</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Customer</th>
+                                    <th class="px-3 py-3 text-right text-[10px] font-semibold uppercase">Amount</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Expected Date</th>
+                                    <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="collectionsTableBody" class="divide-y">
+                                <tr><td colspan="6" class="px-4 py-8 text-center">
+                                    <div class="skeleton" style="height: 40px; margin: 5px 0;"></div>
+                                    <div class="skeleton" style="height: 40px; margin: 5px 0;"></div>
+                                    <div class="skeleton" style="height: 40px; margin: 5px 0;"></div>
+                                </td></tr>
+                            </tbody>
                         </table>
                     </div>
                     
@@ -598,8 +894,6 @@
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div><h3 class="text-lg font-semibold mb-2">Logout?</h3><p class="text-sm text-gray-500 mb-5">Are you sure you want to logout?</p><div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-gray-100">Cancel</button><button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-danger text-white">Logout</button></div></div>
     </div>
 
-    
-    
     <!-- Auth Check Script -->
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
@@ -641,9 +935,12 @@
         
         let isProcessing = false;
         let allCollections = [];
+        let filteredCollections = [];
         let currentPage = 1;
         let perPage = 50;
         let currentSearchTerm = '';
+        let filterFromDate = '';
+        let filterToDate = '';
         let customerNameMap = new Map();
         let customerDataMap = new Map();
         let allCustomers = [];
@@ -664,6 +961,36 @@
             } catch (e) { return 'N/A'; }
         }
         
+        function getTodayStr() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function getWeekStart() {
+            const now = new Date();
+            const day = now.getDay();
+            const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+            const monday = new Date(now.getFullYear(), now.getMonth(), diff);
+            return monday.toISOString().split('T')[0];
+        }
+
+        function getWeekEnd() {
+            const now = new Date();
+            const day = now.getDay();
+            const diff = now.getDate() - day + (day === 0 ? 0 : 7 - day);
+            const sunday = new Date(now.getFullYear(), now.getMonth(), diff);
+            return sunday.toISOString().split('T')[0];
+        }
+
+        function getMonthStart() {
+            const now = new Date();
+            return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        }
+
+        function getMonthEnd() {
+            const now = new Date();
+            return new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+        }
+        
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -675,6 +1002,9 @@
         
         function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none'; }
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+        function formatCurrency(amount) {
+            return '৳' + (amount || 0).toFixed(2);
+        }
         
         // =============================================
         // SEARCHABLE SELECT LOGIC
@@ -939,10 +1269,122 @@
                 return 0;
             }
         }
+
+        // =============================================
+        // UPDATE SUMMARY CARDS
+        // =============================================
+        function updateSummaryCards() {
+            const today = getTodayStr();
+            const weekStart = getWeekStart();
+            const weekEnd = getWeekEnd();
+            const monthStart = getMonthStart();
+            const monthEnd = getMonthEnd();
+
+            // Total Collection (all entries)
+            const totalAmount = allCollections.reduce((sum, c) => sum + (c.amount || 0), 0);
+            document.getElementById('totalCollectionDisplay').textContent = formatCurrency(totalAmount);
+            document.getElementById('totalCollectionCount').textContent = `${allCollections.length} entries`;
+
+            // Monthly Collection
+            const monthlyEntries = allCollections.filter(c => c.date >= monthStart && c.date <= monthEnd);
+            const monthlyAmount = monthlyEntries.reduce((sum, c) => sum + (c.amount || 0), 0);
+            document.getElementById('monthlyCollectionDisplay').textContent = formatCurrency(monthlyAmount);
+            document.getElementById('monthlyCollectionCount').textContent = `${monthlyEntries.length} entries`;
+
+            // Weekly Collection
+            const weeklyEntries = allCollections.filter(c => c.date >= weekStart && c.date <= weekEnd);
+            const weeklyAmount = weeklyEntries.reduce((sum, c) => sum + (c.amount || 0), 0);
+            document.getElementById('weeklyCollectionDisplay').textContent = formatCurrency(weeklyAmount);
+            document.getElementById('weeklyCollectionCount').textContent = `${weeklyEntries.length} entries`;
+
+            // Today's Collection
+            const todayEntries = allCollections.filter(c => c.date === today);
+            const todayAmount = todayEntries.reduce((sum, c) => sum + (c.amount || 0), 0);
+            document.getElementById('dailyCollectionDisplay').textContent = formatCurrency(todayAmount);
+            document.getElementById('dailyCollectionCount').textContent = `${todayEntries.length} entries`;
+        }
+
+        // =============================================
+        // FILTER COLLECTIONS
+        // =============================================
+        function applyFilters() {
+            let data = [...allCollections];
+            
+            // Date range filter
+            if (filterFromDate && filterToDate) {
+                data = data.filter(c => c.date >= filterFromDate && c.date <= filterToDate);
+            } else if (filterFromDate) {
+                data = data.filter(c => c.date >= filterFromDate);
+            } else if (filterToDate) {
+                data = data.filter(c => c.date <= filterToDate);
+            }
+            
+            // Search filter
+            if (currentSearchTerm) {
+                const term = currentSearchTerm.toLowerCase();
+                data = data.filter(c => 
+                    c.customerName.toLowerCase().includes(term) || 
+                    (c.remarks && c.remarks.toLowerCase().includes(term))
+                );
+            }
+            
+            filteredCollections = data;
+            currentPage = 1;
+            renderTable();
+            updateFilterStatus();
+        }
+
+        function updateFilterStatus() {
+            const statusText = document.getElementById('filterStatusText');
+            if (filterFromDate && filterToDate) {
+                statusText.textContent = `Showing entries from ${filterFromDate} to ${filterToDate} (${filteredCollections.length})`;
+            } else if (filterFromDate) {
+                statusText.textContent = `Showing entries from ${filterFromDate} (${filteredCollections.length})`;
+            } else if (filterToDate) {
+                statusText.textContent = `Showing entries up to ${filterToDate} (${filteredCollections.length})`;
+            } else {
+                statusText.textContent = `Showing all entries (${filteredCollections.length})`;
+            }
+        }
+
+        // Quick filter dropdown handler
+        function handleQuickFilter(value) {
+            if (!value) {
+                resetDateFilter();
+                return;
+            }
+            
+            const today = getTodayStr();
+            let from, to;
+            
+            switch(value) {
+                case 'today':
+                    from = today;
+                    to = today;
+                    break;
+                case 'week':
+                    from = getWeekStart();
+                    to = getWeekEnd();
+                    break;
+                case 'month':
+                    from = getMonthStart();
+                    to = getMonthEnd();
+                    break;
+                default:
+                    return;
+            }
+            
+            filterFromDate = from;
+            filterToDate = to;
+            document.getElementById('filterFromDate').value = from;
+            document.getElementById('filterToDate').value = to;
+            applyFilters();
+            showToast(`Showing ${value} entries`, 'success');
+        }
         
         async function loadAllCollections() {
             const tbody = document.getElementById('collectionsTableBody');
-            tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center"><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div></td>';
+            tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center"><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div><div class="skeleton" style="height: 40px; margin: 5px 0;"></div></td>';
             
             try {
                 const querySnapshot = await getDocs(collection(db, 'transactions'));
@@ -984,11 +1426,13 @@
                 });
                 
                 allCollections = collections;
-                renderTable();
+                filteredCollections = [...collections];
+                updateSummaryCards();
+                applyFilters();
                 
             } catch (error) {
                 console.error('Error loading collections:', error);
-                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-red-500">Error loading data: ' + error.message + '</td>';
+                tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-red-500">Error loading data: ' + error.message + '</td>';
                 showToast('Error loading data: ' + error.message, 'error');
             }
         }
@@ -996,28 +1440,29 @@
         function renderTable() {
             const tbody = document.getElementById('collectionsTableBody');
             
-            let filteredData = [...allCollections];
-            if (currentSearchTerm) {
-                const term = currentSearchTerm.toLowerCase();
-                filteredData = filteredData.filter(c => 
-                    c.customerName.toLowerCase().includes(term) || 
-                    (c.remarks && c.remarks.toLowerCase().includes(term))
-                );
-            }
-            
             const start = (currentPage - 1) * perPage;
-            const end = start + perPage;
-            const paginatedData = filteredData.slice(start, end);
-            const totalPages = Math.ceil(filteredData.length / perPage);
+            const end = Math.min(start + perPage, filteredCollections.length);
+            const paginatedData = filteredCollections.slice(start, end);
+            const totalPages = Math.ceil(filteredCollections.length / perPage);
+            
+            // Update showing info
+            document.getElementById('filteredStart').textContent = filteredCollections.length ? start + 1 : 0;
+            document.getElementById('filteredEnd').textContent = end;
+            document.getElementById('filteredTotal').textContent = filteredCollections.length;
             
             if (paginatedData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No collections found</p></td>';
+                tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No collections found</p></td>';
                 updatePaginationControls(totalPages);
                 return;
             }
             
             tbody.innerHTML = '';
-            for (const col of paginatedData) {
+            const serialStart = start + 1;
+            
+            for (let i = 0; i < paginatedData.length; i++) {
+                const col = paginatedData[i];
+                const serial = serialStart + i;
+                
                 const row = tbody.insertRow();
                 row.className = 'table-row-hover transition-colors cursor-pointer';
                 row.setAttribute('data-collection-id', col.id);
@@ -1029,6 +1474,7 @@
                 row.setAttribute('data-collection-created', col.createdAt);
                 
                 row.innerHTML = `
+                    <td class="px-3 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400">${serial}</td>
                     <td class="px-3 py-2.5 text-xs whitespace-nowrap">${col.date}</td>
                     <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(col.customerName)}</td>
                     <td class="px-3 py-2.5 text-right text-sm font-bold text-green-600">৳${col.amount.toFixed(2)}</td>
@@ -1089,14 +1535,12 @@
         }
         
         function exportToCSV() {
-            if (allCollections.length === 0) { showToast('No data to export', 'error'); return; }
-            let exportData = [...allCollections];
-            if (currentSearchTerm) {
-                const term = currentSearchTerm.toLowerCase();
-                exportData = exportData.filter(c => c.customerName.toLowerCase().includes(term) || (c.remarks && c.remarks.toLowerCase().includes(term)));
-            }
-            let csv = ['\uFEFF"Date","Customer","Amount (৳)","Expected Date","Remarks"'];
-            exportData.forEach(c => { csv.push(`"${c.date}","${c.customerName.replace(/"/g, '""')}","${c.amount.toFixed(2)}","${c.expectedDate || ''}","${c.remarks.replace(/"/g, '""')}"`); });
+            if (filteredCollections.length === 0) { showToast('No data to export', 'error'); return; }
+            
+            let csv = ['\uFEFF"SL","Date","Customer","Amount (৳)","Expected Date","Remarks"'];
+            filteredCollections.forEach((c, index) => { 
+                csv.push(`"${index + 1}","${c.date}","${c.customerName.replace(/"/g, '""')}","${c.amount.toFixed(2)}","${c.expectedDate || ''}","${c.remarks.replace(/"/g, '""')}"`); 
+            });
             const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1169,6 +1613,27 @@
                 showLoading(false);
             }
         }
+
+        // =============================================
+        // DATE FILTER FUNCTIONS
+        // =============================================
+        function setDateFilter(from, to) {
+            filterFromDate = from;
+            filterToDate = to;
+            document.getElementById('filterFromDate').value = from || '';
+            document.getElementById('filterToDate').value = to || '';
+            applyFilters();
+        }
+
+        function resetDateFilter() {
+            filterFromDate = '';
+            filterToDate = '';
+            document.getElementById('filterFromDate').value = '';
+            document.getElementById('filterToDate').value = '';
+            document.getElementById('quickFilterSelect').value = '';
+            applyFilters();
+            showToast('Filter reset', 'info');
+        }
         
         // Event Listeners
         document.getElementById('collectionForm')?.addEventListener('submit', submitCollection);
@@ -1176,8 +1641,41 @@
         document.getElementById('refreshBtn')?.addEventListener('click', () => { loadCustomers(); loadAllCollections(); showToast('Refreshed!'); });
         document.getElementById('darkModeToggle')?.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
         document.getElementById('perPageSelect')?.addEventListener('change', (e) => { perPage = parseInt(e.target.value); currentPage = 1; renderTable(); });
-        document.getElementById('tableSearchInput')?.addEventListener('input', (e) => { currentSearchTerm = e.target.value; currentPage = 1; renderTable(); });
+        document.getElementById('tableSearchInput')?.addEventListener('input', (e) => { currentSearchTerm = e.target.value; currentPage = 1; applyFilters(); });
         document.getElementById('exportTableBtn')?.addEventListener('click', exportToCSV);
+        
+        // Date filter events
+        document.getElementById('applyDateFilterBtn')?.addEventListener('click', () => {
+            const from = document.getElementById('filterFromDate').value;
+            const to = document.getElementById('filterToDate').value;
+            if (from || to) {
+                setDateFilter(from, to);
+                document.getElementById('quickFilterSelect').value = '';
+                showToast('Date filter applied!', 'success');
+            } else {
+                showToast('Please select a date range', 'error');
+            }
+        });
+        
+        document.getElementById('resetDateFilterBtn')?.addEventListener('click', resetDateFilter);
+        
+        // Quick filter dropdown
+        document.getElementById('quickFilterSelect')?.addEventListener('change', (e) => {
+            const value = e.target.value;
+            if (value) {
+                handleQuickFilter(value);
+            } else {
+                resetDateFilter();
+            }
+        });
+        
+        // Allow Enter key to apply date filter
+        document.getElementById('filterFromDate')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('applyDateFilterBtn').click();
+        });
+        document.getElementById('filterToDate')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('applyDateFilterBtn').click();
+        });
         
         document.getElementById('closeDetailsModalBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));
         document.getElementById('closeDetailsModalFooterBtn')?.addEventListener('click', () => document.getElementById('detailsModal').classList.add('hidden'));

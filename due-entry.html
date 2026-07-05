@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
     <meta name="theme-color" content="#0f3b3a">
     <title>Due Entry | JackDev Due Managements</title>
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -23,397 +23,199 @@
                         warning: '#dd6b20',
                         info: '#3182ce',
                     },
-                    fontFamily: {
-                        'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
-                    },
+                    fontFamily: { 'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'] },
                 }
             }
         }
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
-        
-        * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
+        * { transition: background-color 0.2s, border-color 0.2s; }
         body { font-family: 'Inter', system-ui, sans-serif; }
         
-        .sidebar-nav-fixed {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none;
+        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
+        .nav-active { background:linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%); border-left:3px solid #d4af37; }
+        .dark .nav-active { background:linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%); }
+        .submenu-modern { max-height:0; overflow:hidden; transition:max-height 0.28s cubic-bezier(0.4,0,0.2,1); }
+        .submenu-modern.open { max-height:280px; }
+        .has-submenu>a .chevron-icon { transition:transform 0.2s ease; }
+        .has-submenu.open>a .chevron-icon { transform:rotate(180deg); }
+        @keyframes modalSlideUp { from { opacity:0; transform:translateY(20px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+        .modal-animate { animation:modalSlideUp 0.2s ease-out forwards; }
+        .btn-active:active { transform:scale(0.97); }
+        .product-item { animation:modalSlideUp 0.2s ease-out; }
+        
+        .file-upload-area { border:2px dashed #cbd5e1; transition:all 0.2s; cursor:pointer; }
+        .file-upload-area:hover, .file-upload-area.drag-over { border-color:#0f3b3a; background:rgba(15,59,58,0.05); }
+        .dark .file-upload-area { border-color:#475569; }
+        .dark .file-upload-area:hover { border-color:#0f3b3a; }
+        
+        .image-preview-container { position:relative; display:inline-block; }
+        .image-preview { width:60px; height:60px; object-fit:cover; border-radius:8px; border:1px solid #e5e7eb; }
+        .remove-image-preview { position:absolute; top:-8px; right:-8px; background:#e53e3e; color:white; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:10px; cursor:pointer; transition:all 0.2s; }
+        .remove-image-preview:hover { background:#c53030; transform:scale(1.1); }
+        
+        #sidebarOverlay { animation:fadeIn 0.2s ease-out; }
+        .sidebar-open { overflow:hidden; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        
+        .table-row-hover:hover { background-color:rgba(15,59,58,0.04); }
+        .dark .table-row-hover:hover { background-color:rgba(30,107,104,0.1); }
+        .table-scroll-hint { display:none; }
+        @media (max-width:768px) {
+            .table-scroll-hint { display:flex; font-size:9px; padding:4px 8px; background:#f0fdf4; color:#166534; border-radius:20px; margin-bottom:8px; width:fit-content; }
+            .dark .table-scroll-hint { background:#064e3b; color:#86efac; }
         }
         
-        .nav-active {
-            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
-            border-left: 3px solid #d4af37;
-        }
-        .dark .nav-active {
-            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
-        }
+        .skeleton { background:linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:4px; }
+        .dark .skeleton { background:linear-gradient(90deg, #2d3748 25%, #4a5568 50%, #2d3748 75%); }
+        @keyframes shimmer { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
         
-        .stat-card { transition: all 0.2s ease; }
-        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12); }
+        .sidebar-fixed { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+        .sidebar-header-fixed { flex-shrink:0; position:sticky; top:0; background:inherit; z-index:10; }
         
-        .submenu-modern {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .submenu-modern.open { max-height: 280px; }
+        .pagination-select { padding:4px 8px; border-radius:6px; border:1px solid #d1d5db; font-size:11px; background:white; cursor:pointer; }
+        .dark .pagination-select { background:#1f2937; border-color:#4b5563; color:white; }
+        .pagination-select:focus { outline:none; ring:2px solid #0f3b3a; }
         
-        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
-        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
+        .product-item input, .product-item select { padding-top:0.6rem; padding-bottom:0.6rem; min-height:42px; }
+        .product-item .grid { align-items:center; }
         
-        @keyframes modalSlideUp {
-            from { opacity: 0; transform: translateY(20px) scale(0.96); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
+        .detail-modal-content { max-height:70vh; overflow-y:auto; }
+        .detail-modal-content .detail-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #e5e7eb; }
+        .dark .detail-modal-content .detail-row { border-bottom-color:#374151; }
+        .detail-modal-content .detail-row:last-child { border-bottom:none; }
+        .detail-modal-content .label { font-weight:500; color:#6b7280; }
+        .dark .detail-modal-content .label { color:#9ca3af; }
+        .detail-modal-content .value { font-weight:600; text-align:right; word-break:break-word; max-width:60%; }
+        .detail-modal-content .value.amount { color:#0f3b3a; }
+        .dark .detail-modal-content .value.amount { color:#d4af37; }
+        .detail-modal-content .product-list { background:#f9fafb; border-radius:8px; padding:0.5rem 0.75rem; margin-top:0.25rem; }
+        .dark .detail-modal-content .product-list { background:#1f2937; }
+        .detail-modal-content .product-item-detail { display:flex; justify-content:space-between; font-size:0.8rem; padding:0.15rem 0; border-bottom:1px dashed #e5e7eb; }
+        .dark .detail-modal-content .product-item-detail { border-bottom-color:#4b5563; }
+        .detail-modal-content .product-item-detail:last-child { border-bottom:none; }
         
-        .btn-active:active { transform: scale(0.97); }
-        
-        .product-item { animation: modalSlideUp 0.2s ease-out; }
-        
-        .file-upload-area {
-            border: 2px dashed #cbd5e1;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .file-upload-area:hover, .file-upload-area.drag-over {
-            border-color: #0f3b3a;
-            background: rgba(15, 59, 58, 0.05);
-        }
-        .dark .file-upload-area { border-color: #475569; }
-        .dark .file-upload-area:hover { border-color: #0f3b3a; }
-        
-        .image-preview-container {
-            position: relative;
-            display: inline-block;
-        }
-        .image-preview {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-        }
-        .remove-image-preview {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #e53e3e;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .remove-image-preview:hover { background: #c53030; transform: scale(1.1); }
-        
-        #sidebarOverlay { animation: fadeIn 0.2s ease-out; }
-        .sidebar-open { overflow: hidden; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .table-row-hover:hover { background-color: rgba(15, 59, 58, 0.04); }
-        .dark .table-row-hover:hover { background-color: rgba(30, 107, 104, 0.1); }
-        
-        .table-scroll-hint { display: none; }
-        @media (max-width: 768px) {
-            .table-scroll-hint {
-                display: flex;
-                font-size: 9px;
-                padding: 4px 8px;
-                background: #f0fdf4;
-                color: #166534;
-                border-radius: 20px;
-                margin-bottom: 8px;
-                width: fit-content;
-            }
-            .dark .table-scroll-hint { background: #064e3b; color: #86efac; }
-        }
-        
-        .skeleton {
-            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 4px;
-        }
-        .dark .skeleton { background: linear-gradient(90deg, #2d3748 25%, #4a5568 50%, #2d3748 75%); }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        
-        .sidebar-fixed {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .sidebar-header-fixed {
-            flex-shrink: 0;
-            position: sticky;
-            top: 0;
-            background: inherit;
-            z-index: 10;
-        }
-        .sidebar-nav-fixed {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .pagination-select {
-            padding: 4px 8px;
-            border-radius: 6px;
-            border: 1px solid #d1d5db;
-            font-size: 11px;
-            background: white;
-            cursor: pointer;
-        }
-        .dark .pagination-select {
-            background: #1f2937;
-            border-color: #4b5563;
-            color: white;
-        }
-        .pagination-select:focus {
-            outline: none;
-            ring: 2px solid #0f3b3a;
-        }
+        .searchable-select-wrapper { position:relative; width:100%; }
+        .searchable-select-wrapper input[type="text"] { width:100%; padding:10px 12px; padding-right:40px; font-size:14px; border:1px solid #d1d5db; border-radius:12px; background:white; color:#1f2937; outline:none; transition:border-color 0.2s, box-shadow 0.2s; cursor:text; }
+        .dark .searchable-select-wrapper input[type="text"] { background:#1f2937; border-color:#4b5563; color:#f1f5f9; }
+        .searchable-select-wrapper input[type="text"]:focus { border-color:#0f3b3a; box-shadow:0 0 0 3px rgba(15,59,58,0.15); }
+        .dark .searchable-select-wrapper input[type="text"]:focus { border-color:#1e6b68; box-shadow:0 0 0 3px rgba(30,107,104,0.2); }
+        .searchable-select-wrapper .dropdown-icon { position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#9ca3af; pointer-events:none; font-size:14px; transition:transform 0.2s; }
+        .searchable-select-wrapper .dropdown-icon.open { transform:translateY(-50%) rotate(180deg); }
+        .searchable-select-dropdown { position:absolute; top:calc(100% + 6px); left:0; right:0; background:white; border:1px solid #d1d5db; border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,0.12); max-height:240px; overflow-y:auto; z-index:60; display:none; padding:4px 0; }
+        .dark .searchable-select-dropdown { background:#1f2937; border-color:#4b5563; }
+        .searchable-select-dropdown.show { display:block; animation:dropdownSlide 0.15s ease-out; }
+        @keyframes dropdownSlide { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+        .searchable-select-dropdown .dropdown-item { padding:8px 14px; cursor:pointer; font-size:13px; color:#1f2937; transition:background 0.15s; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f3f4f6; }
+        .dark .searchable-select-dropdown .dropdown-item { color:#e5e7eb; border-bottom-color:#374151; }
+        .searchable-select-dropdown .dropdown-item:last-child { border-bottom:none; }
+        .searchable-select-dropdown .dropdown-item:hover { background:#f3f4f6; }
+        .dark .searchable-select-dropdown .dropdown-item:hover { background:#374151; }
+        .searchable-select-dropdown .dropdown-item.active { background:#e5e7eb; }
+        .dark .searchable-select-dropdown .dropdown-item.active { background:#374151; }
+        .searchable-select-dropdown .dropdown-item .customer-name { font-weight:500; }
+        .searchable-select-dropdown .dropdown-item .customer-due { font-size:11px; font-weight:600; color:#dc2626; padding:2px 10px; border-radius:12px; background:#fef2f2; white-space:nowrap; }
+        .dark .searchable-select-dropdown .dropdown-item .customer-due { color:#f87171; background:#450a0a; }
+        .searchable-select-dropdown .dropdown-item .customer-due.zero { color:#16a34a; background:#f0fdf4; }
+        .dark .searchable-select-dropdown .dropdown-item .customer-due.zero { color:#4ade80; background:#052e16; }
+        .searchable-select-dropdown .no-results { padding:12px 14px; text-align:center; color:#9ca3af; font-size:13px; }
+        .searchable-select-dropdown::-webkit-scrollbar { width:4px; }
+        .searchable-select-dropdown::-webkit-scrollbar-track { background:transparent; }
+        .searchable-select-dropdown::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:4px; }
+        .dark .searchable-select-dropdown::-webkit-scrollbar-thumb { background:#4b5563; }
 
-        /* taller product row inputs */
-        .product-item input, .product-item select {
-            padding-top: 0.6rem;
-            padding-bottom: 0.6rem;
-            min-height: 42px;
-        }
-        .product-item .grid {
-            align-items: center;
-        }
-
-        /* Detail modal styling */
-        .detail-modal-content {
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-        .detail-modal-content .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .dark .detail-modal-content .detail-row {
-            border-bottom-color: #374151;
-        }
-        .detail-modal-content .detail-row:last-child {
-            border-bottom: none;
-        }
-        .detail-modal-content .label {
-            font-weight: 500;
-            color: #6b7280;
-        }
-        .dark .detail-modal-content .label {
-            color: #9ca3af;
-        }
-        .detail-modal-content .value {
-            font-weight: 600;
-            text-align: right;
-            word-break: break-word;
-            max-width: 60%;
-        }
-        .detail-modal-content .value.amount {
-            color: #0f3b3a;
-        }
-        .dark .detail-modal-content .value.amount {
-            color: #d4af37;
-        }
-        .detail-modal-content .product-list {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 0.5rem 0.75rem;
-            margin-top: 0.25rem;
-        }
-        .dark .detail-modal-content .product-list {
-            background: #1f2937;
-        }
-        .detail-modal-content .product-item-detail {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            padding: 0.15rem 0;
-            border-bottom: 1px dashed #e5e7eb;
-        }
-        .dark .detail-modal-content .product-item-detail {
-            border-bottom-color: #4b5563;
-        }
-        .detail-modal-content .product-item-detail:last-child {
-            border-bottom: none;
-        }
-
-        /* Searchable select styles */
-        .searchable-select-wrapper {
-            position: relative;
+        /* Filter row styles */
+        .filter-input {
             width: 100%;
-        }
-        .searchable-select-wrapper input[type="text"] {
-            width: 100%;
-            padding: 10px 12px;
-            padding-right: 40px;
-            font-size: 14px;
+            padding: 6px 10px;
+            padding-left: 32px;
+            font-size: 12px;
             border: 1px solid #d1d5db;
-            border-radius: 12px;
+            border-radius: 8px;
             background: white;
             color: #1f2937;
             outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            cursor: text;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .dark .searchable-select-wrapper input[type="text"] {
+        .filter-input:focus {
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 2px rgba(15, 59, 58, 0.1);
+        }
+        .dark .filter-input {
             background: #1f2937;
             border-color: #4b5563;
             color: #f1f5f9;
         }
-        .searchable-select-wrapper input[type="text"]:focus {
-            border-color: #0f3b3a;
-            box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.15);
-        }
-        .dark .searchable-select-wrapper input[type="text"]:focus {
+        .dark .filter-input:focus {
             border-color: #1e6b68;
-            box-shadow: 0 0 0 3px rgba(30, 107, 104, 0.2);
+            box-shadow: 0 0 0 2px rgba(30, 107, 104, 0.15);
         }
-        .searchable-select-wrapper .dropdown-icon {
+        .filter-wrapper { position: relative; width: 100%; }
+        .filter-wrapper i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 12px; }
+        .filter-clear-btn {
             position: absolute;
-            right: 12px;
+            right: 8px;
             top: 50%;
             transform: translateY(-50%);
             color: #9ca3af;
-            pointer-events: none;
-            font-size: 14px;
-            transition: transform 0.2s ease;
-        }
-        .searchable-select-wrapper .dropdown-icon.open {
-            transform: translateY(-50%) rotate(180deg);
-        }
-        .searchable-select-dropdown {
-            position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #d1d5db;
-            border-radius: 12px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
-            max-height: 240px;
-            overflow-y: auto;
-            z-index: 60;
+            cursor: pointer;
+            font-size: 12px;
             display: none;
-            padding: 4px 0;
+            padding: 2px;
         }
-        .dark .searchable-select-dropdown {
+        .filter-clear-btn:hover { color: #ef4444; }
+        .filter-wrapper input.has-value + .filter-clear-btn { display: block; }
+        
+        .filter-select {
+            padding: 6px 10px;
+            font-size: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            color: #1f2937;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            min-width: 70px;
+        }
+        .filter-select:focus {
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 2px rgba(15, 59, 58, 0.1);
+        }
+        .dark .filter-select {
             background: #1f2937;
             border-color: #4b5563;
+            color: #f1f5f9;
         }
-        .searchable-select-dropdown.show {
-            display: block;
-            animation: dropdownSlide 0.15s ease-out;
+        .dark .filter-select:focus {
+            border-color: #1e6b68;
+            box-shadow: 0 0 0 2px rgba(30, 107, 104, 0.15);
         }
-        @keyframes dropdownSlide {
-            from { opacity: 0; transform: translateY(-6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .searchable-select-dropdown .dropdown-item {
-            padding: 8px 14px;
-            cursor: pointer;
-            font-size: 13px;
+        .filter-select option {
+            background: white;
             color: #1f2937;
-            transition: background 0.15s ease;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #f3f4f6;
         }
-        .dark .searchable-select-dropdown .dropdown-item {
-            color: #e5e7eb;
-            border-bottom-color: #374151;
+        .dark .filter-select option {
+            background: #1f2937;
+            color: #f1f5f9;
         }
-        .searchable-select-dropdown .dropdown-item:last-child {
-            border-bottom: none;
-        }
-        .searchable-select-dropdown .dropdown-item:hover {
-            background: #f3f4f6;
-        }
-        .dark .searchable-select-dropdown .dropdown-item:hover {
-            background: #374151;
-        }
-        .searchable-select-dropdown .dropdown-item.active {
-            background: #e5e7eb;
-        }
-        .dark .searchable-select-dropdown .dropdown-item.active {
-            background: #374151;
-        }
-        .searchable-select-dropdown .dropdown-item .customer-name {
-            font-weight: 500;
-        }
-        .searchable-select-dropdown .dropdown-item .customer-due {
-            font-size: 11px;
-            font-weight: 600;
-            color: #dc2626;
-            padding: 2px 10px;
-            border-radius: 12px;
-            background: #fef2f2;
+        
+        .filter-label {
+            font-size: 12px;
+            color: #6b7280;
             white-space: nowrap;
         }
-        .dark .searchable-select-dropdown .dropdown-item .customer-due {
-            color: #f87171;
-            background: #450a0a;
-        }
-        .searchable-select-dropdown .dropdown-item .customer-due.zero {
-            color: #16a34a;
-            background: #f0fdf4;
-        }
-        .dark .searchable-select-dropdown .dropdown-item .customer-due.zero {
-            color: #4ade80;
-            background: #052e16;
-        }
-        .searchable-select-dropdown .no-results {
-            padding: 12px 14px;
-            text-align: center;
+        .dark .filter-label {
             color: #9ca3af;
-            font-size: 13px;
-        }
-        .searchable-select-dropdown::-webkit-scrollbar {
-            width: 4px;
-        }
-        .searchable-select-dropdown::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .searchable-select-dropdown::-webkit-scrollbar-thumb {
-            background: #d1d5db;
-            border-radius: 4px;
-        }
-        .dark .searchable-select-dropdown::-webkit-scrollbar-thumb {
-            background: #4b5563;
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-    
+<body class="bg-gray-50 dark:bg-gray-900">
+
     <div class="flex min-h-screen">
-        
+
         <!-- Sidebar -->
         <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
             <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
@@ -454,6 +256,9 @@
                             <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition">
                                 <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
                             </a>
+                            <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                            <i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span>
+                            </a>
                             <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
                                 <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
                             </a>
@@ -488,6 +293,10 @@
                     <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
                     </a>
+                    
+                    <a href="expenses.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Expenses</span>
+                    </a>
                     <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
                     </a>
@@ -500,10 +309,10 @@
                 </div>
             </div>
         </aside>
-        
+
         <!-- Main Content -->
         <main class="flex-1 md:ml-64 min-h-screen w-full">
-            
+
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
                 <div class="px-3 py-2.5 flex justify-between items-center">
                     <div class="flex items-center gap-2">
@@ -516,88 +325,66 @@
                     </div>
                 </div>
             </header>
-            
+
             <div class="p-3 md:p-4">
-                
+
                 <!-- Due Entry Form -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-5">
                     <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700">
-                        <h3 class="text-base font-semibold text-gray-800 dark:text-white">
-                            <i class="fas fa-plus-circle text-primary mr-2"></i>New Due Entry
-                        </h3>
+                        <h3 class="text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-plus-circle text-primary mr-2"></i>New Due Entry</h3>
                         <p class="text-[10px] text-gray-500 mt-0.5">Create a new due entry for a customer</p>
                     </div>
-                    
+
                     <form id="dueEntryForm" class="p-5 space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    <i class="fas fa-user text-primary mr-1"></i> Customer <span class="text-red-500">*</span>
-                                </label>
-                                <!-- Searchable Customer Select -->
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-user text-primary mr-1"></i> Customer <span class="text-red-500">*</span></label>
                                 <div class="searchable-select-wrapper" id="customerSelectWrapper">
                                     <input type="text" id="customerSearchInput" placeholder="Search by name or phone number..." autocomplete="off" spellcheck="false">
                                     <i class="fas fa-chevron-down dropdown-icon" id="dropdownIcon"></i>
                                     <input type="hidden" id="selectedCustomerId" value="">
-                                    <div class="searchable-select-dropdown" id="customerDropdown">
-                                        <!-- Items will be populated dynamically -->
-                                    </div>
+                                    <div class="searchable-select-dropdown" id="customerDropdown"></div>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    <i class="fas fa-calendar text-primary mr-1"></i> Date <span class="text-red-500">*</span>
-                                </label>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-calendar text-primary mr-1"></i> Date <span class="text-red-500">*</span></label>
                                 <input type="date" id="dueDate" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50" required>
                             </div>
                         </div>
-                        
-                        <!-- Products Section -->
+
+                        <!-- Products -->
                         <div>
                             <div class="flex justify-between items-center mb-2">
-                                <label class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                                    <i class="fas fa-boxes text-primary mr-1"></i> Products <span class="text-gray-400 text-[10px]">(Optional)</span>
-                                </label>
-                                <button type="button" id="addProductBtn" class="text-primary text-xs flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-primary/10 transition-colors">
-                                    <i class="fas fa-plus-circle"></i> Add Product
-                                </button>
+                                <label class="text-xs font-medium text-gray-700 dark:text-gray-300"><i class="fas fa-boxes text-primary mr-1"></i> Products <span class="text-gray-400 text-[10px]">(Optional)</span></label>
+                                <button type="button" id="addProductBtn" class="text-primary text-xs flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-primary/10 transition-colors"><i class="fas fa-plus-circle"></i> Add Product</button>
                             </div>
                             <div id="productsContainer" class="space-y-2">
                                 <div class="empty-placeholder text-center py-6 text-gray-400 text-xs border border-dashed rounded-xl">
-                                    <i class="fas fa-box-open mb-1 block text-lg"></i>
-                                    No products added. Click "Add Product" to add items.
+                                    <i class="fas fa-box-open mb-1 block text-lg"></i>No products added. Click "Add Product" to add items.
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    <i class="fas fa-money-bill-wave text-primary mr-1"></i> Direct Due Amount
-                                </label>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-money-bill-wave text-primary mr-1"></i> Direct Due Amount</label>
                                 <input type="number" id="directDueAmount" placeholder="Enter due amount directly" step="0.01" min="0" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
                                 <p class="text-[9px] text-gray-400 mt-1">Use if no products are added</p>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    <i class="fas fa-calendar-week text-primary mr-1"></i> Expected Date
-                                </label>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-calendar-week text-primary mr-1"></i> Expected Date</label>
                                 <input type="date" id="expectedDate" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
                                 <p class="text-[9px] text-gray-400 mt-1">For follow-up reminders</p>
                             </div>
                         </div>
-                        
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    <i class="fas fa-money-bill text-primary mr-1"></i> Paid Amount
-                                </label>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-money-bill text-primary mr-1"></i> Paid Amount</label>
                                 <input type="number" id="paidAmount" placeholder="0.00" value="0" step="0.01" min="0" class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    <i class="fas fa-image text-primary mr-1"></i> Invoice Image
-                                </label>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-image text-primary mr-1"></i> Invoice Image</label>
                                 <div id="imageUploadArea" class="file-upload-area rounded-xl p-3 text-center">
                                     <input type="file" id="invoiceImage" accept="image/*" class="hidden">
                                     <i class="fas fa-cloud-upload-alt text-xl text-gray-400 mb-1"></i>
@@ -613,15 +400,13 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                <i class="fas fa-sticky-note text-primary mr-1"></i> Remarks
-                            </label>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-sticky-note text-primary mr-1"></i> Remarks</label>
                             <textarea id="remarks" rows="2" placeholder="Additional notes..." class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
                         </div>
-                        
-                        <!-- Summary Card -->
+
+                        <!-- Summary -->
                         <div class="bg-gradient-to-r from-primary/5 to-transparent rounded-xl p-3 border border-primary/20">
                             <div class="flex flex-col sm:flex-row sm:justify-between gap-3">
                                 <div class="flex justify-between items-center"><span class="text-sm font-medium text-gray-600 dark:text-gray-400">Total:</span><span id="totalAmountDisplay" class="text-sm font-semibold text-gray-800 dark:text-white">৳0.00</span></div>
@@ -629,70 +414,79 @@
                                 <div class="flex justify-between items-center"><span class="text-sm font-medium text-red-500">Due:</span><span id="dueAmount" class="text-lg font-bold text-red-600">৳0.00</span></div>
                             </div>
                         </div>
-                        
+
                         <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 shadow-md btn-active transition-all">
                             <i class="fas fa-save"></i> Save Due Entry
                         </button>
                     </form>
                 </div>
-                
+
                 <!-- Recent Due Entries -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                     <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2">
                         <div>
-                            <h3 class="text-base font-semibold text-gray-800 dark:text-white">
-                                <i class="fas fa-history text-primary mr-2"></i>Recent Due Entries
-                            </h3>
-                            <p class="text-[10px] text-gray-500 mt-0.5">Last 20 entries</p>
+                            <h3 class="text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-history text-primary mr-2"></i>Recent Due Entries</h3>
+                            <p class="text-[10px] text-gray-500 mt-0.5">Last entries</p>
                         </div>
+                        <button id="exportDueBtn" class="bg-success hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 btn-active transition-all">
+                            <i class="fas fa-download text-xs"></i> Export CSV
+                        </button>
+                    </div>
+
+                    <!-- FILTER ROW - With Show dropdown and Search -->
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-3">
                         <div class="flex items-center gap-2">
-                            <select id="paginationSize" class="pagination-select text-xs">
-                                <option value="5">5</option>
-                                <option value="10" selected>10</option>
-                                <option value="20">20</option>
+                            <span class="filter-label">Show</span>
+                            <select id="perPageSelect" class="filter-select">
+                                <option value="20" selected>20</option>
                                 <option value="50">50</option>
                                 <option value="100">100</option>
+                                <option value="200">200</option>
                             </select>
-                            <button id="exportDueBtn" class="bg-success hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 btn-active transition-all">
-                                <i class="fas fa-download text-xs"></i> Export CSV
-                            </button>
+                            <span class="filter-label">entries</span>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">|</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                Showing <span id="pageStart">0</span> - <span id="pageEnd">0</span> of <span id="totalEntries">0</span>
+                            </span>
+                        </div>
+                        <div class="relative w-full sm:w-64 filter-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="tableSearchInput" placeholder="Search by customer, remarks..." class="filter-input">
+                            <span class="filter-clear-btn" id="clearSearchBtn"><i class="fas fa-times-circle"></i></span>
                         </div>
                     </div>
-                    
-                    <div class="table-scroll-hint px-3 pt-2">
-                        <i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns →
-                    </div>
-                    
+
+                    <div class="table-scroll-hint px-3 pt-2"><i class="fas fa-arrows-alt-h mr-1 text-[8px]"></i> Swipe to see more columns →</div>
+
                     <div class="overflow-x-auto">
-                        <table class="w-full min-w-[900px]">
+                        <table class="w-full min-w-[950px]">
                             <thead class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                 <tr>
+                                    <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider w-[50px]">#</th>
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Date</th>
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Customer</th>
                                     <th class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Details</th>
                                     <th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Total</th>
                                     <th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Paid</th>
                                     <th class="px-3 py-3 text-right text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Due</th>
-                                    <!-- Actions column -->
                                     <th class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="recentDueBody" class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading due entries...</p></td></tr>
+                                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading due entries...</p></td></tr>
                             </tbody>
                         </table>
                     </div>
-                    
-                    <!-- Pagination Controls -->
+
+                    <!-- Pagination -->
                     <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2">
                         <div class="text-xs text-gray-500 dark:text-gray-400">
-                            Showing <span id="pageStart">0</span> - <span id="pageEnd">0</span> of <span id="totalEntries">0</span> entries
+                            Page <span id="pageInfo">1</span> of <span id="totalPages">1</span>
                         </div>
                         <div class="flex gap-1">
                             <button id="prevPageBtn" class="px-3 py-1 text-xs rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
                                 <i class="fas fa-chevron-left text-[10px]"></i> Prev
                             </button>
-                            <span id="pageInfo" class="px-3 py-1 text-xs flex items-center">Page 1</span>
                             <button id="nextPageBtn" class="px-3 py-1 text-xs rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
                                 Next <i class="fas fa-chevron-right text-[10px]"></i>
                             </button>
@@ -704,18 +498,18 @@
             <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
                 <div class="max-w-7xl mx-auto px-4 py-3 text-center">
                     <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
-                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span> 
-                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span>
+                        <span class="text-gray-300 dark:border-gray-600">|</span>
                         <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
-                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-300 dark:border-gray-600">|</span>
                         <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
                     </p>
                 </div>
             </footer>
         </main>
     </div>
-    
-    <!-- Invoice Image Modal -->
+
+    <!-- Modals -->
     <div id="invoiceModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/75 backdrop-blur-sm">
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-4xl w-full mx-4 overflow-hidden shadow-2xl modal-animate">
             <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
@@ -727,126 +521,132 @@
         </div>
     </div>
 
-    <!-- Details Modal -->
     <div id="detailsModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/75 backdrop-blur-sm">
         <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-xl w-full mx-4 overflow-hidden shadow-2xl modal-animate">
             <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="font-semibold text-gray-800 dark:text-white"><i class="fas fa-info-circle text-primary mr-2"></i>Due Entry Details</h3>
                 <button onclick="closeDetailsModal()" class="text-gray-500 hover:text-red-500 transition-colors"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <div id="detailsModalBody" class="p-4 detail-modal-content">
-                <!-- Dynamic content -->
-            </div>
+            <div id="detailsModalBody" class="p-4 detail-modal-content"></div>
             <div class="p-3 border-t border-gray-200 dark:border-gray-700 text-right">
                 <button onclick="closeDetailsModal()" class="px-4 py-2 bg-primary text-white rounded-lg text-sm">Close</button>
             </div>
         </div>
     </div>
-    
+
     <div id="loadingOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden">
         <div class="bg-white dark:bg-gray-800 rounded-xl p-5 text-center"><i class="fas fa-spinner fa-pulse text-primary text-2xl mb-2"></i><p class="text-sm text-gray-600 dark:text-gray-300">Processing...</p></div>
     </div>
-    
+
     <div id="toastContainer" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col items-center sm:items-end gap-2"></div>
-    
-    <!-- Auth Check Script -->
+
+    <!-- Auth Check -->
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
         checkAuthState(true);
+        window.logout = logout;
     </script>
-    
+
+    <!-- Main Script -->
     <script type="module">
-        import { 
-            db, collection, addDoc, getDocs, doc, updateDoc, getDoc, 
-            Timestamp, query, orderBy, limit 
+        import {
+            db, collection, addDoc, getDocs, doc, updateDoc, getDoc,
+            Timestamp, query, orderBy, limit, onSnapshot
         } from './js/firebase.js';
-        
-        // Sidebar submenu toggle
-        const warrantySubmenu = document.getElementById('warrantySubmenu');
-        const warrantyLink = warrantySubmenu?.querySelector('a');
-        if (warrantyLink) {
-            warrantyLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                warrantySubmenu.classList.toggle('open');
-                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
+
+        // ─── DOM REFS ───
+        const $ = id => document.getElementById(id);
+        const dueForm = $('dueEntryForm'),
+            customerSearch = $('customerSearchInput'),
+            customerDropdown = $('customerDropdown'),
+            selectedCustomerId = $('selectedCustomerId'),
+            dropdownIcon = $('dropdownIcon'),
+            productsContainer = $('productsContainer'),
+            recentBody = $('recentDueBody'),
+            toastContainer = $('toastContainer'),
+            loadingOverlay = $('loadingOverlay');
+
+        // ─── STATE ───
+        let selectedImageFile = null,
+            allDueEntries = [],
+            allCustomers = [],
+            customerNameMap = new Map(),
+            customerDataMap = new Map(),
+            unsubscribeCustomers = null,
+            currentPage = 1,
+            pageSize = 20,
+            filteredData = [],
+            searchTerm = '',
+            isDropdownOpen = false,
+            highlightedIndex = -1;
+
+        // ─── UTILITIES ───
+        function showToast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.className =
+                `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : type === 'error' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'}`;
+            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2 text-xs"></i>${msg}`;
+            toastContainer.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
         }
-        
-        // Sidebar functions
-        const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
-        function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.id = 'sidebarOverlay'; overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
-        function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); const overlay = document.getElementById('sidebarOverlay'); if (overlay) overlay.remove(); }
-        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
-        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
-        window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); } });
-        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
-        
-        // Submenu toggle for Due Entry
-        const dueSubmenu = document.getElementById('dueSubmenu');
-        const dueSubmenuLink = dueSubmenu?.querySelector('a');
-        if (dueSubmenuLink) {
-            dueSubmenuLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                dueSubmenu.classList.toggle('open');
-                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
+
+        function showLoading(show) { loadingOverlay.style.display = show ? 'flex' : 'none'; }
+
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+
+        function getCustomerName(id) {
+            if (!id) return 'Unknown';
+            if (customerNameMap.has(id)) {
+                return customerNameMap.get(id);
+            }
+            if (customerDataMap.has(id)) {
+                const data = customerDataMap.get(id);
+                return data.name || 'Unknown';
+            }
+            return 'Unknown';
         }
-        
-        // ==================== GLOBAL VARIABLES ====================
-        let selectedImageFile = null;
-        let allDueEntriesData = [];
-        let customerMap = new Map();
-        let customerNameMap = new Map(); // Store customer names with ID
-        let allCustomers = [];
-        
-        // Pagination variables
-        let currentPage = 1;
-        let pageSize = 10;
-        let filteredData = [];
-        
-        // ==================== UTILITY FUNCTIONS ====================
-        function showToast(message, type = 'success') { 
-            const c = document.getElementById('toastContainer'); 
-            const t = document.createElement('div'); 
-            t.className = `px-4 py-2 rounded-xl shadow-lg text-sm font-medium transition-all duration-300 ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`; 
-            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`; 
-            c.appendChild(t); 
-            setTimeout(() => t.remove(), 3000); 
+
+        function getCustomerData(id) {
+            if (!id) return null;
+            return customerDataMap.get(id) || null;
         }
-        
-        function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none'; }
-        
-        window.closeInvoiceModal = function() { document.getElementById('invoiceModal').classList.add('hidden'); document.getElementById('invoiceModal').style.display = 'none'; };
-        window.closeDetailsModal = function() { document.getElementById('detailsModal').classList.add('hidden'); document.getElementById('detailsModal').style.display = 'none'; };
-        
-        function showInvoiceModal(imageData) { 
-            const modal = document.getElementById('invoiceModal'), modalImg = document.getElementById('modalImage'); 
-            if (imageData && (imageData.startsWith('data:image') || imageData.startsWith('http'))) { 
-                modalImg.src = imageData; 
-                modal.classList.remove('hidden'); 
-                modal.style.display = 'flex'; 
-            } else { 
-                showToast('No invoice image available', 'error'); 
-            } 
+
+        window.closeInvoiceModal = () => {
+            $('invoiceModal').classList.add('hidden');
+            $('invoiceModal').style.display = 'none';
+        };
+        window.closeDetailsModal = () => {
+            $('detailsModal').classList.add('hidden');
+            $('detailsModal').style.display = 'none';
+        };
+
+        function showInvoiceModal(imageData) {
+            const modal = $('invoiceModal'),
+                img = $('modalImage');
+            if (imageData && (imageData.startsWith('data:image') || imageData.startsWith('http'))) {
+                img.src = imageData;
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            } else showToast('No invoice image available', 'error');
         }
 
         function showDetailsModal(entry) {
             if (!entry) { showToast('Entry not found', 'error'); return; }
-            const body = document.getElementById('detailsModalBody');
-            const customerName = entry.customerName || getCustomerName(entry.customerId) || 'Unknown';
-            
+            const body = $('detailsModalBody');
+            const customerName = getCustomerName(entry.customerId) || entry.customerName || 'Unknown';
+
             let productHtml = '';
-            if (entry.products && entry.products.length > 0) {
-                productHtml = `<div class="product-list"><div class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Products</div>`;
+            if (entry.products?.length) {
+                productHtml =
+                    `<div class="product-list"><div class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Products</div>`;
                 entry.products.forEach(p => {
-                    productHtml += `<div class="product-item-detail"><span>${p.name}</span><span>${p.qty} ${p.unit || 'Pcs'} × ৳${p.price.toFixed(2)} = ৳${p.total.toFixed(2)}</span></div>`;
+                    productHtml +=
+                        `<div class="product-item-detail"><span>${escapeHtml(p.name)}</span><span>${p.qty} ${p.unit || 'Pcs'} × ৳${p.price.toFixed(2)} = ৳${p.total.toFixed(2)}</span></div>`;
                 });
                 productHtml += `</div>`;
             } else if (entry.directDueAmount) {
                 productHtml = `<div class="product-list text-sm">Direct Due: ৳${entry.directDueAmount.toFixed(2)}</div>`;
-            } else {
-                productHtml = `<div class="text-xs text-gray-500 italic">No products</div>`;
-            }
+            } else productHtml = `<div class="text-xs text-gray-500 italic">No products</div>`;
 
             body.innerHTML = `
                 <div class="detail-row"><span class="label">Date</span><span class="value">${entry.date || 'N/A'}</span></div>
@@ -859,99 +659,62 @@
                 ${entry.remarks ? `<div class="detail-row"><span class="label">Remarks</span><span class="value text-sm font-normal">${escapeHtml(entry.remarks)}</span></div>` : ''}
                 <div class="detail-row"><span class="label">Invoice Image</span><span class="value">${entry.invoiceImage ? '<i class="fas fa-check-circle text-green-500"></i> Available' : '<span class="text-gray-400">No image</span>'}</span></div>
             `;
-            
-            const modal = document.getElementById('detailsModal');
-            modal.classList.remove('hidden');
-            modal.style.display = 'flex';
+            $('detailsModal').classList.remove('hidden');
+            $('detailsModal').style.display = 'flex';
         }
-        
-        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
-        
-        // ==================== SEARCHABLE CUSTOMER SELECT LOGIC ====================
-        const customerSearchInput = document.getElementById('customerSearchInput');
-        const customerDropdown = document.getElementById('customerDropdown');
-        const selectedCustomerId = document.getElementById('selectedCustomerId');
-        const dropdownIcon = document.getElementById('dropdownIcon');
-        let isDropdownOpen = false;
-        let highlightedIndex = -1;
-        let currentFilteredItems = [];
-        
+
+        // ─── SEARCHABLE SELECT ───
         function renderDropdown(items) {
-            currentFilteredItems = items;
-            if (items.length === 0) {
+            if (!items?.length) {
                 customerDropdown.innerHTML = `<div class="no-results">No customers found</div>`;
                 return;
             }
-            
             customerDropdown.innerHTML = '';
-            items.forEach((customer, index) => {
+            items.forEach((c, i) => {
                 const div = document.createElement('div');
-                div.className = 'dropdown-item';
-                if (index === highlightedIndex) {
-                    div.classList.add('active');
-                }
-                const dueClass = customer.due <= 0 ? 'zero' : '';
-                div.innerHTML = `
-                    <span class="customer-name">${escapeHtml(customer.name)}</span>
-                    <span class="customer-due ${dueClass}">৳${customer.due.toFixed(2)}</span>
-                `;
-                div.dataset.id = customer.id;
-                div.dataset.index = index;
-                div.addEventListener('click', () => {
-                    selectCustomer(customer.id);
-                });
-                div.addEventListener('mouseenter', () => {
-                    highlightedIndex = index;
-                    updateHighlight();
-                });
+                div.className = `dropdown-item${i === highlightedIndex ? ' active' : ''}`;
+                const dueClass = c.due <= 0 ? ' zero' : '';
+                div.innerHTML =
+                    `<span class="customer-name">${escapeHtml(c.name)}</span><span class="customer-due${dueClass}">৳${c.due.toFixed(2)}</span>`;
+                div.dataset.id = c.id;
+                div.onclick = () => selectCustomer(c.id);
+                div.onmouseenter = () => { highlightedIndex = i;
+                    updateHighlight(); };
                 customerDropdown.appendChild(div);
             });
         }
-        
+
         function updateHighlight() {
-            const items = customerDropdown.querySelectorAll('.dropdown-item');
-            items.forEach((item, index) => {
-                if (index === highlightedIndex) {
-                    item.classList.add('active');
-                    item.scrollIntoView({ block: 'nearest' });
-                } else {
-                    item.classList.remove('active');
-                }
+            customerDropdown.querySelectorAll('.dropdown-item').forEach((el, i) => {
+                el.classList.toggle('active', i === highlightedIndex);
+                if (i === highlightedIndex) el.scrollIntoView({ block: 'nearest' });
             });
         }
-        
-        function filterCustomers(searchTerm) {
-            const term = searchTerm.toLowerCase().trim();
-            if (!term) return allCustomers;
-            
-            return allCustomers.filter(c => 
-                c.name.toLowerCase().includes(term) || 
-                (c.phone && c.phone.includes(term))
+
+        function filterCustomers(term) {
+            const t = term.toLowerCase().trim();
+            if (!t) return allCustomers;
+            return allCustomers.filter(c =>
+                c.name.toLowerCase().includes(t) ||
+                (c.phone && c.phone.includes(t))
             );
         }
-        
-        function selectCustomer(customerId) {
-            const customer = allCustomers.find(c => c.id === customerId);
-            if (!customer) return;
-            
-            selectedCustomerId.value = customerId;
-            customerSearchInput.value = customer.name;
+
+        function selectCustomer(id) {
+            const c = allCustomers.find(x => x.id === id);
+            if (!c) return;
+            selectedCustomerId.value = id;
+            customerSearch.value = c.name;
             customerDropdown.classList.remove('show');
             dropdownIcon.classList.remove('open');
             isDropdownOpen = false;
             highlightedIndex = -1;
         }
-        
+
         function toggleDropdown(show) {
-            if (show === undefined) {
-                isDropdownOpen = !isDropdownOpen;
-            } else {
-                isDropdownOpen = show;
-            }
-            
+            isDropdownOpen = show !== undefined ? show : !isDropdownOpen;
             if (isDropdownOpen) {
-                const searchTerm = customerSearchInput.value;
-                const filtered = filterCustomers(searchTerm);
+                const filtered = filterCustomers(customerSearch.value);
                 highlightedIndex = -1;
                 renderDropdown(filtered);
                 customerDropdown.classList.add('show');
@@ -962,182 +725,137 @@
                 highlightedIndex = -1;
             }
         }
-        
-        // Event listeners for searchable select
-        customerSearchInput.addEventListener('focus', () => {
-            if (customerSearchInput.value) {
-                const filtered = filterCustomers(customerSearchInput.value);
-                highlightedIndex = -1;
-                renderDropdown(filtered);
-                customerDropdown.classList.add('show');
-                dropdownIcon.classList.add('open');
-                isDropdownOpen = true;
-            } else {
-                toggleDropdown(true);
-            }
-        });
-        
-        customerSearchInput.addEventListener('input', (e) => {
-            const filtered = filterCustomers(customerSearchInput.value);
+
+        // ─── CUSTOMER SEARCH EVENTS ───
+        customerSearch.addEventListener('focus', () => toggleDropdown(true));
+        customerSearch.addEventListener('input', () => {
+            const filtered = filterCustomers(customerSearch.value);
             highlightedIndex = -1;
             renderDropdown(filtered);
             customerDropdown.classList.add('show');
             dropdownIcon.classList.add('open');
             isDropdownOpen = true;
-            
-            // Clear selection if input doesn't match any customer exactly
-            const matchedCustomer = filtered.find(c => c.name.toLowerCase() === customerSearchInput.value.toLowerCase());
-            if (!matchedCustomer && filtered.length !== 1) {
+            if (!filtered.find(c => c.name.toLowerCase() === customerSearch.value.toLowerCase()) && filtered.length !== 1) {
                 selectedCustomerId.value = '';
             }
         });
-        
-        customerSearchInput.addEventListener('keydown', (e) => {
-            const visibleItems = customerDropdown.querySelectorAll('.dropdown-item');
-            const totalItems = visibleItems.length;
-            
+        customerSearch.addEventListener('keydown', e => {
+            const items = customerDropdown.querySelectorAll('.dropdown-item'),
+                total = items.length;
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
-                if (totalItems > 0) {
-                    highlightedIndex = (highlightedIndex + 1) % totalItems;
-                    updateHighlight();
-                    if (!isDropdownOpen) {
-                        toggleDropdown(true);
-                    }
-                }
+                if (total) { highlightedIndex = (highlightedIndex + 1) % total;
+                    updateHighlight(); if (!isDropdownOpen) toggleDropdown(true); }
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
-                if (totalItems > 0) {
-                    highlightedIndex = (highlightedIndex - 1 + totalItems) % totalItems;
-                    updateHighlight();
-                    if (!isDropdownOpen) {
-                        toggleDropdown(true);
-                    }
-                }
+                if (total) { highlightedIndex = (highlightedIndex - 1 + total) % total;
+                    updateHighlight(); if (!isDropdownOpen) toggleDropdown(true); }
             } else if (e.key === 'Enter') {
                 e.preventDefault();
-                if (highlightedIndex >= 0 && highlightedIndex < totalItems) {
-                    const item = visibleItems[highlightedIndex];
-                    if (item) {
-                        const id = item.dataset.id;
-                        selectCustomer(id);
-                    }
-                } else if (totalItems === 1) {
-                    const item = visibleItems[0];
-                    if (item) {
-                        const id = item.dataset.id;
-                        selectCustomer(id);
-                    }
-                } else if (totalItems > 0) {
-                    const item = visibleItems[0];
-                    if (item) {
-                        const id = item.dataset.id;
-                        selectCustomer(id);
-                    }
-                }
+                if (highlightedIndex >= 0 && highlightedIndex < total) selectCustomer(items[highlightedIndex].dataset.id);
+                else if (total === 1) selectCustomer(items[0].dataset.id);
+                else if (total > 0) selectCustomer(items[0].dataset.id);
                 toggleDropdown(false);
-                customerSearchInput.blur();
-            } else if (e.key === 'Escape') {
-                toggleDropdown(false);
-                customerSearchInput.blur();
-            } else if (e.key === 'Tab') {
-                toggleDropdown(false);
-            }
+                customerSearch.blur();
+            } else if (e.key === 'Escape' || e.key === 'Tab') { toggleDropdown(false);
+                customerSearch.blur(); }
         });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            const wrapper = document.getElementById('customerSelectWrapper');
-            if (wrapper && !wrapper.contains(e.target)) {
-                toggleDropdown(false);
-            }
+        document.addEventListener('click', e => {
+            if (!document.getElementById('customerSelectWrapper')?.contains(e.target)) toggleDropdown(false);
         });
-        
-        // Handle blur - auto-select if exact match
-        customerSearchInput.addEventListener('blur', () => {
+        customerSearch.addEventListener('blur', () => {
             setTimeout(() => {
-                if (!selectedCustomerId.value && customerSearchInput.value) {
-                    const filtered = filterCustomers(customerSearchInput.value);
-                    if (filtered.length === 1) {
-                        selectCustomer(filtered[0].id);
-                    }
+                if (!selectedCustomerId.value && customerSearch.value) {
+                    const filtered = filterCustomers(customerSearch.value);
+                    if (filtered.length === 1) selectCustomer(filtered[0].id);
                 }
             }, 200);
         });
-        
-        // ==================== LOAD CUSTOMERS ====================
-        async function loadCustomers() {
-            try {
-                const querySnapshot = await getDocs(collection(db, 'customers'));
-                allCustomers = [];
-                customerMap.clear();
-                customerNameMap.clear();
-                
-                querySnapshot.forEach(docSnap => {
-                    const customer = docSnap.data();
-                    const customerId = docSnap.id;
-                    const due = customer.totalDue || 0;
-                    
-                    allCustomers.push({
-                        id: customerId,
-                        name: customer.name || 'Unknown',
-                        phone: customer.phone || 'N/A',
-                        due: due
-                    });
-                    
-                    customerMap.set(customerId, customer);
-                    customerNameMap.set(customerId, customer.name);
-                });
-                
-                allCustomers.sort((a, b) => a.name.localeCompare(b.name));
-                renderDropdown(allCustomers);
-                
-            } catch (error) {
-                console.error('Error loading customers:', error);
-                showToast('Error loading customers', 'error');
+
+        // ─── REAL-TIME CUSTOMER LISTENER ───
+        function setupCustomerListener() {
+            if (unsubscribeCustomers) {
+                unsubscribeCustomers();
+                unsubscribeCustomers = null;
             }
+
+            unsubscribeCustomers = onSnapshot(
+                collection(db, 'customers'),
+                (snapshot) => {
+                    allCustomers = [];
+                    customerNameMap.clear();
+                    customerDataMap.clear();
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const id = doc.id;
+                        const name = data.name || 'Unknown';
+                        const phone = data.phone || 'N/A';
+                        const due = data.totalDue || 0;
+
+                        customerNameMap.set(id, name);
+                        customerDataMap.set(id, data);
+                        allCustomers.push({ id, name, phone, due });
+                    });
+
+                    allCustomers.sort((a, b) => a.name.localeCompare(b.name));
+                    const term = customerSearch?.value || '';
+                    renderDropdown(term ? filterCustomers(term) : allCustomers);
+                    updateCustomerNamesInTable();
+                    console.log('🔄 Customers updated:', allCustomers.length);
+                },
+                (error) => {
+                    console.error('Customer listener error:', error);
+                    showToast('Error loading customers', 'error');
+                }
+            );
         }
-        
-        // ==================== GET CUSTOMER NAME ====================
-        function getCustomerName(customerId) {
-            if (!customerId) return 'Unknown';
-            return customerNameMap.get(customerId) || customerMap.get(customerId)?.name || 'Unknown';
+
+        // ─── UPDATE CUSTOMER NAMES IN TABLE ───
+        function updateCustomerNamesInTable() {
+            const rows = recentBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const customerId = row.dataset.customerId;
+                if (customerId) {
+                    const nameCell = row.querySelector('.customer-name-cell');
+                    if (nameCell) {
+                        const freshName = getCustomerName(customerId);
+                        if (freshName && freshName !== 'Unknown') {
+                            nameCell.textContent = freshName;
+                        }
+                    }
+                }
+            });
         }
-        
-        // ==================== CALCULATE TOTALS ====================
+
+        // ─── CALCULATE TOTALS ───
         function calculateTotals() {
-            const products = document.querySelectorAll('.product-item');
             let subtotal = 0;
-            
-            products.forEach((product) => {
-                const qty = parseFloat(product.querySelector('input[name="qty"]')?.value) || 0;
-                const price = parseFloat(product.querySelector('input[name="unitPrice"]')?.value) || 0;
+            document.querySelectorAll('.product-item').forEach(p => {
+                const qty = parseFloat(p.querySelector('input[name="qty"]')?.value) || 0;
+                const price = parseFloat(p.querySelector('input[name="unitPrice"]')?.value) || 0;
                 const total = qty * price;
                 subtotal += total;
-                const totalSpan = product.querySelector('.product-total');
-                if (totalSpan) totalSpan.textContent = `৳${total.toFixed(2)}`;
+                const span = p.querySelector('.product-total');
+                if (span) span.textContent = `৳${total.toFixed(2)}`;
             });
-            
-            const directDue = parseFloat(document.getElementById('directDueAmount').value) || 0;
-            const totalAmount = subtotal + directDue;
-            const paid = parseFloat(document.getElementById('paidAmount').value) || 0;
-            const due = totalAmount - paid;
-            
-            document.getElementById('totalAmountDisplay').textContent = `৳${totalAmount.toFixed(2)}`;
-            document.getElementById('totalPaid').textContent = `৳${paid.toFixed(2)}`;
-            document.getElementById('dueAmount').textContent = `৳${due.toFixed(2)}`;
-            
-            return { totalAmount, paid, due };
+            const direct = parseFloat($('directDueAmount').value) || 0;
+            const total = subtotal + direct,
+                paid = parseFloat($('paidAmount').value) || 0,
+                due = total - paid;
+            $('totalAmountDisplay').textContent = `৳${total.toFixed(2)}`;
+            $('totalPaid').textContent = `৳${paid.toFixed(2)}`;
+            $('dueAmount').textContent = `৳${due.toFixed(2)}`;
+            return { total, paid, due };
         }
-        
-        // ==================== ADD PRODUCT ROW ====================
+
+        // ─── PRODUCT ROW ───
         function addProductRow() {
-            const container = document.getElementById('productsContainer');
-            if (container.querySelector('.empty-placeholder')) container.innerHTML = '';
-            
-            const newRow = document.createElement('div');
-            newRow.className = 'product-item bg-gray-50 dark:bg-gray-700/30 rounded-xl p-3 border border-gray-200 dark:border-gray-600 mb-2';
-            newRow.innerHTML = `
+            if (productsContainer.querySelector('.empty-placeholder')) productsContainer.innerHTML = '';
+            const row = document.createElement('div');
+            row.className =
+                'product-item bg-gray-50 dark:bg-gray-700/30 rounded-xl p-3 border border-gray-200 dark:border-gray-600 mb-2';
+            row.innerHTML = `
                 <div class="grid grid-cols-1 sm:grid-cols-6 gap-2 items-center">
                     <div class="sm:col-span-2"><input type="text" name="productName" placeholder="Product Name" class="w-full px-2 py-2 text-xs border rounded-lg bg-white dark:bg-gray-800"></div>
                     <div class="flex gap-1"><input type="number" name="qty" placeholder="Qty" value="1" min="1" class="w-2/3 px-2 py-2 text-xs border rounded-lg bg-white dark:bg-gray-800"><select name="unit" class="w-1/3 px-1 py-2 text-xs border rounded-lg bg-white dark:bg-gray-800"><option value="Pcs">Pcs</option><option value="Meter">Meter</option><option value="Box">Box</option></select></div>
@@ -1145,498 +863,470 @@
                     <div class="flex items-center justify-between gap-1"><span class="text-xs font-semibold text-primary product-total">৳0</span><button type="button" class="remove-product text-red-500 text-xs p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"><i class="fas fa-trash-alt"></i></button></div>
                 </div>
             `;
-            
-            const inputs = newRow.querySelectorAll('input, select');
-            inputs.forEach(input => { input.addEventListener('input', () => calculateTotals()); });
-            
-            const removeBtn = newRow.querySelector('.remove-product');
-            removeBtn.addEventListener('click', () => { newRow.remove(); if (container.children.length === 0) showEmptyPlaceholder(); calculateTotals(); });
-            
-            container.appendChild(newRow);
+            row.querySelectorAll('input, select').forEach(el => el.addEventListener('input', calculateTotals));
+            row.querySelector('.remove-product').onclick = () => {
+                row.remove();
+                if (!productsContainer.children.length) showEmptyPlaceholder();
+                calculateTotals();
+            };
+            productsContainer.appendChild(row);
             calculateTotals();
         }
-        
+
         function showEmptyPlaceholder() {
-            const container = document.getElementById('productsContainer');
-            if (container.children.length === 0) { 
-                container.innerHTML = `<div class="empty-placeholder text-center py-6 text-gray-400 text-xs border border-dashed rounded-xl"><i class="fas fa-box-open mb-1 block text-lg"></i>No products added. Click "Add Product" to add items.</div>`; 
+            if (!productsContainer.children.length) {
+                productsContainer.innerHTML =
+                    `<div class="empty-placeholder text-center py-6 text-gray-400 text-xs border border-dashed rounded-xl"><i class="fas fa-box-open mb-1 block text-lg"></i>No products added. Click "Add Product" to add items.</div>`;
             }
         }
-        
-        // ==================== PAGINATION FUNCTIONS ====================
+
+        // ─── IMAGE UPLOAD ───
+        function setupImageUpload() {
+            const area = $('imageUploadArea'),
+                input = $('invoiceImage'),
+                previewContainer = $('imagePreviewContainer'),
+                previewImg = $('imagePreview'),
+                fileName = $('fileNameDisplay'),
+                removeBtn = $('removeImageBtn');
+            const MAX_SIZE = 5 * 1024 * 1024,
+                ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/bmp'];
+
+            function validate(file) {
+                if (!file) { showToast('No file selected', 'error'); return false; }
+                if (!ALLOWED_TYPES.includes(file.type)) {
+                    showToast('Invalid type! Allowed: JPG, PNG, WEBP', 'error');
+                    return false;
+                }
+                if (file.size > MAX_SIZE) { showToast('File too large! Max 5MB', 'error'); return false; }
+                return true;
+            }
+
+            async function handleFile(file) {
+                if (!validate(file)) return;
+                showLoading(true);
+                try {
+                    selectedImageFile = file;
+                    fileName.textContent = `${file.name} (${(file.size/1024).toFixed(0)}KB)`;
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        previewImg.src = e.target.result;
+                        previewContainer.classList.remove('hidden');
+                        area.classList.add('hidden');
+                        showToast('Image uploaded!', 'success');
+                        showLoading(false);
+                    };
+                    reader.onerror = () => { showToast('Error reading file', 'error');
+                        showLoading(false); };
+                    reader.readAsDataURL(file);
+                } catch (err) { showToast('Error: ' + err.message, 'error');
+                    showLoading(false); }
+            }
+
+            area.onclick = () => input.click();
+            area.ondragover = e => { e.preventDefault();
+                area.classList.add('drag-over'); };
+            area.ondragleave = () => area.classList.remove('drag-over');
+            area.ondrop = e => {
+                e.preventDefault();
+                area.classList.remove('drag-over');
+                const f = e.dataTransfer.files[0];
+                if (f && f.type.startsWith('image/')) handleFile(f);
+                else if (f) showToast('Please drop an image file', 'error');
+            };
+            input.onchange = e => { if (e.target.files?.[0]) handleFile(e.target.files[0]); };
+            removeBtn.onclick = () => {
+                selectedImageFile = null;
+                input.value = '';
+                previewContainer.classList.add('hidden');
+                area.classList.remove('hidden');
+                showToast('Image removed', 'info');
+            };
+        }
+
+        // ─── FILTERING ───
+        function applyFilters() {
+            const search = searchTerm.toLowerCase().trim();
+            if (!search) {
+                filteredData = [...allDueEntries];
+            } else {
+                filteredData = allDueEntries.filter(entry => {
+                    const name = getCustomerName(entry.customerId) || entry.customerName || '';
+                    const remarks = entry.remarks || '';
+                    const details = entry.products?.map(p => p.name).join(' ') || entry.productName || '';
+                    return name.toLowerCase().includes(search) ||
+                           remarks.toLowerCase().includes(search) ||
+                           details.toLowerCase().includes(search);
+                });
+            }
+            currentPage = 1;
+            renderPage();
+        }
+
+        // ─── RENDER TABLE ───
         function renderPage() {
-            const tbody = document.getElementById('recentDueBody');
-            const start = (currentPage - 1) * pageSize;
-            const end = Math.min(start + pageSize, filteredData.length);
-            const pageData = filteredData.slice(start, end);
+            const start = (currentPage - 1) * pageSize,
+                end = Math.min(start + pageSize, filteredData.length),
+                pageData = filteredData.slice(start, end);
             
-            document.getElementById('pageStart').textContent = filteredData.length > 0 ? start + 1 : 0;
-            document.getElementById('pageEnd').textContent = end;
-            document.getElementById('totalEntries').textContent = filteredData.length;
-            document.getElementById('pageInfo').textContent = `Page ${currentPage}`;
+            const totalPages = Math.ceil(filteredData.length / pageSize) || 1;
             
-            document.getElementById('prevPageBtn').disabled = currentPage === 1;
-            document.getElementById('nextPageBtn').disabled = end >= filteredData.length;
-            
-            if (pageData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No due entries found</p></td></tr>';
+            $('pageStart').textContent = filteredData.length ? start + 1 : 0;
+            $('pageEnd').textContent = end;
+            $('totalEntries').textContent = filteredData.length;
+            $('pageInfo').textContent = `${currentPage}`;
+            $('totalPages').textContent = totalPages;
+            $('prevPageBtn').disabled = currentPage === 1;
+            $('nextPageBtn').disabled = currentPage >= totalPages;
+
+            if (!pageData.length) {
+                recentBody.innerHTML =
+                    '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No due entries found</p></td></tr>';
                 return;
             }
+
+            recentBody.innerHTML = '';
+            const serialStart = start + 1;
             
-            tbody.innerHTML = '';
-            
-            for (const due of pageData) {
-                let customerName = due.customerName || getCustomerName(due.customerId);
-                
-                let detailsDisplay = '';
-                if (due.products && due.products.length > 0) {
-                    detailsDisplay = due.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).slice(0, 2).join(', ');
-                    if (due.products.length > 2) detailsDisplay += ` +${due.products.length - 2}`;
-                } else if (due.directDueAmount && due.directDueAmount > 0) {
-                    detailsDisplay = `Direct: ৳${due.directDueAmount.toFixed(2)}`;
-                } else if (due.productName) {
-                    detailsDisplay = due.productName;
-                } else {
-                    detailsDisplay = 'Due Entry';
-                }
-                
-                const row = tbody.insertRow();
+            pageData.forEach((due, index) => {
+                const serial = serialStart + index;
+                const freshName = getCustomerName(due.customerId);
+                const name = freshName !== 'Unknown' ? freshName : (due.customerName || 'Unknown');
+
+                let details = '';
+                if (due.products?.length) {
+                    details = due.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).slice(0, 2).join(', ');
+                    if (due.products.length > 2) details += ` +${due.products.length - 2}`;
+                } else if (due.directDueAmount) details = `Direct: ৳${due.directDueAmount.toFixed(2)}`;
+                else details = due.productName || 'Due Entry';
+
+                const row = recentBody.insertRow();
                 row.className = 'table-row-hover transition-colors';
+                row.dataset.customerId = due.customerId;
                 row.innerHTML = `
+                    <td class="px-3 py-2.5 text-center text-xs font-medium text-gray-500 dark:text-gray-400">${serial}</td>
                     <td class="px-3 py-2.5 text-sm whitespace-nowrap">${due.date || 'N/A'}</td>
-                    <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(customerName)}</td>
-                    <td class="px-3 py-2.5 text-sm text-gray-600 dark:text-gray-400 max-w-[250px] truncate" title="${escapeHtml(detailsDisplay)}">${escapeHtml(detailsDisplay)}</td>
-                    <td class="px-3 py-2.5 text-right text-sm font-semibold">৳${(due.totalAmount || 0).toFixed(2)}</td>
-                    <td class="px-3 py-2.5 text-right text-sm text-green-600 font-semibold">৳${(due.paidAmount || 0).toFixed(2)}</td>
-                    <td class="px-3 py-2.5 text-right text-sm text-red-600 font-bold">৳${(due.dueAmount || 0).toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white customer-name-cell">${escapeHtml(name)}</td>
+                    <td class="px-3 py-2.5 text-sm text-gray-600 dark:text-gray-400 max-w-[250px] truncate" title="${escapeHtml(details)}">${escapeHtml(details)}</td>
+                    <td class="px-3 py-2.5 text-right text-sm font-semibold">৳${(due.totalAmount||0).toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-right text-sm text-green-600 font-semibold">৳${(due.paidAmount||0).toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-right text-sm text-red-600 font-bold">৳${(due.dueAmount||0).toFixed(2)}</td>
                     <td class="px-3 py-2.5 text-center">
                         <button class="view-details-btn text-info hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-id="${due.id}" title="View Details"><i class="fas fa-eye text-sm"></i></button>
                         <button class="view-invoice-btn text-info hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-image="${due.invoiceImage || ''}" title="Invoice Image"><i class="fas fa-file-image text-sm"></i></button>
                     </td>
                 `;
-            }
-            
-            // Invoice image button
-            document.querySelectorAll('.view-invoice-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const imageData = btn.getAttribute('data-image');
-                    if (imageData && imageData !== '' && imageData !== 'null') showInvoiceModal(imageData);
-                    else showToast('No invoice image attached', 'error');
-                });
             });
 
-            // Details button - open details modal
-            document.querySelectorAll('.view-details-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
+            recentBody.querySelectorAll('.view-invoice-btn').forEach(btn => {
+                btn.onclick = e => {
                     e.stopPropagation();
-                    const id = btn.getAttribute('data-id');
-                    const entry = allDueEntriesData.find(d => d.id === id);
+                    const img = btn.dataset.image;
+                    if (img && img !== '' && img !== 'null') showInvoiceModal(img);
+                    else showToast('No invoice image attached', 'error');
+                };
+            });
+            recentBody.querySelectorAll('.view-details-btn').forEach(btn => {
+                btn.onclick = e => {
+                    e.stopPropagation();
+                    const entry = allDueEntries.find(d => d.id === btn.dataset.id);
                     if (entry) {
+                        if (entry.customerId) {
+                            const freshName = getCustomerName(entry.customerId);
+                            if (freshName !== 'Unknown') entry.customerName = freshName;
+                        }
                         showDetailsModal(entry);
-                    } else {
-                        showToast('Entry not found', 'error');
-                    }
-                });
+                    } else showToast('Entry not found', 'error');
+                };
             });
         }
-        
-        // ==================== LOAD RECENT DUE ENTRIES ====================
-        async function loadRecentDueEntries() {
-            const tbody = document.getElementById('recentDueBody');
-            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading due entries...</p></td>';
-            
+
+        // ─── LOAD DUE ENTRIES ───
+        async function loadDueEntries() {
+            recentBody.innerHTML =
+                '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading due entries...</p></td>';
             try {
                 const q = query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(500));
-                const querySnapshot = await getDocs(q);
-                const dueEntries = [];
-                
-                querySnapshot.forEach(docSnap => {
-                    const data = docSnap.data();
+                const snap = await getDocs(q);
+                const entries = [];
+                snap.forEach(d => {
+                    const data = d.data();
                     if (data.type === 'due') {
-                        dueEntries.push({ id: docSnap.id, ...data });
+                        entries.push({ id: d.id, ...data });
                     }
                 });
-                
-                dueEntries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-                allDueEntriesData = dueEntries;
-                filteredData = [...allDueEntriesData];
-                currentPage = 1;
-                renderPage();
-                
-            } catch (error) {
-                console.error('Error loading due entries:', error);
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
+                entries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+                allDueEntries = entries;
+                applyFilters();
+            } catch (err) {
+                console.error(err);
+                recentBody.innerHTML =
+                    '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
             }
         }
-        
-        // ==================== EXPORT TO CSV ====================
-        async function exportDueToCSV() {
-            if (allDueEntriesData.length === 0) { 
-                showToast('No data to export', 'error'); 
-                return; 
-            }
-            
-            try {
-                showLoading(true);
-                const csvRows = [['Date', 'Customer Name', 'Details', 'Total Amount (৳)', 'Paid Amount (৳)', 'Due Amount (৳)', 'Remarks', 'Expected Date']];
-                
-                for (const due of allDueEntriesData) {
-                    let customerName = due.customerName || getCustomerName(due.customerId);
-                    let detailsStr = '';
-                    if (due.products && due.products.length > 0) {
-                        detailsStr = due.products.map(p => `${p.name}(${p.qty} ${p.unit || 'Pcs'})`).join('; ');
-                    } else if (due.directDueAmount) {
-                        detailsStr = `Direct Due: ${due.directDueAmount}`;
-                    } else {
-                        detailsStr = due.productName || 'Due Entry';
-                    }
-                    csvRows.push([
-                        due.date || '',
-                        customerName,
-                        detailsStr,
-                        (due.totalAmount || 0).toFixed(2),
-                        (due.paidAmount || 0).toFixed(2),
-                        (due.dueAmount || 0).toFixed(2),
-                        (due.remarks || ''),
-                        (due.expectedDate || '')
-                    ]);
-                }
-                
-                const csvContent = csvRows.map(row => 
-                    row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
-                ).join('\n');
-                
-                const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `due_entries_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
-                document.body.appendChild(link);
-                link.click();
-                setTimeout(() => {
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                }, 100);
-                showToast(`Export successful! ${allDueEntriesData.length} entries exported.`, 'success');
-                showLoading(false);
-            } catch (error) { 
-                console.error('Export error:', error);
-                showToast('Export failed: ' + error.message, 'error');
-                showLoading(false);
-            }
-        }
-        
-        // ==================== IMAGE UPLOAD ====================
-        function setupImageUpload() {
-            const uploadArea = document.getElementById('imageUploadArea');
-            const fileInput = document.getElementById('invoiceImage');
-            const previewContainer = document.getElementById('imagePreviewContainer');
-            const previewImg = document.getElementById('imagePreview');
-            const fileNameDisplay = document.getElementById('fileNameDisplay');
-            const removeImageBtn = document.getElementById('removeImageBtn');
-            
-            const MAX_FILE_SIZE = 5 * 1024 * 1024;
-            const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/bmp'];
-            const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.bmp'];
-            
-            function formatFileSize(bytes) {
-                if (bytes === 0) return '0 Bytes';
-                const k = 1024;
-                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-            }
-            
-            function validateFile(file) {
-                if (!file) { showToast('No file selected', 'error'); return false; }
-                if (!ALLOWED_TYPES.includes(file.type)) {
-                    const allowedTypesStr = ALLOWED_EXTENSIONS.join(', ');
-                    showToast(`Invalid file type! Allowed types: ${allowedTypesStr}`, 'error');
-                    return false;
-                }
-                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-                if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
-                    showToast(`Invalid file extension! Allowed: ${ALLOWED_EXTENSIONS.join(', ')}`, 'error');
-                    return false;
-                }
-                if (file.size > MAX_FILE_SIZE) {
-                    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                    showToast(`File too large! Size: ${fileSizeMB}MB. Maximum allowed: 5MB`, 'error');
-                    return false;
-                }
-                return true;
-            }
-            
-            async function compressImage(file, maxWidth = 1200, maxHeight = 1200, quality = 0.85) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = (e) => {
-                        const img = new Image();
-                        img.src = e.target.result;
-                        img.onload = () => {
-                            let width = img.width;
-                            let height = img.height;
-                            if (width > maxWidth) {
-                                height = (height * maxWidth) / width;
-                                width = maxWidth;
-                            }
-                            if (height > maxHeight) {
-                                width = (width * maxHeight) / height;
-                                height = maxHeight;
-                            }
-                            const canvas = document.createElement('canvas');
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-                            let outputFormat = 'image/jpeg';
-                            let outputQuality = quality;
-                            if (file.type === 'image/png') {
-                                outputFormat = 'image/png';
-                                outputQuality = 0.9;
-                            } else if (file.type === 'image/webp') {
-                                outputFormat = 'image/webp';
-                                outputQuality = quality;
-                            }
-                            canvas.toBlob((blob) => {
-                                if (blob) {
-                                    const compressedFile = new File([blob], file.name, {
-                                        type: outputFormat,
-                                        lastModified: Date.now()
-                                    });
-                                    resolve(compressedFile.size < file.size ? compressedFile : file);
-                                } else {
-                                    resolve(file);
-                                }
-                            }, outputFormat, outputQuality);
-                        };
-                        img.onerror = reject;
-                    };
-                    reader.onerror = reject;
-                });
-            }
-            
-            async function handleImageFile(file) {
-                if (!validateFile(file)) return false;
-                showLoading(true);
-                try {
-                    let processedFile = file;
-                    if (file.size > 1024 * 1024) {
-                        try {
-                            processedFile = await compressImage(file, 1200, 1200, 0.8);
-                        } catch (compressError) {
-                            console.warn('Compression failed, using original file:', compressError);
-                            processedFile = file;
-                        }
-                    }
-                    if (processedFile.size > MAX_FILE_SIZE) {
-                        const fileSizeMB = (processedFile.size / (1024 * 1024)).toFixed(2);
-                        showToast(`File still too large after compression! Size: ${fileSizeMB}MB`, 'error');
-                        showLoading(false);
-                        return false;
-                    }
-                    selectedImageFile = processedFile;
-                    fileNameDisplay.textContent = `${processedFile.name} (${formatFileSize(processedFile.size)})`;
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        previewImg.src = e.target.result;
-                        previewContainer.classList.remove('hidden');
-                        uploadArea.classList.add('hidden');
-                        showToast('Image uploaded successfully!', 'success');
-                        showLoading(false);
-                    };
-                    reader.onerror = () => {
-                        showToast('Error reading file', 'error');
-                        showLoading(false);
-                    };
-                    reader.readAsDataURL(processedFile);
-                    return true;
-                } catch (error) {
-                    console.error('Image processing error:', error);
-                    showToast('Error processing image: ' + error.message, 'error');
-                    showLoading(false);
-                    return false;
-                }
-            }
-            
-            uploadArea.addEventListener('click', () => fileInput.click());
-            uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
-            uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('drag-over'); });
-            uploadArea.addEventListener('drop', async (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('drag-over');
-                const file = e.dataTransfer.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    await handleImageFile(file);
-                } else if (file) {
-                    showToast('Please drop an image file (PNG, JPG, JPEG, WEBP)', 'error');
-                }
-            });
-            fileInput.addEventListener('change', async (e) => {
-                if (e.target.files && e.target.files[0]) {
-                    await handleImageFile(e.target.files[0]);
-                }
-            });
-            removeImageBtn.addEventListener('click', () => {
-                selectedImageFile = null;
-                fileInput.value = '';
-                previewContainer.classList.add('hidden');
-                uploadArea.classList.remove('hidden');
-                showToast('Image removed', 'info');
-            });
-        }
-        
-        // ==================== SUBMIT DUE ENTRY ====================
-        async function submitDueEntry(event) {
-            event.preventDefault();
-            
-            const customerId = document.getElementById('selectedCustomerId').value;
+
+        // ─── SUBMIT DUE ENTRY ───
+        async function submitDueEntry(e) {
+            e.preventDefault();
+            const customerId = selectedCustomerId.value;
             if (!customerId) { showToast('Please select a customer', 'error'); return; }
-            
-            const date = document.getElementById('dueDate').value;
+            const date = $('dueDate').value;
             if (!date) { showToast('Please select date', 'error'); return; }
-            
-            const expectedDate = document.getElementById('expectedDate').value;
+
             const products = [];
-            const productRows = document.querySelectorAll('.product-item');
-            productRows.forEach(row => { 
-                const name = row.querySelector('input[name="productName"]')?.value.trim(); 
-                const qty = parseFloat(row.querySelector('input[name="qty"]')?.value) || 0; 
-                const unit = row.querySelector('select[name="unit"]')?.value || 'Pcs'; 
-                const price = parseFloat(row.querySelector('input[name="unitPrice"]')?.value) || 0; 
-                if (name && qty > 0 && price > 0) products.push({ name, qty, unit, price, total: qty * price }); 
+            document.querySelectorAll('.product-item').forEach(row => {
+                const name = row.querySelector('input[name="productName"]')?.value.trim();
+                const qty = parseFloat(row.querySelector('input[name="qty"]')?.value) || 0;
+                const unit = row.querySelector('select[name="unit"]')?.value || 'Pcs';
+                const price = parseFloat(row.querySelector('input[name="unitPrice"]')?.value) || 0;
+                if (name && qty > 0 && price > 0) products.push({ name, qty, unit, price, total: qty * price });
             });
-            
-            const directDueAmount = parseFloat(document.getElementById('directDueAmount').value) || 0;
-            const productTotal = products.reduce((sum, p) => sum + p.total, 0);
-            const totalAmount = productTotal + directDueAmount;
-            const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
-            const dueAmount = totalAmount - paidAmount;
-            const remarks = document.getElementById('remarks').value;
-            
-            if (totalAmount === 0) { showToast('Please add either products or a due amount', 'error'); return; }
-            if (dueAmount <= 0) { showToast('Due amount must be greater than 0', 'error'); return; }
-            
+
+            const direct = parseFloat($('directDueAmount').value) || 0;
+            const productTotal = products.reduce((s, p) => s + p.total, 0);
+            const total = productTotal + direct;
+            const paid = parseFloat($('paidAmount').value) || 0;
+            const due = total - paid;
+            const remarks = $('remarks').value;
+
+            if (!total) { showToast('Please add products or a due amount', 'error'); return; }
+            if (due <= 0) { showToast('Due amount must be greater than 0', 'error'); return; }
+
             showLoading(true);
             try {
                 let imageData = null;
-                if (selectedImageFile) { 
-                    imageData = await new Promise((resolve) => { 
-                        const reader = new FileReader(); 
-                        reader.onloadend = () => resolve(reader.result); 
-                        reader.readAsDataURL(selectedImageFile); 
-                    }); 
+                if (selectedImageFile) {
+                    imageData = await new Promise(r => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => r(reader.result);
+                        reader.readAsDataURL(selectedImageFile);
+                    });
                 }
-                
+
                 const customerName = getCustomerName(customerId);
-                
-                const transaction = { 
-                    customerId, 
+                if (!customerName || customerName === 'Unknown') {
+                    showToast('Customer not found!', 'error');
+                    showLoading(false);
+                    return;
+                }
+
+                await addDoc(collection(db, 'transactions'), {
+                    customerId,
                     customerName,
-                    type: 'due', 
-                    date, 
-                    products: products.length ? products : null, 
-                    directDueAmount: directDueAmount > 0 ? directDueAmount : null, 
-                    productName: products.map(p => p.name).join(', ') || (directDueAmount > 0 ? 'Direct Due' : ''), 
-                    totalAmount, 
-                    paidAmount, 
-                    dueAmount, 
-                    remarks, 
-                    expectedDate: expectedDate || null, 
-                    invoiceImage: imageData, 
-                    createdAt: Timestamp.now() 
-                };
-                
-                await addDoc(collection(db, 'transactions'), transaction);
-                
-                const customerRef = doc(db, 'customers', customerId);
-                const customerSnap = await getDoc(customerRef);
-                const currentDue = customerSnap.data()?.totalDue || 0;
-                await updateDoc(customerRef, { totalDue: currentDue + dueAmount });
-                
+                    type: 'due',
+                    date,
+                    products: products.length ? products : null,
+                    directDueAmount: direct > 0 ? direct : null,
+                    productName: products.map(p => p.name).join(', ') || (direct > 0 ? 'Direct Due' : ''),
+                    totalAmount: total,
+                    paidAmount: paid,
+                    dueAmount: due,
+                    remarks,
+                    expectedDate: $('expectedDate').value || null,
+                    invoiceImage: imageData,
+                    createdAt: Timestamp.now()
+                });
+
+                const custRef = doc(db, 'customers', customerId);
+                const custSnap = await getDoc(custRef);
+                const currentDue = custSnap.data()?.totalDue || 0;
+                await updateDoc(custRef, { totalDue: currentDue + due });
+
                 showToast('Due entry added successfully!', 'success');
-                
-                document.getElementById('dueEntryForm').reset();
-                document.getElementById('dueDate').valueAsDate = new Date();
-                document.getElementById('paidAmount').value = '0';
-                document.getElementById('directDueAmount').value = '';
-                document.getElementById('expectedDate').value = '';
-                document.getElementById('selectedCustomerId').value = '';
-                document.getElementById('customerSearchInput').value = '';
+                dueForm.reset();
+                $('dueDate').valueAsDate = new Date();
+                $('paidAmount').value = '0';
+                $('directDueAmount').value = '';
+                selectedCustomerId.value = '';
+                customerSearch.value = '';
                 selectedImageFile = null;
-                document.getElementById('imagePreviewContainer').classList.add('hidden');
-                document.getElementById('imageUploadArea').classList.remove('hidden');
-                document.getElementById('productsContainer').innerHTML = '';
+                $('imagePreviewContainer').classList.add('hidden');
+                $('imageUploadArea').classList.remove('hidden');
+                productsContainer.innerHTML = '';
                 showEmptyPlaceholder();
                 calculateTotals();
-                await loadRecentDueEntries();
-                await loadCustomers();
-                
-            } catch (error) { 
-                console.error('Error:', error); 
-                showToast('Error: ' + error.message, 'error'); 
-            } finally { 
-                showLoading(false); 
+                await loadDueEntries();
+
+            } catch (err) {
+                showToast('Error: ' + err.message, 'error');
+                console.error(err);
+            } finally { showLoading(false); }
+        }
+
+        // ─── EXPORT CSV ───
+        async function exportCSV() {
+            if (!allDueEntries.length) { showToast('No data to export', 'error'); return; }
+            showLoading(true);
+            try {
+                const rows = [
+                    ['SL', 'Date', 'Customer Name', 'Details', 'Total Amount (৳)', 'Paid Amount (৳)', 'Due Amount (৳)',
+                        'Remarks', 'Expected Date'
+                    ]
+                ];
+                allDueEntries.forEach((due, index) => {
+                    const name = getCustomerName(due.customerId) || due.customerName || 'Unknown';
+                    let details = '';
+                    if (due.products?.length) details = due.products.map(p => `${p.name}(${p.qty} ${p.unit || 'Pcs'})`).join(
+                        '; ');
+                    else if (due.directDueAmount) details = `Direct Due: ${due.directDueAmount}`;
+                    else details = due.productName || 'Due Entry';
+                    rows.push([
+                        String(index + 1),
+                        due.date || '',
+                        name,
+                        details,
+                        (due.totalAmount || 0).toFixed(2),
+                        (due.paidAmount || 0).toFixed(2),
+                        (due.dueAmount || 0).toFixed(2),
+                        due.remarks || '',
+                        due.expectedDate || ''
+                    ]);
+                });
+                const csv = rows.map(row => row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `due_entries_${new Date().toISOString().slice(0,10)}.csv`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+                showToast(`Exported ${allDueEntries.length} entries`, 'success');
+            } catch (err) { showToast('Export failed: ' + err.message, 'error'); } finally { showLoading(false); }
+        }
+
+        // ─── SIDEBAR ───
+        const sidebar = $('sidebar'),
+            menuToggle = $('menuToggle'),
+            closeSidebarBtn = $('closeSidebarBtn');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            document.body.classList.add('sidebar-open');
+            if (!document.getElementById('sidebarOverlay')) {
+                const ov = document.createElement('div');
+                ov.id = 'sidebarOverlay';
+                ov.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
+                ov.onclick = closeSidebar;
+                document.body.appendChild(ov);
             }
         }
-        
-        // ==================== EVENT LISTENERS ====================
-        document.getElementById('dueEntryForm').addEventListener('submit', submitDueEntry);
-        document.getElementById('addProductBtn').addEventListener('click', addProductRow);
-        document.getElementById('paidAmount').addEventListener('input', calculateTotals);
-        document.getElementById('directDueAmount').addEventListener('input', calculateTotals);
-        document.getElementById('dueDate').valueAsDate = new Date();
-        
-        // Pagination events
-        document.getElementById('exportDueBtn').addEventListener('click', exportDueToCSV);
-        
-        document.getElementById('paginationSize').addEventListener('change', (e) => {
+
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            document.body.classList.remove('sidebar-open');
+            document.getElementById('sidebarOverlay')?.remove();
+        }
+
+        menuToggle?.addEventListener('click', openSidebar);
+        closeSidebarBtn?.addEventListener('click', closeSidebar);
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('-translate-x-full');
+                document.getElementById('sidebarOverlay')?.remove();
+                document.body.classList.remove('sidebar-open');
+            } else sidebar.classList.add('-translate-x-full');
+        });
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
+        else sidebar.classList.add('-translate-x-full');
+
+        // ─── SUBMENU TOGGLES ───
+        document.querySelectorAll('.has-submenu > a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const parent = link.closest('.has-submenu');
+                parent.classList.toggle('open');
+                parent.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        });
+
+        // ─── EVENT LISTENERS ───
+        dueForm.addEventListener('submit', submitDueEntry);
+        $('addProductBtn').addEventListener('click', addProductRow);
+        $('paidAmount').addEventListener('input', calculateTotals);
+        $('directDueAmount').addEventListener('input', calculateTotals);
+        $('dueDate').valueAsDate = new Date();
+
+        $('exportDueBtn').addEventListener('click', exportCSV);
+
+        // Per page select
+        const perPageSelect = $('perPageSelect');
+        perPageSelect.addEventListener('change', (e) => {
             pageSize = parseInt(e.target.value);
             currentPage = 1;
             renderPage();
         });
+
+        // Search input
+        const searchInput = $('tableSearchInput');
+        const clearSearchBtn = $('clearSearchBtn');
         
-        document.getElementById('prevPageBtn').addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                renderPage();
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            if (searchTerm) {
+                searchInput.classList.add('has-value');
+            } else {
+                searchInput.classList.remove('has-value');
+            }
+            applyFilters();
+        });
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchInput.classList.remove('has-value');
+            searchTerm = '';
+            applyFilters();
+        });
+
+        $('prevPageBtn').addEventListener('click', () => { if (currentPage > 1) { currentPage--;
+                renderPage(); } });
+        $('nextPageBtn').addEventListener('click', () => {
+            const total = Math.ceil(filteredData.length / pageSize);
+            if (currentPage < total) { currentPage++;
+                renderPage(); }
+        });
+
+        $('refreshBtn').addEventListener('click', () => {
+            loadDueEntries();
+            if (unsubscribeCustomers) {
+                unsubscribeCustomers();
+                setupCustomerListener();
+            }
+            showToast('Refreshed!', 'success');
+        });
+
+        $('darkModeToggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+        });
+
+        // ─── LOGOUT ───
+        $('logoutLink')?.addEventListener('click', async e => {
+            e.preventDefault();
+            try {
+                if (unsubscribeCustomers) {
+                    unsubscribeCustomers();
+                    unsubscribeCustomers = null;
+                }
+                await window.logout();
+            } catch (err) { showToast('Logout error', 'error'); }
+        });
+
+        // ─── FOOTER YEAR ───
+        $('footerYear').textContent = new Date().getFullYear();
+
+        // ─── CLEANUP ───
+        window.addEventListener('beforeunload', () => {
+            if (unsubscribeCustomers) {
+                unsubscribeCustomers();
+                unsubscribeCustomers = null;
             }
         });
-        
-        document.getElementById('nextPageBtn').addEventListener('click', () => {
-            const totalPages = Math.ceil(filteredData.length / pageSize);
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderPage();
-            }
-        });
-        
-        document.getElementById('refreshBtn').addEventListener('click', () => { 
-            loadRecentDueEntries(); 
-            loadCustomers(); 
-            showToast('Refreshed!', 'success'); 
-        });
-        
-        document.getElementById('darkModeToggle').addEventListener('click', () => { 
-            document.documentElement.classList.toggle('dark'); 
-            document.body.classList.toggle('dark'); 
-        });
-        
-        const logoutLink = document.getElementById('logoutLink');
-        if (logoutLink) {
-            logoutLink.addEventListener('click', async (e) => {
-                e.preventDefault();
-                await logout();
-            });
-        }
-        
-        // ==================== INITIALIZE ====================
+
+        // ─── INIT ───
+        setupCustomerListener();
+        loadDueEntries();
         setupImageUpload();
-        loadCustomers();
-        loadRecentDueEntries();
         calculateTotals();
+
+        console.log('🚀 Due Entry page initialized with S.L column and Show dropdown (20,50,100,200)');
     </script>
 </body>
 </html>

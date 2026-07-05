@@ -10,7 +10,7 @@ const CONFIG = {
     // Set to false to disable all console logs
     ENABLE_LOGS: false,
     // Set to true to show only important logs (errors, warnings)
-    ENABLE_IMPORTANT_LOGS_ONLY: true
+    ENABLE_IMPORTANT_LOGS_ONLY: false
 };
 
 // Custom logger - controls all console output
@@ -26,13 +26,20 @@ const logger = {
         }
     },
     warn: (...args) => {
-        if (CONFIG.ENABLE_LOGS || CONFIG.ENABLE_IMPORTANT_LOGS_ONLY) {
+        // Only show warnings if explicitly enabled
+        if (CONFIG.ENABLE_LOGS && CONFIG.ENABLE_IMPORTANT_LOGS_ONLY) {
             console.warn(...args);
         }
     },
     error: (...args) => {
-        // Errors always show
-        console.error(...args);
+        // Only show errors if explicitly enabled
+        if (CONFIG.ENABLE_LOGS && CONFIG.ENABLE_IMPORTANT_LOGS_ONLY) {
+            console.error(...args);
+        }
+    },
+    // Special method for critical errors that always show
+    critical: (...args) => {
+        console.error('🚨 CRITICAL:', ...args);
     }
 };
 
@@ -41,7 +48,6 @@ const REDIRECT_KEY = 'is_redirecting';
 const REDIRECT_TIMESTAMP_KEY = 'redirect_timestamp';
 const TAB_ID_KEY = 'tab_id';
 const ACTIVE_TAB_KEY = 'active_tab_id';
-const AUTH_HANDLED_KEY = 'auth_handled';
 
 // Generate unique tab ID
 function generateTabId() {
@@ -69,22 +75,17 @@ function isActiveTab() {
 
 // Handle tab activation/deactivation
 function setupTabSync() {
-    // Register on load
     registerActiveTab();
     
-    // Update on visibility change
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
             registerActiveTab();
         }
     });
     
-    // Listen for storage changes from other tabs
     window.addEventListener('storage', (e) => {
         if (e.key === ACTIVE_TAB_KEY) {
-            // Another tab became active - silently handle
             if (!isActiveTab() && auth.currentUser) {
-                // This tab lost active status - prevent auto-redirect
                 sessionStorage.setItem(REDIRECT_KEY, 'false');
             }
         }
@@ -103,12 +104,10 @@ function setRedirecting(value) {
 }
 
 function shouldRedirect() {
-    // If already redirecting, don't redirect again
     if (isRedirecting()) {
         return false;
     }
     
-    // Check if a redirect happened recently (within last 3 seconds)
     const lastRedirect = sessionStorage.getItem(REDIRECT_TIMESTAMP_KEY);
     if (lastRedirect) {
         const timeSince = Date.now() - parseInt(lastRedirect);
@@ -117,7 +116,6 @@ function shouldRedirect() {
         }
     }
     
-    // Check if this tab is active
     if (!isActiveTab()) {
         return false;
     }
@@ -128,7 +126,7 @@ function shouldRedirect() {
 // Initialize tab sync
 setupTabSync();
 
-// ============ INACTIVITY TIMER (20 MINUTES) ============
+// ============ INACTIVITY TIMER (10 MINUTES) ============
 let inactivityTimer = null;
 let dailyResetTimer = null;
 const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
@@ -148,7 +146,6 @@ function resetInactivityTimer() {
     
     if (auth.currentUser) {
         inactivityTimer = setTimeout(async () => {
-            logger.log("🕐 User inactive for 10 minutes, auto logging out...");
             try {
                 await signOut(auth);
                 showToast('Logged out due to 10 minutes of inactivity', 'warning');
@@ -156,7 +153,7 @@ function resetInactivityTimer() {
                 localStorage.removeItem(ACTIVE_TAB_KEY);
                 window.location.replace('login.html');
             } catch (error) {
-                logger.error("Auto logout error:", error);
+                // Silent error - no console log
             }
         }, INACTIVITY_TIMEOUT);
     }
@@ -170,10 +167,8 @@ function setupDailyReset() {
     
     if (auth.currentUser) {
         const timeUntilMidnight = getTimeUntilMidnight();
-        // Silent - no log
         
         dailyResetTimer = setTimeout(async () => {
-            logger.log("🕐 Midnight reached, auto logging out...");
             try {
                 await signOut(auth);
                 showToast('Session expired - daily reset at midnight', 'warning');
@@ -181,7 +176,7 @@ function setupDailyReset() {
                 localStorage.removeItem(ACTIVE_TAB_KEY);
                 window.location.replace('login.html');
             } catch (error) {
-                logger.error("Daily reset logout error:", error);
+                // Silent error - no console log
             }
         }, timeUntilMidnight);
     }
@@ -236,12 +231,8 @@ function redirectToDashboard() {
 let authStateChecked = false;
 let isInitialAuthCheck = true;
 
-// Check auth state
 export function checkAuthState(redirectToLoginPage = true) {
-    let isRedirecting = false;
-    
     onAuthStateChanged(auth, (user) => {
-        // Prevent multiple executions
         if (authStateChecked && !isInitialAuthCheck) {
             return;
         }
@@ -249,24 +240,15 @@ export function checkAuthState(redirectToLoginPage = true) {
         isInitialAuthCheck = false;
         
         if (user) {
-            // User is logged in - silent (no log)
-            
-            // Register this tab as active
             registerActiveTab();
-            
-            // Start inactivity timer
             resetInactivityTimer();
-            
-            // Setup daily reset
             setupDailyReset();
             
-            // Setup activity listeners (only once)
             if (!window._activityListenersSetup) {
                 setupActivityListeners();
                 window._activityListenersSetup = true;
             }
             
-            // Only redirect if on login page and this tab should redirect
             if (isAuthPage() && shouldRedirect()) {
                 setRedirecting(true);
                 setTimeout(() => {
@@ -274,9 +256,6 @@ export function checkAuthState(redirectToLoginPage = true) {
                 }, 100);
             }
         } else {
-            // User is NOT logged in - silent
-            
-            // Clear timers
             if (inactivityTimer) {
                 clearTimeout(inactivityTimer);
                 inactivityTimer = null;
@@ -286,7 +265,6 @@ export function checkAuthState(redirectToLoginPage = true) {
                 dailyResetTimer = null;
             }
             
-            // Only redirect if not on auth page and redirectToLogin is true
             if (redirectToLoginPage && !isAuthPage() && 
                 !window.location.pathname.includes('clear-data.html') &&
                 !isRedirecting()) {
@@ -303,11 +281,7 @@ export function checkAuthState(redirectToLoginPage = true) {
 export async function login(email, password) {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        
-        // Register this tab as active
         registerActiveTab();
-        
-        // Start inactivity timer
         resetInactivityTimer();
         setupDailyReset();
         
@@ -343,7 +317,176 @@ export async function login(email, password) {
     }
 }
 
-// Logout function
+// ============ URL ACCESS CONTROL FUNCTIONS ============
+
+/**
+ * ফাংশন 1: চেক করে ইউজার লগইন আছে কিনা এবং পেজ অ্যাক্সেস কন্ট্রোল করে
+ * ব্যবহার: protectedPage() কে প্রতিটি পেজের শুরুতে কল করুন
+ */
+export function protectedPage() {
+    return new Promise((resolve) => {
+        // Check if already redirecting
+        if (isRedirecting()) {
+            resolve(false);
+            return;
+        }
+        
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe();
+            
+            if (user) {
+                // User logged in - grant access
+                resolve(true);
+            } else {
+                // User not logged in - redirect to login
+                if (!isRedirecting()) {
+                    setRedirecting(true);
+                    showToast('Please login to access this page', 'warning');
+                    setTimeout(() => {
+                        window.location.replace('login.html');
+                    }, 100);
+                }
+                resolve(false);
+            }
+        });
+    });
+}
+
+/**
+ * ফাংশন 2: চেক করে ইউজার লগইন নেই কিনা এবং পেজ অ্যাক্সেস কন্ট্রোল করে
+ * ব্যবহার: publicPage() কে login/register পেজের শুরুতে কল করুন
+ */
+export function publicPage() {
+    return new Promise((resolve) => {
+        // Check if already redirecting
+        if (isRedirecting()) {
+            resolve(false);
+            return;
+        }
+        
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe();
+            
+            if (user) {
+                // User logged in - redirect to dashboard
+                if (shouldRedirect()) {
+                    setRedirecting(true);
+                    showToast('You are already logged in', 'info');
+                    setTimeout(() => {
+                        window.location.replace('dashboard.html');
+                    }, 100);
+                }
+                resolve(false);
+            } else {
+                // User not logged in - grant access
+                resolve(true);
+            }
+        });
+    });
+}
+
+// ============ PAGE GUARD MIXIN / DECORATOR ============
+
+/**
+ * পেজ গার্ড - যেকোনো পেজের জন্য সহজ ব্যবহার
+ * @param {string} type - 'protected' অথবা 'public'
+ */
+export function pageGuard(type = 'protected') {
+    try {
+        if (type === 'protected') {
+            return protectedPage();
+        } else if (type === 'public') {
+            return publicPage();
+        } else {
+            // Unknown type - treat as protected
+            return protectedPage();
+        }
+    } catch (error) {
+        // Silent error - show toast and redirect
+        showToast('Page access error. Redirecting to login.', 'error');
+        setTimeout(() => {
+            window.location.replace('login.html');
+        }, 100);
+        return Promise.resolve(false);
+    }
+}
+
+// ============ AUTO PAGE GUARD (সব পেজের জন্য) ============
+
+/**
+ * পেজের নাম অনুযায়ী অটো গার্ড
+ * page-name: 'login' বা 'dashboard' বা অন্য কিছু
+ */
+export function autoPageGuard(pageName) {
+    const protectedPages = ['dashboard', 'profile', 'settings', 'admin', 'home'];
+    const publicPages = ['login', 'register', 'index', 'forgot-password'];
+    
+    if (protectedPages.includes(pageName)) {
+        return protectedPage();
+    } else if (publicPages.includes(pageName)) {
+        return publicPage();
+    } else {
+        // ডিফল্ট: protected
+        return protectedPage();
+    }
+}
+
+// ============ URL BASED REDIRECT CONTROL ============
+
+/**
+ * URL এর উপর ভিত্তি করে রিডাইরেক্ট কন্ট্রোল
+ * কোন URL এ কি হবে তা কনফিগার করুন
+ */
+export function setupUrlRedirectControl() {
+    const currentPath = window.location.pathname;
+    const currentPage = currentPath.split('/').pop() || 'index.html';
+    
+    // পেজ ক্যাটাগরি ডিটেক্ট করুন
+    const publicPages = ['login.html', 'register.html', 'index.html', 'forgot-password.html'];
+    const isProtectedPage = !publicPages.includes(currentPage);
+    const isPublicPage = publicPages.includes(currentPage);
+    
+    // অটো গার্ড অ্যাপ্লাই করুন
+    if (isProtectedPage) {
+        protectedPage();
+    } else if (isPublicPage) {
+        publicPage();
+    }
+}
+
+// ============ ROUTER GUARD (স্পা এর জন্য) ============
+
+/**
+ * SPA (Single Page Application) এর জন্য রাউটার গার্ড
+ * @param {string} route - রাউটের নাম
+ * @param {Function} callback - রাউট লোড হওয়ার পর কলব্যাক
+ */
+export function routerGuard(route, callback) {
+    const protectedRoutes = ['/dashboard', '/profile', '/settings'];
+    const publicRoutes = ['/login', '/register', '/'];
+    
+    onAuthStateChanged(auth, (user) => {
+        if (protectedRoutes.includes(route)) {
+            if (user) {
+                callback(true);
+            } else {
+                showToast('Please login first', 'warning');
+                window.location.href = '/login.html';
+            }
+        } else if (publicRoutes.includes(route)) {
+            if (user) {
+                showToast('Already logged in', 'info');
+                window.location.href = '/dashboard.html';
+            } else {
+                callback(true);
+            }
+        } else {
+            callback(true);
+        }
+    });
+}
+
+// ============ LOGOUT FUNCTION ============
 export async function logout() {
     try {
         if (inactivityTimer) {
@@ -355,7 +498,6 @@ export async function logout() {
             dailyResetTimer = null;
         }
         
-        // Clear all session data
         sessionStorage.clear();
         localStorage.removeItem(ACTIVE_TAB_KEY);
         
@@ -367,12 +509,11 @@ export async function logout() {
     }
 }
 
-// Show toast notification with styles
+// ============ TOAST NOTIFICATION ============
 function showToast(message, type = 'info') {
     const existingToasts = document.querySelectorAll('.toast');
     existingToasts.forEach(toast => toast.remove());
     
-    // Add toast styles if not exists
     if (!document.querySelector('#toast-styles')) {
         const styles = document.createElement('style');
         styles.id = 'toast-styles';
@@ -390,6 +531,7 @@ function showToast(message, type = 'info') {
                 animation: slideIn 0.3s ease;
                 font-family: Arial, sans-serif;
                 font-size: 14px;
+                max-width: 400px;
             }
             .toast.success {
                 background: #4caf50;
@@ -437,22 +579,27 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-// Get current user
+// ============ USER HELPERS ============
 export function getCurrentUser() {
     return auth.currentUser;
 }
 
-// Check if user is logged in (synchronous)
 export function isLoggedIn() {
     return auth.currentUser !== null;
 }
 
-// Enable/disable logs dynamically
+// ============ LOG CONFIGURATION ============
 export function setLoggingEnabled(enabled) {
     CONFIG.ENABLE_LOGS = enabled;
 }
 
-// Enable/disable important logs only
 export function setImportantLogsOnly(enabled) {
     CONFIG.ENABLE_IMPORTANT_LOGS_ONLY = enabled;
+}
+
+export function getLogConfig() {
+    return {
+        enabled: CONFIG.ENABLE_LOGS,
+        importantOnly: CONFIG.ENABLE_IMPORTANT_LOGS_ONLY
+    };
 }
