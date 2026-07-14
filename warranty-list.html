@@ -932,6 +932,7 @@
         let selectedIds = new Set();
         let currentPage = 1;
         const supplierCache = new Map();
+        let supplierMap = new Map(); // All suppliers loaded at once
         
         // Status Config
         const statusConfig = {
@@ -1007,15 +1008,27 @@
             `;
         }
         
-        async function getSupplierName(supplierId) {
-            if (!supplierId) return 'Unknown';
-            if (supplierCache.has(supplierId)) return supplierCache.get(supplierId);
+        // ✅ FIX: Load all suppliers at once for better performance
+        async function loadAllSuppliers() {
             try {
-                const docSnap = await getDoc(doc(db, 'suppliers', supplierId));
-                const name = docSnap.exists() ? docSnap.data().name : 'Unknown';
-                supplierCache.set(supplierId, name);
-                return name;
-            } catch { return 'Unknown'; }
+                const snap = await getDocs(collection(db, 'suppliers'));
+                supplierMap.clear();
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    supplierMap.set(doc.id, data.name || 'Unknown');
+                });
+                console.log('✅ Suppliers loaded:', supplierMap.size);
+            } catch (error) {
+                console.error('Error loading suppliers:', error);
+            }
+        }
+        
+        function getSupplierName(supplierId) {
+            if (!supplierId) return 'Unknown';
+            if (supplierMap.has(supplierId)) {
+                return supplierMap.get(supplierId);
+            }
+            return 'Unknown';
         }
         
         async function loadWarrantyList() {
@@ -1023,21 +1036,20 @@
             isLoading = true;
             showSkeletonLoading();
             try {
+                // Load suppliers first if not loaded
+                if (supplierMap.size === 0) {
+                    await loadAllSuppliers();
+                }
+                
                 const snapshot = await getDocs(collection(db, 'warranties'));
                 const warranties = [];
-                const promises = [];
                 
                 snapshot.forEach(docSnap => {
                     const w = { id: docSnap.id, ...docSnap.data() };
+                    // Get supplier name from map
+                    w.supplierName = getSupplierName(w.supplierId);
                     warranties.push(w);
-                    if (w.supplierId) {
-                        promises.push(getSupplierName(w.supplierId).then(name => { w.supplierName = name; }));
-                    } else {
-                        w.supplierName = 'Unknown';
-                    }
                 });
-                
-                await Promise.all(promises);
                 
                 warranties.sort((a, b) => {
                     const dateA = a.createdAt || '';
@@ -1329,6 +1341,9 @@
             // Status badge
             const statusBadgeHtml = getStatusBadge(warranty.status);
             
+            // ✅ FIX: Ensure supplier name is shown correctly
+            const supplierDisplay = warranty.supplierName || getSupplierName(warranty.supplierId) || 'Unknown';
+            
             detailsContent.innerHTML = `
                 <div class="details-grid">
                     <!-- Row 1: Warranty ID -->
@@ -1345,7 +1360,7 @@
                     <!-- Row 2: Supplier -->
                     <div class="details-item">
                         <span class="label"><i class="fas fa-truck text-primary mr-1"></i> Supplier</span>
-                        <span class="value font-medium">${escapeHtml(warranty.supplierName)}</span>
+                        <span class="value font-medium">${escapeHtml(supplierDisplay)}</span>
                     </div>
                     <!-- Row 2: Product -->
                     <div class="details-item">
@@ -1705,7 +1720,10 @@
         });
         
         document.getElementById('footerYear').textContent = new Date().getFullYear();
-        loadWarrantyList();
+        
+        // ─── INIT ───
+        await loadAllSuppliers();
+        await loadWarrantyList();
     </script>
 </body>
 </html>

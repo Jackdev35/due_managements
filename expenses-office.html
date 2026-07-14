@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0f3b3a">
+    <title>Office Expenses | JackDev Due Managements</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0f3b3a',
+                        'primary-light': '#1e6b68',
+                        'primary-dark': '#092c2b',
+                        accent: '#d4af37',
+                        danger: '#e53e3e',
+                        success: '#2c7a4d',
+                        warning: '#dd6b20',
+                        info: '#3182ce',
+                    },
+                    fontFamily: { 'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+        * { transition: background-color 0.2s, border-color 0.2s; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; }
+        
+        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
+        .sidebar-fixed { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+        .sidebar-header-fixed { flex-shrink:0; position:sticky; top:0; background:inherit; z-index:10; }
+        
+        .nav-active { 
+            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%); 
+            border-left: 3px solid #d4af37;
+            color: white !important;
+        }
+        .dark .nav-active { 
+            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%); 
+        }
+        
+        .submenu-modern { max-height:0; overflow:hidden; transition:max-height 0.28s ease; }
+        .submenu-modern.open { max-height:350px; }
+        .has-submenu>a .chevron-icon { transition:transform 0.2s; }
+        .has-submenu.open>a .chevron-icon { transform:rotate(180deg); }
+        
+        .tab-btn {
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #6b7280;
+        }
+        .tab-btn.active {
+            background: #0f3b3a;
+            color: white;
+            box-shadow: 0 4px 12px rgba(15,59,58,0.3);
+        }
+        .tab-btn:not(.active):hover { background: #e5e7eb; transform: translateY(-1px); }
+        .dark .tab-btn:not(.active) { color: #9ca3af; }
+        .dark .tab-btn:not(.active):hover { background: #374151; }
+        .tab-btn i { font-size: 14px; }
+
+        .stat-card { transition:all 0.2s; }
+        .stat-card:hover { transform:translateY(-3px); box-shadow:0 12px 22px -12px rgba(0,0,0,0.12); }
+
+        .filter-input { padding:6px 10px; padding-left:32px; font-size:12px; border:1px solid #d1d5db; border-radius:8px; background:white; color:#1f2937; outline:none; transition:border-color 0.2s, box-shadow 0.2s; width:100%; }
+        .filter-input:focus { border-color:#0f3b3a; box-shadow:0 0 0 2px rgba(15,59,58,0.1); }
+        .dark .filter-input { background:#1f2937; border-color:#4b5563; color:#f1f5f9; }
+        .dark .filter-input:focus { border-color:#1e6b68; box-shadow:0 0 0 2px rgba(30,107,104,0.15); }
+        .filter-wrapper { position:relative; width:100%; }
+        .filter-wrapper i { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:12px; }
+        .filter-clear-btn { position:absolute; right:8px; top:50%; transform:translateY(-50%); color:#9ca3af; cursor:pointer; font-size:12px; display:none; padding:2px; }
+        .filter-clear-btn:hover { color:#ef4444; }
+        .filter-wrapper input.has-value + .filter-clear-btn { display:block; }
+        
+        .filter-select { padding:6px 10px; font-size:12px; border:1px solid #d1d5db; border-radius:8px; background:white; color:#1f2937; outline:none; cursor:pointer; min-width:70px; }
+        .filter-select:focus { border-color:#0f3b3a; box-shadow:0 0 0 2px rgba(15,59,58,0.1); }
+        .dark .filter-select { background:#1f2937; border-color:#4b5563; color:#f1f5f9; }
+        .filter-label { font-size:12px; color:#6b7280; white-space:nowrap; }
+        .dark .filter-label { color:#9ca3af; }
+        
+        .pagination-btn { transition:all 0.2s; padding:4px 12px; font-size:12px; border-radius:6px; border:1px solid #d1d5db; background:white; cursor:pointer; }
+        .pagination-btn:hover:not(:disabled) { background:#0f3b3a; color:white; transform:translateY(-1px); }
+        .pagination-btn:disabled { opacity:0.5; cursor:not-allowed; }
+        .dark .pagination-btn { background:#1f2937; border-color:#4b5563; color:#e5e7eb; }
+        .dark .pagination-btn:hover:not(:disabled) { background:#0f3b3a; color:white; }
+        .table-row-hover:hover { background-color:rgba(15,59,58,0.04); }
+        .dark .table-row-hover:hover { background-color:rgba(30,107,104,0.1); }
+        
+        .expense-category-badge { display:inline-block; padding:2px 10px; border-radius:12px; font-size:10px; font-weight:600; }
+        .expense-rent { background:#dbeafe; color:#1e40af; }
+        .expense-electricity { background:#fef3c7; color:#92400e; }
+        .expense-staff { background:#d1fae5; color:#065f46; }
+        .expense-other { background:#e5e7eb; color:#374151; }
+        .dark .expense-rent { background:#1e3a5f; color:#93c5fd; }
+        .dark .expense-electricity { background:#78350f; color:#fcd34d; }
+        .dark .expense-staff { background:#064e3b; color:#6ee7b7; }
+        .dark .expense-other { background:#374151; color:#9ca3af; }
+
+        .modal-overlay {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            padding: 16px;
+        }
+        .modal-overlay .modal-content {
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes modalSlideUp { 
+            from { opacity:0; transform:translateY(20px) scale(0.96); } 
+            to { opacity:1; transform:translateY(0) scale(1); } 
+        }
+        .modal-animate { animation:modalSlideUp 0.2s ease-out forwards; }
+
+        .category-field-transition {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+            opacity: 0;
+            margin: 0;
+        }
+        .category-field-transition.open {
+            max-height: 80px;
+            opacity: 1;
+            margin-top: 12px;
+        }
+
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background 0.2s;
+        }
+        .dark .category-item { border-bottom-color: #374151; }
+        .category-item:last-child { border-bottom: none; }
+        .category-item:hover { background: rgba(15,59,58,0.05); }
+        .dark .category-item:hover { background: rgba(30,107,104,0.1); }
+        .category-item .cat-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .category-item .cat-count {
+            font-size: 11px;
+            color: #6b7280;
+        }
+        .btn-active:active { transform:scale(0.97); }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out border-r border-white/5 sidebar-fixed">
+            <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
+                        </div>
+                        <div class="leading-tight">
+                            <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
+                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
+                        </div>
+                    </div>
+                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
+                <nav class="space-y-1.5">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                        <span class="text-sm font-medium">Dashboard</span>
+                    </a>
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                        <span class="text-sm font-medium">Customers</span>
+                    </a>
+                    <div class="has-submenu" id="dueSubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a>
+                            <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span></a>
+                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a>
+                        </div>
+                    </div>
+                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span>
+                    </a>
+                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
+                    </a>
+                    <div class="has-submenu" id="warrantySubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern pl-9 mt-1 space-y-1">
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span></a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span></a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span></a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span></a>
+                        </div>
+                    </div>
+                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
+                    </a>
+                    <a href="expenses.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150">
+                        <div class="w-6 text-center"><i class="fas fa-money-bill-wave text-sm text-accent"></i></div>
+                        <span class="text-sm font-medium">Expenses</span>
+                    </a>
+                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
+                    </a>
+                </nav>
+                <div class="pt-4 mt-2 border-t border-white/10">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition">
+                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                        <span class="text-sm font-medium">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 md:ml-64 min-h-screen w-full">
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+                <div class="px-3 py-2.5 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg"><i class="fas fa-bars text-lg"></i></button>
+                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-building text-primary mr-2"></i>Office Expenses</h2>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt text-sm"></i></button>
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-moon dark:hidden text-sm"></i><i class="fas fa-sun hidden dark:inline-block text-sm"></i></button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-3 md:p-4">
+                <!-- Tab Navigation -->
+                <div class="flex flex-wrap gap-2 mb-6 bg-white dark:bg-gray-800 p-2 rounded-xl border shadow-sm">
+                    <a href="expenses.html" class="tab-btn">
+                        <i class="fas fa-home"></i> Overview
+                    </a>
+                    <a href="expenses-staff.html" class="tab-btn">
+                        <i class="fas fa-users"></i> Staff Salaries
+                    </a>
+                    <a href="expenses-office.html" class="tab-btn active">
+                        <i class="fas fa-building"></i> Office Expenses
+                    </a>
+                    <a href="expenses-summary.html" class="tab-btn">
+                        <i class="fas fa-chart-bar"></i> Summary
+                    </a>
+                </div>
+
+                <!-- Office Expenses Content -->
+                <div>
+                    <!-- Add Expense Form -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-4">
+                        <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex justify-between items-center flex-wrap gap-2">
+                            <h3 class="text-sm font-semibold"><i class="fas fa-plus-circle text-primary mr-2"></i>Add Office Expense</h3>
+                            <button id="manageCategoriesBtn" class="bg-info hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 transition btn-active">
+                                <i class="fas fa-tags"></i> Manage Categories
+                            </button>
+                        </div>
+                        <form id="expenseForm" class="p-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Category <span class="text-red-500">*</span></label>
+                                    <select id="expenseCategory" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                        <option value="rent">🏢 Office Rent</option>
+                                        <option value="electricity">⚡ Electricity Bill</option>
+                                        <option value="staff">👨‍💼 Staff Salary</option>
+                                        <option value="other">📋 Other Expenses</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Amount <span class="text-red-500">*</span></label>
+                                    <input type="number" id="expenseAmount" placeholder="Enter amount" step="0.01" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Date <span class="text-red-500">*</span></label>
+                                    <input type="date" id="expenseDate" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium mb-1.5">Description</label>
+                                    <input type="text" id="expenseDescription" placeholder="Brief description" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                </div>
+                            </div>
+                            <div class="category-field-transition" id="otherCategoryField">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-medium mb-1.5">Custom Category Name <span class="text-red-500">*</span></label>
+                                        <input type="text" id="otherCategoryName" placeholder="e.g., Stationery, Repair, etc." class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sm:col-span-4 mt-3">
+                                <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 btn-active">
+                                    <i class="fas fa-save"></i> Add Expense
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Expenses List -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                        <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex justify-between items-center flex-wrap gap-2">
+                            <h3 class="text-sm font-semibold"><i class="fas fa-list text-primary mr-2"></i>All Expenses</h3>
+                            <button id="exportExpenseBtn" class="bg-success hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 transition btn-active">
+                                <i class="fas fa-download text-xs"></i> Export CSV
+                            </button>
+                        </div>
+
+                        <div class="px-4 py-3 border-b flex flex-col sm:flex-row justify-between items-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <span class="filter-label">Show</span>
+                                <select id="expensePerPage" class="filter-select">
+                                    <option value="10" selected>10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <span class="filter-label">entries</span>
+                                <span class="text-xs text-gray-400 ml-2">|</span>
+                                <span class="text-xs text-gray-500">Showing <span id="expensePageStart">0</span> - <span id="expensePageEnd">0</span> of <span id="expenseTotalEntries">0</span></span>
+                            </div>
+                            <div class="relative w-full sm:w-64 filter-wrapper">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="expenseSearch" placeholder="Search expenses..." class="filter-input">
+                                <span class="filter-clear-btn" id="clearExpenseSearch"><i class="fas fa-times-circle"></i></span>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[850px]">
+                                <thead class="bg-gray-50 dark:bg-gray-700/50 border-b">
+                                    <tr>
+                                        <th class="px-3 py-3 text-center text-[10px] font-semibold uppercase w-[50px]">#</th>
+                                        <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Date</th>
+                                        <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Category</th>
+                                        <th class="px-3 py-3 text-left text-[10px] font-semibold uppercase">Description</th>
+                                        <th class="px-3 py-3 text-right text-[10px] font-semibold uppercase">Amount</th>
+                                        <th class="px-3 py-3 text-center text-[10px] font-semibold uppercase">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expenseTableBody">
+                                    <tr><td colspan="6" class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="px-4 py-3 border-t flex justify-between items-center flex-wrap gap-2">
+                            <div class="text-xs text-gray-500">Page <span id="expensePageInfo">1</span> of <span id="expenseTotalPages">1</span></div>
+                            <div class="flex gap-1">
+                                <button id="expensePrevPage" class="pagination-btn" disabled><i class="fas fa-chevron-left text-[10px]"></i> Prev</button>
+                                <button id="expenseNextPage" class="pagination-btn" disabled>Next <i class="fas fa-chevron-right text-[10px]"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                    <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span>
+                        <span class="text-gray-300 dark:border-gray-600">|</span>
+                        <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                    </p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Edit Expense Modal -->
+    <div id="editExpenseModal" class="modal-overlay hidden">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl modal-animate">
+            <div class="flex justify-between items-center px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="font-semibold text-gray-800 dark:text-white"><i class="fas fa-edit text-primary mr-2"></i>Edit Expense</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="editExpenseForm" class="p-5 space-y-4">
+                <input type="hidden" id="editExpenseId">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Category <span class="text-red-500">*</span></label>
+                    <select id="editExpenseCategory" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                        <option value="rent">🏢 Office Rent</option>
+                        <option value="electricity">⚡ Electricity Bill</option>
+                        <option value="staff">👨‍💼 Staff Salary</option>
+                        <option value="other">📋 Other Expenses</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Amount <span class="text-red-500">*</span></label>
+                    <input type="number" id="editExpenseAmount" step="0.01" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Date <span class="text-red-500">*</span></label>
+                    <input type="date" id="editExpenseDate" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
+                    <input type="text" id="editExpenseDescription" class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                </div>
+                <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i> Update Expense
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Categories Modal -->
+    <div id="manageCategoriesModal" class="modal-overlay hidden">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl modal-animate">
+            <div class="flex justify-between items-center px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="font-semibold text-gray-800 dark:text-white"><i class="fas fa-tags text-primary mr-2"></i>Manage Categories</h3>
+                <button onclick="closeCategoriesModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-5">
+                <div class="mb-4">
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Add New Category</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="newCategoryName" placeholder="Enter category name" class="flex-1 px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                        <button id="addCategoryBtn" class="bg-primary hover:bg-primary-dark text-white px-4 py-2.5 rounded-xl text-sm font-medium transition flex items-center gap-2 btn-active">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Custom Categories</p>
+                    <div id="categoryList" class="max-h-[250px] overflow-y-auto">
+                        <div class="text-center py-4 text-gray-400 text-sm">Loading categories...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Category Modal -->
+    <div id="editCategoryModal" class="modal-overlay hidden">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl modal-animate">
+            <div class="flex justify-between items-center px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="font-semibold text-gray-800 dark:text-white"><i class="fas fa-edit text-primary mr-2"></i>Edit Category</h3>
+                <button onclick="closeEditCategoryModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <form id="editCategoryForm" class="p-5 space-y-4">
+                <input type="hidden" id="editCategoryId">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Category Name <span class="text-red-500">*</span></label>
+                    <input type="text" id="editCategoryName" required class="w-full px-3 py-2.5 text-sm border rounded-xl dark:bg-gray-800 focus:ring-2 focus:ring-primary/50">
+                </div>
+                <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i> Update Category
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal-overlay hidden">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 text-center modal-animate max-w-sm">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <i class="fas fa-exclamation-triangle text-orange-500 text-xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 dark:text-white mb-2" id="confirmationTitle">Confirm Action</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4" id="confirmationMessage">Are you sure you want to perform this action?</p>
+            <div class="flex gap-3 justify-center">
+                <button id="confirmationCancelBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition">Cancel</button>
+                <button id="confirmationConfirmBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-red-500 text-white hover:bg-red-600 transition">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+    <div id="logoutModal" class="modal-overlay hidden">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 text-center modal-animate max-w-sm">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <i class="fas fa-sign-out-alt text-orange-500 text-xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Are you sure you want to logout?</p>
+            <div class="flex gap-3 justify-center">
+                <button id="cancelLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition">Cancel</button>
+                <button id="confirmLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-red-500 text-white hover:bg-red-600 transition">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkAuthState, logout } from './js/auth.js';
+        import { 
+            db, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            doc, 
+            updateDoc, 
+            deleteDoc, 
+            query, 
+            orderBy, 
+            Timestamp,
+            where
+        } from './js/firebase.js';
+        checkAuthState();
+
+        // ==================== STATE ====================
+        let allExpenses = [];
+        let filteredExpenses = [];
+        let expensePage = 1;
+        let expensePageSize = 10;
+        let customCategories = [];
+        let categoryUsageCount = {};
+
+        const defaultCategories = {
+            rent: { label: 'Office Rent', icon: '🏢', class: 'expense-rent' },
+            electricity: { label: 'Electricity Bill', icon: '⚡', class: 'expense-electricity' },
+            staff: { label: 'Staff Salary', icon: '👨‍💼', class: 'expense-staff' },
+            other: { label: 'Other Expenses', icon: '📋', class: 'expense-other' }
+        };
+
+        // ==================== UTILITIES ====================
+        function showToast(msg, type = 'success') {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = `px-4 py-2 rounded-lg shadow text-sm ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+            t.innerText = msg;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+        }
+
+        function getTodayDate() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        // ==================== CONFIRMATION MODAL ====================
+        function showConfirmationModal(title, message, onConfirm) {
+            const modal = document.getElementById('confirmationModal');
+            document.getElementById('confirmationTitle').textContent = title;
+            document.getElementById('confirmationMessage').textContent = message;
+            modal.classList.remove('hidden');
+
+            const cancelBtn = document.getElementById('confirmationCancelBtn');
+            const confirmBtn = document.getElementById('confirmationConfirmBtn');
+
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+            newCancelBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+
+            newConfirmBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                if (typeof onConfirm === 'function') onConfirm();
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        }
+
+        // ==================== CATEGORY FUNCTIONS ====================
+        async function loadCategories() {
+            try {
+                const q = query(collection(db, 'categories'), orderBy('name', 'asc'));
+                const snap = await getDocs(q);
+                customCategories = [];
+                categoryUsageCount = {};
+                
+                snap.forEach(d => {
+                    const data = d.data();
+                    customCategories.push({
+                        id: d.id,
+                        name: data.name,
+                        createdAt: data.createdAt
+                    });
+                });
+
+                // Count usage for each category
+                await countCategoryUsage();
+                renderCategoryList();
+                updateCategoryDropdowns();
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                document.getElementById('categoryList').innerHTML = 
+                    '<div class="text-center py-4 text-red-500 text-sm">Error loading categories</div>';
+            }
+        }
+
+        async function countCategoryUsage() {
+            try {
+                const expensesSnap = await getDocs(collection(db, 'expenses'));
+                categoryUsageCount = {};
+                expensesSnap.forEach(d => {
+                    const data = d.data();
+                    const category = data.category;
+                    if (category && !defaultCategories[category]) {
+                        categoryUsageCount[category] = (categoryUsageCount[category] || 0) + 1;
+                    }
+                });
+            } catch (error) {
+                console.error('Error counting category usage:', error);
+            }
+        }
+
+        async function addCategory(name) {
+            try {
+                const docRef = await addDoc(collection(db, 'categories'), {
+                    name: name.trim(),
+                    createdAt: Timestamp.now()
+                });
+                showToast('Category added successfully!');
+                await loadCategories();
+                return docRef;
+            } catch (error) {
+                showToast('Error adding category: ' + error.message, 'error');
+                throw error;
+            }
+        }
+
+        async function updateCategory(id, newName) {
+            try {
+                await updateDoc(doc(db, 'categories', id), {
+                    name: newName.trim()
+                });
+                showToast('Category updated successfully!');
+                await loadCategories();
+            } catch (error) {
+                showToast('Error updating category: ' + error.message, 'error');
+                throw error;
+            }
+        }
+
+        async function deleteCategory(id) {
+            try {
+                // Check if category is in use
+                const category = customCategories.find(c => c.id === id);
+                if (category) {
+                    const usage = categoryUsageCount[category.name] || 0;
+                    if (usage > 0) {
+                        showToast(`Cannot delete "${category.name}" - it's used in ${usage} expense(s)`, 'error');
+                        return;
+                    }
+                }
+                
+                await deleteDoc(doc(db, 'categories', id));
+                showToast('Category deleted successfully!');
+                await loadCategories();
+            } catch (error) {
+                showToast('Error deleting category: ' + error.message, 'error');
+                throw error;
+            }
+        }
+
+        function renderCategoryList() {
+            const container = document.getElementById('categoryList');
+            if (customCategories.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400 text-sm">
+                        <i class="fas fa-inbox text-2xl block mb-2 opacity-40"></i>
+                        No custom categories added yet
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = customCategories.map(cat => {
+                const usage = categoryUsageCount[cat.name] || 0;
+                return `
+                    <div class="category-item">
+                        <div>
+                            <span class="cat-name">${escapeHtml(cat.name)}</span>
+                            <span class="cat-count ml-2">(${usage} expense${usage !== 1 ? 's' : ''})</span>
+                        </div>
+                        <div class="flex gap-1">
+                            <button class="edit-category-btn text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50 transition" data-id="${cat.id}" data-name="${escapeHtml(cat.name)}" title="Edit category">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-category-btn text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition" data-id="${cat.id}" data-name="${escapeHtml(cat.name)}" title="Delete category">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Edit category buttons
+            document.querySelectorAll('.edit-category-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.dataset.id;
+                    const name = btn.dataset.name;
+                    openEditCategoryModal(id, name);
+                });
+            });
+
+            // Delete category buttons
+            document.querySelectorAll('.delete-category-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.dataset.id;
+                    const name = btn.dataset.name;
+                    showConfirmationModal(
+                        'Delete Category',
+                        `Are you sure you want to delete the category "${name}"? ${categoryUsageCount[name] > 0 ? `It's used in ${categoryUsageCount[name]} expense(s).` : ''}`,
+                        () => deleteCategory(id)
+                    );
+                });
+            });
+        }
+
+        function updateCategoryDropdowns() {
+            const selects = ['expenseCategory', 'editExpenseCategory'];
+            selects.forEach(id => {
+                const select = document.getElementById(id);
+                if (!select) return;
+                const currentValue = select.value;
+                
+                // Keep default options
+                const defaultValues = ['rent', 'electricity', 'staff', 'other'];
+                const defaultOptions = [];
+                select.querySelectorAll('option').forEach(opt => {
+                    if (defaultValues.includes(opt.value)) {
+                        defaultOptions.push(opt);
+                    }
+                });
+                
+                // Clear all options except defaults
+                select.innerHTML = '';
+                defaultOptions.forEach(opt => select.appendChild(opt));
+                
+                // Add custom categories
+                customCategories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.name;
+                    opt.textContent = `📌 ${cat.name}`;
+                    select.appendChild(opt);
+                });
+                
+                // Restore selected value if it exists
+                if (currentValue && (defaultValues.includes(currentValue) || customCategories.some(c => c.name === currentValue))) {
+                    select.value = currentValue;
+                }
+            });
+        }
+
+        // ==================== EDIT CATEGORY MODAL ====================
+        function openEditCategoryModal(id, name) {
+            document.getElementById('editCategoryId').value = id;
+            document.getElementById('editCategoryName').value = name;
+            document.getElementById('editCategoryModal').classList.remove('hidden');
+        }
+
+        window.closeEditCategoryModal = function() {
+            document.getElementById('editCategoryModal').classList.add('hidden');
+        };
+
+        document.getElementById('editCategoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editCategoryId').value;
+            const name = document.getElementById('editCategoryName').value.trim();
+            
+            if (!name) {
+                showToast('Please enter a category name', 'error');
+                return;
+            }
+            
+            // Check if name already exists (excluding current category)
+            if (customCategories.some(c => c.id !== id && c.name.toLowerCase() === name.toLowerCase())) {
+                showToast('Category name already exists', 'error');
+                return;
+            }
+            
+            await updateCategory(id, name);
+            closeEditCategoryModal();
+        });
+
+        // ==================== CATEGORY FIELD TOGGLE ====================
+        document.getElementById('expenseCategory').addEventListener('change', function() {
+            const field = document.getElementById('otherCategoryField');
+            if (this.value === 'other') {
+                field.classList.add('open');
+            } else {
+                field.classList.remove('open');
+                document.getElementById('otherCategoryName').value = '';
+            }
+        });
+
+        // ==================== EXPENSE FUNCTIONS ====================
+        async function loadExpenses() {
+            try {
+                const q = query(collection(db, 'expenses'), orderBy('date', 'desc'));
+                const snap = await getDocs(q);
+                allExpenses = [];
+                snap.forEach(d => {
+                    const data = d.data();
+                    allExpenses.push({
+                        id: d.id,
+                        category: data.category || 'other',
+                        customCategory: data.customCategory || '',
+                        amount: data.amount || 0,
+                        date: data.date || '',
+                        description: data.description || '',
+                        createdAt: data.createdAt || ''
+                    });
+                });
+                applyExpenseFilters();
+            } catch (error) {
+                console.error('Error loading expenses:', error);
+                document.getElementById('expenseTableBody').innerHTML = '<tr><td colspan="6" class="text-center py-8 text-red-500 text-sm">Error loading data</td></tr>';
+            }
+        }
+
+        function applyExpenseFilters() {
+            const search = document.getElementById('expenseSearch').value.toLowerCase().trim();
+            if (!search) {
+                filteredExpenses = [...allExpenses];
+            } else {
+                filteredExpenses = allExpenses.filter(e => 
+                    e.category.toLowerCase().includes(search) ||
+                    e.customCategory.toLowerCase().includes(search) ||
+                    e.description.toLowerCase().includes(search) ||
+                    e.date.includes(search)
+                );
+            }
+            expensePage = 1;
+            renderExpenseTable();
+        }
+
+        function renderExpenseTable() {
+            const totalEntries = filteredExpenses.length;
+            const totalPages = Math.ceil(totalEntries / expensePageSize) || 1;
+            const start = (expensePage - 1) * expensePageSize;
+            const end = Math.min(start + expensePageSize, totalEntries);
+            const pageData = filteredExpenses.slice(start, end);
+
+            document.getElementById('expensePageStart').textContent = totalEntries ? start + 1 : 0;
+            document.getElementById('expensePageEnd').textContent = end;
+            document.getElementById('expenseTotalEntries').textContent = totalEntries;
+            document.getElementById('expensePageInfo').textContent = expensePage;
+            document.getElementById('expenseTotalPages').textContent = totalPages;
+            document.getElementById('expensePrevPage').disabled = expensePage === 1;
+            document.getElementById('expenseNextPage').disabled = expensePage >= totalPages;
+
+            const tbody = document.getElementById('expenseTableBody');
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400 text-sm">No expenses found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = pageData.map((e, index) => {
+                const serial = start + index + 1;
+                const isCustom = e.category !== 'rent' && e.category !== 'electricity' && e.category !== 'staff' && e.category !== 'other';
+                let displayCategory = isCustom ? e.category : (e.customCategory || defaultCategories[e.category]?.label || e.category);
+                let categoryClass = isCustom || e.customCategory ? 'expense-other' : (defaultCategories[e.category]?.class || 'expense-other');
+                
+                return `
+                <tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-700/50 table-row-hover transition-colors">
+                    <td class="px-3 py-2.5 text-center text-xs font-medium text-gray-500">${serial}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(e.date)}</td>
+                    <td class="px-3 py-2.5 text-sm"><span class="expense-category-badge ${categoryClass}">${escapeHtml(displayCategory)}</span></td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(e.description || '-')}</td>
+                    <td class="px-3 py-2.5 text-right text-sm font-bold text-red-600">৳${e.amount.toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-center">
+                        <button class="edit-expense-btn text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50 transition" data-id="${e.id}" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-expense-btn text-red-600 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-50 transition" data-id="${e.id}" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `}).join('');
+
+            document.querySelectorAll('.edit-expense-btn').forEach(btn => {
+                btn.addEventListener('click', () => openEditModal(btn.dataset.id));
+            });
+
+            document.querySelectorAll('.delete-expense-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const expenseId = btn.dataset.id;
+                    const expense = allExpenses.find(e => e.id === expenseId);
+                    showConfirmationModal(
+                        'Delete Expense',
+                        `Are you sure you want to delete this expense of ৳${expense?.amount.toFixed(2) || ''}?`,
+                        async () => {
+                            await deleteDoc(doc(db, 'expenses', expenseId));
+                            showToast('Expense deleted');
+                            loadExpenses();
+                        }
+                    );
+                });
+            });
+        }
+
+        // ==================== EDIT EXPENSE MODAL ====================
+        function openEditModal(id) {
+            const expense = allExpenses.find(e => e.id === id);
+            if (!expense) return;
+            document.getElementById('editExpenseId').value = id;
+            document.getElementById('editExpenseCategory').value = expense.category;
+            document.getElementById('editExpenseAmount').value = expense.amount;
+            document.getElementById('editExpenseDate').value = expense.date;
+            document.getElementById('editExpenseDescription').value = expense.description || '';
+            document.getElementById('editExpenseModal').classList.remove('hidden');
+        }
+
+        window.closeEditModal = function() {
+            document.getElementById('editExpenseModal').classList.add('hidden');
+        };
+
+        document.getElementById('editExpenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editExpenseId').value;
+            const category = document.getElementById('editExpenseCategory').value;
+            const amount = parseFloat(document.getElementById('editExpenseAmount').value);
+            const date = document.getElementById('editExpenseDate').value;
+            const description = document.getElementById('editExpenseDescription').value.trim();
+
+            if (!amount || !date) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            try {
+                await updateDoc(doc(db, 'expenses', id), {
+                    category,
+                    amount,
+                    date,
+                    description: description || ''
+                });
+                showToast('Expense updated!');
+                closeEditModal();
+                loadExpenses();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        // ==================== FORM SUBMISSIONS ====================
+        document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const category = document.getElementById('expenseCategory').value;
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const date = document.getElementById('expenseDate').value;
+            const description = document.getElementById('expenseDescription').value.trim();
+            const customCategory = document.getElementById('otherCategoryName').value.trim();
+
+            if (!amount || !date) {
+                showToast('Please fill required fields', 'error');
+                return;
+            }
+
+            const isCustom = category !== 'rent' && category !== 'electricity' && category !== 'staff' && category !== 'other';
+            let finalCategory = category;
+            let finalCustomCategory = '';
+
+            if (category === 'other') {
+                if (!customCategory) {
+                    showToast('Please enter a custom category name', 'error');
+                    return;
+                }
+                // Check if category exists, if not add it
+                const exists = customCategories.some(c => c.name.toLowerCase() === customCategory.toLowerCase());
+                if (!exists) {
+                    await addCategory(customCategory);
+                }
+                finalCustomCategory = customCategory;
+            } else if (isCustom) {
+                finalCategory = category;
+            }
+
+            try {
+                await addDoc(collection(db, 'expenses'), {
+                    category: finalCategory,
+                    customCategory: finalCustomCategory,
+                    amount: amount,
+                    date: date,
+                    description: description || '',
+                    createdAt: Timestamp.now()
+                });
+                showToast('Expense added successfully!');
+                document.getElementById('expenseForm').reset();
+                document.getElementById('expenseDate').value = getTodayDate();
+                document.getElementById('otherCategoryField').classList.remove('open');
+                loadExpenses();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        });
+
+        // ==================== EXPORT CSV ====================
+        function exportExpenseCSV() {
+            if (filteredExpenses.length === 0) { showToast('No data to export', 'error'); return; }
+            let rows = ['"SL","Date","Category","Description","Amount"'];
+            filteredExpenses.forEach((e, i) => {
+                const cat = e.customCategory || defaultCategories[e.category]?.label || e.category;
+                rows.push(`"${i+1}","${e.date}","${cat}","${e.description.replace(/"/g,'""')}","${e.amount.toFixed(2)}"`);
+            });
+            const blob = new Blob(['\uFEFF' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `expenses_${getTodayDate()}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Exported ${filteredExpenses.length} expenses`);
+        }
+
+        document.getElementById('exportExpenseBtn').addEventListener('click', exportExpenseCSV);
+
+        // ==================== CATEGORY MODAL EVENTS ====================
+        document.getElementById('manageCategoriesBtn').addEventListener('click', () => {
+            document.getElementById('manageCategoriesModal').classList.remove('hidden');
+            loadCategories();
+        });
+
+        window.closeCategoriesModal = function() {
+            document.getElementById('manageCategoriesModal').classList.add('hidden');
+        };
+
+        document.getElementById('addCategoryBtn').addEventListener('click', async () => {
+            const input = document.getElementById('newCategoryName');
+            const name = input.value.trim();
+            if (!name) {
+                showToast('Please enter a category name', 'error');
+                return;
+            }
+            if (customCategories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+                showToast('Category already exists', 'error');
+                return;
+            }
+            await addCategory(name);
+            input.value = '';
+        });
+
+        document.getElementById('newCategoryName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('addCategoryBtn').click();
+            }
+        });
+
+        // ==================== EVENT LISTENERS ====================
+        document.getElementById('expenseSearch').addEventListener('input', applyExpenseFilters);
+        document.getElementById('clearExpenseSearch').addEventListener('click', () => {
+            const input = document.getElementById('expenseSearch');
+            input.value = '';
+            input.classList.remove('has-value');
+            applyExpenseFilters();
+        });
+
+        document.getElementById('expensePerPage').addEventListener('change', (e) => {
+            expensePageSize = parseInt(e.target.value);
+            expensePage = 1;
+            renderExpenseTable();
+        });
+
+        document.getElementById('expensePrevPage').addEventListener('click', () => {
+            if (expensePage > 1) { expensePage--; renderExpenseTable(); }
+        });
+        document.getElementById('expenseNextPage').addEventListener('click', () => {
+            const total = Math.ceil(filteredExpenses.length / expensePageSize);
+            if (expensePage < total) { expensePage++; renderExpenseTable(); }
+        });
+
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            loadExpenses();
+            loadCategories();
+            showToast('Refreshed');
+        });
+
+        // ==================== SIDEBAR ====================
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            if (window.innerWidth < 768) {
+                const overlay = document.createElement('div');
+                overlay.id = 'sidebarOverlay';
+                overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
+                overlay.onclick = closeSidebar;
+                document.body.appendChild(overlay);
+            }
+        }
+
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (overlay) overlay.remove();
+        }
+
+        menuToggle.addEventListener('click', openSidebar);
+        closeSidebarBtn.addEventListener('click', closeSidebar);
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('-translate-x-full');
+                const overlay = document.getElementById('sidebarOverlay');
+                if (overlay) overlay.remove();
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
+
+        if (window.innerWidth >= 768) {
+            sidebar.classList.remove('-translate-x-full');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+        }
+
+        document.querySelectorAll('.has-submenu').forEach(m => {
+            const a = m.querySelector('a');
+            a?.addEventListener('click', (e) => {
+                e.preventDefault();
+                m.classList.toggle('open');
+                m.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        });
+
+        // ==================== DARK MODE ====================
+        document.getElementById('darkModeToggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+        });
+
+        // ==================== LOGOUT ====================
+        document.getElementById('logoutLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('logoutModal').classList.remove('hidden');
+        });
+
+        document.getElementById('cancelLogoutBtn').addEventListener('click', () => {
+            document.getElementById('logoutModal').classList.add('hidden');
+        });
+
+        document.getElementById('confirmLogoutBtn').addEventListener('click', async () => {
+            document.getElementById('logoutModal').classList.add('hidden');
+            await logout();
+        });
+
+        // ==================== INIT ====================
+        document.getElementById('footerYear').textContent = new Date().getFullYear();
+        document.getElementById('expenseDate').value = getTodayDate();
+        
+        await loadCategories();
+        await loadExpenses();
+    </script>
+</body>
+</html>

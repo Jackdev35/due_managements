@@ -1231,6 +1231,55 @@
             document.body.classList.add('modal-open');
         }
         
+        // Export Suppliers to CSV
+        function exportSuppliersToCSV() {
+            if (allSuppliers.length === 0) {
+                showToast('No suppliers to export', 'error');
+                return;
+            }
+            
+            // Helper to escape CSV fields
+            const escapeCSV = (str) => {
+                if (str === null || str === undefined) return '""';
+                const string = String(str);
+                if (string.includes(',') || string.includes('"') || string.includes('\n')) {
+                    return `"${string.replace(/"/g, '""')}"`;
+                }
+                return string;
+            };
+            
+            // Define CSV headers
+            const headers = ['SL', 'Name', 'Contact Person', 'Phone', 'Address'];
+            
+            // Create CSV rows
+            const rows = allSuppliers.map((supplier, index) => [
+                index + 1,
+                escapeCSV(supplier.name || ''),
+                escapeCSV(supplier.contactPerson || ''),
+                escapeCSV(supplier.phone || ''),
+                escapeCSV(supplier.address || '')
+            ]);
+            
+            // Combine headers and rows
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.join(','))
+            ].join('\n');
+            
+            // Add BOM for UTF-8 (helps Excel recognize UTF-8)
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = `suppliers_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showToast(`Exported ${allSuppliers.length} suppliers successfully!`);
+        }
+        
         // ==================== EVENT LISTENERS ====================
         document.getElementById('addCourierBtn')?.addEventListener('click', () => openCourierModal());
         document.getElementById('saveCourierBtn')?.addEventListener('click', saveCourierRecord);
@@ -1280,7 +1329,9 @@
             }
         });
         
-        document.getElementById('exportSupplierBtn')?.addEventListener('click', () => showToast('Export CSV ready', 'success'));
+        // Export Button - Now with full functionality
+        document.getElementById('exportSupplierBtn')?.addEventListener('click', exportSuppliersToCSV);
+        
         document.getElementById('refreshBtn')?.addEventListener('click', () => {
             loadSuppliers();
             loadCouriers();

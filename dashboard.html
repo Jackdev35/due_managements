@@ -15,10 +15,6 @@
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
-    </script>
-
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com">
     </script>
@@ -55,7 +51,6 @@
             font-family: 'Inter', system-ui, sans-serif;
         }
 
-        /* Hide scrollbar in sidebar navigation */
         .sidebar-nav-fixed {
             flex: 1;
             overflow-y: auto;
@@ -97,18 +92,6 @@
         }
         .has-submenu.open>a .chevron-icon {
             transform: rotate(180deg);
-        }
-
-        @keyframes softPulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.6);
-            }
-            70% {
-                box-shadow: 0 0 0 6px rgba(212, 175, 55, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
-            }
         }
 
         @keyframes modalSlideUp {
@@ -195,7 +178,6 @@
             background: transparent;
         }
 
-        /* Fix for recent activity - use full height */
         .activity-container {
             height: 100%;
             display: flex;
@@ -222,7 +204,6 @@
             background: #374151;
         }
 
-        /* Notification badge count */
         .notification-count {
             position: absolute;
             top: -4px;
@@ -245,7 +226,6 @@
             border-color: #1f2937;
         }
 
-        /* ========== NOTIFICATION DROPDOWN ========== */
         .notification-dropdown {
             position: absolute;
             top: calc(100% + 8px);
@@ -474,13 +454,11 @@
             }
         }
 
-        /* Notification bell wrapper */
         .notif-wrapper {
             position: relative;
             display: inline-block;
         }
 
-        /* Border left for notification items */
         .notif-border-due {
             border-left: 3px solid #dc2626;
         }
@@ -488,7 +466,6 @@
             border-left: 3px solid #16a34a;
         }
 
-        /* Clock Styles */
         .live-clock {
             font-size: 12px;
             font-weight: 500;
@@ -588,7 +565,7 @@
                     <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
                     </a>
-                    <!--============ Warranty Submenu  ==================-->
+
                     <div class="has-submenu" id="warrantySubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                             <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
@@ -645,28 +622,23 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <!-- Live Clock - 12 Hour Format -->
                         <div class="live-clock" id="liveClock">
                             <i class="far fa-clock"></i>
                             <span class="clock-time" id="clockDisplay">--:--:--</span>
                             <span class="clock-ampm" id="ampmDisplay">AM</span>
                         </div>
 
-                        <!-- Notification Bell with Dropdown -->
                         <div class="notif-wrapper">
                             <button id="notificationBell" class="relative p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
                                 <i class="far fa-bell text-base"></i>
                                 <span id="notificationBadge" class="notification-count hidden">0</span>
                             </button>
-                            <!-- Notification Dropdown -->
                             <div id="notificationDropdown" class="notification-dropdown">
                                 <div class="notification-dropdown-header">
                                     <h4><i class="far fa-bell mr-2 text-accent"></i>Notifications</h4>
                                     <span class="mark-all-btn" id="markAllReadBtn">Mark all read</span>
                                 </div>
-                                <div id="notificationList" class="notification-list">
-                                    <!-- Notifications will be loaded dynamically -->
-                                </div>
+                                <div id="notificationList" class="notification-list"></div>
                                 <div class="notification-dropdown-footer">
                                     <a href="notifications.html" id="seeMoreNotifications"><i class="fas fa-arrow-right mr-1"></i> See more notifications</a>
                                 </div>
@@ -697,7 +669,7 @@
                     </div>
                     <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm stat-card">
                         <div class="flex items-center justify-between"><div class="bg-emerald-50 dark:bg-emerald-900/20 w-9 h-9 rounded-xl flex items-center justify-center"><i class="fas fa-wallet text-emerald-600 dark:text-emerald-400 text-sm"></i></div><span class="text-[10px] font-medium text-gray-400">revenue</span></div>
-                        <div><h3 class="text-gray-500 dark:text-gray-400 text-[11px] font-semibold">Collections</h3><p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalCollections">৳0</p></div>
+                        <div><h3 class="text-gray-500 dark:text-gray-400 text-[11px] font-semibold">Total Collections</h3><p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalCollections">৳0</p></div>
                     </div>
                     <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm stat-card">
                         <div class="flex items-center justify-between"><div class="bg-amber-50 dark:bg-amber-900/20 w-9 h-9 rounded-xl flex items-center justify-center"><i class="fas fa-calendar-day text-amber-600 dark:text-amber-400 text-sm"></i></div><span class="text-[10px] font-medium text-gray-400">today</span></div>
@@ -705,31 +677,7 @@
                     </div>
                     <div class="bg-white dark:bg-gray-800 rounded-2xl p-3 border border-gray-100 dark:border-gray-700 shadow-sm stat-card">
                         <div class="flex items-center justify-between"><div class="bg-purple-50 dark:bg-purple-900/20 w-9 h-9 rounded-xl flex items-center justify-center"><i class="fas fa-file-invoice-dollar text-purple-600 dark:text-purple-400 text-sm"></i></div><span class="text-[10px] font-medium text-gray-400">total due entry</span></div>
-                        <div><h3 class="text-gray-500 dark:text-gray-400 text-[11px] font-semibold">Total Due Entry</h3><p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalInvoiceValue">৳0</p></div>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
-                    <div class="space-y-4">
-                        <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
-                            <div class="flex justify-between items-center mb-3"><h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-chart-line text-primary mr-2"></i>Monthly Due Trend</h3><span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">current year</span></div>
-                            <canvas id="dueChart" style="max-height: 180px;"></canvas>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
-                            <div class="flex justify-between items-center mb-3"><h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-chart-line text-amber-600 mr-2"></i>Daily Due (Last 7 Days)</h3><span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">realtime</span></div>
-                            <canvas id="dailyDueChart" style="max-height: 160px;"></canvas>
-                        </div>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
-                            <div class="flex justify-between items-center mb-3"><h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-chart-line text-emerald-600 mr-2"></i>Daily Collection (Current Month)</h3><span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">realtime</span></div>
-                            <canvas id="collectionChart" style="max-height: 180px;"></canvas>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm">
-                            <div class="flex justify-between items-center mb-3"><h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200"><i class="fas fa-chart-bar text-primary mr-2"></i>Monthly Collection</h3><span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">current year</span></div>
-                            <canvas id="monthlyCollectionChart" style="max-height: 160px;"></canvas>
-                        </div>
+                        <div><h3 class="text-gray-500 dark:text-gray-400 text-[11px] font-semibold">Total Due Entry</h3><p class="text-2xl font-bold text-gray-800 dark:text-white" id="totalDueEntry">৳0</p></div>
                     </div>
                 </div>
 
@@ -817,14 +765,10 @@
         </div>
     </div>
 
-    <!-- ============ SCRIPTS SECTION ============ -->
-
-    <!-- MAIN DASHBOARD SCRIPTS - AUTO REFRESH DISABLED -->
     <script type="module">
         import { db, collection, getDocs, query, orderBy, limit } from './js/firebase.js';
         import { logout } from './js/auth.js';
 
-        let dueChart, dailyDueChart, collectionChart, monthlyCollectionChart;
         let statsCache = null;
         let customerNameMap = new Map();
         let allTransactions = [];
@@ -968,28 +912,43 @@
             try {
                 if (customerNameMap.size === 0) await loadCustomerNames();
 
-                const transactionsSnap = await getDocs(query(collection(db, 'transactions'), orderBy('date', 'desc'), limit(200)));
+                // ✅ FIX: Load ALL transactions (no limit) for accurate total due entry
+                const transactionsSnap = await getDocs(collection(db, 'transactions'));
                 allTransactions = [];
                 transactionsSnap.forEach(d => {
                     allTransactions.push({ id: d.id, ...d.data() });
                 });
 
                 // Calculate stats
-                let totalDue = 0,
-                    totalInvoiceValue = 0,
-                    totalCollections = 0;
+                let totalDueFromCustomers = 0;
+                let totalCollections = 0;
+                let totalDueEntry = 0;
+
+                // ✅ FIX: Get Total Due from CUSTOMERS collection (not transactions)
                 const customersSnap = await getDocs(collection(db, 'customers'));
-                customersSnap.forEach(d => { totalDue += (d.data().totalDue || 0); });
-                allTransactions.forEach(t => {
-                    if (t.type === 'due') totalInvoiceValue += (t.dueAmount || t.totalAmount || 0);
-                    else if (t.type === 'collection') totalCollections += (t.collectionAmount || 0);
+                customersSnap.forEach(d => {
+                    totalDueFromCustomers += (d.data().totalDue || 0);
                 });
 
-                statsCache = { totalCustomers: customersSnap.size, totalDue, totalInvoiceValue, totalCollections };
+                // Get total collections and total due entry from transactions
+                allTransactions.forEach(t => {
+                    if (t.type === 'collection') {
+                        totalCollections += (t.collectionAmount || 0);
+                    } else if (t.type === 'due') {
+                        totalDueEntry += (t.dueAmount || t.totalAmount || 0);
+                    }
+                });
+
+                statsCache = {
+                    totalCustomers: customersSnap.size,
+                    totalDue: totalDueFromCustomers,
+                    totalDueEntry: totalDueEntry,
+                    totalCollections: totalCollections
+                };
 
                 document.getElementById('totalCustomers').textContent = statsCache.totalCustomers || 0;
                 document.getElementById('totalDue').textContent = '৳' + (statsCache.totalDue || 0).toFixed(2);
-                document.getElementById('totalInvoiceValue').textContent = '৳' + (statsCache.totalInvoiceValue || 0).toFixed(2);
+                document.getElementById('totalDueEntry').textContent = '৳' + (statsCache.totalDueEntry || 0).toFixed(2);
                 document.getElementById('totalCollections').textContent = '৳' + (statsCache.totalCollections || 0).toFixed(2);
 
                 const today = new Date().toISOString().split('T')[0];
@@ -1000,7 +959,6 @@
                 document.getElementById('todayCollection').textContent = '৳' + todayCollection.toFixed(2);
 
                 await Promise.all([
-                    loadCharts(),
                     loadRecentTransactions(),
                     loadRecentCollection(),
                     updateRatio(),
@@ -1013,98 +971,6 @@
             } finally {
                 isDataLoading = false;
             }
-        }
-
-        // ─── Charts ───
-        async function loadCharts() {
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const dueData = new Array(12).fill(0);
-            const monthlyCollData = new Array(12).fill(0);
-
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
-            const lastYearStr = new Date(year - 1, 11, 31).toISOString().split('T')[0];
-
-            const dayLabels = [];
-            const dailyDueData = [];
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date(now);
-                d.setDate(d.getDate() - i);
-                dayLabels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-                dailyDueData.push(0);
-            }
-
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const dailyCollLabels = [];
-            const dailyCollData = [];
-            for (let d = 1; d <= daysInMonth; d++) {
-                dailyCollLabels.push(d.toString());
-                dailyCollData.push(0);
-            }
-
-            allTransactions.forEach(t => {
-                if (!t.date) return;
-
-                if (t.date >= lastYearStr) {
-                    const m = new Date(t.date).getMonth();
-                    if (t.type === 'due') dueData[m] += (t.dueAmount || t.totalAmount || 0);
-                    else if (t.type === 'collection') monthlyCollData[m] += (t.collectionAmount || 0);
-                }
-
-                if (t.type === 'due') {
-                    const txDate = new Date(t.date);
-                    const diff = Math.floor((now - txDate) / (1000 * 60 * 60 * 24));
-                    if (diff >= 0 && diff <= 6) {
-                        dailyDueData[6 - diff] += (t.dueAmount || t.totalAmount || 0);
-                    }
-                }
-
-                if (t.type === 'collection') {
-                    const txDate = new Date(t.date);
-                    if (txDate.getFullYear() === year && txDate.getMonth() === month) {
-                        const day = txDate.getDate();
-                        if (day >= 1 && day <= daysInMonth) {
-                            dailyCollData[day - 1] += (t.collectionAmount || 0);
-                        }
-                    }
-                }
-            });
-
-            const chartOptions = {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: { legend: { labels: { font: { size: 8 } } } },
-                scales: { y: { beginAtZero: true, ticks: { font: { size: 8 } } }, x: { ticks: { font: { size: 8 } } } }
-            };
-
-            if (dueChart) dueChart.destroy();
-            dueChart = new Chart(document.getElementById('dueChart'), {
-                type: 'line',
-                data: { labels: months, datasets: [{ label: 'Due (৳)', data: dueData, borderColor: '#d4af37', backgroundColor: 'rgba(212,175,55,0.05)', borderWidth: 2, pointBackgroundColor: '#d4af37', tension: 0.3, fill: true }] },
-                options: chartOptions
-            });
-
-            if (dailyDueChart) dailyDueChart.destroy();
-            dailyDueChart = new Chart(document.getElementById('dailyDueChart'), {
-                type: 'line',
-                data: { labels: dayLabels, datasets: [{ label: 'Daily Due (৳)', data: dailyDueData, borderColor: '#d97706', backgroundColor: 'rgba(217,119,6,0.08)', borderWidth: 2, pointBackgroundColor: '#d97706', pointRadius: 3, tension: 0.3, fill: true }] },
-                options: chartOptions
-            });
-
-            if (collectionChart) collectionChart.destroy();
-            collectionChart = new Chart(document.getElementById('collectionChart'), {
-                type: 'line',
-                data: { labels: dailyCollLabels, datasets: [{ label: 'Daily Coll. (৳)', data: dailyCollData, borderColor: '#2c7a4d', backgroundColor: 'rgba(44,122,77,0.08)', borderWidth: 2, pointBackgroundColor: '#2c7a4d', pointRadius: 2, tension: 0.3, fill: true }] },
-                options: { ...chartOptions, scales: { ...chartOptions.scales, x: { ...chartOptions.scales.x, maxTicksLimit: 12 } } }
-            });
-
-            if (monthlyCollectionChart) monthlyCollectionChart.destroy();
-            monthlyCollectionChart = new Chart(document.getElementById('monthlyCollectionChart'), {
-                type: 'bar',
-                data: { labels: months, datasets: [{ label: 'Monthly Coll. (৳)', data: monthlyCollData, backgroundColor: '#2c7a4d', borderRadius: 4 }] },
-                options: chartOptions
-            });
         }
 
         // ─── Recent Transactions ───
@@ -1283,8 +1149,8 @@
             showToast('Dashboard refreshed', 'success');
         });
 
-        document.getElementById('viewAllBtn')?.addEventListener('click', () => { 
-            window.location.href = 'ledger.html'; 
+        document.getElementById('viewAllBtn')?.addEventListener('click', () => {
+            window.location.href = 'ledger.html';
         });
 
         // ─── LOGOUT ───
@@ -1333,19 +1199,13 @@
         // ─── Dynamic Footer Year ───
         document.getElementById('footerYear').textContent = new Date().getFullYear();
 
-        // ─── INIT - Load once on page load ───
+        // ─── INIT ───
         await loadCustomerNames();
         await loadDashboardData();
 
-        // ═══════════════════════════════════════════════════════════════
-        // ║  ALL AUTO-REFRESH AND BACKGROUND UPDATES HAVE BEEN REMOVED  ║
-        // ║  Data only loads on initial page load and manual refresh    ║
-        // ═══════════════════════════════════════════════════════════════
-
         console.log('✅ Dashboard loaded. Auto-refresh is DISABLED.');
         console.log('💡 Click the refresh button (⟳) to manually update data.');
-
+        console.log('✅ Total Due is now fetched from customers collection for accuracy.');
     </script>
-
 </body>
 </html>

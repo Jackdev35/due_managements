@@ -43,9 +43,7 @@
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
-        .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none;
-        }
+        .sidebar-nav-fixed::-webkit-scrollbar { display: none; }
         
         .nav-active {
             background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
@@ -156,22 +154,8 @@
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
-        .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none;
-        }
+        .sidebar-nav-fixed::-webkit-scrollbar { display: none; }
         
-        .skeleton {
-            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 4px;
-        }
-        .dark .skeleton { background: linear-gradient(90deg, #2d3748 25%, #4a5568 50%, #2d3748 75%); }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
         .status-badge-upcoming {
             background: #fef3c7;
             color: #d97706;
@@ -188,10 +172,18 @@
             border-radius: 12px;
             font-weight: 600;
         }
+        .status-badge-cleared {
+            background: #d1fae5;
+            color: #059669;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
         .dark .status-badge-upcoming { background: #451a03; color: #fbbf24; }
         .dark .status-badge-overdue { background: #7f1d1d; color: #fca5a5; }
+        .dark .status-badge-cleared { background: #064e3b; color: #6ee7b7; }
 
-        /* Priority Icon Styles */
         .priority-icon {
             display: inline-flex;
             align-items: center;
@@ -204,9 +196,11 @@
         .priority-icon.high { background: #fee2e2; color: #dc2626; }
         .priority-icon.medium { background: #fed7aa; color: #ea580c; }
         .priority-icon.low { background: #d1fae5; color: #059669; }
+        .priority-icon.zero { background: #e5e7eb; color: #6b7280; }
         .dark .priority-icon.high { background: #7f1d1d; color: #fca5a5; }
         .dark .priority-icon.medium { background: #7c2d12; color: #fdba74; }
         .dark .priority-icon.low { background: #064e3b; color: #6ee7b7; }
+        .dark .priority-icon.zero { background: #374151; color: #9ca3af; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -375,6 +369,7 @@
                         <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white transition-all" data-filter="month"><i class="fas fa-calendar-alt mr-1"></i> This Month</button>
                         <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-primary hover:text-white transition-all" data-filter="upcoming"><i class="fas fa-calendar-check mr-1"></i> Upcoming (5 days)</button>
                         <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-primary hover:text-white transition-all" data-filter="overdue"><i class="fas fa-exclamation-circle mr-1"></i> Overdue</button>
+                        <button class="quick-filter-btn px-4 py-1.5 text-sm rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-primary hover:text-white transition-all" data-filter="cleared"><i class="fas fa-check-circle mr-1"></i> Cleared</button>
                     </div>
                     <button id="exportFollowUpBtn" class="bg-success hover:bg-green-700 text-white font-medium px-4 py-1.5 rounded-lg text-sm flex items-center gap-2 btn-active"><i class="fas fa-download text-xs"></i> Export CSV</button>
                 </div>
@@ -498,6 +493,7 @@
         let currentQuickFilter = 'all';
         let customerNameMap = new Map();
         let customerDataMap = new Map();
+        let allCustomerIds = new Set();
         let unsubscribeCustomers = null;
 
         // ─── UTILITIES ───
@@ -523,13 +519,12 @@
                 unsubscribeCustomers = null;
             }
 
-            console.log('🔄 Setting up real-time customer listener...');
-
             unsubscribeCustomers = onSnapshot(
                 collection(db, 'customers'),
                 (snapshot) => {
                     customerNameMap.clear();
                     customerDataMap.clear();
+                    allCustomerIds.clear();
 
                     snapshot.forEach(doc => {
                         const data = doc.data();
@@ -538,15 +533,12 @@
 
                         customerNameMap.set(id, name);
                         customerDataMap.set(id, data);
+                        allCustomerIds.add(id);
                     });
-
-                    console.log('🔄 Customers updated in Follow Up page:', customerNameMap.size);
                     
-                    // Refresh the table with updated names
                     refreshFollowUps();
                 },
                 (error) => {
-                    console.error('Customer listener error:', error);
                     showToast('Error loading customers', 'error');
                 }
             );
@@ -624,74 +616,104 @@
                 const dueEntriesSnap = await getDocs(query(collection(db, 'transactions'), where('type', '==', 'due')));
                 const followUps = [];
                 const today = getTodayDate();
+                const processedCustomers = new Set();
                 
-                for (const docSnap of dueEntriesSnap.docs) {
+                // First pass: Collect all unique customers from due entries
+                const uniqueCustomerIds = new Set();
+                dueEntriesSnap.forEach(docSnap => {
                     const due = docSnap.data();
-                    const customerId = due.customerId;
-                    
-                    // Get REAL-TIME due balance from customer record
-                    const actualDueBalance = getCustomerDue(customerId);
-                    
-                    // Skip if due balance is 0 or less (payment cleared)
-                    if (actualDueBalance <= 0) continue;
-                    
-                    // Get fresh customer name from real-time cache
+                    if (due.customerId) {
+                        uniqueCustomerIds.add(due.customerId);
+                    }
+                });
+                
+                // Also add all customers from customer map
+                allCustomerIds.forEach(id => uniqueCustomerIds.add(id));
+                
+                // Now create follow up entries for each unique customer
+                for (const customerId of uniqueCustomerIds) {
                     const customerName = getCustomerName(customerId);
+                    const dueBalance = getCustomerDue(customerId);
                     
-                    let description = due.remarks || '';
-                    if (!description && due.products && due.products.length > 0) {
-                        description = due.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).join(', ');
-                        if (due.totalAmount) description += ` | ৳${due.totalAmount.toFixed(2)}`;
-                    } else if (due.directDueAmount) {
-                        description = `Direct Due: ৳${due.directDueAmount.toFixed(2)}`;
-                    } else if (due.productName) {
-                        description = due.productName;
-                    }
-                    if (!description) description = 'Due Entry';
+                    // Find the most recent due entry for this customer
+                    let latestDue = null;
+                    let latestDate = '';
                     
-                    let followUpDate = due.expectedDate || due.date;
-                    if (!followUpDate && due.createdAt) {
-                        followUpDate = due.createdAt.toDate().toISOString().split('T')[0];
-                    }
-                    if (!followUpDate) followUpDate = today;
-                    
-                    const daysDiff = getDaysDifference(followUpDate);
-                    const priority = calculatePriority(daysDiff);
-                    const nextRemarks = due.nextRemarks || due.remarks || '';
-                    
-                    followUps.push({
-                        id: docSnap.id,
-                        transactionId: docSnap.id,
-                        customerId: customerId,
-                        customerName: customerName,
-                        description: description,
-                        expectedDate: followUpDate,
-                        priority: priority,
-                        daysDiff: daysDiff,
-                        currentRemarks: due.remarks || '',
-                        nextRemarks: nextRemarks,
-                        dueBalance: actualDueBalance
+                    dueEntriesSnap.forEach(docSnap => {
+                        const due = docSnap.data();
+                        if (due.customerId === customerId) {
+                            const dueDate = due.expectedDate || due.date || '';
+                            if (dueDate > latestDate) {
+                                latestDate = dueDate;
+                                latestDue = { ...due, id: docSnap.id };
+                            }
+                        }
                     });
-                }
-                
-                // Remove duplicates - keep only one entry per customer (most recent)
-                const uniqueFollowUps = [];
-                const seenCustomers = new Set();
-                followUps.sort((a, b) => b.expectedDate.localeCompare(a.expectedDate));
-                for (const f of followUps) {
-                    if (!seenCustomers.has(f.customerId)) {
-                        seenCustomers.add(f.customerId);
-                        uniqueFollowUps.push(f);
+                    
+                    if (latestDue) {
+                        let description = latestDue.remarks || '';
+                        if (!description && latestDue.products && latestDue.products.length > 0) {
+                            description = latestDue.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).join(', ');
+                            if (latestDue.totalAmount) description += ` | ৳${latestDue.totalAmount.toFixed(2)}`;
+                        } else if (latestDue.directDueAmount) {
+                            description = `Direct Due: ৳${latestDue.directDueAmount.toFixed(2)}`;
+                        } else if (latestDue.productName) {
+                            description = latestDue.productName;
+                        }
+                        if (!description) description = 'Due Entry';
+                        
+                        const followUpDate = latestDue.expectedDate || latestDue.date || today;
+                        const daysDiff = getDaysDifference(followUpDate);
+                        const priority = calculatePriority(daysDiff);
+                        
+                        followUps.push({
+                            id: latestDue.id,
+                            transactionId: latestDue.id,
+                            customerId: customerId,
+                            customerName: customerName,
+                            description: description,
+                            expectedDate: followUpDate,
+                            priority: priority,
+                            daysDiff: daysDiff,
+                            currentRemarks: latestDue.remarks || '',
+                            nextRemarks: latestDue.nextRemarks || '',
+                            dueBalance: dueBalance
+                        });
+                    } else {
+                        // Customer has no due entry but exists in system
+                        // Create a default entry
+                        const followUpDate = today;
+                        const daysDiff = getDaysDifference(followUpDate);
+                        const priority = calculatePriority(daysDiff);
+                        
+                        followUps.push({
+                            id: 'no-due-' + customerId,
+                            transactionId: 'no-due-' + customerId,
+                            customerId: customerId,
+                            customerName: customerName,
+                            description: 'No due entry found',
+                            expectedDate: followUpDate,
+                            priority: priority,
+                            daysDiff: daysDiff,
+                            currentRemarks: '',
+                            nextRemarks: '',
+                            dueBalance: dueBalance
+                        });
                     }
                 }
-                uniqueFollowUps.sort((a, b) => a.expectedDate.localeCompare(b.expectedDate));
                 
-                allFollowUps = uniqueFollowUps;
+                // Sort by customer name
+                followUps.sort((a, b) => a.customerName.localeCompare(b.customerName));
+                
+                allFollowUps = followUps;
+                
+                showToast(`✅ Found ${allFollowUps.length} customers with follow up data`, 'success');
+                
                 applyFilters();
                 
             } catch (error) {
-                console.error('Error loading follow ups:', error);
                 tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
+                showToast('Error loading follow ups', 'error');
             }
         }
 
@@ -699,7 +721,6 @@
         function refreshFollowUps() {
             if (allFollowUps.length === 0) return;
             
-            // Update customer names and due balances in the data
             let updated = false;
             allFollowUps = allFollowUps.map(f => {
                 const freshName = getCustomerName(f.customerId);
@@ -716,9 +737,7 @@
                 return f;
             });
             
-            // Only re-render if something changed
             if (updated) {
-                console.log('🔄 Refreshing follow ups with updated data');
                 applyFilters();
                 updateStats(allFollowUps);
             }
@@ -738,6 +757,8 @@
                     const daysDiff = getDaysDifference(f.expectedDate);
                     return daysDiff < 0;
                 });
+            } else if (currentQuickFilter === 'cleared') {
+                filtered = filtered.filter(f => f.dueBalance <= 0);
             } else if (currentQuickFilter !== 'all') {
                 const dateRange = getDateRangeFromFilter(currentQuickFilter);
                 if (dateRange) {
@@ -759,7 +780,8 @@
             if (followUps.length === 0) {
                 const message = currentQuickFilter === 'upcoming' ? 'No upcoming follow-ups in the next 5 days' :
                                currentQuickFilter === 'overdue' ? 'No overdue follow-ups' :
-                               'No follow up records found (all payments cleared)';
+                               currentQuickFilter === 'cleared' ? 'No cleared customers' :
+                               'No follow up records found';
                 tbody.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">${message}</p></td>`;
                 return;
             }
@@ -768,13 +790,16 @@
             let sl = 1;
             
             for (const followUp of followUps) {
-                const priorityClass = followUp.priority.class;
-                const priorityIcon = followUp.priority.icon;
+                const isCleared = followUp.dueBalance <= 0;
+                const priorityClass = isCleared ? 'priority-icon zero' : followUp.priority.class;
+                const priorityIcon = isCleared ? 'fa-check' : followUp.priority.icon;
                 const daysLeft = followUp.daysDiff;
                 const dateStatus = daysLeft < 0 ? 'text-red-500' : daysLeft === 0 ? 'text-orange-500' : 'text-green-600';
                 
                 let statusBadge = '';
-                if (daysLeft < 0) {
+                if (isCleared) {
+                    statusBadge = `<span class="status-badge-cleared">✅ Cleared</span>`;
+                } else if (daysLeft < 0) {
                     statusBadge = `<span class="status-badge-overdue">Overdue (${Math.abs(daysLeft)}d)</span>`;
                 } else if (daysLeft <= 5) {
                     statusBadge = `<span class="status-badge-upcoming">Upcoming (${daysLeft}d)</span>`;
@@ -787,7 +812,7 @@
                 row.setAttribute('data-id', followUp.id);
                 row.setAttribute('data-customer', followUp.customerName);
                 row.setAttribute('data-description', followUp.description);
-                row.setAttribute('data-priority', followUp.priority.level);
+                row.setAttribute('data-priority', isCleared ? 'cleared' : followUp.priority.level);
                 row.setAttribute('data-date', followUp.expectedDate);
                 row.setAttribute('data-days', daysLeft);
                 row.setAttribute('data-current-remarks', followUp.currentRemarks);
@@ -800,14 +825,16 @@
                     <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white customer-name-cell">${escapeHtml(followUp.customerName)}</td>
                     <td class="px-3 py-2.5 text-sm"><div class="text-xs text-gray-600 dark:text-gray-400 max-w-[200px] truncate" title="${escapeHtml(followUp.description)}">${escapeHtml(followUp.description)}</div></td>
                     <td class="px-3 py-2.5 text-center">
-                        <span class="${priorityClass}" title="${followUp.priority.level.charAt(0).toUpperCase() + followUp.priority.level.slice(1)} Priority">
+                        <span class="${priorityClass}" title="${isCleared ? 'Cleared' : followUp.priority.level.charAt(0).toUpperCase() + followUp.priority.level.slice(1) + ' Priority'}">
                             <i class="fas ${priorityIcon}"></i>
                         </span>
                     </td>
-                    <td class="px-3 py-2.5 text-sm font-bold text-red-600 dark:text-red-400 due-balance-cell">৳${(followUp.dueBalance || 0).toFixed(2)}</td>
+                    <td class="px-3 py-2.5 text-sm font-bold ${isCleared ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'} due-balance-cell">৳${(followUp.dueBalance || 0).toFixed(2)}</td>
                     <td class="px-3 py-2.5 text-sm ${dateStatus}">${followUp.expectedDate}</td>
                     <td class="px-3 py-2.5">${statusBadge}</td>
-                    <td class="px-3 py-2.5 text-center"><button class="update-followup text-primary hover:text-primary-dark p-1.5 rounded-lg transition-colors" data-id="${followUp.id}" data-customer="${escapeHtml(followUp.customerName)}" data-date="${followUp.expectedDate}" data-remarks="${escapeHtml(followUp.currentRemarks)}" data-next-remarks="${escapeHtml(followUp.nextRemarks)}" title="Update Follow Up"><i class="fas fa-edit text-sm"></i></button></td>
+                    <td class="px-3 py-2.5 text-center">
+                        ${!isCleared ? `<button class="update-followup text-primary hover:text-primary-dark p-1.5 rounded-lg transition-colors" data-id="${followUp.id}" data-customer="${escapeHtml(followUp.customerName)}" data-date="${followUp.expectedDate}" data-remarks="${escapeHtml(followUp.currentRemarks)}" data-next-remarks="${escapeHtml(followUp.nextRemarks)}" title="Update Follow Up"><i class="fas fa-edit text-sm"></i></button>` : `<span class="text-gray-400 text-xs">-</span>`}
+                    </td>
                 `;
             }
             
@@ -831,17 +858,20 @@
                     const dateStatusText = daysLeft < 0 ? 'Overdue' : daysLeft === 0 ? 'Today' : 'Pending';
                     const dateStatusColor = daysLeft < 0 ? 'text-red-500' : daysLeft === 0 ? 'text-orange-500' : 'text-green-600';
                     const dueBalance = parseFloat(data.dueBalance) || 0;
+                    const isCleared = dueBalance <= 0;
                     const priorityLevel = data.priority || 'low';
                     const priorityIcons = {
                         high: 'fa-arrow-up',
                         medium: 'fa-minus',
-                        low: 'fa-arrow-down'
+                        low: 'fa-arrow-down',
+                        cleared: 'fa-check'
                     };
                     const priorityIcon = priorityIcons[priorityLevel] || 'fa-minus';
                     const priorityColors = {
                         high: 'text-red-600',
                         medium: 'text-orange-500',
-                        low: 'text-green-600'
+                        low: 'text-green-600',
+                        cleared: 'text-green-600'
                     };
                     const priorityColor = priorityColors[priorityLevel] || 'text-gray-600';
                     
@@ -849,8 +879,8 @@
                         <div class="space-y-3">
                             <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Customer</span><span class="font-semibold text-sm">${escapeHtml(data.customer)}</span></div>
                             <div class="flex justify-between items-start pb-2 border-b"><span class="text-xs text-gray-500">Description</span><span class="text-sm text-right max-w-[220px]">${escapeHtml(data.description)}</span></div>
-                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Priority</span><span class="text-sm font-semibold ${priorityColor}"><i class="fas ${priorityIcon} mr-1"></i> ${priorityLevel.charAt(0).toUpperCase() + priorityLevel.slice(1)}</span></div>
-                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Due Balance</span><span class="text-sm font-bold text-red-600">৳${dueBalance.toFixed(2)}</span></div>
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Priority</span><span class="text-sm font-semibold ${priorityColor}"><i class="fas ${priorityIcon} mr-1"></i> ${isCleared ? 'Cleared' : priorityLevel.charAt(0).toUpperCase() + priorityLevel.slice(1)}</span></div>
+                            <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Due Balance</span><span class="text-sm font-bold ${isCleared ? 'text-green-600' : 'text-red-600'}">৳${dueBalance.toFixed(2)}</span></div>
                             <div class="flex justify-between items-center pb-2 border-b"><span class="text-xs text-gray-500">Follow Up Date</span><div class="text-right"><span class="text-sm font-semibold">${data.date}</span><span class="text-xs ${dateStatusColor} ml-1">(${dateStatusText})</span></div></div>
                             <div class="flex justify-between items-start pb-2 border-b"><span class="text-xs text-gray-500">Current Remarks</span><span class="text-sm text-right">${escapeHtml(data.currentRemarks) || '-'}</span></div>
                             <div class="flex justify-between items-start"><span class="text-xs text-gray-500">Next Remarks</span><span class="text-sm text-right text-primary font-medium">${escapeHtml(data.nextRemarks) || '-'}</span></div>
@@ -864,14 +894,21 @@
         // ─── UPDATE STATS ───
         function updateStats(followUps) {
             const total = followUps.length;
-            let pending = 0, overdue = 0, upcoming = 0, monthly = 0;
+            let pending = 0, overdue = 0, upcoming = 0, monthly = 0, cleared = 0;
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
             
             followUps.forEach(f => {
                 const daysDiff = getDaysDifference(f.expectedDate);
-                if (daysDiff < 0) overdue++;
-                else if (daysDiff >= 0) pending++;
+                const isCleared = f.dueBalance <= 0;
+                
+                if (isCleared) {
+                    cleared++;
+                } else if (daysDiff < 0) {
+                    overdue++;
+                } else if (daysDiff >= 0) {
+                    pending++;
+                }
                 
                 if (daysDiff >= 0 && daysDiff <= 5) upcoming++;
                 
@@ -905,7 +942,7 @@
                 showToast('Follow up updated successfully!', 'success');
                 document.getElementById('updateModal').classList.add('hidden');
                 await loadFollowUps();
-            } catch (error) { console.error('Update error:', error); showToast('Error updating follow up', 'error'); }
+            } catch (error) { showToast('Error updating follow up', 'error'); }
         }
 
         // ─── EXPORT CSV ───
@@ -922,6 +959,8 @@
                     const daysDiff = getDaysDifference(f.expectedDate);
                     return daysDiff < 0;
                 });
+            } else if (currentQuickFilter === 'cleared') {
+                exportData = exportData.filter(f => f.dueBalance <= 0);
             } else if (currentQuickFilter !== 'all') {
                 const dateRange = getDateRangeFromFilter(currentQuickFilter);
                 if (dateRange) {
@@ -938,9 +977,10 @@
             let sl = 1;
             exportData.forEach(f => {
                 const daysDiff = getDaysDifference(f.expectedDate);
-                const statusText = daysDiff < 0 ? 'Overdue' : daysDiff === 0 ? 'Today' : 'Pending';
-                const daysText = daysDiff < 0 ? `${Math.abs(daysDiff)} days overdue` : `${daysDiff} days left`;
-                csv.push(`"${sl++}","${f.customerName.replace(/"/g, '""')}","${f.description.replace(/"/g, '""')}","${f.priority.level}","${(f.dueBalance||0).toFixed(2)}","${f.expectedDate}","${daysText}","${statusText}","${(f.nextRemarks || '').replace(/"/g, '""')}"`);
+                const isCleared = f.dueBalance <= 0;
+                const statusText = isCleared ? 'Cleared' : (daysDiff < 0 ? 'Overdue' : daysDiff === 0 ? 'Today' : 'Pending');
+                const daysText = isCleared ? 'Paid' : (daysDiff < 0 ? `${Math.abs(daysDiff)} days overdue` : `${daysDiff} days left`);
+                csv.push(`"${sl++}","${f.customerName.replace(/"/g, '""')}","${f.description.replace(/"/g, '""')}","${isCleared ? 'Cleared' : f.priority.level}","${(f.dueBalance||0).toFixed(2)}","${f.expectedDate}","${daysText}","${statusText}","${(f.nextRemarks || '').replace(/"/g, '""')}"`);
             });
             const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
@@ -995,16 +1035,11 @@
         });
 
         // ─── INIT ───
-        console.log('🚀 Initializing Follow Up page...');
-        
-        // Setup real-time customer listener first
         setupCustomerListener();
         
-        // Wait a moment for customer data to load, then load follow ups
         setTimeout(async () => {
             await loadFollowUps();
             document.querySelector('.quick-filter-btn[data-filter="all"]')?.classList.add('active');
-            console.log('🚀 Follow Up page initialized with real-time customer updates');
         }, 500);
     </script>
 </body>

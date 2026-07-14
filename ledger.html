@@ -36,7 +36,6 @@
         * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
         body { font-family: 'Inter', system-ui, sans-serif; }
         
-        /* Hide scrollbar but keep functionality */
         .sidebar-nav-fixed {
             flex: 1;
             overflow-y: auto;
@@ -44,9 +43,7 @@
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
-        .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none;
-        }
+        .sidebar-nav-fixed::-webkit-scrollbar { display: none; }
         
         .nav-active {
             background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
@@ -91,25 +88,12 @@
             background: inherit;
             z-index: 10;
         }
-        .sidebar-nav-fixed {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* ============================================= */
-        /* CUSTOM SEARCHABLE SELECT STYLES - Same as Collection */
-        /* ============================================= */
+        
+        /* Searchable Select */
         .searchable-select-wrapper {
             position: relative;
             width: 100%;
         }
-        
         .searchable-select-wrapper input[type="text"] {
             width: 100%;
             padding: 10px 12px;
@@ -123,23 +107,19 @@
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
             cursor: text;
         }
-        
         .dark .searchable-select-wrapper input[type="text"] {
             background: #1f2937;
             border-color: #4b5563;
             color: #f1f5f9;
         }
-        
         .searchable-select-wrapper input[type="text"]:focus {
             border-color: #0f3b3a;
             box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.15);
         }
-        
         .dark .searchable-select-wrapper input[type="text"]:focus {
             border-color: #1e6b68;
             box-shadow: 0 0 0 3px rgba(30, 107, 104, 0.2);
         }
-        
         .searchable-select-wrapper .dropdown-icon {
             position: absolute;
             right: 12px;
@@ -150,11 +130,9 @@
             font-size: 14px;
             transition: transform 0.2s ease;
         }
-        
         .searchable-select-wrapper .dropdown-icon.open {
             transform: translateY(-50%) rotate(180deg);
         }
-        
         .searchable-select-dropdown {
             position: absolute;
             top: calc(100% + 6px);
@@ -170,22 +148,18 @@
             display: none;
             padding: 4px 0;
         }
-        
         .dark .searchable-select-dropdown {
             background: #1f2937;
             border-color: #4b5563;
         }
-        
         .searchable-select-dropdown.show {
             display: block;
             animation: dropdownSlide 0.15s ease-out;
         }
-        
         @keyframes dropdownSlide {
             from { opacity: 0; transform: translateY(-6px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
         .searchable-select-dropdown .dropdown-item {
             padding: 8px 14px;
             cursor: pointer;
@@ -197,36 +171,16 @@
             align-items: center;
             border-bottom: 1px solid #f3f4f6;
         }
-        
         .dark .searchable-select-dropdown .dropdown-item {
             color: #e5e7eb;
             border-bottom-color: #374151;
         }
-        
-        .searchable-select-dropdown .dropdown-item:last-child {
-            border-bottom: none;
-        }
-        
-        .searchable-select-dropdown .dropdown-item:hover {
-            background: #f3f4f6;
-        }
-        
-        .dark .searchable-select-dropdown .dropdown-item:hover {
-            background: #374151;
-        }
-        
-        .searchable-select-dropdown .dropdown-item.active {
-            background: #e5e7eb;
-        }
-        
-        .dark .searchable-select-dropdown .dropdown-item.active {
-            background: #374151;
-        }
-        
-        .searchable-select-dropdown .dropdown-item .customer-name {
-            font-weight: 500;
-        }
-        
+        .searchable-select-dropdown .dropdown-item:last-child { border-bottom: none; }
+        .searchable-select-dropdown .dropdown-item:hover { background: #f3f4f6; }
+        .dark .searchable-select-dropdown .dropdown-item:hover { background: #374151; }
+        .searchable-select-dropdown .dropdown-item.active { background: #e5e7eb; }
+        .dark .searchable-select-dropdown .dropdown-item.active { background: #374151; }
+        .searchable-select-dropdown .dropdown-item .customer-name { font-weight: 500; }
         .searchable-select-dropdown .dropdown-item .customer-due {
             font-size: 11px;
             font-weight: 600;
@@ -236,53 +190,39 @@
             background: #fef2f2;
             white-space: nowrap;
         }
-        
         .dark .searchable-select-dropdown .dropdown-item .customer-due {
             color: #f87171;
             background: #450a0a;
         }
-        
         .searchable-select-dropdown .dropdown-item .customer-due.zero {
             color: #16a34a;
             background: #f0fdf4;
         }
-        
         .dark .searchable-select-dropdown .dropdown-item .customer-due.zero {
             color: #4ade80;
             background: #052e16;
         }
-        
         .searchable-select-dropdown .no-results {
             padding: 12px 14px;
             text-align: center;
             color: #9ca3af;
             font-size: 13px;
         }
-        
-        .searchable-select-dropdown::-webkit-scrollbar {
-            width: 4px;
-        }
-        .searchable-select-dropdown::-webkit-scrollbar-track {
-            background: transparent;
-        }
+        .searchable-select-dropdown::-webkit-scrollbar { width: 4px; }
+        .searchable-select-dropdown::-webkit-scrollbar-track { background: transparent; }
         .searchable-select-dropdown::-webkit-scrollbar-thumb {
             background: #d1d5db;
             border-radius: 4px;
         }
-        .dark .searchable-select-dropdown::-webkit-scrollbar-thumb {
-            background: #4b5563;
-        }
+        .dark .searchable-select-dropdown::-webkit-scrollbar-thumb { background: #4b5563; }
         
-        /* ========== PRINT STYLES ========== */
+        /* Print Styles */
         @media print {
             html, body {
                 overflow: visible !important;
-                overflow-x: visible !important;
-                overflow-y: visible !important;
                 height: auto !important;
                 width: 100% !important;
             }
-            
             body * { visibility: hidden; }
             #ledgerCard, #ledgerCard * { visibility: visible; }
             #ledgerCard { 
@@ -299,13 +239,11 @@
                 overflow: visible !important;
                 max-height: none !important;
             }
-            
             .overflow-x-auto, .overflow-y-auto, .overflow-auto {
                 overflow: visible !important;
                 max-height: none !important;
                 height: auto !important;
             }
-            
             .no-print, .no-print * { display: none !important; }
             
             #printHeader {
@@ -337,9 +275,6 @@
                 gap: 20px;
                 flex-wrap: wrap;
             }
-            #printHeader .customer-info span {
-                display: inline-block;
-            }
             #printHeader .customer-info .customer-name-print {
                 font-size: 14px !important;
                 font-weight: 700;
@@ -358,7 +293,6 @@
                 margin-top: 8px;
                 table-layout: fixed;
             }
-            
             #ledgerTable th {
                 background: #f7fafc !important;
                 border-bottom: 2px solid #0f3b3a;
@@ -374,10 +308,7 @@
                 border-bottom: 1px solid #e2e8f0;
                 font-size: 9.5px;
             }
-            #ledgerTable tr:last-child td {
-                border-bottom: none;
-            }
-            
+            #ledgerTable tr:last-child td { border-bottom: none; }
             #ledgerTable th:nth-child(1), #ledgerTable td:nth-child(1) { width: 12%; }
             #ledgerTable th:nth-child(2), #ledgerTable td:nth-child(2) { width: 12%; }
             #ledgerTable th:nth-child(3), #ledgerTable td:nth-child(3) { width: 45%; }
@@ -389,7 +320,6 @@
                 font-weight: 700;
                 padding-top: 8px;
             }
-            
             #printFooter {
                 display: block !important;
                 text-align: center;
@@ -404,39 +334,13 @@
                 font-weight: 700;
                 color: #0f3b3a;
             }
-            
-            #ledgerTable td:nth-child(4),
-            #ledgerTable td:nth-child(5) {
-                text-align: right;
-            }
-            #ledgerTable th:nth-child(4),
-            #ledgerTable th:nth-child(5) {
-                text-align: right;
-            }
-            
-            .print-opening-row td {
-                background: #f7fafc !important;
-                font-weight: 600;
-            }
-            
-            #ledgerCard .overflow-x-auto {
-                overflow: visible !important;
-                max-height: none !important;
-            }
-            
-            #ledgerTable {
-                table-layout: fixed;
-                word-wrap: break-word;
-            }
-            
-            #ledgerTable td, #ledgerTable th {
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-            }
-            
-            #ledgerCard .ledger-footer {
-                display: none !important;
-            }
+            #ledgerTable td:nth-child(4), #ledgerTable td:nth-child(5) { text-align: right; }
+            #ledgerTable th:nth-child(4), #ledgerTable th:nth-child(5) { text-align: right; }
+            .print-opening-row td { background: #f7fafc !important; font-weight: 600; }
+            #ledgerCard .overflow-x-auto { overflow: visible !important; max-height: none !important; }
+            #ledgerTable { table-layout: fixed; word-wrap: break-word; }
+            #ledgerTable td, #ledgerTable th { word-wrap: break-word; overflow-wrap: break-word; }
+            #ledgerCard .ledger-footer { display: none !important; }
         }
         
         #printHeader { display: none; }
@@ -474,19 +378,6 @@
         .clear-date-btn:hover { color: #ef4444; }
         .date-input-wrapper { position: relative; }
         .date-input-wrapper input.has-value + .clear-date-btn { display: block; }
-        
-        .ledger-footer {
-            text-align: center;
-            font-size: 10px;
-            color: #6b7280;
-            padding: 8px 0 4px 0;
-            border-top: 1px solid #e5e7eb;
-            margin-top: 4px;
-        }
-        .dark .ledger-footer {
-            color: #9ca3af;
-            border-top-color: #374151;
-        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -607,7 +498,7 @@
             
             <div class="p-3 md:p-4">
                 
-                <!-- Filter Section - Using custom searchable select -->
+                <!-- Filter Section -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-4 no-print">
                     <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
                         <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-filter text-primary mr-2"></i>Filter Ledger</h3>
@@ -618,15 +509,11 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                             <div class="lg:col-span-2">
                                 <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5"><i class="fas fa-user text-primary mr-1"></i>Select Customer <span class="text-red-500">*</span></label>
-                                
-                                <!-- Custom Searchable Select - Same as Collection page -->
                                 <div class="searchable-select-wrapper" id="customerSelectWrapper">
                                     <input type="text" id="customerSearchInput" placeholder="Search by name or phone number..." autocomplete="off" spellcheck="false">
                                     <i class="fas fa-chevron-down dropdown-icon" id="dropdownIcon"></i>
                                     <input type="hidden" id="selectedCustomerId" value="">
-                                    <div class="searchable-select-dropdown" id="customerDropdown">
-                                        <!-- Items will be populated dynamically -->
-                                    </div>
+                                    <div class="searchable-select-dropdown" id="customerDropdown"></div>
                                 </div>
                             </div>
                             <div>
@@ -680,7 +567,7 @@
                 <!-- Ledger Card -->
                 <div id="ledgerCard" class="hidden bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                     
-                    <!-- PRINT HEADER - Only visible in print -->
+                    <!-- PRINT HEADER -->
                     <div id="printHeader">
                         <h1 class="company-name">EC Sales & Service</h1>
                         <h2 class="statement-title">Customer Ledger Statement</h2>
@@ -717,18 +604,14 @@
                             </thead>
                             <tbody id="ledgerTableBody" class="divide-y"><tr><td colspan="5" class="text-center py-8 text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading customers...</p></td></tr></tbody>
                         </table>
-
-                        <!-- PRINT FOOTER - Only visible in print -->
                         <div id="printFooter">
                             <span>Generated by JackDev Due System | Valid for record keeping</span> 
                         </div>
                     </div>
-                    
-                    
                 </div>
             </div>
 
-            <!-- Main Footer - visible on screen, hidden in print -->
+            <!-- Footer -->
             <footer class="mt-6 border-t border-gray-200 dark:border-gray-700 no-print">
                 <div class="max-w-7xl mx-auto px-4 py-3 text-center">
                     <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
@@ -743,6 +626,7 @@
         </main>
     </div>
     
+    <!-- Modals -->
     <div id="loadingOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden">
         <div class="bg-white dark:bg-gray-800 rounded-xl p-5 text-center"><i class="fas fa-spinner fa-pulse text-primary text-2xl mb-2"></i><p class="text-sm">Loading ledger...</p></div>
     </div>
@@ -750,119 +634,142 @@
     <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 no-print"></div>
     
     <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center"><div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div><h3 class="text-lg font-semibold mb-2">Logout?</h3><p class="text-sm text-gray-500 mb-5">Are you sure you want to logout?</p><div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-gray-100">Cancel</button><button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-danger text-white">Logout</button></div></div>
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div>
+            <h3 class="text-lg font-semibold mb-2">Logout?</h3>
+            <p class="text-sm text-gray-500 mb-5">Are you sure you want to logout?</p>
+            <div class="flex gap-3 justify-center"><button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-gray-100">Cancel</button><button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm rounded-xl bg-danger text-white">Logout</button></div>
+        </div>
     </div>
     
     <script>
         window.clearDate = function(inputId) {
             const input = document.getElementById(inputId);
-            if (input) {
-                input.value = '';
-                input.dispatchEvent(new Event('input'));
-            }
+            if (input) { input.value = ''; input.dispatchEvent(new Event('input')); }
         };
     </script>
     
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
+        import { db, collection, getDocs } from './js/firebase.js';
+        
         checkAuthState(true);
-    </script>
-    
-    <script type="module">
-        import { db, collection, getDocs, getDoc, doc } from './js/firebase.js';
         
-        // Sidebar submenu toggle
-        const warrantySubmenu = document.getElementById('warrantySubmenu');
-        const warrantyLink = warrantySubmenu?.querySelector('a');
-        if (warrantyLink) {
-            warrantyLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                warrantySubmenu.classList.toggle('open');
-                warrantySubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
-        }
+        // =============================================
+        // UTILITY FUNCTIONS
+        // =============================================
+        const $ = id => document.getElementById(id);
         
-        // Sidebar functions
-        const sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle'), closeSidebarBtn = document.getElementById('closeSidebarBtn');
-        function openSidebar() { sidebar.classList.remove('-translate-x-full'); document.body.classList.add('sidebar-open'); if (!document.getElementById('sidebarOverlay')) { const overlay = document.createElement('div'); overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden'; overlay.addEventListener('click', closeSidebar); document.body.appendChild(overlay); } }
-        function closeSidebar() { sidebar.classList.add('-translate-x-full'); document.body.classList.remove('sidebar-open'); const overlay = document.getElementById('sidebarOverlay'); if (overlay) overlay.remove(); }
-        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
-        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
-        window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); document.body.classList.remove('sidebar-open'); } else { sidebar.classList.add('-translate-x-full'); } });
-        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full'); else sidebar.classList.add('-translate-x-full');
-        
-        // Submenu toggle for Due Entry
-        const dueSubmenu = document.getElementById('dueSubmenu');
-        const dueSubmenuLink = dueSubmenu?.querySelector('a');
-        if (dueSubmenuLink) {
-            dueSubmenuLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                dueSubmenu.classList.toggle('open');
-                dueSubmenu.querySelector('.submenu-modern')?.classList.toggle('open');
-            });
-        }
-        
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
+        const showToast = (message, type = 'success') => {
+            const container = $('toastContainer');
             const toast = document.createElement('div');
             toast.className = `mb-2 px-4 py-2 rounded-xl shadow-lg text-sm font-medium ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
             toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2 text-xs"></i>${message}`;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 2500);
-        }
+        };
         
-        function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none'; }
-        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+        const showLoading = (show) => $('loadingOverlay').style.display = show ? 'flex' : 'none';
+        const escapeHtml = (str) => str ? str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])) : '';
         
+        // =============================================
+        // STATE
+        // =============================================
         let customerMap = new Map();
+        let allCustomers = [];
         let allTransactions = [];
         let currentClosingBalance = 0;
-        let currentCustomerName = '';
-        let currentCustomerPhone = '';
-        let currentCustomerAddress = '';
-        let currentFilterStartDate = '';
-        let currentFilterEndDate = '';
+        let isDropdownOpen = false;
+        let highlightedIndex = -1;
         
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
+        // DOM References
+        const customerSearchInput = $('customerSearchInput');
+        const customerDropdown = $('customerDropdown');
+        const selectedCustomerId = $('selectedCustomerId');
+        const dropdownIcon = $('dropdownIcon');
+        const startDateInput = $('startDate');
+        const endDateInput = $('endDate');
         
-        function updateDateInputClass(input) {
+        // =============================================
+        // SIDEBAR LOGIC
+        // =============================================
+        const sidebar = $('sidebar');
+        const menuToggle = $('menuToggle');
+        const closeSidebarBtn = $('closeSidebarBtn');
+        
+        const openSidebar = () => {
+            sidebar.classList.remove('-translate-x-full');
+            document.body.classList.add('sidebar-open');
+            if (!document.getElementById('sidebarOverlay')) {
+                const overlay = document.createElement('div');
+                overlay.id = 'sidebarOverlay';
+                overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
+                overlay.addEventListener('click', closeSidebar);
+                document.body.appendChild(overlay);
+            }
+        };
+        
+        const closeSidebar = () => {
+            sidebar.classList.add('-translate-x-full');
+            document.body.classList.remove('sidebar-open');
+            document.getElementById('sidebarOverlay')?.remove();
+        };
+        
+        menuToggle?.addEventListener('click', openSidebar);
+        closeSidebarBtn?.addEventListener('click', closeSidebar);
+        
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('-translate-x-full');
+                document.getElementById('sidebarOverlay')?.remove();
+                document.body.classList.remove('sidebar-open');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
+        
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
+        else sidebar.classList.add('-translate-x-full');
+        
+        // =============================================
+        // SUBMENU TOGGLES
+        // =============================================
+        document.querySelectorAll('.has-submenu').forEach(menu => {
+            const link = menu.querySelector('a');
+            link?.addEventListener('click', (e) => {
+                e.preventDefault();
+                menu.classList.toggle('open');
+                menu.querySelector('.submenu-modern')?.classList.toggle('open');
+            });
+        });
+        
+        // =============================================
+        // DATE INPUT HANDLING
+        // =============================================
+        const updateDateInputClass = (input) => {
+            if (!input) return;
+            const wrapper = input.closest('.date-input-wrapper');
+            const clearBtn = wrapper?.querySelector('.clear-date-btn');
             if (input.value) {
                 input.classList.add('has-value');
-                const wrapper = input.closest('.date-input-wrapper');
-                const clearBtn = wrapper?.querySelector('.clear-date-btn');
                 if (clearBtn) clearBtn.style.display = 'block';
             } else {
                 input.classList.remove('has-value');
-                const wrapper = input.closest('.date-input-wrapper');
-                const clearBtn = wrapper?.querySelector('.clear-date-btn');
                 if (clearBtn) clearBtn.style.display = 'none';
             }
-        }
+        };
         
-        if (startDateInput) {
-            startDateInput.addEventListener('input', () => updateDateInputClass(startDateInput));
-            updateDateInputClass(startDateInput);
-        }
-        if (endDateInput) {
-            endDateInput.addEventListener('input', () => updateDateInputClass(endDateInput));
-            updateDateInputClass(endDateInput);
-        }
+        [startDateInput, endDateInput].forEach(input => {
+            if (input) {
+                input.addEventListener('input', () => updateDateInputClass(input));
+                updateDateInputClass(input);
+            }
+        });
         
         // =============================================
-        // SEARCHABLE SELECT LOGIC - Same as Collection page
+        // SEARCHABLE SELECT
         // =============================================
-        const customerSearchInput = document.getElementById('customerSearchInput');
-        const customerDropdown = document.getElementById('customerDropdown');
-        const selectedCustomerId = document.getElementById('selectedCustomerId');
-        const dropdownIcon = document.getElementById('dropdownIcon');
-        let isDropdownOpen = false;
-        let highlightedIndex = -1;
-        let allCustomers = [];
-        let currentFilteredItems = [];
-        
-        function renderDropdown(items) {
-            currentFilteredItems = items;
+        const renderDropdown = (items) => {
             if (items.length === 0) {
                 customerDropdown.innerHTML = `<div class="no-results">No customers found</div>`;
                 return;
@@ -871,241 +778,141 @@
             customerDropdown.innerHTML = '';
             items.forEach((customer, index) => {
                 const div = document.createElement('div');
-                div.className = 'dropdown-item';
-                if (index === highlightedIndex) {
-                    div.classList.add('active');
-                }
+                div.className = 'dropdown-item' + (index === highlightedIndex ? ' active' : '');
                 const dueClass = customer.due <= 0 ? 'zero' : '';
                 div.innerHTML = `
                     <span class="customer-name">${escapeHtml(customer.name)}</span>
                     <span class="customer-due ${dueClass}">৳${customer.due.toFixed(2)}</span>
                 `;
                 div.dataset.id = customer.id;
-                div.dataset.index = index;
-                div.addEventListener('click', () => {
-                    selectCustomer(customer.id);
-                });
+                div.addEventListener('click', () => selectCustomer(customer.id));
                 div.addEventListener('mouseenter', () => {
                     highlightedIndex = index;
                     updateHighlight();
                 });
                 customerDropdown.appendChild(div);
             });
-        }
+        };
         
-        function updateHighlight() {
-            const items = customerDropdown.querySelectorAll('.dropdown-item');
-            items.forEach((item, index) => {
-                if (index === highlightedIndex) {
-                    item.classList.add('active');
-                    item.scrollIntoView({ block: 'nearest' });
-                } else {
-                    item.classList.remove('active');
-                }
+        const updateHighlight = () => {
+            customerDropdown.querySelectorAll('.dropdown-item').forEach((item, index) => {
+                item.classList.toggle('active', index === highlightedIndex);
+                if (index === highlightedIndex) item.scrollIntoView({ block: 'nearest' });
             });
-        }
+        };
         
-        function filterCustomers(searchTerm) {
+        const filterCustomers = (searchTerm) => {
             const term = searchTerm.toLowerCase().trim();
             if (!term) return allCustomers;
-            
             return allCustomers.filter(c => 
                 c.name.toLowerCase().includes(term) || 
                 (c.phone && c.phone.includes(term))
             );
-        }
+        };
         
-        function selectCustomer(customerId) {
+        const selectCustomer = (customerId) => {
             const customer = allCustomers.find(c => c.id === customerId);
             if (!customer) return;
-            
             selectedCustomerId.value = customerId;
             customerSearchInput.value = customer.name;
             customerDropdown.classList.remove('show');
             dropdownIcon.classList.remove('open');
             isDropdownOpen = false;
             highlightedIndex = -1;
-            
-            // Auto view ledger after selection
             viewLedger();
-        }
+        };
         
-        function toggleDropdown(show) {
-            if (show === undefined) {
-                isDropdownOpen = !isDropdownOpen;
-            } else {
-                isDropdownOpen = show;
-            }
-            
+        const toggleDropdown = (show) => {
+            isDropdownOpen = show !== undefined ? show : !isDropdownOpen;
             if (isDropdownOpen) {
-                const searchTerm = customerSearchInput.value;
-                const filtered = filterCustomers(searchTerm);
-                highlightedIndex = -1;
-                renderDropdown(filtered);
+                renderDropdown(filterCustomers(customerSearchInput.value));
                 customerDropdown.classList.add('show');
                 dropdownIcon.classList.add('open');
+                highlightedIndex = -1;
             } else {
                 customerDropdown.classList.remove('show');
                 dropdownIcon.classList.remove('open');
                 highlightedIndex = -1;
             }
-        }
+        };
         
-        // Event listeners for searchable select
         customerSearchInput.addEventListener('focus', () => {
-            if (customerSearchInput.value) {
-                const filtered = filterCustomers(customerSearchInput.value);
-                highlightedIndex = -1;
-                renderDropdown(filtered);
-                customerDropdown.classList.add('show');
-                dropdownIcon.classList.add('open');
-                isDropdownOpen = true;
-            } else {
-                toggleDropdown(true);
-            }
-        });
-        
-        customerSearchInput.addEventListener('input', (e) => {
             const filtered = filterCustomers(customerSearchInput.value);
-            highlightedIndex = -1;
             renderDropdown(filtered);
             customerDropdown.classList.add('show');
             dropdownIcon.classList.add('open');
             isDropdownOpen = true;
-            
-            const matchedCustomer = filtered.find(c => c.name.toLowerCase() === customerSearchInput.value.toLowerCase());
-            if (!matchedCustomer && filtered.length !== 1) {
-                selectedCustomerId.value = '';
-            }
+        });
+        
+        customerSearchInput.addEventListener('input', () => {
+            const filtered = filterCustomers(customerSearchInput.value);
+            renderDropdown(filtered);
+            customerDropdown.classList.add('show');
+            dropdownIcon.classList.add('open');
+            isDropdownOpen = true;
+            const matched = filtered.find(c => c.name.toLowerCase() === customerSearchInput.value.toLowerCase());
+            if (!matched && filtered.length !== 1) selectedCustomerId.value = '';
         });
         
         customerSearchInput.addEventListener('keydown', (e) => {
-            const visibleItems = customerDropdown.querySelectorAll('.dropdown-item');
-            const totalItems = visibleItems.length;
-            
+            const items = customerDropdown.querySelectorAll('.dropdown-item');
+            const total = items.length;
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
-                if (totalItems > 0) {
-                    highlightedIndex = (highlightedIndex + 1) % totalItems;
+                if (total > 0) {
+                    highlightedIndex = (highlightedIndex + 1) % total;
                     updateHighlight();
-                    if (!isDropdownOpen) {
-                        toggleDropdown(true);
-                    }
+                    if (!isDropdownOpen) toggleDropdown(true);
                 }
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
-                if (totalItems > 0) {
-                    highlightedIndex = (highlightedIndex - 1 + totalItems) % totalItems;
+                if (total > 0) {
+                    highlightedIndex = (highlightedIndex - 1 + total) % total;
                     updateHighlight();
-                    if (!isDropdownOpen) {
-                        toggleDropdown(true);
-                    }
+                    if (!isDropdownOpen) toggleDropdown(true);
                 }
             } else if (e.key === 'Enter') {
                 e.preventDefault();
-                if (highlightedIndex >= 0 && highlightedIndex < totalItems) {
-                    const item = visibleItems[highlightedIndex];
-                    if (item) {
-                        const id = item.dataset.id;
-                        selectCustomer(id);
-                    }
-                } else if (totalItems === 1) {
-                    const item = visibleItems[0];
-                    if (item) {
-                        const id = item.dataset.id;
-                        selectCustomer(id);
-                    }
-                } else if (totalItems > 0) {
-                    const item = visibleItems[0];
-                    if (item) {
-                        const id = item.dataset.id;
-                        selectCustomer(id);
-                    }
+                if (highlightedIndex >= 0 && highlightedIndex < total) {
+                    selectCustomer(items[highlightedIndex].dataset.id);
+                } else if (total === 1) {
+                    selectCustomer(items[0].dataset.id);
+                } else if (total > 0) {
+                    selectCustomer(items[0].dataset.id);
                 }
                 toggleDropdown(false);
                 customerSearchInput.blur();
-            } else if (e.key === 'Escape') {
+            } else if (e.key === 'Escape' || e.key === 'Tab') {
                 toggleDropdown(false);
                 customerSearchInput.blur();
-            } else if (e.key === 'Tab') {
-                toggleDropdown(false);
             }
         });
         
         document.addEventListener('click', (e) => {
             const wrapper = document.getElementById('customerSelectWrapper');
-            if (wrapper && !wrapper.contains(e.target)) {
-                toggleDropdown(false);
-            }
+            if (wrapper && !wrapper.contains(e.target)) toggleDropdown(false);
         });
         
         customerSearchInput.addEventListener('blur', () => {
             setTimeout(() => {
                 if (!selectedCustomerId.value && customerSearchInput.value) {
                     const filtered = filterCustomers(customerSearchInput.value);
-                    if (filtered.length === 1) {
-                        selectCustomer(filtered[0].id);
-                    }
+                    if (filtered.length === 1) selectCustomer(filtered[0].id);
                 }
             }, 200);
         });
         
         // =============================================
-        // END SEARCHABLE SELECT LOGIC
+        // CORE FUNCTIONS
         // =============================================
-        
-        async function loadCustomers() {
-            try {
-                const customersSnap = await getDocs(collection(db, 'customers'));
-                allCustomers = [];
-                customerMap.clear();
-
-                customersSnap.forEach(docSnap => {
-                    const customer = docSnap.data();
-                    const customerId = docSnap.id;
-                    const due = customer.totalDue || 0;
-                    
-                    allCustomers.push({
-                        id: customerId,
-                        name: customer.name || 'Unknown',
-                        phone: customer.phone || 'N/A',
-                        due: due
-                    });
-                    
-                    customerMap.set(customerId, {
-                        id: customerId,
-                        ...customer
-                    });
-                });
-
-                allCustomers.sort((a, b) => a.name.localeCompare(b.name));
-                renderDropdown(allCustomers);
-
-            } catch (error) {
-                console.error(error);
-                showToast('Error loading customers', 'error');
-            }
-        }
-        
-        async function loadAllTransactions() {
-            if (allTransactions.length === 0) {
-                const snapshot = await getDocs(collection(db, 'transactions'));
-                allTransactions = [];
-                snapshot.forEach(doc => {
-                    allTransactions.push({ id: doc.id, ...doc.data() });
-                });
-            }
-            return allTransactions;
-        }
-        
-        function updateDateFilterInfo() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const infoDiv = document.getElementById('dateFilterInfo');
-            const filterText = document.getElementById('dateFilterText');
+        const updateDateFilterInfo = () => {
+            const startDate = startDateInput?.value || '';
+            const endDate = endDateInput?.value || '';
+            const infoDiv = $('dateFilterInfo');
+            const filterText = $('dateFilterText');
             
             if (startDate || endDate) {
-                infoDiv.classList.remove('hidden');
+                infoDiv?.classList.remove('hidden');
                 if (startDate && endDate) {
                     filterText.textContent = `Showing transactions from ${startDate} to ${endDate}`;
                 } else if (startDate) {
@@ -1114,35 +921,70 @@
                     filterText.textContent = `Showing transactions up to ${endDate}`;
                 }
             } else {
-                infoDiv.classList.add('hidden');
+                infoDiv?.classList.add('hidden');
                 filterText.textContent = 'Showing all transactions';
             }
-        }
+        };
         
-        function clearDateFilters() {
-            if (startDateInput) startDateInput.value = '';
-            if (endDateInput) endDateInput.value = '';
-            updateDateInputClass(startDateInput);
-            updateDateInputClass(endDateInput);
+        const clearDateFilters = () => {
+            if (startDateInput) { startDateInput.value = ''; updateDateInputClass(startDateInput); }
+            if (endDateInput) { endDateInput.value = ''; updateDateInputClass(endDateInput); }
             updateDateFilterInfo();
-            const customerId = document.getElementById('selectedCustomerId').value;
-            if (customerId) {
-                viewLedger();
-            }
-        }
+            if (selectedCustomerId.value) viewLedger();
+        };
         
-        async function viewLedger() {
-            const customerId = document.getElementById('selectedCustomerId').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
+        const getTransactionAmount = (trans) => {
+            if (trans.type === 'due') {
+                // Check dueAmount first
+                if (trans.dueAmount !== undefined && trans.dueAmount !== null) {
+                    return trans.dueAmount;
+                }
+                // Then check totalAmount - paidAmount
+                if (trans.totalAmount && trans.paidAmount) {
+                    return trans.totalAmount - trans.paidAmount;
+                }
+                // Finally return totalAmount or 0
+                return trans.totalAmount || 0;
+            } else if (trans.type === 'collection') {
+                return trans.collectionAmount || 0;
+            }
+            return 0;
+        };
+        
+        // =============================================
+        // LOAD DATA
+        // =============================================
+        const loadCustomers = async () => {
+            try {
+                const snap = await getDocs(collection(db, 'customers'));
+                allCustomers = [];
+                customerMap.clear();
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    allCustomers.push({ id, name: data.name || 'Unknown', phone: data.phone || 'N/A', due: data.totalDue || 0 });
+                    customerMap.set(id, { id, ...data });
+                });
+                allCustomers.sort((a, b) => a.name.localeCompare(b.name));
+                renderDropdown(allCustomers);
+            } catch {
+                showToast('Error loading customers', 'error');
+            }
+        };
+        
+        // =============================================
+        // VIEW LEDGER
+        // =============================================
+        const viewLedger = async () => {
+            const customerId = selectedCustomerId.value;
+            const startDate = startDateInput?.value || '';
+            const endDate = endDateInput?.value || '';
             
             if (!customerId) {
                 showToast('Please select a customer', 'error');
                 return;
             }
             
-            currentFilterStartDate = startDate;
-            currentFilterEndDate = endDate;
             updateDateFilterInfo();
             showLoading(true);
             
@@ -1154,67 +996,80 @@
                     return;
                 }
                 
-                currentCustomerName = customer.name || 'N/A';
-                currentCustomerPhone = customer.phone || 'N/A';
-                currentCustomerAddress = customer.address || 'N/A';
+                // Update customer info
+                $('customerName').textContent = customer.name || 'N/A';
+                $('customerPhone').textContent = customer.phone || 'N/A';
+                $('customerAddress').textContent = customer.address || 'N/A';
+                $('customerCurrentDue').innerHTML = `৳${(customer.totalDue || 0).toFixed(2)}`;
+                $('customerInfoCard').classList.remove('hidden');
                 
-                document.getElementById('customerName').textContent = customer.name || 'N/A';
-                document.getElementById('customerPhone').textContent = customer.phone || 'N/A';
-                document.getElementById('customerAddress').textContent = customer.address || 'N/A';
-                document.getElementById('customerCurrentDue').innerHTML = `৳${(customer.totalDue || 0).toFixed(2)}`;
-                document.getElementById('customerInfoCard').classList.remove('hidden');
+                ['printCustomerName', 'printCustomerPhone', 'printCustomerAddress'].forEach(id => {
+                    const el = $(id);
+                    if (el) el.textContent = customer[id.replace('print', '').toLowerCase()] || 'N/A';
+                });
+                $('printDate').textContent = new Date().toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' });
                 
-                document.getElementById('printCustomerName').textContent = customer.name || 'N/A';
-                document.getElementById('printCustomerPhone').textContent = customer.phone || 'N/A';
-                document.getElementById('printCustomerAddress').textContent = customer.address || 'N/A';
-                document.getElementById('printDate').textContent = new Date().toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' });
+                // Load transactions
+                const snap = await getDocs(collection(db, 'transactions'));
+                allTransactions = [];
+                snap.forEach(doc => allTransactions.push({ id: doc.id, ...doc.data() }));
                 
-                const transactions = await loadAllTransactions();
-                let customerTransactions = transactions.filter(trans => trans.customerId === customerId);
-                customerTransactions.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+                // Filter by customer
+                let customerTransactions = allTransactions.filter(t => {
+                    if (t.customerName) {
+                        return t.customerName.trim().toLowerCase() === customer.name.trim().toLowerCase();
+                    }
+                    return t.customerId === customerId || t.customer_id === customerId || t.custId === customerId;
+                });
                 
-                let filteredTransactions = [...customerTransactions];
-                if (startDate) {
-                    filteredTransactions = filteredTransactions.filter(t => t.date >= startDate);
-                }
-                if (endDate) {
-                    filteredTransactions = filteredTransactions.filter(t => t.date <= endDate);
-                }
-                
-                const tbody = document.getElementById('ledgerTableBody');
-                
-                if (filteredTransactions.length === 0) {
-                    let message = 'No transactions found';
-                    if (startDate || endDate) message += ' in selected date range';
-                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500"><i class="fas fa-calendar-times text-3xl mb-2 opacity-40 block"></i><p class="text-xs">${message}</p></td></tr>`;
-                    document.getElementById('ledgerCard').classList.remove('hidden');
+                if (customerTransactions.length === 0) {
+                    $('ledgerTableBody').innerHTML = `
+                        <tr><td colspan="5" class="text-center py-8">
+                            <i class="fas fa-exclamation-triangle text-3xl mb-2 opacity-40 block text-yellow-500"></i>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">No transactions found for this customer</p>
+                            <p class="text-xs text-gray-400 mt-2">Total transactions in system: ${allTransactions.length}</p>
+                        </td></tr>
+                    `;
+                    $('ledgerCard').classList.remove('hidden');
                     currentClosingBalance = 0;
                     showLoading(false);
                     return;
                 }
                 
-                tbody.innerHTML = '';
+                // Sort and filter by date
+                customerTransactions.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+                let filtered = [...customerTransactions];
+                if (startDate) filtered = filtered.filter(t => t.date >= startDate);
+                if (endDate) filtered = filtered.filter(t => t.date <= endDate);
                 
+                const tbody = $('ledgerTableBody');
+                
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500"><i class="fas fa-calendar-times text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No transactions in selected date range</p><p class="text-xs text-gray-400 mt-1">Total: ${customerTransactions.length} transactions</p></td></tr>`;
+                    $('ledgerCard').classList.remove('hidden');
+                    currentClosingBalance = 0;
+                    showLoading(false);
+                    return;
+                }
+                
+                // Render
+                tbody.innerHTML = '';
                 let openingBalance = 0;
                 if (startDate) {
-                    const transactionsBeforeStart = customerTransactions.filter(t => t.date < startDate);
-                    for (const trans of transactionsBeforeStart) {
-                        if (trans.type === 'due') {
-                            openingBalance += getTransactionAmount(trans);
-                        } else if (trans.type === 'collection') {
-                            openingBalance -= getTransactionAmount(trans);
-                        }
+                    const before = customerTransactions.filter(t => t.date < startDate);
+                    for (const t of before) {
+                        if (t.type === 'due') openingBalance += getTransactionAmount(t);
+                        else if (t.type === 'collection') openingBalance -= getTransactionAmount(t);
                     }
                 }
                 
                 let runningBalance = openingBalance;
-                let totalDueAdded = 0;
-                let totalCollected = 0;
+                let totalDue = 0, totalCollected = 0;
                 
                 if (startDate && openingBalance !== 0) {
-                    const openingRow = tbody.insertRow();
-                    openingRow.className = 'bg-gray-100 dark:bg-gray-700/30 font-semibold print-opening-row';
-                    openingRow.innerHTML = `
+                    const row = tbody.insertRow();
+                    row.className = 'bg-gray-100 dark:bg-gray-700/30 font-semibold print-opening-row';
+                    row.innerHTML = `
                         <td class="px-3 py-2.5 text-xs whitespace-nowrap">${startDate}</td>
                         <td class="px-3 py-2.5"><span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium bg-gray-300 dark:bg-gray-600">Opening Balance</span></td>
                         <td class="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400">Previous balance brought forward</td>
@@ -1223,19 +1078,13 @@
                     `;
                 }
                 
-                for (const trans of filteredTransactions) {
-                    let description = '';
-                    let amount = 0;
-                    let amountClass = '';
-                    let typeClass = '';
-                    let typeIcon = '';
-                    let typeText = '';
-                    let displayAmount = '';
+                for (const trans of filtered) {
+                    let desc = '', amount = 0, amountClass = '', typeClass = '', typeIcon = '', typeText = '', displayAmount = '';
                     
                     if (trans.type === 'due') {
                         amount = getTransactionAmount(trans);
                         runningBalance += amount;
-                        totalDueAdded += amount;
+                        totalDue += amount;
                         amountClass = 'text-red-600 dark:text-red-400';
                         typeClass = 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400';
                         typeIcon = 'fa-plus-circle';
@@ -1243,18 +1092,16 @@
                         displayAmount = `+ ৳${amount.toFixed(2)}`;
                         
                         if (trans.products && trans.products.length > 0) {
-                            description = trans.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).join(', ');
-                            if (trans.paidAmount && trans.paidAmount > 0) {
-                                description += ` | Paid: ৳${trans.paidAmount.toFixed(2)}`;
-                            }
+                            desc = trans.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).join(', ');
+                            if (trans.paidAmount) desc += ` | Paid: ৳${trans.paidAmount.toFixed(2)}`;
                         } else if (trans.directDueAmount) {
-                            description = `Direct Due: ৳${trans.directDueAmount.toFixed(2)}`;
+                            desc = `Direct Due: ৳${trans.directDueAmount.toFixed(2)}`;
                         } else if (trans.productName) {
-                            description = trans.productName;
+                            desc = trans.productName;
                         } else {
-                            description = `Due Entry - Amount: ৳${amount.toFixed(2)}`;
+                            desc = `Due Entry - Amount: ৳${amount.toFixed(2)}`;
                         }
-                        if (trans.remarks) description += ` (${trans.remarks})`;
+                        if (trans.remarks) desc += ` (${trans.remarks})`;
                         
                     } else if (trans.type === 'collection') {
                         amount = getTransactionAmount(trans);
@@ -1265,8 +1112,8 @@
                         typeIcon = 'fa-hand-holding-usd';
                         typeText = 'Collection';
                         displayAmount = `- ৳${amount.toFixed(2)}`;
-                        description = `Payment received${trans.remarks ? ' - ' + trans.remarks : ''}`;
-                        if (trans.expectedDate) description += ` | Expected: ${trans.expectedDate}`;
+                        desc = `Payment received${trans.remarks ? ' - ' + trans.remarks : ''}`;
+                        if (trans.expectedDate) desc += ` | Expected: ${trans.expectedDate}`;
                     }
                     
                     const balanceClass = runningBalance > 0 ? 'text-red-600 dark:text-red-400 font-bold' : runningBalance < 0 ? 'text-green-600 dark:text-green-400 font-bold' : '';
@@ -1276,7 +1123,7 @@
                     row.innerHTML = `
                         <td class="px-3 py-2.5 text-xs whitespace-nowrap">${trans.date || 'N/A'}</td>
                         <td class="px-3 py-2.5"><span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${typeClass}"><i class="fas ${typeIcon} text-[10px]"></i> ${typeText}</span></td>
-                        <td class="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400 break-words max-w-[350px]">${escapeHtml(description)}</td>
+                        <td class="px-3 py-2.5 text-xs text-gray-600 dark:text-gray-400 break-words max-w-[350px]">${escapeHtml(desc)}</td>
                         <td class="px-3 py-2.5 text-right text-xs font-semibold ${amountClass} whitespace-nowrap">${displayAmount}</td>
                         <td class="px-3 py-2.5 text-right text-xs font-semibold ${balanceClass} whitespace-nowrap">৳${runningBalance.toFixed(2)}</td>
                     `;
@@ -1284,37 +1131,29 @@
                 
                 currentClosingBalance = runningBalance;
                 
-                const summaryRow = tbody.insertRow();
-                summaryRow.className = 'bg-gray-100 dark:bg-gray-700/50 font-bold border-t-2 print-summary-row';
-                summaryRow.innerHTML = `
-                    <td colspan="3" class="px-3 py-3 text-right text-xs">Total Due Added: ৳${totalDueAdded.toFixed(2)} | Total Collection: ৳${totalCollected.toFixed(2)}</td>
+                const summary = tbody.insertRow();
+                summary.className = 'bg-gray-100 dark:bg-gray-700/50 font-bold border-t-2 print-summary-row';
+                summary.innerHTML = `
+                    <td colspan="3" class="px-3 py-3 text-right text-xs">Total Due: ৳${totalDue.toFixed(2)} | Total Collection: ৳${totalCollected.toFixed(2)}</td>
                     <td class="px-3 py-3 text-right"></td>
                     <td class="px-3 py-3 text-right text-sm font-bold ${runningBalance > 0 ? 'text-red-600' : 'text-green-600'} whitespace-nowrap">Closing: ৳${runningBalance.toFixed(2)}</td>
                 `;
                 
-                document.getElementById('ledgerCard').classList.remove('hidden');
-                
-                const filterMsg = (startDate || endDate) ? ` (Filtered: ${filteredTransactions.length} transactions)` : ` (${filteredTransactions.length} transactions)`;
-                showToast(`Ledger loaded | Balance: ৳${runningBalance.toFixed(2)}${filterMsg}`, 'success');
+                $('ledgerCard').classList.remove('hidden');
+                showToast(`Ledger loaded | Balance: ৳${runningBalance.toFixed(2)} (${filtered.length} transactions)`, 'success');
                 
             } catch (error) {
-                console.error("Ledger Error:", error);
-                showToast('Error loading ledger: ' + error.message, 'error');
+                showToast('Error loading ledger', 'error');
+                console.error('Ledger error:', error);
             } finally {
                 showLoading(false);
             }
-        }
+        };
         
-        function getTransactionAmount(trans) {
-            if (trans.type === 'due') {
-                return trans.dueAmount !== undefined ? trans.dueAmount : (trans.totalAmount - (trans.paidAmount || 0)) || trans.totalAmount || 0;
-            } else if (trans.type === 'collection') {
-                return trans.collectionAmount || 0;
-            }
-            return 0;
-        }
-        
-        function exportToCSV() {
+        // =============================================
+        // EXPORT & PRINT
+        // =============================================
+        const exportToCSV = () => {
             const rows = document.querySelectorAll('#ledgerTableBody tr');
             if (rows.length === 0 || (rows.length === 1 && rows[0].cells.length === 1)) {
                 showToast('No data to export', 'error');
@@ -1322,91 +1161,85 @@
             }
             
             const today = new Date();
-            const dateStr = today.getFullYear() + '-' + 
-                           String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                           String(today.getDate()).padStart(2, '0');
-            
-            let csvRows = [];
-            csvRows.push('"Date","Transaction Type","Description","Amount (TK)","Balance (TK)"');
+            const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+            let csvRows = ['"Date","Type","Description","Amount","Balance"'];
             
             for (let i = 0; i < rows.length - 1; i++) {
-                const row = rows[i];
-                const cells = row.querySelectorAll('td');
+                const cells = rows[i].querySelectorAll('td');
                 if (cells.length === 5) {
-                    let date = cells[0].textContent.trim();
-                    let typeElem = cells[1].querySelector('span');
-                    let type = typeElem ? typeElem.innerText.trim() : cells[1].textContent.trim();
-                    let description = cells[2].textContent.trim();
-                    let amountRaw = cells[3].textContent.trim();
-                    let balanceRaw = cells[4].textContent.trim();
-                    
-                    let amountMatch = amountRaw.match(/([\d.]+)/);
-                    let amount = amountMatch ? amountMatch[0] : '0';
-                    let balanceMatch = balanceRaw.match(/([\d.]+)/);
-                    let balance = balanceMatch ? balanceMatch[0] : '0';
-                    
-                    csvRows.push(`"${date}","${type}","${description.replace(/"/g, '""')}","${amount}","${balance}"`);
+                    const date = cells[0].textContent.trim();
+                    const type = cells[1].textContent.trim();
+                    const desc = cells[2].textContent.trim().replace(/"/g, '""');
+                    const amount = cells[3].textContent.trim().match(/([\d.]+)/)?.[0] || '0';
+                    const balance = cells[4].textContent.trim().match(/([\d.]+)/)?.[0] || '0';
+                    csvRows.push(`"${date}","${type}","${desc}","${amount}","${balance}"`);
                 }
             }
             
-            csvRows.push('"","","","",""');
             csvRows.push(`"Closing Balance","","","${currentClosingBalance.toFixed(2)}","${currentClosingBalance.toFixed(2)}"`);
             
             const blob = new Blob(["\uFEFF" + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.download = `ledger_${dateStr}.csv`;
-            a.href = url;
+            a.href = URL.createObjectURL(blob);
             a.click();
-            URL.revokeObjectURL(url);
+            URL.revokeObjectURL(a.href);
             showToast('CSV exported successfully!', 'success');
-        }
+        };
         
-        function printLedger() { 
-            const customerId = document.getElementById('selectedCustomerId').value;
+        const printLedger = () => {
+            const customerId = selectedCustomerId.value;
             if (customerId) {
                 const customer = customerMap.get(customerId);
                 if (customer) {
-                    document.getElementById('printCustomerName').textContent = customer.name || 'N/A';
-                    document.getElementById('printCustomerPhone').textContent = customer.phone || 'N/A';
-                    document.getElementById('printCustomerAddress').textContent = customer.address || 'N/A';
+                    $('printCustomerName').textContent = customer.name || 'N/A';
+                    $('printCustomerPhone').textContent = customer.phone || 'N/A';
+                    $('printCustomerAddress').textContent = customer.address || 'N/A';
                 }
             }
-            document.getElementById('printDate').textContent = new Date().toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' });
-            window.print(); 
-        }
+            $('printDate').textContent = new Date().toLocaleDateString('en-BD', { day: '2-digit', month: 'short', year: 'numeric' });
+            window.print();
+        };
         
-        // Event Listeners
-        document.getElementById('viewLedgerBtn').addEventListener('click', viewLedger);
-        document.getElementById('exportBtn').addEventListener('click', exportToCSV);
-        document.getElementById('printBtn').addEventListener('click', printLedger);
-        document.getElementById('clearDateFilterBtn')?.addEventListener('click', clearDateFilters);
-        document.getElementById('refreshBtn').addEventListener('click', () => {
-            document.getElementById('selectedCustomerId').value = '';
-            document.getElementById('customerSearchInput').value = '';
-            document.getElementById('ledgerCard').classList.add('hidden');
-            document.getElementById('customerInfoCard').classList.add('hidden');
-            if (startDateInput) startDateInput.value = '';
-            if (endDateInput) endDateInput.value = '';
-            updateDateInputClass(startDateInput);
-            updateDateInputClass(endDateInput);
-            document.getElementById('dateFilterInfo').classList.add('hidden');
+        // =============================================
+        // EVENT LISTENERS
+        // =============================================
+        $('viewLedgerBtn')?.addEventListener('click', viewLedger);
+        $('exportBtn')?.addEventListener('click', exportToCSV);
+        $('printBtn')?.addEventListener('click', printLedger);
+        $('clearDateFilterBtn')?.addEventListener('click', clearDateFilters);
+        $('darkModeToggle')?.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+        });
+        
+        $('refreshBtn')?.addEventListener('click', () => {
+            selectedCustomerId.value = '';
+            customerSearchInput.value = '';
+            $('ledgerCard').classList.add('hidden');
+            $('customerInfoCard').classList.add('hidden');
+            if (startDateInput) { startDateInput.value = ''; updateDateInputClass(startDateInput); }
+            if (endDateInput) { endDateInput.value = ''; updateDateInputClass(endDateInput); }
+            $('dateFilterInfo')?.classList.add('hidden');
             loadCustomers();
             showToast('Refreshed!', 'success');
         });
-        document.getElementById('darkModeToggle').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); document.body.classList.toggle('dark'); });
         
-        // Logout functionality
-        const logoutModal = document.getElementById('logoutModal');
-        const logoutLink = document.getElementById('logoutLink');
-        const cancelLogout = document.getElementById('cancelLogoutBtn');
-        const confirmLogout = document.getElementById('confirmLogoutBtn');
-        const { logout } = await import('./js/auth.js');
-        if (logoutLink) logoutLink.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); });
-        if (cancelLogout) cancelLogout.addEventListener('click', () => logoutModal.classList.add('hidden'));
-        if (confirmLogout) confirmLogout.addEventListener('click', async () => { logoutModal.classList.add('hidden'); await logout(); });
+        // Logout
+        const logoutModal = $('logoutModal');
+        $('logoutLink')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutModal.classList.remove('hidden');
+        });
+        $('cancelLogoutBtn')?.addEventListener('click', () => logoutModal.classList.add('hidden'));
+        $('confirmLogoutBtn')?.addEventListener('click', async () => {
+            logoutModal.classList.add('hidden');
+            await logout();
+        });
         
-        // Initialize
+        // =============================================
+        // INIT
+        // =============================================
         await loadCustomers();
     </script>
 </body>

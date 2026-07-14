@@ -114,7 +114,6 @@
         .detail-modal-content .value.amount { color:#0f3b3a; }
         .dark .detail-modal-content .value.amount { color:#d4af37; }
 
-        /* Top Summary Cards */
         .top-stat-card {
             background: white;
             border-radius: 16px;
@@ -221,9 +220,9 @@
                         <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
                             <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
                         </a>
-                        <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                        <a href="due-reports.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
                             <i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span>
-                            </a>
+                        </a>
                         <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
                             <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
                         </a>
@@ -468,6 +467,7 @@
     let allDueEntries = [];
     let customerNameMap = new Map();
     let allCustomers = [];
+    let customerDataMap = new Map();
 
     // ─── UTILITIES ───
     function showToast(msg, type = 'success') {
@@ -480,9 +480,22 @@
 
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
 
+    // ✅ FIX: Improved customer name lookup
     function getCustomerName(id) {
         if (!id) return 'Unknown';
-        return customerNameMap.get(id) || 'Unknown';
+        // Try to get from map first
+        if (customerNameMap.has(id)) {
+            return customerNameMap.get(id);
+        }
+        // Try to find by checking customerDataMap
+        if (customerDataMap.has(id)) {
+            const data = customerDataMap.get(id);
+            return data.name || 'Unknown';
+        }
+        // Try to find by checking allCustomers array
+        const found = allCustomers.find(c => c.id === id);
+        if (found) return found.name;
+        return 'Unknown';
     }
 
     function formatDate(dateStr) {
@@ -579,13 +592,15 @@
         try {
             const snap = await getDocs(collection(db, 'customers'));
             customerNameMap.clear();
+            customerDataMap.clear();
             allCustomers = [];
             snap.forEach(doc => {
                 const data = doc.data();
                 const id = doc.id;
                 const name = data.name || 'Unknown';
                 customerNameMap.set(id, name);
-                allCustomers.push({ id, name });
+                customerDataMap.set(id, data);
+                allCustomers.push({ id, name, ...data });
             });
         } catch (error) {
             console.error('Error loading customers:', error);
@@ -718,7 +733,16 @@
         `;
 
         entries.forEach((entry, index) => {
-            const customerName = getCustomerName(entry.customerId) || entry.customerName || 'Unknown';
+            // ✅ FIX: Get customer name from multiple sources
+            let customerName = 'Unknown';
+            if (entry.customerId) {
+                customerName = getCustomerName(entry.customerId);
+            }
+            // If still unknown, try using customerName from entry
+            if (customerName === 'Unknown' && entry.customerName) {
+                customerName = entry.customerName;
+            }
+
             let details = '';
             if (entry.products?.length) {
                 details = entry.products.map(p => `${p.name} (${p.qty} ${p.unit || 'Pcs'})`).slice(0, 2).join(', ');
@@ -731,7 +755,7 @@
                 <tr class="report-row border-b border-gray-200 dark:border-gray-700">
                     <td class="px-3 py-2.5 text-center text-xs font-medium text-gray-500">${index + 1}</td>
                     <td class="px-3 py-2.5 text-sm">${entry.date || 'N/A'}</td>
-                    <td class="px-3 py-2.5 text-sm font-semibold">${escapeHtml(customerName)}</td>
+                    <td class="px-3 py-2.5 text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(customerName)}</td>
                     <td class="px-3 py-2.5 text-sm text-gray-600 dark:text-gray-400 max-w-[200px] truncate" title="${escapeHtml(details)}">${escapeHtml(details)}</td>
                     <td class="px-3 py-2.5 text-right text-sm font-semibold">${formatCurrency(entry.totalAmount)}</td>
                     <td class="px-3 py-2.5 text-right text-sm text-green-600 font-semibold">${formatCurrency(entry.paidAmount)}</td>
@@ -915,7 +939,6 @@
 
     // ─── INIT ───
     loadAllReports();
-    console.log('📊 Due Reports page initialized with summary cards');
 
 </script>
 </body>

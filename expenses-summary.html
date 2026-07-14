@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
     <meta name="theme-color" content="#0f3b3a">
-    <title>Expenses | JackDev Due Managements</title>
+    <title>Summary | JackDev Due Managements</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -35,22 +36,15 @@
         
         .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
         .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
-        .sidebar-fixed { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
-        .sidebar-header-fixed { flex-shrink:0; position:sticky; top:0; background:inherit; z-index:10; }
-        
-        .nav-active { 
-            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%); 
-            border-left: 3px solid #d4af37;
-            color: white !important;
-        }
-        .dark .nav-active { 
-            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%); 
-        }
-        
-        .submenu-modern { max-height:0; overflow:hidden; transition:max-height 0.28s ease; }
+        .nav-active { background:linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%); border-left:3px solid #d4af37; }
+        .dark .nav-active { background:linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%); }
+        .submenu-modern { max-height:0; overflow:hidden; transition:max-height 0.28s; }
         .submenu-modern.open { max-height:350px; }
         .has-submenu>a .chevron-icon { transition:transform 0.2s; }
         .has-submenu.open>a .chevron-icon { transform:rotate(180deg); }
+        
+        .sidebar-fixed { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+        .sidebar-header-fixed { flex-shrink:0; position:sticky; top:0; background:inherit; z-index:10; }
         
         .tab-btn {
             padding: 10px 24px;
@@ -77,39 +71,53 @@
         .dark .tab-btn:not(.active):hover { background: #374151; }
         .tab-btn i { font-size: 14px; }
 
-        .stat-card { transition:all 0.2s; }
-        .stat-card:hover { transform:translateY(-3px); box-shadow:0 12px 22px -12px rgba(0,0,0,0.12); }
-
-        .modal-overlay {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 200;
-            padding: 16px;
-        }
-        .modal-overlay .modal-content {
-            max-width: 600px;
+        .chart-container {
+            position: relative;
+            height: 250px;
             width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
+            max-width: 350px;
+            margin: 0 auto;
         }
 
-        @keyframes modalSlideUp { 
-            from { opacity:0; transform:translateY(20px) scale(0.96); } 
-            to { opacity:1; transform:translateY(0) scale(1); } 
+        .salary-ledger-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .modal-animate { animation:modalSlideUp 0.2s ease-out forwards; }
+        .salary-ledger-item:last-child { border-bottom: none; }
+        .dark .salary-ledger-item { border-bottom-color: #374151; }
+        .salary-ledger-item .date { font-size: 11px; color: #6b7280; }
+        .dark .salary-ledger-item .date { color: #9ca3af; }
+        .salary-ledger-item .amount { font-weight: 600; }
+        .salary-ledger-item .amount.positive { color: #16a34a; }
+        .salary-ledger-item .amount.negative { color: #dc2626; }
+        .salary-ledger-item .month-badge {
+            display: inline-block;
+            padding: 1px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .dark .salary-ledger-item .month-badge {
+            background: #374151;
+            color: #e5e7eb;
+        }
+
+        .filter-select { padding:6px 10px; font-size:12px; border:1px solid #d1d5db; border-radius:8px; background:white; color:#1f2937; outline:none; cursor:pointer; min-width:70px; }
+        .filter-select:focus { border-color:#0f3b3a; box-shadow:0 0 0 2px rgba(15,59,58,0.1); }
+        .dark .filter-select { background:#1f2937; border-color:#4b5563; color:#f1f5f9; }
+        .btn-active:active { transform:scale(0.97); }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
 
     <div class="flex min-h-screen">
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out border-r border-white/5 sidebar-fixed">
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 border-r border-white/5 sidebar-fixed">
             <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
@@ -143,7 +151,9 @@
                         </a>
                         <div class="submenu-modern pl-9 mt-1 space-y-1">
                             <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a>
-                            <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span></a>
+                            <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                            <i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span>
+                            </a>
                             <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a>
                         </div>
                     </div>
@@ -168,7 +178,7 @@
                     <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
                     </a>
-                    <a href="expenses.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150">
+                    <a href="expenses.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-money-bill-wave text-sm text-accent"></i></div>
                         <span class="text-sm font-medium">Expenses</span>
                     </a>
@@ -191,7 +201,7 @@
                 <div class="px-3 py-2.5 flex justify-between items-center">
                     <div class="flex items-center gap-2">
                         <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg"><i class="fas fa-bars text-lg"></i></button>
-                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-money-bill-wave text-primary mr-2"></i>Expenses</h2>
+                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-chart-bar text-primary mr-2"></i>Summary</h2>
                     </div>
                     <div class="flex items-center gap-1">
                         <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt text-sm"></i></button>
@@ -203,7 +213,7 @@
             <div class="p-3 md:p-4">
                 <!-- Tab Navigation -->
                 <div class="flex flex-wrap gap-2 mb-6 bg-white dark:bg-gray-800 p-2 rounded-xl border shadow-sm">
-                    <a href="expenses.html" class="tab-btn active">
+                    <a href="expenses.html" class="tab-btn">
                         <i class="fas fa-home"></i> Overview
                     </a>
                     <a href="expenses-staff.html" class="tab-btn">
@@ -212,98 +222,80 @@
                     <a href="expenses-office.html" class="tab-btn">
                         <i class="fas fa-building"></i> Office Expenses
                     </a>
-                    <a href="expenses-attendance.html" class="tab-btn <?php echo basename($_SERVER['PHP_SELF']) == 'expenses-attendance.html' ? 'active' : ''; ?>">
-                        <i class="fas fa-clipboard-check"></i> Attendance
-                    </a>
-                    <a href="expenses-summary.html" class="tab-btn">
+                    <a href="expenses-summary.html" class="tab-btn active">
                         <i class="fas fa-chart-bar"></i> Summary
                     </a>
                 </div>
 
-                <!-- Overview Content -->
-                <div>
-                    <!-- Stats Cards -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
-                            <div class="bg-blue-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-coins text-blue-600 text-sm"></i></div>
-                            <p class="text-gray-500 text-[9px] font-semibold uppercase">Total Expenses</p>
-                            <p class="text-lg font-bold" id="totalExpenses">৳0</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
-                            <div class="bg-green-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-calendar-check text-green-600 text-sm"></i></div>
-                            <p class="text-gray-500 text-[9px] font-semibold uppercase">This Month</p>
-                            <p class="text-lg font-bold" id="monthlyExpenses">৳0</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
-                            <div class="bg-purple-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-users text-purple-600 text-sm"></i></div>
-                            <p class="text-gray-500 text-[9px] font-semibold uppercase">Total Staff</p>
-                            <p class="text-lg font-bold" id="totalStaff">0</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
-                            <div class="bg-red-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-exclamation-triangle text-red-600 text-sm"></i></div>
-                            <p class="text-gray-500 text-[9px] font-semibold uppercase">Salary Due</p>
-                            <p class="text-lg font-bold text-red-600" id="salaryDue">৳0</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
-                            <div class="bg-amber-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-building text-amber-600 text-sm"></i></div>
-                            <p class="text-gray-500 text-[9px] font-semibold uppercase">Office Expenses</p>
-                            <p class="text-lg font-bold text-amber-600" id="officeExpenses">৳0</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
-                            <div class="bg-teal-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-hand-holding-usd text-teal-600 text-sm"></i></div>
-                            <p class="text-gray-500 text-[9px] font-semibold uppercase">Staff Paid</p>
-                            <p class="text-lg font-bold text-teal-600" id="staffPaid">৳0</p>
-                        </div>
-                    </div>
-
-                    <!-- Quick Action Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <a href="expenses-staff.html" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-6 hover:shadow-md transition-all group">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition">
-                                    <i class="fas fa-user-plus text-primary text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-800 dark:text-white">Staff Management</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Add, manage & pay salaries</p>
-                                </div>
-                                <i class="fas fa-arrow-right ml-auto text-gray-400 group-hover:text-primary transition"></i>
-                            </div>
-                        </a>
-                        <a href="expenses-office.html" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-6 hover:shadow-md transition-all group">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center group-hover:bg-amber-200 transition">
-                                    <i class="fas fa-plus-circle text-amber-600 text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-800 dark:text-white">Office Expenses</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Track bills & other expenses</p>
-                                </div>
-                                <i class="fas fa-arrow-right ml-auto text-gray-400 group-hover:text-primary transition"></i>
-                            </div>
-                        </a>
-                        <a href="expenses-summary.html" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-6 hover:shadow-md transition-all group">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center group-hover:bg-green-200 transition">
-                                    <i class="fas fa-chart-pie text-green-600 text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-800 dark:text-white">Summary & Reports</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">View expense distribution</p>
-                                </div>
-                                <i class="fas fa-arrow-right ml-auto text-gray-400 group-hover:text-primary transition"></i>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Recent Activity -->
-                    <div class="mt-4 bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                <!-- Summary Content -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <!-- Staff Summary -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
                         <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
-                            <h3 class="text-sm font-semibold"><i class="fas fa-clock text-primary mr-2"></i>Recent Activity</h3>
+                            <h3 class="text-sm font-semibold"><i class="fas fa-users text-primary mr-2"></i>Staff Summary</h3>
                         </div>
-                        <div class="p-4 max-h-[300px] overflow-y-auto">
-                            <div id="recentActivityContent">
+                        <div class="p-4">
+                            <div id="staffSummaryContent">
                                 <div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Office Expenses Summary -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                        <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                            <h3 class="text-sm font-semibold"><i class="fas fa-building text-primary mr-2"></i>Office Expenses Summary</h3>
+                        </div>
+                        <div class="p-4">
+                            <div id="expenseSummaryContent">
+                                <div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Salary Ledger -->
+                    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                        <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex justify-between items-center flex-wrap gap-2">
+                            <h3 class="text-sm font-semibold"><i class="fas fa-book text-primary mr-2"></i>Salary Ledger</h3>
+                            <div class="flex items-center gap-2">
+                                <select id="ledgerStaffSelect" class="filter-select text-sm px-3 py-1.5 min-w-[200px]">
+                                    <option value="">-- Select Staff --</option>
+                                </select>
+                                <button id="viewLedgerBtn" class="bg-primary hover:bg-primary-dark text-white px-4 py-1.5 rounded-lg text-sm transition btn-active">
+                                    <i class="fas fa-eye mr-1"></i> View
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4 max-h-[400px] overflow-y-auto">
+                            <div id="salaryLedgerContent">
+                                <div class="text-center py-8 text-gray-400 text-sm">Select a staff member to view salary ledger</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pie Chart & Recent Activity -->
+                    <div class="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <!-- Pie Chart -->
+                        <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                            <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                                <h3 class="text-sm font-semibold"><i class="fas fa-chart-pie text-primary mr-2"></i>Expense Distribution</h3>
+                            </div>
+                            <div class="p-4">
+                                <div class="chart-container">
+                                    <canvas id="expensePieChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                            <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                                <h3 class="text-sm font-semibold"><i class="fas fa-clock text-primary mr-2"></i>Recent Activity</h3>
+                            </div>
+                            <div class="p-4 max-h-[400px] overflow-y-auto">
+                                <div id="recentActivityContent">
+                                    <div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -345,20 +337,29 @@
         // ==================== STATE ====================
         let allStaff = [];
         let allExpenses = [];
+        let pieChartInstance = null;
+
+        const defaultCategories = {
+            rent: { label: 'Office Rent', icon: '🏢', class: 'expense-rent' },
+            electricity: { label: 'Electricity Bill', icon: '⚡', class: 'expense-electricity' },
+            staff: { label: 'Staff Salary', icon: '👨‍💼', class: 'expense-staff' },
+            other: { label: 'Other Expenses', icon: '📋', class: 'expense-other' }
+        };
 
         // ==================== UTILITIES ====================
-        function showToast(msg, type = 'success') {
+        function showToast(msg, type='success') {
             const c = document.getElementById('toastContainer');
             const t = document.createElement('div');
-            t.className = `px-4 py-2 rounded-lg shadow text-sm ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+            t.className = `px-4 py-2 rounded-lg shadow text-sm ${type==='success'?'bg-green-500 text-white':'bg-red-500 text-white'}`;
             t.innerText = msg;
             c.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
+            setTimeout(()=>t.remove(), 3000);
         }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+        function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+
+        function getTodayDate() {
+            return new Date().toISOString().split('T')[0];
         }
 
         // ==================== LOAD DATA ====================
@@ -384,7 +385,9 @@
                         salaryHistory: data.salaryHistory || []
                     });
                 });
-                updateStats();
+                updateStaffSummary();
+                updateLedgerDropdown();
+                updatePieChart();
             } catch (error) {
                 console.error('Error loading staff:', error);
             }
@@ -407,49 +410,240 @@
                         createdAt: data.createdAt || ''
                     });
                 });
-                updateStats();
+                updateExpenseSummary();
+                updatePieChart();
                 updateRecentActivity();
             } catch (error) {
                 console.error('Error loading expenses:', error);
             }
         }
 
-        // ==================== UPDATE STATS ====================
-        function updateStats() {
-            const totalExp = allExpenses.reduce((sum, e) => sum + e.amount, 0);
+        // ==================== UPDATE STAFF SUMMARY ====================
+        function updateStaffSummary() {
             const totalSalaryPaid = allStaff.reduce((sum, s) => sum + s.paidAmount, 0);
             const totalSalaryDue = allStaff.reduce((sum, s) => sum + s.dueAmount, 0);
-            const total = totalExp + totalSalaryPaid;
+            
+            document.getElementById('staffSummaryContent').innerHTML = `
+                <div class="space-y-2">
+                    <div class="flex justify-between py-2 border-b"><span class="text-sm">Total Staff</span><span class="font-bold">${allStaff.length}</span></div>
+                    <div class="flex justify-between py-2 border-b"><span class="text-sm">Active Staff</span><span class="font-bold text-green-600">${allStaff.filter(s => s.status === 'active').length}</span></div>
+                    <div class="flex justify-between py-2 border-b"><span class="text-sm">Total Salary Paid</span><span class="font-bold text-blue-600">৳${totalSalaryPaid.toFixed(2)}</span></div>
+                    <div class="flex justify-between py-2"><span class="text-sm">Total Salary Due</span><span class="font-bold text-red-600">৳${totalSalaryDue.toFixed(2)}</span></div>
+                </div>
+            `;
+        }
 
-            const month = new Date().toISOString().slice(0, 7);
-            const monthly = allExpenses.filter(e => e.date.startsWith(month)).reduce((sum, e) => sum + e.amount, 0) +
-                allStaff.filter(s => s.salaryHistory?.some(h => h.month === month)).reduce((sum, s) => {
-                    const m = s.salaryHistory?.filter(h => h.month === month);
-                    return sum + (m ? m.reduce((acc, cur) => acc + cur.amount, 0) : 0);
-                }, 0);
+        // ==================== UPDATE EXPENSE SUMMARY ====================
+        function updateExpenseSummary() {
+            const expenseCategories = {};
+            allExpenses.forEach(e => {
+                const cat = e.customCategory || defaultCategories[e.category]?.label || e.category;
+                expenseCategories[cat] = (expenseCategories[cat] || 0) + e.amount;
+            });
 
-            const officeExp = allExpenses.reduce((sum, e) => sum + e.amount, 0);
+            let html = '<div class="space-y-2">';
+            Object.entries(expenseCategories).forEach(([cat, amount]) => {
+                html += `<div class="flex justify-between py-2 border-b"><span class="text-sm">${cat}</span><span class="font-bold">৳${amount.toFixed(2)}</span></div>`;
+            });
+            const totalExp = allExpenses.reduce((sum, e) => sum + e.amount, 0);
+            html += `<div class="flex justify-between py-2"><span class="text-sm font-semibold">Total</span><span class="font-bold text-blue-600">৳${totalExp.toFixed(2)}</span></div>`;
+            html += '</div>';
+            document.getElementById('expenseSummaryContent').innerHTML = html;
+        }
 
-            document.getElementById('totalExpenses').textContent = `৳${total.toFixed(2)}`;
-            document.getElementById('monthlyExpenses').textContent = `৳${monthly.toFixed(2)}`;
-            document.getElementById('totalStaff').textContent = allStaff.length;
-            document.getElementById('salaryDue').textContent = `৳${totalSalaryDue.toFixed(2)}`;
-            document.getElementById('officeExpenses').textContent = `৳${officeExp.toFixed(2)}`;
-            document.getElementById('staffPaid').textContent = `৳${totalSalaryPaid.toFixed(2)}`;
+        // ==================== PIE CHART ====================
+        function updatePieChart() {
+            const ctx = document.getElementById('expensePieChart').getContext('2d');
+            
+            const categoryMap = {};
+            allExpenses.forEach(e => {
+                const key = e.customCategory || defaultCategories[e.category]?.label || e.category;
+                categoryMap[key] = (categoryMap[key] || 0) + e.amount;
+            });
+
+            allStaff.forEach(s => {
+                if(s.paidAmount > 0) {
+                    const key = '👨‍💼 Staff Salaries';
+                    categoryMap[key] = (categoryMap[key] || 0) + s.paidAmount;
+                }
+            });
+
+            const labels = Object.keys(categoryMap);
+            const data = Object.values(categoryMap);
+            const colors = [
+                '#0f3b3a', '#d4af37', '#2c7a4d', '#e53e3e', '#3182ce', 
+                '#dd6b20', '#805ad5', '#38a169', '#d69e2e', '#ed64a6'
+            ];
+
+            if(pieChartInstance) {
+                pieChartInstance.destroy();
+            }
+
+            if(data.length === 0) {
+                pieChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['No Data'],
+                        datasets: [{
+                            data: [1],
+                            backgroundColor: ['#e5e7eb'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { 
+                                display: true,
+                                position: 'bottom',
+                                labels: { font: { size: 10 } }
+                            }
+                        }
+                    }
+                });
+                return;
+            }
+
+            pieChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, data.length),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            display: true,
+                            position: 'bottom',
+                            labels: { 
+                                font: { size: 10 },
+                                padding: 10,
+                                boxWidth: 12
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `৳${context.parsed.toFixed(2)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==================== LEDGER DROPDOWN ====================
+        function updateLedgerDropdown() {
+            const select = document.getElementById('ledgerStaffSelect');
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">-- Select Staff --</option>';
+            allStaff.forEach(s => {
+                const option = document.createElement('option');
+                option.value = s.id;
+                option.textContent = `${s.name} (${s.position || 'No Position'})`;
+                select.appendChild(option);
+            });
+            if (currentValue && allStaff.some(s => s.id === currentValue)) {
+                select.value = currentValue;
+            }
+        }
+
+        // ==================== VIEW LEDGER ====================
+        document.getElementById('viewLedgerBtn').addEventListener('click', () => {
+            const staffId = document.getElementById('ledgerStaffSelect').value;
+            if (!staffId) {
+                showToast('Please select a staff member', 'error');
+                return;
+            }
+            const staff = allStaff.find(s => s.id === staffId);
+            if (!staff) {
+                showToast('Staff not found', 'error');
+                return;
+            }
+            renderSalaryLedger(staff);
+        });
+
+        function renderSalaryLedger(staff) {
+            const container = document.getElementById('salaryLedgerContent');
+            
+            if (!staff.salaryHistory || staff.salaryHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400 text-sm">
+                        <i class="fas fa-inbox text-3xl mb-2 block opacity-40"></i>
+                        No salary payments recorded for ${escapeHtml(staff.name)}
+                    </div>
+                `;
+                return;
+            }
+
+            const history = [...staff.salaryHistory].sort((a, b) => b.month.localeCompare(a.month));
+            const totalPaid = history.reduce((sum, h) => sum + h.amount, 0);
+            const monthNames = {
+                '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+                '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+                '09': 'September', '10': 'October', '11': 'November', '12': 'December'
+            };
+
+            let html = `
+                <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg flex justify-between items-center">
+                    <div>
+                        <div class="font-bold text-base">${escapeHtml(staff.name)}</div>
+                        <div class="text-xs text-gray-500">${escapeHtml(staff.position || 'No Position')}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-gray-500">Total Salary Paid</div>
+                        <div class="text-xl font-bold text-green-600">৳${totalPaid.toFixed(2)}</div>
+                    </div>
+                </div>
+                <div class="space-y-1">
+            `;
+
+            history.forEach((h) => {
+                const [year, month] = h.month.split('-');
+                const monthName = monthNames[month] || month;
+                const date = h.paidDate || 'N/A';
+                const amount = h.amount || 0;
+                const remarks = h.remarks || '';
+
+                html += `
+                    <div class="salary-ledger-item">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3">
+                                <span class="date">${date}</span>
+                                <span class="month-badge">${monthName} ${year}</span>
+                                ${remarks ? `<span class="text-xs text-gray-400 ml-2">${escapeHtml(remarks)}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="amount positive">+ ৳${amount.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+                <div class="mt-3 p-2 bg-gray-100 dark:bg-gray-700/30 rounded-lg flex justify-between items-center">
+                    <span class="text-sm font-semibold">Total Payments</span>
+                    <span class="text-sm font-bold text-green-600">${history.length} payments</span>
+                </div>
+            `;
+
+            container.innerHTML = html;
         }
 
         // ==================== RECENT ACTIVITY ====================
         function updateRecentActivity() {
-            const defaultCategories = {
-                rent: '🏢 Office Rent',
-                electricity: '⚡ Electricity Bill',
-                staff: '👨‍💼 Staff Salary',
-                other: '📋 Other Expenses'
-            };
-
             const recent = [];
-
-            // Staff salary payments
             allStaff.forEach(s => {
                 if (s.salaryHistory?.length) {
                     s.salaryHistory.slice(-2).forEach(h => {
@@ -458,28 +652,23 @@
                             type: '💰 Salary Paid',
                             name: s.name,
                             description: `Salary payment for ${s.name} (${h.month})`,
-                            amount: h.amount,
-                            isSalary: true
+                            amount: h.amount
                         });
                     });
                 }
             });
-
-            // Office expenses
             allExpenses.slice(0, 10).forEach(e => {
-                const cat = e.customCategory || defaultCategories[e.category] || e.category;
+                const cat = e.customCategory || defaultCategories[e.category]?.label || e.category;
                 recent.push({
                     date: e.date,
-                    type: cat,
+                    type: `🏢 ${cat}`,
                     name: e.description || 'Office Expense',
                     description: `${cat}${e.description ? ': ' + e.description : ''}`,
-                    amount: e.amount,
-                    isSalary: false
+                    amount: e.amount
                 });
             });
-
             recent.sort((a, b) => b.date.localeCompare(a.date));
-            const recentData = recent.slice(0, 15);
+            const recentData = recent.slice(0, 20);
 
             const container = document.getElementById('recentActivityContent');
             if (recentData.length === 0) {
@@ -494,7 +683,7 @@
                             </div>
                             <div class="text-xs text-gray-500 truncate">${escapeHtml(r.description)}</div>
                         </div>
-                        <span class="text-sm font-bold ${r.isSalary ? 'text-green-600' : 'text-red-600'} ml-2">${r.isSalary ? '+' : '-'} ৳${r.amount.toFixed(2)}</span>
+                        <span class="text-sm font-bold ${r.type.includes('Salary') ? 'text-green-600' : 'text-red-600'} ml-2">${r.type.includes('Salary') ? '+' : '-'} ৳${r.amount.toFixed(2)}</span>
                     </div>
                 `).join('');
             }
@@ -502,49 +691,17 @@
 
         // ==================== SIDEBAR ====================
         const sidebar = document.getElementById('sidebar');
-        const menuToggle = document.getElementById('menuToggle');
-        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-
-        function openSidebar() {
+        document.getElementById('menuToggle').addEventListener('click', () => {
             sidebar.classList.remove('-translate-x-full');
-            // Add overlay for mobile
-            if (window.innerWidth < 768) {
-                const overlay = document.createElement('div');
-                overlay.id = 'sidebarOverlay';
-                overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
-                overlay.onclick = closeSidebar;
-                document.body.appendChild(overlay);
-            }
-        }
-
-        function closeSidebar() {
-            sidebar.classList.add('-translate-x-full');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (overlay) overlay.remove();
-        }
-
-        menuToggle.addEventListener('click', openSidebar);
-        closeSidebarBtn.addEventListener('click', closeSidebar);
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768) {
-                sidebar.classList.remove('-translate-x-full');
-                const overlay = document.getElementById('sidebarOverlay');
-                if (overlay) overlay.remove();
-            } else {
-                sidebar.classList.add('-translate-x-full');
-            }
+            document.body.insertAdjacentHTML('beforeend', '<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 md:hidden" onclick="document.getElementById(\'sidebar\').classList.add(\'-translate-x-full\');this.remove()"></div>');
         });
-
-        // Initialize sidebar state
-        if (window.innerWidth >= 768) {
-            sidebar.classList.remove('-translate-x-full');
-        } else {
+        document.getElementById('closeSidebarBtn').addEventListener('click', () => {
             sidebar.classList.add('-translate-x-full');
-        }
+            document.getElementById('sidebarOverlay')?.remove();
+        });
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
+        else sidebar.classList.add('-translate-x-full');
 
-        // ==================== SUBMENU TOGGLE ====================
         document.querySelectorAll('.has-submenu').forEach(m => {
             const a = m.querySelector('a');
             a?.addEventListener('click', (e) => {
@@ -558,6 +715,7 @@
         document.getElementById('darkModeToggle').addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
             document.body.classList.toggle('dark');
+            setTimeout(updatePieChart, 300);
         });
 
         // ==================== LOGOUT ====================
@@ -565,11 +723,9 @@
             e.preventDefault();
             document.getElementById('logoutModal').classList.remove('hidden');
         });
-
         document.getElementById('cancelLogoutBtn').addEventListener('click', () => {
             document.getElementById('logoutModal').classList.add('hidden');
         });
-
         document.getElementById('confirmLogoutBtn').addEventListener('click', async () => {
             document.getElementById('logoutModal').classList.add('hidden');
             await logout();
