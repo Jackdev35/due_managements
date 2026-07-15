@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
     <meta name="theme-color" content="#0f3b3a">
-    <title>Attendance & Salary | JackDev</title>
+    <title>Attendance | JackDev Due Managements</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -22,47 +23,289 @@
                         success: '#2c7a4d',
                         warning: '#dd6b20',
                         info: '#3182ce',
-                        'present': '#10b981',
-                        'absent': '#ef4444',
-                        'half': '#f59e0b',
-                        'leave': '#8b5cf6',
-                        'holiday': '#3b82f6',
-                        'weekend': '#6b7280',
-                        'duty': '#ec4899',
                     },
-                    fontFamily: { 'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'] },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+                    },
                 }
             }
         }
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
-        * { transition: background-color 0.2s, border-color 0.2s; }
-        body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; }
         
-        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
-        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
-        .sidebar-fixed { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
-        .sidebar-header-fixed { flex-shrink:0; position:sticky; top:0; background:inherit; z-index:10; }
+        * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; overflow-x: hidden; }
         
-        .nav-active { 
-            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%); 
+        .sidebar-nav-fixed {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .sidebar-nav-fixed::-webkit-scrollbar { display: none; }
+        
+        .nav-active {
+            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
             border-left: 3px solid #d4af37;
-            color: white !important;
         }
-        .dark .nav-active { 
-            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%); 
+        .dark .nav-active {
+            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
         }
         
-        .submenu-modern { max-height:0; overflow:hidden; transition:max-height 0.28s ease; }
-        .submenu-modern.open { max-height:350px; }
-        .has-submenu>a .chevron-icon { transition:transform 0.2s; }
-        .has-submenu.open>a .chevron-icon { transform:rotate(180deg); }
+        .stat-card {
+            transition: all 0.2s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12);
+        }
         
-        .tab-btn {
-            padding: 8px 16px;
-            border-radius: 10px;
+        .submenu-modern {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .submenu-modern.open { max-height: 280px; }
+        
+        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
+        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
+        
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-animate { animation: modalSlideUp 0.2s ease-out forwards; }
+        
+        .btn-active:active { transform: scale(0.97); }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .status-present {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .dark .status-present {
+            background: #064e3b;
+            color: #86efac;
+        }
+        .status-absent {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .dark .status-absent {
+            background: #450a0a;
+            color: #f87171;
+        }
+        .status-leave {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .dark .status-leave {
+            background: #451a03;
+            color: #fbbf24;
+        }
+        .status-weekend {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        .dark .status-weekend {
+            background: #374151;
+            color: #9ca3af;
+        }
+        
+        .table-row-hover:hover {
+            background-color: rgba(15, 59, 58, 0.04);
+        }
+        .dark .table-row-hover:hover {
+            background-color: rgba(30, 107, 104, 0.1);
+        }
+        
+        .table-scroll {
+            max-height: 520px;
+            overflow-y: auto;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            padding-bottom: 4px;
+        }
+        .table-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .table-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+        .dark .table-scroll::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .dark .table-scroll::-webkit-scrollbar-thumb {
+            background: #4b5563;
+        }
+        
+        .attendance-select {
+            border: 1px solid #e5e7eb;
+            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.75rem;
+            background: white;
+            cursor: pointer;
+        }
+        .dark .attendance-select {
+            background: #1f2937;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+        .attendance-select:focus {
+            outline: 2px solid #0f3b3a;
+            outline-offset: 1px;
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 1.25rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.03), 0 2px 6px rgba(0,0,0,0.02);
+            transition: all 0.2s;
+        }
+        .dark .card {
+            background: #1f2937;
+        }
+        .card:hover {
+            box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+            transform: translateY(-2px);
+        }
+        
+        #sidebarOverlay { animation: fadeIn 0.2s ease-out; }
+        .sidebar-open { overflow: hidden; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .sidebar-fixed {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar-header-fixed {
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            background: inherit;
+            z-index: 10;
+        }
+        
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            padding: 12px 20px;
+            border-radius: 12px;
             font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            animation: slideUp 0.3s ease-out;
+            min-width: 200px;
+            max-width: 400px;
+        }
+        .toast-success { background: #2c7a4d; color: white; }
+        .toast-error { background: #dc2626; color: white; }
+        .toast-info { background: #3182ce; color: white; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .filter-input {
+            padding: 6px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 12px;
+            background: white;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .dark .filter-input {
+            background: #1f2937;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+        .filter-input:focus {
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.1);
+        }
+        
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .status-dot.present { background: #10b981; }
+        .status-dot.absent { background: #ef4444; }
+        .status-dot.leave { background: #f59e0b; }
+        .status-dot.weekend { background: #9ca3af; }
+        
+        .month-nav-btn {
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+        }
+        .dark .month-nav-btn {
+            background: #1f2937;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+        .month-nav-btn:hover {
+            background: #f3f4f6;
+        }
+        .dark .month-nav-btn:hover {
+            background: #374151;
+        }
+        .month-label {
+            padding: 4px 16px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #0f3b3a;
+        }
+        .dark .month-label {
+            color: #d4af37;
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: 600;
             transition: all 0.3s;
             cursor: pointer;
@@ -70,7 +313,7 @@
             background: transparent;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             text-decoration: none;
             color: #6b7280;
         }
@@ -82,290 +325,209 @@
         .tab-btn:not(.active):hover { background: #e5e7eb; transform: translateY(-1px); }
         .dark .tab-btn:not(.active) { color: #9ca3af; }
         .dark .tab-btn:not(.active):hover { background: #374151; }
-        .tab-btn i { font-size: 13px; }
+        .tab-btn i { font-size: 14px; }
 
-        .stat-card { transition:all 0.2s; }
-        .stat-card:hover { transform:translateY(-2px); box-shadow:0 8px 16px -8px rgba(0,0,0,0.12); }
-
-        .filter-select { padding:4px 8px; font-size:11px; border:1px solid #d1d5db; border-radius:6px; background:white; color:#1f2937; outline:none; cursor:pointer; }
-        .filter-select:focus { border-color:#0f3b3a; box-shadow:0 0 0 2px rgba(15,59,58,0.1); }
-        .dark .filter-select { background:#1f2937; border-color:#4b5563; color:#f1f5f9; }
-
-        .modal-overlay {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 200;
-            padding: 16px;
-        }
-        .modal-overlay .modal-content {
-            max-width: 650px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        @keyframes modalSlideUp { 
-            from { opacity:0; transform:translateY(20px) scale(0.96); } 
-            to { opacity:1; transform:translateY(0) scale(1); } 
-        }
-        .modal-animate { animation:modalSlideUp 0.2s ease-out forwards; }
-
-        .attendance-badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-        .attendance-present { background:#d1fae5; color:#065f46; }
-        .attendance-absent { background:#fee2e2; color:#991b1b; }
-        .attendance-half { background:#fef3c7; color:#92400e; }
-        .attendance-leave { background:#ede9fe; color:#5b21b6; }
-        .attendance-holiday { background:#dbeafe; color:#1e40af; }
-        .attendance-weekend { background:#e5e7eb; color:#374151; }
-        .attendance-duty { background:#fce7f3; color:#9d174d; }
-        
-        .dark .attendance-present { background:#064e3b; color:#6ee7b7; }
-        .dark .attendance-absent { background:#7f1d1d; color:#fca5a5; }
-        .dark .attendance-half { background:#78350f; color:#fcd34d; }
-        .dark .attendance-leave { background:#4c1d95; color:#c4b5fd; }
-        .dark .attendance-holiday { background:#1e3a5f; color:#93c5fd; }
-        .dark .attendance-weekend { background:#374151; color:#9ca3af; }
-        .dark .attendance-duty { background:#831843; color:#f9a8d4; }
-
-        /* Colorful Compact Calendar */
-        .calendar-colorful {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 3px;
-            max-width: 100%;
-        }
-        .calendar-colorful .day-header {
-            text-align: center;
-            font-size: 9px;
-            font-weight: 700;
-            color: #6b7280;
-            padding: 4px 0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .dark .calendar-colorful .day-header { color: #9ca3af; }
-        
-        .calendar-colorful .day-cell {
-            aspect-ratio: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: default;
-            transition: all 0.2s ease;
-            min-height: 36px;
-            position: relative;
-            background: #f3f4f6;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        }
-        .dark .calendar-colorful .day-cell { background: #1f2937; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .calendar-colorful .day-cell:hover { transform: scale(1.05); z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        
-        .calendar-colorful .day-cell .day-number { font-size: 11px; font-weight: 700; line-height: 1; }
-        .calendar-colorful .day-cell .day-status { font-size: 7px; margin-top: 1px; opacity: 0.9; font-weight: 500; }
-        .calendar-colorful .day-cell .day-badge {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            font-size: 7px;
-        }
-        
-        /* Colorful statuses */
-        .calendar-colorful .day-cell.present { background: linear-gradient(135deg, #10b981, #059669); color: white; }
-        .calendar-colorful .day-cell.absent { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
-        .calendar-colorful .day-cell.half { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
-        .calendar-colorful .day-cell.leave { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; }
-        .calendar-colorful .day-cell.holiday { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
-        .calendar-colorful .day-cell.weekend { background: linear-gradient(135deg, #6b7280, #4b5563); color: white; }
-        .calendar-colorful .day-cell.duty { background: linear-gradient(135deg, #ec4899, #db2777); color: white; }
-        .calendar-colorful .day-cell.empty { background: transparent; cursor: default; box-shadow: none; }
-        .calendar-colorful .day-cell.empty:hover { transform: none; box-shadow: none; }
-        .calendar-colorful .day-cell.today { 
-            border: 3px solid #d4af37; 
-            box-shadow: 0 0 20px rgba(212,175,55,0.3);
-        }
-
-        .btn-active:active { transform:scale(0.95); }
-        
-        .salary-summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 13px;
-        }
-        .dark .salary-summary-item { border-bottom-color: #374151; }
-        .salary-summary-item:last-child { border-bottom: none; }
-
-        .staff-attendance-row {
-            display: grid;
-            grid-template-columns: 100px 1fr 70px;
-            gap: 8px;
-            padding: 5px 8px;
-            border-bottom: 1px solid #e5e7eb;
-            align-items: center;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .dark .staff-attendance-row { border-bottom-color: #374151; }
-        .staff-attendance-row:hover { background: rgba(15,59,58,0.08); }
-        .dark .staff-attendance-row:hover { background: rgba(30,107,104,0.15); }
-        .staff-attendance-row .status-select {
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid #d1d5db;
-            background: white;
-            width: 100%;
-            cursor: pointer;
-        }
-        .dark .staff-attendance-row .status-select { background: #1f2937; border-color: #4b5563; color: #f1f5f9; }
-
-        .color-dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 4px;
-        }
-
-        .duty-history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 10px;
-            border-bottom: 1px solid #e5e7eb;
-            border-radius: 6px;
-            transition: background 0.2s;
-        }
-        .duty-history-item:hover { background: rgba(236, 72, 153, 0.05); }
-        .dark .duty-history-item { border-bottom-color: #374151; }
-        .dark .duty-history-item:hover { background: rgba(236, 72, 153, 0.1); }
-        .duty-history-item:last-child { border-bottom: none; }
-        
-        .duty-staff-card {
-            background: linear-gradient(135deg, #fdf2f8, #fce7f3);
-            border-radius: 8px;
-            padding: 10px 12px;
-            border: 1px solid #f9a8d4;
-        }
-        .dark .duty-staff-card { background: linear-gradient(135deg, #831843, #9d174d); border-color: #db2777; }
-
-        .duty-count-badge {
+        /* Monthly Attendance Cell Styles */
+        .attendance-cell {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            background: #fce7f3;
-            color: #9d174d;
-        }
-        .dark .duty-count-badge { background: #831843; color: #f9a8d4; }
-
-        /* Staff Detail Modal Calendar - Compact & Colorful */
-        .staff-detail-calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 3px;
-            max-width: 100%;
-        }
-        .staff-detail-calendar .day-header {
-            text-align: center;
-            font-size: 8px;
-            font-weight: 700;
-            color: #6b7280;
-            padding: 3px 0;
-        }
-        .dark .staff-detail-calendar .day-header { color: #9ca3af; }
-        
-        .staff-detail-calendar .day-cell {
-            aspect-ratio: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            width: 28px;
+            height: 28px;
             border-radius: 6px;
-            font-size: 10px;
-            font-weight: 600;
-            min-height: 28px;
-            position: relative;
-            background: #f3f4f6;
+            font-size: 11px;
+            font-weight: 700;
             transition: all 0.2s;
             cursor: default;
         }
-        .dark .staff-detail-calendar .day-cell { background: #1f2937; }
-        .staff-detail-calendar .day-cell .day-number { font-size: 10px; font-weight: 600; }
-        .staff-detail-calendar .day-cell .day-status-icon { font-size: 7px; margin-top: 1px; }
-        
-        .staff-detail-calendar .day-cell.present { background: linear-gradient(135deg, #10b981, #059669); color: white; }
-        .staff-detail-calendar .day-cell.absent { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
-        .staff-detail-calendar .day-cell.half { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
-        .staff-detail-calendar .day-cell.leave { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; }
-        .staff-detail-calendar .day-cell.holiday { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
-        .staff-detail-calendar .day-cell.weekend { background: linear-gradient(135deg, #6b7280, #4b5563); color: white; }
-        .staff-detail-calendar .day-cell.duty { background: linear-gradient(135deg, #ec4899, #db2777); color: white; }
-        .staff-detail-calendar .day-cell.empty { background: transparent; cursor: default; }
-        .staff-detail-calendar .day-cell.today { border: 2px solid #d4af37; }
-        
-        .staff-detail-calendar .day-cell .status-tooltip {
-            display: none;
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
+        .attendance-cell.present {
+            background: #10b981;
             color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 8px;
-            white-space: nowrap;
+        }
+        .attendance-cell.absent {
+            background: #ef4444;
+            color: white;
+        }
+        .attendance-cell.leave {
+            background: #f59e0b;
+            color: white;
+        }
+        .attendance-cell.weekend {
+            background: #f97316;
+            color: white;
+        }
+        .attendance-cell.empty {
+            background: transparent;
+            color: #d1d5db;
+        }
+        .dark .attendance-cell.empty {
+            color: #4b5563;
+        }
+        .attendance-cell:hover {
+            transform: scale(1.15);
             z-index: 10;
         }
-        .staff-detail-calendar .day-cell:hover .status-tooltip {
-            display: block;
+
+        .day-header {
+            font-size: 9px;
+            font-weight: 600;
+            text-align: center;
+            padding: 2px 0;
+            color: #6b7280;
+        }
+        .dark .day-header {
+            color: #9ca3af;
+        }
+        /* Friday & Saturday - Weekend (Red) */
+        .day-header.weekend-day {
+            color: #ef4444;
+        }
+        .dark .day-header.weekend-day {
+            color: #f87171;
         }
 
-        .staff-name-clickable {
+        .staff-name-cell {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 8px;
+            white-space: nowrap;
+        }
+
+        .monthly-summary-cell {
+            font-size: 10px;
+            font-weight: 600;
+            text-align: center;
+            padding: 2px 4px;
+        }
+
+        /* Week separator */
+        .week-separator {
+            border-left: 2px solid #e5e7eb;
+        }
+        .dark .week-separator {
+            border-left-color: #374151;
+        }
+
+        /* Save Button */
+        .btn-save {
+            padding: 6px 18px;
+            font-size: 12px;
+            border-radius: 10px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            border: none;
             cursor: pointer;
-            transition: color 0.2s;
+            background: #0f3b3a;
+            color: white;
+            min-height: 34px;
         }
-        .staff-name-clickable:hover {
-            color: #0f3b3a;
+        .btn-save:hover {
+            background: #092c2b;
+            box-shadow: 0 4px 12px rgba(15, 59, 58, 0.3);
         }
-        .dark .staff-name-clickable:hover {
-            color: #d4af37;
+        .btn-save:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .dark .btn-save {
+            background: #1e6b68;
+        }
+        .dark .btn-save:hover {
+            background: #155a57;
         }
 
-        .salary-calculation-box {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            border-radius: 8px;
-            padding: 12px;
+        /* Load Button - Icon Only */
+        .btn-load-icon {
+            padding: 6px 10px;
+            font-size: 14px;
+            border-radius: 10px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            background: #3182ce;
+            color: white;
+            min-height: 34px;
+            min-width: 34px;
         }
-        .dark .salary-calculation-box { background: linear-gradient(135deg, #064e3b, #065f46); }
+        .btn-load-icon:hover {
+            background: #2563eb;
+            box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+        }
+        .dark .btn-load-icon {
+            background: #2563eb;
+        }
+        .dark .btn-load-icon:hover {
+            background: #1d4ed8;
+        }
+
+        .date-input {
+            padding: 6px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 12px;
+            background: white;
+            outline: none;
+            min-height: 34px;
+        }
+        .dark .date-input {
+            background: #1f2937;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+        .date-input:focus {
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.1);
+        }
+
+        .main-wrapper {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        /* Friday & Saturday marker */
+        .weekend-marker {
+            position: relative;
+        }
+        .weekend-marker::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 2px;
+            background: #ef4444;
+            border-radius: 2px;
+        }
+        .dark .weekend-marker::after {
+            background: #f87171;
+        }
+
+        .week-gap {
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+        .week-gap-left {
+            padding-left: 6px;
+        }
+        .week-gap-right {
+            padding-right: 6px;
+        }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900">
-
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200 main-wrapper">
+    
     <div class="flex min-h-screen">
+        
         <!-- Sidebar -->
-        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out border-r border-white/5 sidebar-fixed">
+        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
             <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2.5">
@@ -382,1574 +544,947 @@
                     </button>
                 </div>
             </div>
+            
             <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
                 <nav class="space-y-1.5">
-                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
                         <span class="text-sm font-medium">Dashboard</span>
                     </a>
-                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                    
+                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
                         <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
                         <span class="text-sm font-medium">Customers</span>
                     </a>
+                    
                     <div class="has-submenu" id="dueSubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                             <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
                             <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
                         </a>
                         <div class="submenu-modern pl-9 mt-1 space-y-1">
-                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a>
-                            <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span></a>
-                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a>
+                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
+                            </a>
+                            <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span>
+                            </a>
+                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
+                            </a>
                         </div>
                     </div>
+                    
                     <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span>
                     </a>
                     <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                         <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
                     </a>
+                    
                     <div class="has-submenu" id="warrantySubmenu">
                         <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
                             <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
                             <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
                         </a>
                         <div class="submenu-modern pl-9 mt-1 space-y-1">
-                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span></a>
-                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span></a>
-                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span></a>
-                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span></a>
+                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span>
+                            </a>
+                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span>
+                            </a>
+                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span>
+                            </a>
+                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span>
+                            </a>
                         </div>
                     </div>
+                    
                     <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
+                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
                     </a>
-                    <a href="expenses.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150">
-                        <div class="w-6 text-center"><i class="fas fa-money-bill-wave text-sm text-accent"></i></div>
-                        <span class="text-sm font-medium">Expenses</span>
-                    </a>
+                    
+                    <div class="has-submenu open" id="expensesSubmenu">
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-white bg-white/5 transition">
+                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm text-accent"></i></div><span class="text-sm font-medium">Expenses</span></div>
+                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                        </a>
+                        <div class="submenu-modern open pl-9 mt-1 space-y-1">
+                            <a href="expenses.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
+                                <i class="fas fa-wallet text-[10px] w-4"></i><span>Expense List</span>
+                            </a>
+                            <a href="attendance.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition">
+                                <i class="fas fa-clipboard-check text-[10px] w-4"></i><span>Attendance</span>
+                            </a>
+                        </div>
+                    </div>
+                    
                     <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
+                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div>
+                        <span class="text-sm font-medium">Backup & Restore</span>
                     </a>
                 </nav>
+                
                 <div class="pt-4 mt-2 border-t border-white/10">
-                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition">
+                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
                         <i class="fas fa-sign-out-alt text-sm w-5"></i>
                         <span class="text-sm font-medium">Logout</span>
                     </a>
                 </div>
             </div>
         </aside>
-
+        
         <!-- Main Content -->
-        <main class="flex-1 md:ml-64 min-h-screen w-full">
+        <main class="flex-1 md:ml-64 min-h-screen w-full overflow-x-hidden">
+            
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
                 <div class="px-3 py-2.5 flex justify-between items-center">
                     <div class="flex items-center gap-2">
-                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg"><i class="fas fa-bars text-lg"></i></button>
-                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-clipboard-check text-primary mr-2"></i>Attendance & Salary</h2>
+                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
+                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
+                            <i class="fas fa-clipboard-check text-primary mr-2"></i>Attendance Management
+                        </h2>
                     </div>
                     <div class="flex items-center gap-1">
-                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt text-sm"></i></button>
-                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-moon dark:hidden text-sm"></i><i class="fas fa-sun hidden dark:inline-block text-sm"></i></button>
+                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-sync-alt text-sm"></i>
+                        </button>
+                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-moon dark:hidden text-sm"></i>
+                            <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
+                        </button>
                     </div>
                 </div>
             </header>
-
+            
             <div class="p-3 md:p-4">
-                <!-- Tab Navigation -->
-                <div class="flex flex-wrap gap-1.5 mb-4 bg-white dark:bg-gray-800 p-1.5 rounded-xl border shadow-sm">
-                    <a href="expenses.html" class="tab-btn"><i class="fas fa-home"></i> Overview</a>
-                    <a href="expenses-staff.html" class="tab-btn"><i class="fas fa-users"></i> Staff</a>
-                    <a href="expenses-office.html" class="tab-btn"><i class="fas fa-building"></i> Office</a>
-                    <a href="expenses-attendance.html" class="tab-btn active"><i class="fas fa-clipboard-check"></i> Attendance</a>
-                    <a href="expenses-summary.html" class="tab-btn"><i class="fas fa-chart-bar"></i> Summary</a>
+                
+                <!-- Expenses Tab Navigation -->
+                <div class="flex flex-wrap gap-2 mb-6 bg-white dark:bg-gray-800 p-2 rounded-xl border shadow-sm">
+                    <a href="expenses.html" class="tab-btn">
+                        <i class="fas fa-home"></i> Overview
+                    </a>
+                    <a href="expenses-staff.html" class="tab-btn">
+                        <i class="fas fa-users"></i> Staff Salaries
+                    </a>
+                    <a href="expenses-office.html" class="tab-btn">
+                        <i class="fas fa-building"></i> Office Expenses
+                    </a>
+                    <a href="attendance.html" class="tab-btn active">
+                        <i class="fas fa-clipboard-check"></i> Attendance
+                    </a>
+                    <a href="expenses-summary.html" class="tab-btn">
+                        <i class="fas fa-chart-bar"></i> Summary
+                    </a>
                 </div>
-
-                <!-- Attendance Content -->
-                <div>
-                    <!-- Stats Cards -->
-                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-4">
-                        <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border shadow-sm text-center stat-card">
-                            <div class="text-green-600 text-sm font-bold" id="presentCount">0</div>
-                            <p class="text-[8px] text-gray-500 uppercase">Present</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border shadow-sm text-center stat-card">
-                            <div class="text-red-600 text-sm font-bold" id="absentCount">0</div>
-                            <p class="text-[8px] text-gray-500 uppercase">Absent</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border shadow-sm text-center stat-card">
-                            <div class="text-amber-600 text-sm font-bold" id="halfCount">0</div>
-                            <p class="text-[8px] text-gray-500 uppercase">Half</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border shadow-sm text-center stat-card">
-                            <div class="text-purple-600 text-sm font-bold" id="leaveCount">0</div>
-                            <p class="text-[8px] text-gray-500 uppercase">Leave</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border shadow-sm text-center stat-card">
-                            <div class="text-blue-600 text-sm font-bold" id="workingDays">0</div>
-                            <p class="text-[8px] text-gray-500 uppercase">Working</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-lg p-2.5 border shadow-sm text-center stat-card">
-                            <div class="text-indigo-600 text-sm font-bold" id="attendancePercent">0%</div>
-                            <p class="text-[8px] text-gray-500 uppercase">% Present</p>
-                        </div>
+                
+                <!-- Page Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800 dark:text-white">Attendance Management</h1>
+                        
                     </div>
-
-                    <!-- Date & Actions -->
-                    <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden mb-4">
-                        <div class="px-3 py-2 bg-gradient-to-r from-primary/10 to-transparent border-b flex flex-wrap items-center justify-between gap-2">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <i class="fas fa-calendar-alt text-primary text-sm"></i>
-                                <input type="date" id="attendanceDate" class="px-2 py-1.5 text-xs border rounded-lg dark:bg-gray-700 w-36">
-                                <button id="loadAttendanceBtn" class="bg-primary hover:bg-primary-dark text-white px-3 py-1.5 rounded-lg text-xs transition btn-active">
-                                    <i class="fas fa-eye mr-1"></i> View
-                                </button>
-                                <button id="markAllPresentBtn" class="bg-present hover:bg-green-700 text-white px-2.5 py-1.5 rounded-lg text-xs transition btn-active">
-                                    <i class="fas fa-check-double mr-1"></i> All Present
-                                </button>
+                    <div class="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+                        <i class="far fa-calendar-alt"></i>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-4">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                        <div class="flex items-center gap-3">
+                            <div class="stat-icon bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                                <i class="fas fa-users text-lg"></i>
                             </div>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <button id="viewDutyHistoryBtn" class="bg-duty hover:bg-pink-700 text-white px-2.5 py-1.5 rounded-lg text-xs transition btn-active">
-                                    <i class="fas fa-history mr-1"></i> Duty History
-                                </button>
-                                <button id="manageHolidaysBtn" class="bg-holiday hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-lg text-xs transition btn-active">
-                                    <i class="fas fa-calendar-plus mr-1"></i> Holidays
-                                </button>
-                                <button id="calculateSalaryBtn" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1.5 rounded-lg text-xs transition btn-active">
-                                    <i class="fas fa-calculator mr-1"></i> Salary
-                                </button>
-                            </div>
-                        </div>
-                        <div class="p-3 max-h-[400px] overflow-y-auto">
-                            <div id="attendanceStaffList">
-                                <div class="text-center py-6 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading staff...</div>
+                            <div>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Total Staff</p>
+                                <p class="text-xl font-bold text-gray-800 dark:text-white" id="statTotal">0</p>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Colorful Calendar & Salary -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        <!-- Calendar -->
-                        <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
-                            <div class="px-3 py-2 bg-gradient-to-r from-primary/10 to-transparent border-b flex items-center justify-between">
-                                <h3 class="text-xs font-semibold"><i class="fas fa-calendar-alt text-primary mr-1"></i>Calendar</h3>
-                                <div class="flex items-center gap-1">
-                                    <button id="prevMonthBtn" class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition text-xs"><i class="fas fa-chevron-left"></i></button>
-                                    <span id="currentMonthDisplay" class="text-xs font-semibold min-w-[100px] text-center"></span>
-                                    <button id="nextMonthBtn" class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition text-xs"><i class="fas fa-chevron-right"></i></button>
-                                </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                        <div class="flex items-center gap-3">
+                            <div class="stat-icon bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
+                                <i class="fas fa-user-check text-lg"></i>
                             </div>
-                            <div class="p-3">
-                                <div id="calendarContainer">
-                                    <div class="text-center py-6 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</div>
-                                </div>
-                                <!-- Calendar Legend -->
-                                <div class="flex flex-wrap items-center gap-2 mt-3 text-[9px]">
-                                    <span class="flex items-center gap-1"><span class="color-dot" style="background:#10b981;"></span> Present</span>
-                                    <span class="flex items-center gap-1"><span class="color-dot" style="background:#f59e0b;"></span> Half</span>
-                                    <span class="flex items-center gap-1"><span class="color-dot" style="background:#ef4444;"></span> Absent</span>
-                                    <span class="flex items-center gap-1"><span class="color-dot" style="background:#8b5cf6;"></span> Leave</span>
-                                    <span class="flex items-center gap-1"><span class="color-dot" style="background:#3b82f6;"></span> Holiday</span>
-                                    <span class="flex items-center gap-1"><span class="color-dot" style="background:#6b7280;"></span> Weekend</span>
-                                    <span class="flex items-center gap-1"><span class="color-dot" style="background:#ec4899;"></span> Duty</span>
-                                </div>
+                            <div>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Present Today</p>
+                                <p class="text-xl font-bold text-gray-800 dark:text-white" id="statPresent">0</p>
                             </div>
                         </div>
-
-                        <!-- Salary Summary -->
-                        <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
-                            <div class="px-3 py-2 bg-gradient-to-r from-primary/10 to-transparent border-b flex items-center justify-between">
-                                <h3 class="text-xs font-semibold"><i class="fas fa-money-bill-wave text-primary mr-1"></i>Monthly Salary</h3>
-                                <span class="text-[10px] text-gray-500" id="salaryMonthDisplay"></span>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                        <div class="flex items-center gap-3">
+                            <div class="stat-icon bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400">
+                                <i class="fas fa-user-slash text-lg"></i>
                             </div>
-                            <div class="p-3 max-h-[400px] overflow-y-auto">
-                                <div id="salarySummaryContainer">
-                                    <div class="text-center py-6 text-gray-400 text-sm">Select a month to calculate</div>
-                                </div>
+                            <div>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Absent Today</p>
+                                <p class="text-xl font-bold text-gray-800 dark:text-white" id="statAbsent">0</p>
                             </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                        <div class="flex items-center gap-3">
+                            <div class="stat-icon bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400">
+                                <i class="fas fa-umbrella-beach text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">On Leave</p>
+                                <p class="text-xl font-bold text-gray-800 dark:text-white" id="statLeave">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-sm stat-card">
+                        <div class="flex items-center gap-3">
+                            <div class="stat-icon bg-gray-100 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-calendar-week text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Weekend</p>
+                                <p class="text-xl font-bold text-gray-800 dark:text-white" id="statWeekend">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Daily Entry + Summary -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                    <!-- Daily Entry -->
+                    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                        <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-2">
+                            <h3 class="text-sm font-semibold text-gray-800 dark:text-white">
+                                <i class="far fa-calendar-check text-primary mr-2"></i>Daily Attendance Entry
+                            </h3>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <input type="date" id="attendanceDate" class="date-input text-xs">
+                                <button id="saveAttendanceBtn" class="btn-save">
+                                    <i class="fas fa-save text-[10px]"></i> Save Attendance
+                                </button>
+                                <button id="loadAttendanceBtn" class="btn-load-icon" title="Load Attendance">
+                                    <i class="fas fa-refresh"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-3 overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-700">
+                                    <tr>
+                                        <th class="text-left py-2 font-medium text-[10px] uppercase tracking-wider">Staff</th>
+                                        <th class="text-right py-2 font-medium text-[10px] uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendanceTableBody" class="divide-y divide-gray-50 dark:divide-gray-700">
+                                    <tr><td colspan="2" class="text-center py-4 text-gray-400 text-xs">Loading staff...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Summary Chart -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4">
+                        <h3 class="text-sm font-semibold text-gray-800 dark:text-white mb-3">
+                            <i class="fas fa-chart-pie text-primary mr-2"></i>Today's Summary
+                        </h3>
+                        <div class="flex flex-col items-center">
+                            <div class="w-40 h-40 my-2">
+                                <canvas id="doughnutChart"></canvas>
+                            </div>
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs w-full mt-3">
+                                <span class="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                    <span class="status-dot present"></span> Present
+                                    <span class="text-gray-400 dark:text-gray-500 ml-auto" id="legendPresent">0%</span>
+                                </span>
+                                <span class="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                    <span class="status-dot absent"></span> Absent
+                                    <span class="text-gray-400 dark:text-gray-500 ml-auto" id="legendAbsent">0%</span>
+                                </span>
+                                <span class="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                    <span class="status-dot leave"></span> Leave
+                                    <span class="text-gray-400 dark:text-gray-500 ml-auto" id="legendLeave">0%</span>
+                                </span>
+                                <span class="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                                    <span class="status-dot weekend"></span> Weekend
+                                    <span class="text-gray-400 dark:text-gray-500 ml-auto" id="legendWeekend">0%</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monthly Summary -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                    <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-2">
+                        <h3 class="text-sm font-semibold text-gray-800 dark:text-white">
+                            <i class="fas fa-calendar-alt text-primary mr-2"></i>Monthly Attendance Summary
+                        </h3>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <select id="monthFilter" class="filter-input text-xs">
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                            <select id="yearFilter" class="filter-input text-xs">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026" selected>2026</option>
+                            </select>
+                            <input type="text" id="employeeSearch" placeholder="Search staff..." class="filter-input text-xs w-32">
+                            <button id="refreshMonthlyBtn" class="bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1 rounded-lg text-xs transition">
+                                <i class="fas fa-refresh"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="w-full text-xs" id="monthlyTable">
+                            <thead class="sticky top-0 bg-white dark:bg-gray-800 z-10 shadow-sm" id="monthlyHeader">
+                                <!-- Header will be rendered dynamically -->
+                            </thead>
+                            <tbody id="monthlyBody" class="divide-y divide-gray-100 dark:divide-gray-700">
+                                <!-- Body will be rendered dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-400 dark:text-gray-500">
+                        <div class="flex items-center gap-3">
+                            <span>Showing <span id="monthlyCount">0</span> staff</span>
+                            <span class="flex items-center gap-1">
+                                <span class="inline-block w-3 h-3 rounded bg-emerald-500"></span> P
+                                <span class="inline-block w-3 h-3 rounded bg-red-500 ml-2"></span> A
+                                <span class="inline-block w-3 h-3 rounded bg-amber-500 ml-2"></span> L
+                                <span class="inline-block w-3 h-3 rounded bg-orange-500 ml-2"></span> W
+                            </span>
+                        </div>
+                        <div class="flex gap-1">
+                            <button class="month-nav-btn" id="prevMonthBtn">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="month-label" id="currentMonthLabel">January 2026</span>
+                            <button class="month-nav-btn" id="nextMonthBtn">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <footer class="mt-4 border-t border-gray-200 dark:border-gray-700">
-                <div class="max-w-7xl mx-auto px-4 py-2.5 text-center">
-                    <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
-                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span>
-                        <span class="text-gray-300 dark:border-gray-600">|</span>
+            
+            <!-- Footer -->
+            <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                    <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span> 
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
                         <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                        <span class="text-gray-300 dark:border-gray-600">|</span> 
+                        <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
                     </p>
                 </div>
             </footer>
         </main>
     </div>
-
-    <!-- Staff Detail Modal -->
-    <div id="staffDetailModal" class="modal-overlay hidden">
-        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl modal-animate">
-            <div class="flex justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="font-semibold text-sm" id="staffDetailTitle"><i class="fas fa-user text-primary mr-2"></i>Staff Attendance</h3>
-                <button onclick="closeStaffDetailModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"><i class="fas fa-times text-lg"></i></button>
-            </div>
-            <div class="p-4">
-                <!-- Staff Info -->
-                <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
-                    <div>
-                        <div class="text-sm font-semibold" id="staffDetailName">Staff Name</div>
-                        <div class="text-xs text-gray-500" id="staffDetailPosition">Position</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-xs text-gray-500">Total Present</div>
-                        <div class="text-sm font-bold text-green-600" id="staffDetailTotalPresent">0 days</div>
-                    </div>
-                </div>
-                
-                <!-- Month Selector -->
-                <div class="flex items-center justify-between mb-2">
-                    <button id="staffPrevMonth" class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition text-xs"><i class="fas fa-chevron-left"></i></button>
-                    <span id="staffDetailMonth" class="text-xs font-semibold"></span>
-                    <button id="staffNextMonth" class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition text-xs"><i class="fas fa-chevron-right"></i></button>
-                </div>
-                
-                <!-- Staff Calendar -->
-                <div id="staffDetailCalendar" class="staff-detail-calendar">
-                    <div class="text-center py-6 text-gray-400 text-sm">Loading...</div>
-                </div>
-                
-                <!-- Summary Stats -->
-                <div class="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                    <div class="text-center bg-green-50 dark:bg-green-900/20 rounded-lg p-1.5">
-                        <div class="text-xs font-bold text-green-600" id="staffDetailPresent">0</div>
-                        <div class="text-[8px] text-gray-500">Present</div>
-                    </div>
-                    <div class="text-center bg-amber-50 dark:bg-amber-900/20 rounded-lg p-1.5">
-                        <div class="text-xs font-bold text-amber-600" id="staffDetailHalf">0</div>
-                        <div class="text-[8px] text-gray-500">Half</div>
-                    </div>
-                    <div class="text-center bg-red-50 dark:bg-red-900/20 rounded-lg p-1.5">
-                        <div class="text-xs font-bold text-red-600" id="staffDetailAbsent">0</div>
-                        <div class="text-[8px] text-gray-500">Absent</div>
-                    </div>
-                    <div class="text-center bg-purple-50 dark:bg-purple-900/20 rounded-lg p-1.5">
-                        <div class="text-xs font-bold text-purple-600" id="staffDetailLeave">0</div>
-                        <div class="text-[8px] text-gray-500">Leave</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Holiday Modal -->
-    <div id="holidayModal" class="modal-overlay hidden">
-        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl modal-animate">
-            <div class="flex justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="font-semibold text-sm"><i class="fas fa-calendar-plus text-primary mr-2"></i>Manage Holidays</h3>
-                <button onclick="closeHolidayModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"><i class="fas fa-times text-lg"></i></button>
-            </div>
-            <div class="p-4">
-                <form id="holidayForm" class="mb-3">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <div>
-                            <label class="block text-[10px] font-medium mb-1">Date *</label>
-                            <input type="date" id="holidayDate" required class="w-full px-2 py-1.5 text-xs border rounded-lg dark:bg-gray-700">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-medium mb-1">Reason *</label>
-                            <input type="text" id="holidayReason" placeholder="e.g., Eid" required class="w-full px-2 py-1.5 text-xs border rounded-lg dark:bg-gray-700">
-                        </div>
-                        <div class="flex items-end">
-                            <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white py-1.5 rounded-lg text-xs transition btn-active">
-                                <i class="fas fa-plus mr-1"></i> Add
-                            </button>
-                        </div>
-                    </div>
-                </form>
-                <div class="border-t pt-2">
-                    <p class="text-[10px] text-gray-500 mb-1.5">Holidays</p>
-                    <div id="holidayList" class="max-h-[200px] overflow-y-auto">
-                        <div class="text-center py-3 text-gray-400 text-xs">No holidays</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Duty History Modal -->
-    <div id="dutyHistoryModal" class="modal-overlay hidden">
-        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl modal-animate">
-            <div class="flex justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="font-semibold text-sm"><i class="fas fa-history text-primary mr-2"></i>Friday Duty History</h3>
-                <button onclick="closeDutyHistoryModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"><i class="fas fa-times text-lg"></i></button>
-            </div>
-            <div class="p-4">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="flex-1">
-                        <label class="block text-[10px] font-medium mb-1">Filter by Staff</label>
-                        <select id="dutyFilterStaff" class="w-full px-2 py-1.5 text-xs border rounded-lg dark:bg-gray-700">
-                            <option value="">All Staff</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end">
-                        <button id="applyDutyFilter" class="bg-primary hover:bg-primary-dark text-white px-3 py-1.5 rounded-lg text-xs transition btn-active">
-                            <i class="fas fa-filter mr-1"></i> Filter
-                        </button>
-                    </div>
-                </div>
-                <div id="dutyHistoryList" class="max-h-[400px] overflow-y-auto">
-                    <div class="text-center py-6 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Salary Modal -->
-    <div id="salaryModal" class="modal-overlay hidden">
-        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl modal-animate">
-            <div class="flex justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="font-semibold text-sm"><i class="fas fa-calculator text-primary mr-2"></i>Salary Calculation</h3>
-                <button onclick="closeSalaryModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"><i class="fas fa-times text-lg"></i></button>
-            </div>
-            <div class="p-4 max-h-[500px] overflow-y-auto">
-                <div id="salaryModalContent">
-                    <div class="text-center py-6 text-gray-400 text-sm">Loading...</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div id="confirmationModal" class="modal-overlay hidden">
-        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-5 text-center modal-animate max-w-sm">
-            <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                <i class="fas fa-exclamation-triangle text-orange-500 text-lg"></i>
-            </div>
-            <h3 class="font-semibold text-gray-800 dark:text-white mb-1.5 text-sm" id="confirmationTitle">Confirm</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3" id="confirmationMessage">Are you sure?</p>
-            <div class="flex gap-2 justify-center">
-                <button id="confirmationCancelBtn" class="px-4 py-1.5 text-xs font-medium rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 transition">Cancel</button>
-                <button id="confirmationConfirmBtn" class="px-4 py-1.5 text-xs font-medium rounded-lg bg-red-500 text-white hover:bg-red-600 transition">Confirm</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast -->
-    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-1.5"></div>
-
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
     <!-- Logout Modal -->
-    <div id="logoutModal" class="modal-overlay hidden">
-        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-5 text-center modal-animate max-w-sm">
-            <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                <i class="fas fa-sign-out-alt text-orange-500 text-lg"></i>
+    <div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl modal-animate">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <i class="fas fa-sign-out-alt text-orange-500 text-xl"></i>
             </div>
-            <h3 class="font-semibold text-gray-800 dark:text-white mb-1.5 text-sm">Logout?</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Are you sure you want to logout?</p>
-            <div class="flex gap-2 justify-center">
-                <button id="cancelLogoutBtn" class="px-4 py-1.5 text-xs font-medium rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 transition">Cancel</button>
-                <button id="confirmLogoutBtn" class="px-4 py-1.5 text-xs font-medium rounded-lg bg-red-500 text-white hover:bg-red-600 transition">Logout</button>
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Are you sure you want to logout?</p>
+            <div class="flex gap-3 justify-center">
+                <button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-100 dark:bg-gray-700 btn-active">Cancel</button>
+                <button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-danger text-white btn-active">Logout</button>
             </div>
         </div>
     </div>
-
+    
+    <!-- Auth Check Script -->
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
-        import { 
-            db, 
-            collection, 
-            addDoc, 
-            getDocs, 
-            doc, 
-            updateDoc, 
-            deleteDoc, 
-            query, 
-            orderBy, 
-            Timestamp,
-            where
-        } from './js/firebase.js';
-        checkAuthState();
-
-        // ==================== CONSTANTS ====================
-        const WEEKEND_DAY = 5; // Friday
-        const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const STATUS_ICONS = {
-            present: '✅',
-            absent: '❌',
-            half: '🌗',
-            leave: '📋',
-            holiday: '🎉',
-            weekend: '📴',
-            duty: '🔄'
-        };
-
-        // ==================== STATE ====================
-        let allStaff = [];
-        let allHolidays = [];
-        let allDutyStaff = [];
-        let currentMonth = new Date();
-        let selectedDate = new Date();
-        let attendanceData = {};
-
-        // ==================== UTILITIES ====================
-        function showToast(msg, type = 'success') {
-            const c = document.getElementById('toastContainer');
-            const t = document.createElement('div');
-            t.className = `px-3 py-1.5 rounded-lg shadow text-xs ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
-            t.innerText = msg;
-            c.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        }
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
-        }
-
-        function formatDate(date) {
-            return date.toISOString().split('T')[0];
-        }
-
-        function isToday(date) {
-            const today = new Date();
-            return date.getDate() === today.getDate() &&
-                   date.getMonth() === today.getMonth() &&
-                   date.getFullYear() === today.getFullYear();
-        }
-
-        function isWeekend(date) {
-            return date.getDay() === WEEKEND_DAY;
-        }
-
-        function getDaysInMonth(year, month) {
-            return new Date(year, month + 1, 0).getDate();
-        }
-
-        function getWorkingDaysInMonth(year, month) {
-            let count = 0;
-            const days = getDaysInMonth(year, month);
-            for (let day = 1; day <= days; day++) {
-                const date = new Date(year, month, day);
-                const dateStr = formatDate(date);
-                const isHoliday = allHolidays.some(h => h.date === dateStr);
-                const isDuty = allDutyStaff.some(d => d.date === dateStr);
-                if (!isWeekend(date) || isDuty) {
-                    if (!isHoliday) {
-                        count++;
-                    }
-                }
-            }
-            return count;
-        }
-
-        // ==================== CONFIRMATION ====================
-        function showConfirmationModal(title, message, onConfirm) {
-            const modal = document.getElementById('confirmationModal');
-            document.getElementById('confirmationTitle').textContent = title;
-            document.getElementById('confirmationMessage').textContent = message;
-            modal.classList.remove('hidden');
-
-            const cancelBtn = document.getElementById('confirmationCancelBtn');
-            const confirmBtn = document.getElementById('confirmationConfirmBtn');
-
-            const newCancelBtn = cancelBtn.cloneNode(true);
-            const newConfirmBtn = confirmBtn.cloneNode(true);
-            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
-            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-
-            newCancelBtn.addEventListener('click', () => modal.classList.add('hidden'));
-            newConfirmBtn.addEventListener('click', () => {
-                modal.classList.add('hidden');
-                if (typeof onConfirm === 'function') onConfirm();
-            });
-
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.classList.add('hidden');
-            });
-        }
-
-        // ==================== LOAD DATA ====================
-        async function loadStaff() {
-            try {
-                const q = query(collection(db, 'staff'), where('status', '==', 'active'));
-                const snap = await getDocs(q);
-                allStaff = [];
-                snap.forEach(d => {
-                    const data = d.data();
-                    allStaff.push({
-                        id: d.id,
-                        name: data.name || 'Unknown',
-                        position: data.position || '',
-                        salary: data.salary || 0,
-                        paidAmount: data.paidAmount || 0,
-                        dueAmount: data.dueAmount || 0,
-                    });
-                });
-                return allStaff;
-            } catch (error) {
-                console.error('Error loading staff:', error);
-                return [];
-            }
-        }
-
-        async function loadHolidays() {
-            try {
-                const q = query(collection(db, 'holidays'), orderBy('date', 'asc'));
-                const snap = await getDocs(q);
-                allHolidays = [];
-                snap.forEach(d => {
-                    const data = d.data();
-                    allHolidays.push({
-                        id: d.id,
-                        date: data.date,
-                        reason: data.reason || 'Holiday'
-                    });
-                });
-                return allHolidays;
-            } catch (error) {
-                console.error('Error loading holidays:', error);
-                return [];
-            }
-        }
-
-        async function loadDutyStaff() {
-            try {
-                const q = query(collection(db, 'duty_staff'), orderBy('date', 'desc'));
-                const snap = await getDocs(q);
-                allDutyStaff = [];
-                snap.forEach(d => {
-                    const data = d.data();
-                    allDutyStaff.push({
-                        id: d.id,
-                        staffId: data.staffId,
-                        date: data.date,
-                        createdAt: data.createdAt
-                    });
-                });
-                return allDutyStaff;
-            } catch (error) {
-                console.error('Error loading duty staff:', error);
-                return [];
-            }
-        }
-
-        async function loadAttendanceForDate(dateStr) {
-            try {
-                const q = query(collection(db, 'attendance'), where('date', '==', dateStr));
-                const snap = await getDocs(q);
-                const data = {};
-                snap.forEach(d => {
-                    const docData = d.data();
-                    data[docData.staffId] = {
-                        id: d.id,
-                        status: docData.status || 'absent',
-                        staffId: docData.staffId,
-                        date: docData.date
-                    };
-                });
-                return data;
-            } catch (error) {
-                console.error('Error loading attendance for date:', error);
-                return {};
-            }
-        }
-
-        async function loadAttendanceForMonth(year, month) {
-            try {
-                const startDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
-                const lastDay = getDaysInMonth(year, month);
-                const endDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-                
-                const q = query(
-                    collection(db, 'attendance'),
-                    where('date', '>=', startDate),
-                    where('date', '<=', endDate)
-                );
-                const snap = await getDocs(q);
-                const data = {};
-                snap.forEach(d => {
-                    const docData = d.data();
-                    const key = `${docData.date}_${docData.staffId}`;
-                    data[key] = {
-                        id: d.id,
-                        status: docData.status || 'absent',
-                        staffId: docData.staffId,
-                        date: docData.date
-                    };
-                });
-                return data;
-            } catch (error) {
-                console.error('Error loading month attendance:', error);
-                return {};
-            }
-        }
-
-        async function loadAttendanceForStaff(staffId, year, month) {
-            try {
-                const startDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
-                const lastDay = getDaysInMonth(year, month);
-                const endDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-                
-                const q = query(
-                    collection(db, 'attendance'),
-                    where('staffId', '==', staffId),
-                    where('date', '>=', startDate),
-                    where('date', '<=', endDate)
-                );
-                const snap = await getDocs(q);
-                const data = {};
-                snap.forEach(d => {
-                    const docData = d.data();
-                    data[docData.date] = {
-                        id: d.id,
-                        status: docData.status || 'absent',
-                        date: docData.date
-                    };
-                });
-                return data;
-            } catch (error) {
-                console.error('Error loading staff attendance:', error);
-                return {};
-            }
-        }
-
-        // ==================== ATTENDANCE FUNCTIONS ====================
-        async function saveAttendance(staffId, dateStr, status) {
-            try {
-                const q = query(
-                    collection(db, 'attendance'), 
-                    where('staffId', '==', staffId),
-                    where('date', '==', dateStr)
-                );
-                const snap = await getDocs(q);
-                
-                if (!snap.empty) {
-                    const docId = snap.docs[0].id;
-                    await updateDoc(doc(db, 'attendance', docId), {
-                        status: status,
-                        updatedAt: Timestamp.now()
-                    });
-                } else {
-                    await addDoc(collection(db, 'attendance'), {
-                        staffId: staffId,
-                        date: dateStr,
-                        status: status,
-                        createdAt: Timestamp.now(),
-                        updatedAt: Timestamp.now()
-                    });
-                }
-                return true;
-            } catch (error) {
-                console.error('Error saving attendance:', error);
-                showToast('Error: ' + error.message, 'error');
-                return false;
-            }
-        }
-
-        async function toggleDutyStaff(staffId, dateStr) {
-            try {
-                const q = query(
-                    collection(db, 'duty_staff'),
-                    where('staffId', '==', staffId),
-                    where('date', '==', dateStr)
-                );
-                const snap = await getDocs(q);
-                
-                if (!snap.empty) {
-                    await deleteDoc(doc(db, 'duty_staff', snap.docs[0].id));
-                    return false;
-                } else {
-                    await addDoc(collection(db, 'duty_staff'), {
-                        staffId: staffId,
-                        date: dateStr,
-                        createdAt: Timestamp.now()
-                    });
-                    return true;
-                }
-            } catch (error) {
-                console.error('Error toggling duty:', error);
-                showToast('Error: ' + error.message, 'error');
-                return false;
-            }
-        }
-
-        // ==================== RENDER ATTENDANCE LIST ====================
-        async function renderAttendanceList(dateStr) {
-            const container = document.getElementById('attendanceStaffList');
-            
-            if (!dateStr) {
-                container.innerHTML = '<div class="text-center py-6 text-gray-400 text-sm">Please select a date</div>';
-                return;
-            }
-
-            const dateObj = new Date(dateStr + 'T00:00:00');
-            const isHoliday = allHolidays.some(h => h.date === dateStr);
-            const isWeekendDay = isWeekend(dateObj);
-            const hasDuty = allDutyStaff.some(d => d.date === dateStr);
-
-            // Load attendance for this date
-            const dayAttendance = await loadAttendanceForDate(dateStr);
-            attendanceData = dayAttendance;
-
-            if (allStaff.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-6 text-gray-400 text-sm">
-                        <i class="fas fa-users-slash text-2xl block mb-1 opacity-40"></i>
-                        No active staff
-                    </div>
-                `;
-                return;
-            }
-
-            let html = `<div class="space-y-1">`;
-            
-            for (const staff of allStaff) {
-                const status = dayAttendance[staff.id]?.status || 'absent';
-                const statusLabel = status === 'present' ? 'Present' :
-                                   status === 'absent' ? 'Absent' :
-                                   status === 'half' ? 'Half Day' :
-                                   status === 'leave' ? 'Leave' : 'Absent';
-                const statusColor = status === 'present' ? 'text-green-600' :
-                                   status === 'absent' ? 'text-red-600' :
-                                   status === 'half' ? 'text-amber-600' :
-                                   status === 'leave' ? 'text-purple-600' : 'text-red-600';
-
-                const isDutyToday = allDutyStaff.some(d => d.staffId === staff.id && d.date === dateStr);
-                const dutyCount = allDutyStaff.filter(d => d.staffId === staff.id).length;
-
-                html += `
-                    <div class="staff-attendance-row" data-staff="${staff.id}">
-                        <div class="text-xs font-medium truncate flex items-center gap-1">
-                            <span class="staff-name-clickable hover:text-primary transition">${escapeHtml(staff.name)}</span>
-                            ${isDutyToday ? '<span class="text-[8px] bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded">Duty</span>' : ''}
-                            ${dutyCount > 0 ? `<span class="text-[8px] text-gray-400 ml-1">(${dutyCount}d)</span>` : ''}
-                        </div>
-                        <div>
-                            ${isHoliday ? 
-                                `<span class="attendance-badge attendance-holiday text-[9px]">🎉 Holiday</span>` :
-                                isWeekendDay && !hasDuty ?
-                                `<div class="flex items-center gap-2">
-                                    <span class="attendance-badge attendance-weekend text-[9px]">📴 Weekend</span>
-                                    <button class="duty-toggle-btn text-[9px] bg-pink-100 text-pink-700 px-2 py-0.5 rounded hover:bg-pink-200 transition" data-staff="${staff.id}" data-date="${dateStr}">
-                                        <i class="fas fa-user-plus"></i> Duty
-                                    </button>
-                                </div>` :
-                                `<select class="status-select text-xs" data-staff="${staff.id}" data-date="${dateStr}">
-                                    <option value="present" ${status === 'present' ? 'selected' : ''}>✅ Present</option>
-                                    <option value="absent" ${status === 'absent' ? 'selected' : ''}>❌ Absent</option>
-                                    <option value="half" ${status === 'half' ? 'selected' : ''}>🌗 Half</option>
-                                    <option value="leave" ${status === 'leave' ? 'selected' : ''}>📋 Leave</option>
-                                </select>`
-                            }
-                            ${isWeekendDay && isDutyToday ? `<span class="attendance-badge attendance-duty text-[9px] ml-1">On Duty</span>` : ''}
-                        </div>
-                        <div class="text-right text-xs font-medium ${statusColor}">
-                            ${isHoliday ? '-' : isWeekendDay && !hasDuty ? '-' : statusLabel}
-                        </div>
-                    </div>
-                `;
-            }
-
-            html += '</div>';
-            container.innerHTML = html;
-
-            // Click on staff name to show detail
-            document.querySelectorAll('.staff-name-clickable').forEach(el => {
-                el.closest('.staff-attendance-row').addEventListener('click', (e) => {
-                    if (e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON' || e.target.closest('select') || e.target.closest('button')) return;
-                    const staffId = e.currentTarget.dataset.staff;
-                    if (staffId) openStaffDetailModal(staffId);
-                });
-            });
-
-            // Event listeners for status select
-            document.querySelectorAll('.staff-attendance-row .status-select').forEach(select => {
-                select.addEventListener('change', async (e) => {
-                    e.stopPropagation();
-                    const staffId = e.target.dataset.staff;
-                    const date = e.target.dataset.date;
-                    const status = e.target.value;
-                    
-                    const success = await saveAttendance(staffId, date, status);
-                    if (success) {
-                        showToast('Attendance updated');
-                        await renderAttendanceList(date);
-                        updateStats(date);
-                        renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
-                    }
-                });
-            });
-
-            // Event listeners for duty toggle
-            document.querySelectorAll('.duty-toggle-btn').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    const staffId = e.target.dataset.staff;
-                    const date = e.target.dataset.date;
-                    const isDuty = await toggleDutyStaff(staffId, date);
-                    showToast(isDuty ? 'Staff added to duty' : 'Staff removed from duty');
-                    await loadDutyStaff();
-                    await renderAttendanceList(date);
-                    updateStats(date);
-                    renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
-                });
-            });
-
-            // Update stats after rendering
-            updateStats(dateStr);
-        }
-
-        // ==================== STAFF DETAIL MODAL ====================
-        let staffDetailMonth = new Date();
-        let currentStaffId = null;
-
-        async function openStaffDetailModal(staffId) {
-            const staff = allStaff.find(s => s.id === staffId);
-            if (!staff) {
-                showToast('Staff not found', 'error');
-                return;
-            }
-
-            currentStaffId = staffId;
-            staffDetailMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
-            
-            document.getElementById('staffDetailTitle').textContent = `👤 ${staff.name}'s Attendance`;
-            document.getElementById('staffDetailName').textContent = staff.name;
-            document.getElementById('staffDetailPosition').textContent = staff.position || 'Staff Member';
-            
-            document.getElementById('staffDetailModal').classList.remove('hidden');
-            await renderStaffDetailCalendar(staffId, staffDetailMonth.getFullYear(), staffDetailMonth.getMonth());
-        }
-
-        window.closeStaffDetailModal = function() {
-            document.getElementById('staffDetailModal').classList.add('hidden');
-        };
-
-        document.getElementById('staffPrevMonth').addEventListener('click', async () => {
-            staffDetailMonth.setMonth(staffDetailMonth.getMonth() - 1);
-            if (currentStaffId) {
-                await renderStaffDetailCalendar(currentStaffId, staffDetailMonth.getFullYear(), staffDetailMonth.getMonth());
-            }
-        });
-
-        document.getElementById('staffNextMonth').addEventListener('click', async () => {
-            staffDetailMonth.setMonth(staffDetailMonth.getMonth() + 1);
-            if (currentStaffId) {
-                await renderStaffDetailCalendar(currentStaffId, staffDetailMonth.getFullYear(), staffDetailMonth.getMonth());
-            }
-        });
-
-        async function renderStaffDetailCalendar(staffId, year, month) {
-            const container = document.getElementById('staffDetailCalendar');
-            const daysInMonth = getDaysInMonth(year, month);
-            const firstDay = new Date(year, month, 1).getDay();
-            
-            // Load attendance for this staff
-            const staffAttendance = await loadAttendanceForStaff(staffId, year, month);
-            
-            document.getElementById('staffDetailMonth').textContent = `${MONTH_NAMES[month]} ${year}`;
-
-            let present = 0, absent = 0, half = 0, leave = 0;
-
-            let html = `
-                ${DAY_NAMES.map(d => `<div class="day-header">${d}</div>`).join('')}
-            `;
-
-            // Empty cells
-            for (let i = 0; i < firstDay; i++) {
-                html += `<div class="day-cell empty"></div>`;
-            }
-
-            // Days
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateObj = new Date(year, month, day);
-                const dateStr = formatDate(dateObj);
-                const isHoliday = allHolidays.some(h => h.date === dateStr);
-                const isWeekendDay = isWeekend(dateObj);
-                const hasDuty = allDutyStaff.some(d => d.staffId === staffId && d.date === dateStr);
-                const isTodayDate = isToday(dateObj);
-                
-                let cellClass = 'empty';
-                let statusText = '';
-                let statusIcon = '';
-
-                if (isHoliday) {
-                    cellClass = 'holiday';
-                    statusText = 'Holiday';
-                    statusIcon = '🎉';
-                } else if (isWeekendDay && !hasDuty) {
-                    cellClass = 'weekend';
-                    statusText = 'Weekend';
-                    statusIcon = '📴';
-                } else if (isWeekendDay && hasDuty) {
-                    cellClass = 'duty';
-                    statusText = 'On Duty';
-                    statusIcon = '🔄';
-                } else {
-                    const attendance = staffAttendance[dateStr];
-                    if (attendance) {
-                        const status = attendance.status;
-                        switch(status) {
-                            case 'present':
-                                cellClass = 'present';
-                                statusText = 'Present';
-                                statusIcon = '✅';
-                                present++;
-                                break;
-                            case 'absent':
-                                cellClass = 'absent';
-                                statusText = 'Absent';
-                                statusIcon = '❌';
-                                absent++;
-                                break;
-                            case 'half':
-                                cellClass = 'half';
-                                statusText = 'Half Day';
-                                statusIcon = '🌗';
-                                half++;
-                                break;
-                            case 'leave':
-                                cellClass = 'leave';
-                                statusText = 'Leave';
-                                statusIcon = '📋';
-                                leave++;
-                                break;
-                            default:
-                                cellClass = 'empty';
-                                statusText = 'No Data';
-                                statusIcon = '•';
-                        }
-                    } else {
-                        cellClass = 'empty';
-                        statusText = 'No Data';
-                        statusIcon = '•';
-                    }
-                }
-
-                const todayClass = isTodayDate ? 'today' : '';
-
-                html += `
-                    <div class="day-cell ${cellClass} ${todayClass}">
-                        <span class="day-number">${day}</span>
-                        <span class="day-status-icon">${statusIcon}</span>
-                        <span class="status-tooltip">${statusText}</span>
-                    </div>
-                `;
-            }
-
-            container.innerHTML = html;
-
-            // Update stats
-            document.getElementById('staffDetailPresent').textContent = present;
-            document.getElementById('staffDetailHalf').textContent = half;
-            document.getElementById('staffDetailAbsent').textContent = absent;
-            document.getElementById('staffDetailLeave').textContent = leave;
-            
-            const totalPresent = present + (half * 0.5);
-            document.getElementById('staffDetailTotalPresent').textContent = `${totalPresent.toFixed(1)} days`;
-        }
-
-        // ==================== UPDATE STATS ====================
-        function updateStats(dateStr) {
-            if (!dateStr) return;
-            
-            const dateObj = new Date(dateStr + 'T00:00:00');
-            const isHoliday = allHolidays.some(h => h.date === dateStr);
-            const isWeekendDay = isWeekend(dateObj);
-            const hasDuty = allDutyStaff.some(d => d.date === dateStr);
-
-            let present = 0, absent = 0, half = 0, leave = 0;
-            let totalStaff = allStaff.length;
-
-            allStaff.forEach(staff => {
-                const status = attendanceData[staff.id]?.status || 'absent';
-                if (isHoliday) return;
-                if (isWeekendDay && !hasDuty) return;
-                switch(status) {
-                    case 'present': present++; break;
-                    case 'absent': absent++; break;
-                    case 'half': half++; break;
-                    case 'leave': leave++; break;
-                }
-            });
-
-            const workingDays = totalStaff > 0 ? totalStaff : 1;
-            const attended = present + (half * 0.5);
-            const percentage = workingDays > 0 ? ((attended / workingDays) * 100).toFixed(1) : 0;
-
-            document.getElementById('presentCount').textContent = present;
-            document.getElementById('absentCount').textContent = absent;
-            document.getElementById('halfCount').textContent = half;
-            document.getElementById('leaveCount').textContent = leave;
-            document.getElementById('workingDays').textContent = workingDays;
-            document.getElementById('attendancePercent').textContent = `${percentage}%`;
-        }
-
-        // ==================== RENDER CALENDAR ====================
-        async function renderCalendar(year, month) {
-            const container = document.getElementById('calendarContainer');
-            
-            if (!container) {
-                console.error('Calendar container not found');
-                return;
-            }
-
-            const daysInMonth = getDaysInMonth(year, month);
-            const firstDay = new Date(year, month, 1).getDay();
-            
-            const monthAttendance = await loadAttendanceForMonth(year, month);
-
-            document.getElementById('currentMonthDisplay').textContent = `${MONTH_NAMES[month]} ${year}`;
-            document.getElementById('salaryMonthDisplay').textContent = `${MONTH_NAMES[month]} ${year}`;
-
-            let html = `
-                <div class="calendar-colorful">
-                    ${DAY_NAMES.map(d => `<div class="day-header">${d}</div>`).join('')}
-            `;
-
-            for (let i = 0; i < firstDay; i++) {
-                html += `<div class="day-cell empty"></div>`;
-            }
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateObj = new Date(year, month, day);
-                const dateStr = formatDate(dateObj);
-                const isHoliday = allHolidays.some(h => h.date === dateStr);
-                const isWeekendDay = isWeekend(dateObj);
-                const hasDuty = allDutyStaff.some(d => d.date === dateStr);
-                const isTodayDate = isToday(dateObj);
-                
-                let cellClass = 'empty';
-                let statusText = '';
-                let badgeText = '';
-
-                if (isHoliday) {
-                    cellClass = 'holiday';
-                    statusText = '🎉';
-                    badgeText = 'H';
-                } else if (isWeekendDay && !hasDuty) {
-                    cellClass = 'weekend';
-                    statusText = '📴';
-                    badgeText = 'W';
-                } else if (isWeekendDay && hasDuty) {
-                    cellClass = 'duty';
-                    statusText = '🔄';
-                    badgeText = 'D';
-                } else {
-                    // Check attendance for this day
-                    let totalPresent = 0;
-                    let totalStaffCount = allStaff.length;
-                    let hasAnyData = false;
-
-                    for (const staff of allStaff) {
-                        const key = `${dateStr}_${staff.id}`;
-                        if (monthAttendance[key]) {
-                            hasAnyData = true;
-                            if (monthAttendance[key].status === 'present') totalPresent++;
-                        }
-                    }
-
-                    if (!hasAnyData) {
-                        cellClass = 'empty';
-                        statusText = '';
-                        badgeText = '';
-                    } else if (totalPresent === totalStaffCount) {
-                        cellClass = 'present';
-                        statusText = '✓';
-                        badgeText = 'All';
-                    } else if (totalPresent === 0) {
-                        cellClass = 'absent';
-                        statusText = '✗';
-                        badgeText = '0';
-                    } else {
-                        cellClass = 'half';
-                        statusText = `${totalPresent}/${totalStaffCount}`;
-                        badgeText = 'Mix';
-                    }
-                }
-
-                const todayClass = isTodayDate ? 'today' : '';
-
-                html += `
-                    <div class="day-cell ${cellClass} ${todayClass}" title="${dateStr} - ${statusText || 'No data'}">
-                        <span class="day-number">${day}</span>
-                        ${statusText ? `<span class="day-status">${statusText}</span>` : ''}
-                        ${badgeText ? `<span class="day-badge">${badgeText}</span>` : ''}
-                    </div>
-                `;
-            }
-
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        // ==================== DUTY HISTORY ====================
-        async function renderDutyHistory(filterStaffId = '') {
-            const container = document.getElementById('dutyHistoryList');
-            
-            let filteredDuty = allDutyStaff;
-            if (filterStaffId) {
-                filteredDuty = allDutyStaff.filter(d => d.staffId === filterStaffId);
-            }
-
-            if (filteredDuty.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8 text-gray-400 text-sm">
-                        <i class="fas fa-calendar-times text-2xl block mb-2 opacity-40"></i>
-                        No duty records found
-                    </div>
-                `;
-                return;
-            }
-
-            const grouped = {};
-            filteredDuty.forEach(duty => {
-                const staff = allStaff.find(s => s.id === duty.staffId);
-                const staffName = staff ? staff.name : 'Unknown Staff';
-                if (!grouped[staffName]) {
-                    grouped[staffName] = [];
-                }
-                grouped[staffName].push(duty);
-            });
-
-            let html = '';
-            const sortedStaff = Object.keys(grouped).sort();
-
-            for (const staffName of sortedStaff) {
-                const duties = grouped[staffName];
-                const dutyCount = duties.length;
-                const staff = allStaff.find(s => s.name === staffName);
-                
-                html += `
-                    <div class="duty-staff-card mb-3">
-                        <div class="flex justify-between items-center mb-2">
-                            <div>
-                                <span class="font-semibold text-sm">${escapeHtml(staffName)}</span>
-                                <span class="duty-count-badge ml-2">
-                                    <i class="fas fa-calendar-check"></i> ${dutyCount} duty day${dutyCount > 1 ? 's' : ''}
-                                </span>
-                            </div>
-                            <span class="text-[10px] text-gray-500">${staff?.position || ''}</span>
-                        </div>
-                        <div class="space-y-1">
-                            ${duties.sort((a, b) => b.date.localeCompare(a.date)).map(duty => {
-                                const dateObj = new Date(duty.date + 'T00:00:00');
-                                const dayName = DAY_NAMES[dateObj.getDay()];
-                                const formattedDate = `${dayName}, ${dateObj.getDate()} ${MONTH_NAMES[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
-                                return `
-                                    <div class="duty-history-item">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs font-medium">${formattedDate}</span>
-                                            <span class="attendance-badge attendance-duty text-[9px]">Duty</span>
-                                        </div>
-                                        <button class="remove-duty-btn text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition text-xs" data-staff="${duty.staffId}" data-date="${duty.date}" title="Remove duty">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            container.innerHTML = html;
-
-            document.querySelectorAll('.remove-duty-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const staffId = btn.dataset.staff;
-                    const date = btn.dataset.date;
-                    showConfirmationModal(
-                        'Remove Duty',
-                        `Remove duty for ${date}?`,
-                        async () => {
-                            await toggleDutyStaff(staffId, date);
-                            showToast('Duty removed');
-                            await loadDutyStaff();
-                            await renderDutyHistory(document.getElementById('dutyFilterStaff').value);
-                            await renderAttendanceList(document.getElementById('attendanceDate').value);
-                            renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
-                        }
-                    );
-                });
-            });
-        }
-
-        // ==================== SALARY CALCULATION ====================
-        async function renderSalarySummary(year, month) {
-            const container = document.getElementById('salarySummaryContainer');
-            const daysInMonth = getDaysInMonth(year, month);
-            const workingDays = getWorkingDaysInMonth(year, month);
-            
-            const monthAttendance = await loadAttendanceForMonth(year, month);
-
-            let totalSalary = 0;
-            let totalDeduction = 0;
-            let totalPayable = 0;
-            let html = `
-                <div class="text-xs text-gray-500 mb-2">${MONTH_NAMES[month]} ${year} | Working Days: ${workingDays}</div>
-                <div class="space-y-1 max-h-[300px] overflow-y-auto">
-            `;
-
-            for (const staff of allStaff) {
-                let present = 0, absent = 0, half = 0, leave = 0;
-
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const dateObj = new Date(year, month, day);
-                    const dateStr = formatDate(dateObj);
-                    const isHoliday = allHolidays.some(h => h.date === dateStr);
-                    const isWeekendDay = isWeekend(dateObj);
-                    const hasDuty = allDutyStaff.some(d => d.date === dateStr);
-
-                    if (isHoliday) continue;
-                    if (isWeekendDay && !hasDuty) continue;
-
-                    const key = `${dateStr}_${staff.id}`;
-                    if (monthAttendance[key]) {
-                        const status = monthAttendance[key].status;
-                        switch(status) {
-                            case 'present': present++; break;
-                            case 'absent': absent++; break;
-                            case 'half': half += 0.5; break;
-                            case 'leave': leave++; break;
-                        }
-                    } else {
-                        absent++;
-                    }
-                }
-
-                const monthlySalary = staff.salary || 0;
-                const dailyRate = workingDays > 0 ? monthlySalary / workingDays : 0;
-                const totalPresentDays = present + half;
-                const salaryToPay = totalPresentDays * dailyRate;
-                const deduction = monthlySalary - salaryToPay;
-
-                totalSalary += monthlySalary;
-                totalDeduction += Math.max(0, deduction);
-                totalPayable += salaryToPay;
-
-                const dutyCount = allDutyStaff.filter(d => d.staffId === staff.id).length;
-                const deductionColor = deduction > 0 ? 'text-red-600' : 'text-green-600';
-
-                html += `
-                    <div class="salary-summary-item">
-                        <div>
-                            <span class="font-medium text-sm">${escapeHtml(staff.name)}</span>
-                            <span class="text-[10px] text-gray-500 ml-1">(P:${present} H:${half} A:${absent} L:${leave})</span>
-                            ${dutyCount > 0 ? `<span class="text-[10px] text-pink-600 ml-1">🔄 ${dutyCount}d duty</span>` : ''}
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm font-medium">৳${salaryToPay.toFixed(2)}</div>
-                            <div class="text-[9px] ${deductionColor}">${deduction > 0 ? '-' : ''}৳${Math.abs(deduction).toFixed(2)}</div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            html += `
-                </div>
-                <div class="mt-3 pt-2 border-t border-gray-200 dark:border-gray-700 salary-calculation-box">
-                    <div class="flex justify-between text-sm">
-                        <span class="font-semibold">Base Salary</span>
-                        <span>৳${totalSalary.toFixed(2)}</span>
-                    </div>
-                    <div class="flex justify-between text-sm text-red-600">
-                        <span>Deduction</span>
-                        <span>- ৳${totalDeduction.toFixed(2)}</span>
-                    </div>
-                    <div class="flex justify-between text-sm font-bold text-green-600 pt-1 border-t border-gray-200 dark:border-gray-700">
-                        <span>Net Payable</span>
-                        <span>৳${totalPayable.toFixed(2)}</span>
-                    </div>
-                    <div class="text-[9px] text-gray-500 mt-1 text-center">
-                        Salary = (Monthly Salary ÷ Working Days) × Present Days
-                    </div>
-                </div>
-            `;
-
-            container.innerHTML = html;
-        }
-
-        // ==================== HOLIDAY MANAGEMENT ====================
-        async function loadHolidaysList() {
-            const container = document.getElementById('holidayList');
-            if (allHolidays.length === 0) {
-                container.innerHTML = '<div class="text-center py-3 text-gray-400 text-xs">No holidays</div>';
-                return;
-            }
-
-            container.innerHTML = allHolidays.map(h => `
-                <div class="flex justify-between items-center py-1.5 border-b border-gray-100 dark:border-gray-700 text-xs">
-                    <div>
-                        <span class="font-medium">${escapeHtml(h.reason)}</span>
-                        <span class="text-gray-500 ml-2">${h.date}</span>
-                    </div>
-                    <button class="delete-holiday-btn text-red-500 hover:text-red-700 p-0.5 rounded transition" data-id="${h.id}">
-                        <i class="fas fa-trash-alt text-[10px]"></i>
-                    </button>
-                </div>
-            `).join('');
-
-            document.querySelectorAll('.delete-holiday-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.dataset.id;
-                    const holiday = allHolidays.find(h => h.id === id);
-                    showConfirmationModal(
-                        'Delete Holiday',
-                        `Delete "${holiday?.reason || 'holiday'}"?`,
-                        async () => {
-                            await deleteDoc(doc(db, 'holidays', id));
-                            showToast('Holiday deleted');
-                            await loadHolidays();
-                            await loadHolidaysList();
-                            await renderAttendanceList(document.getElementById('attendanceDate').value);
-                            renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
-                            renderSalarySummary(currentMonth.getFullYear(), currentMonth.getMonth());
-                        }
-                    );
-                });
-            });
-        }
-
-        // ==================== EVENT LISTENERS ====================
-        document.getElementById('loadAttendanceBtn').addEventListener('click', async () => {
-            const dateStr = document.getElementById('attendanceDate').value;
-            if (!dateStr) {
-                showToast('Select a date', 'error');
-                return;
-            }
-            await renderAttendanceList(dateStr);
-        });
-
-        document.getElementById('attendanceDate').addEventListener('change', async () => {
-            const dateStr = document.getElementById('attendanceDate').value;
-            if (dateStr) {
-                await renderAttendanceList(dateStr);
-            }
-        });
-
-        document.getElementById('prevMonthBtn').addEventListener('click', () => {
-            currentMonth.setMonth(currentMonth.getMonth() - 1);
-            renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
-            renderSalarySummary(currentMonth.getFullYear(), currentMonth.getMonth());
-        });
-
-        document.getElementById('nextMonthBtn').addEventListener('click', () => {
-            currentMonth.setMonth(currentMonth.getMonth() + 1);
-            renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
-            renderSalarySummary(currentMonth.getFullYear(), currentMonth.getMonth());
-        });
-
-        document.getElementById('manageHolidaysBtn').addEventListener('click', () => {
-            document.getElementById('holidayModal').classList.remove('hidden');
-            loadHolidaysList();
-        });
-
-        window.closeHolidayModal = function() {
-            document.getElementById('holidayModal').classList.add('hidden');
-        };
-
-        document.getElementById('holidayForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const date = document.getElementById('holidayDate').value;
-            const reason = document.getElementById('holidayReason').value.trim();
-
-            if (!date || !reason) {
-                showToast('Fill all fields', 'error');
-                return;
-            }
-
-            if (allHolidays.some(h => h.date === date)) {
-                showToast('Holiday already exists', 'error');
-                return;
-            }
-
-            try {
-                await addDoc(collection(db, 'holidays'), {
-                    date: date,
-                    reason: reason,
-                    createdAt: Timestamp.now()
-                });
-                showToast('Holiday added');
-                document.getElementById('holidayForm').reset();
-                await loadHolidays();
-                await loadHolidaysList();
-                await renderAttendanceList(document.getElementById('attendanceDate').value);
-                renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
-                renderSalarySummary(currentMonth.getFullYear(), currentMonth.getMonth());
-            } catch (error) {
-                showToast('Error: ' + error.message, 'error');
-            }
-        });
-
-        document.getElementById('markAllPresentBtn').addEventListener('click', async () => {
-            const dateStr = document.getElementById('attendanceDate').value;
-            if (!dateStr) {
-                showToast('Select a date first', 'error');
-                return;
-            }
-
-            const dateObj = new Date(dateStr + 'T00:00:00');
-            const isHoliday = allHolidays.some(h => h.date === dateStr);
-            const isWeekendDay = isWeekend(dateObj);
-            const hasDuty = allDutyStaff.some(d => d.date === dateStr);
-
-            if (isHoliday) {
-                showToast('Cannot mark on holiday', 'error');
-                return;
-            }
-
-            if (isWeekendDay && !hasDuty) {
-                showToast('Cannot mark on weekend (Friday). Add duty first.', 'error');
-                return;
-            }
-
-            showConfirmationModal(
-                'Mark All Present',
-                `Mark all staff present on ${dateStr}?`,
-                async () => {
-                    let count = 0;
-                    for (const staff of allStaff) {
-                        const saved = await saveAttendance(staff.id, dateStr, 'present');
-                        if (saved) count++;
-                    }
-                    showToast(`${count} staff marked present`);
-                    await renderAttendanceList(dateStr);
-                    renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
-                }
-            );
-        });
-
-        document.getElementById('viewDutyHistoryBtn').addEventListener('click', async () => {
-            const modal = document.getElementById('dutyHistoryModal');
-            modal.classList.remove('hidden');
-            
-            const filterSelect = document.getElementById('dutyFilterStaff');
-            filterSelect.innerHTML = '<option value="">All Staff</option>';
-            allStaff.forEach(staff => {
-                const option = document.createElement('option');
-                option.value = staff.id;
-                option.textContent = staff.name;
-                filterSelect.appendChild(option);
-            });
-            
-            await renderDutyHistory();
-        });
-
-        document.getElementById('applyDutyFilter').addEventListener('click', async () => {
-            const filterValue = document.getElementById('dutyFilterStaff').value;
-            await renderDutyHistory(filterValue);
-        });
-
-        window.closeDutyHistoryModal = function() {
-            document.getElementById('dutyHistoryModal').classList.add('hidden');
-        };
-
-        document.getElementById('calculateSalaryBtn').addEventListener('click', async () => {
-            const modal = document.getElementById('salaryModal');
-            modal.classList.remove('hidden');
-            
-            const content = document.getElementById('salaryModalContent');
-            content.innerHTML = '<div class="text-center py-6 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Calculating...</div>';
-            
-            await renderSalarySummary(currentMonth.getFullYear(), currentMonth.getMonth());
-            content.innerHTML = document.getElementById('salarySummaryContainer').innerHTML;
-        });
-
-        window.closeSalaryModal = function() {
-            document.getElementById('salaryModal').classList.add('hidden');
-        };
-
-        document.getElementById('refreshBtn').addEventListener('click', async () => {
-            await loadStaff();
-            await loadHolidays();
-            await loadDutyStaff();
-            await renderAttendanceList(document.getElementById('attendanceDate').value);
-            renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
-            renderSalarySummary(currentMonth.getFullYear(), currentMonth.getMonth());
-            showToast('Refreshed');
-        });
-
-        // ==================== SIDEBAR ====================
+        checkAuthState(true);
+    </script>
+    
+    <script type="module">
+        import { db, collection, getDocs, addDoc, deleteDoc, doc, query, where } from './js/firebase.js';
+        
+        // ===== SIDEBAR & MENU =====
         const sidebar = document.getElementById('sidebar');
         const menuToggle = document.getElementById('menuToggle');
         const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-
+        
         function openSidebar() {
             sidebar.classList.remove('-translate-x-full');
-            if (window.innerWidth < 768) {
+            document.body.classList.add('sidebar-open');
+            if (!document.getElementById('sidebarOverlay')) {
                 const overlay = document.createElement('div');
                 overlay.id = 'sidebarOverlay';
                 overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
-                overlay.onclick = closeSidebar;
+                overlay.addEventListener('click', closeSidebar);
                 document.body.appendChild(overlay);
             }
         }
-
         function closeSidebar() {
             sidebar.classList.add('-translate-x-full');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (overlay) overlay.remove();
+            document.body.classList.remove('sidebar-open');
+            document.getElementById('sidebarOverlay')?.remove();
         }
-
-        menuToggle.addEventListener('click', openSidebar);
-        closeSidebarBtn.addEventListener('click', closeSidebar);
-
+        menuToggle?.addEventListener('click', openSidebar);
+        closeSidebarBtn?.addEventListener('click', closeSidebar);
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 768) {
                 sidebar.classList.remove('-translate-x-full');
-                const overlay = document.getElementById('sidebarOverlay');
-                if (overlay) overlay.remove();
+                document.getElementById('sidebarOverlay')?.remove();
+                document.body.classList.remove('sidebar-open');
             } else {
                 sidebar.classList.add('-translate-x-full');
             }
         });
-
-        if (window.innerWidth >= 768) {
-            sidebar.classList.remove('-translate-x-full');
-        } else {
-            sidebar.classList.add('-translate-x-full');
-        }
-
-        document.querySelectorAll('.has-submenu').forEach(m => {
-            const a = m.querySelector('a');
-            a?.addEventListener('click', (e) => {
+        if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
+        else sidebar.classList.add('-translate-x-full');
+        
+        // Submenu toggles
+        document.querySelectorAll('.has-submenu > a').forEach(link => {
+            link.addEventListener('click', (e) => {
                 e.preventDefault();
-                m.classList.toggle('open');
-                m.querySelector('.submenu-modern')?.classList.toggle('open');
+                const parent = link.closest('.has-submenu');
+                parent.classList.toggle('open');
+                parent.querySelector('.submenu-modern')?.classList.toggle('open');
             });
         });
-
-        // ==================== DARK MODE ====================
-        document.getElementById('darkModeToggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            document.body.classList.toggle('dark');
-        });
-
-        // ==================== LOGOUT ====================
-        document.getElementById('logoutLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('logoutModal').classList.remove('hidden');
-        });
-
-        document.getElementById('cancelLogoutBtn').addEventListener('click', () => {
-            document.getElementById('logoutModal').classList.add('hidden');
-        });
-
-        document.getElementById('confirmLogoutBtn').addEventListener('click', async () => {
-            document.getElementById('logoutModal').classList.add('hidden');
-            await logout();
-        });
-
-        // ==================== INIT ====================
-        document.getElementById('footerYear').textContent = new Date().getFullYear();
-        document.getElementById('attendanceDate').value = formatDate(new Date());
         
-        await loadStaff();
-        await loadHolidays();
-        await loadDutyStaff();
-        await renderAttendanceList(document.getElementById('attendanceDate').value);
-        renderCalendar(currentMonth.getFullYear(), currentMonth.getMonth());
-        renderSalarySummary(currentMonth.getFullYear(), currentMonth.getMonth());
+        // ===== TOAST =====
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+        }
+        
+        // ===== STATE =====
+        let staffMembers = [];
+        let attendanceRecords = [];
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+        let chartInstance = null;
+        let selectedDate = currentDate.toISOString().split('T')[0];
+        
+        // ===== STATUS CONFIG =====
+        const statuses = ['Present', 'Absent', 'Leave', 'Weekend'];
+        const statusShort = { 'Present': 'P', 'Absent': 'A', 'Leave': 'L', 'Weekend': 'W' };
+        const statusColors = {
+            'Present': { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-400', dot: 'present', cell: 'present' },
+            'Absent': { bg: 'bg-rose-100 dark:bg-rose-900/30', text: 'text-rose-700 dark:text-rose-400', dot: 'absent', cell: 'absent' },
+            'Leave': { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-400', dot: 'leave', cell: 'leave' },
+            'Weekend': { bg: 'bg-gray-100 dark:bg-gray-700/50', text: 'text-gray-500 dark:text-gray-400', dot: 'weekend', cell: 'weekend' }
+        };
+        
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        // Weekend days: Friday (5) and Saturday (6)
+        const weekendDays = [5, 6]; // Friday, Saturday
+        
+        // ===== LOAD STAFF =====
+        async function loadStaff() {
+            try {
+                const snap = await getDocs(collection(db, 'staff'));
+                staffMembers = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    staffMembers.push({
+                        id: doc.id,
+                        name: data.name || 'Unknown',
+                        email: data.email || '',
+                        phone: data.phone || '',
+                        department: data.department || 'General',
+                        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || 'Unknown')}&background=0f3b3a&color=fff&size=32&font-size=0.4`
+                    });
+                });
+                staffMembers.sort((a, b) => a.name.localeCompare(b.name));
+                return staffMembers;
+            } catch (error) {
+                console.error('Error loading staff:', error);
+                showToast('Error loading staff', 'error');
+                return [];
+            }
+        }
+        
+        // ===== LOAD ATTENDANCE =====
+        async function loadAttendance(date) {
+            try {
+                const q = query(collection(db, 'attendance'), where('date', '==', date));
+                const snap = await getDocs(q);
+                attendanceRecords = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    attendanceRecords.push({ id: doc.id, ...data });
+                });
+                return attendanceRecords;
+            } catch (error) {
+                console.error('Error loading attendance:', error);
+                return [];
+            }
+        }
+        
+        // ===== LOAD ALL ATTENDANCE FOR MONTH =====
+        async function loadMonthAttendance(year, month) {
+            try {
+                const startDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+                const endDate = `${year}-${String(month + 1).padStart(2, '0')}-${new Date(year, month + 1, 0).getDate()}`;
+                
+                const q = query(
+                    collection(db, 'attendance'),
+                    where('date', '>=', startDate),
+                    where('date', '<=', endDate)
+                );
+                const snap = await getDocs(q);
+                const records = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    records.push({ id: doc.id, ...data });
+                });
+                return records;
+            } catch (error) {
+                console.error('Error loading month attendance:', error);
+                return [];
+            }
+        }
+        
+        // ===== SAVE ATTENDANCE =====
+        async function saveAttendance() {
+            const date = document.getElementById('attendanceDate').value;
+            if (!date) {
+                showToast('Please select a date', 'error');
+                return;
+            }
+            
+            const saveBtn = document.getElementById('saveAttendanceBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            try {
+                const existing = attendanceRecords.filter(r => r.date === date);
+                for (const rec of existing) {
+                    await deleteDoc(doc(db, 'attendance', rec.id));
+                }
+                
+                const selects = document.querySelectorAll('.status-select');
+                const promises = [];
+                let savedCount = 0;
+                
+                for (const select of selects) {
+                    const staffId = select.dataset.id;
+                    const status = select.value;
+                    const staff = staffMembers.find(s => s.id === staffId);
+                    
+                    if (staff) {
+                        promises.push(addDoc(collection(db, 'attendance'), {
+                            staffId: staffId,
+                            staffName: staff.name,
+                            date: date,
+                            status: status,
+                            createdAt: new Date().toISOString()
+                        }));
+                        savedCount++;
+                    }
+                }
+                await Promise.all(promises);
+                
+                await loadAttendance(date);
+                renderDaily(date);
+                updateStatsAndChart(date);
+                
+                await loadMonthAttendance(currentYear, currentMonth);
+                renderMonthly();
+                
+                showToast(`✅ ${savedCount} attendance records saved!`, 'success');
+                
+            } catch (error) {
+                console.error('Error saving attendance:', error);
+                showToast('❌ Error saving attendance', 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save text-[10px]"></i> Save';
+            }
+        }
+        
+        // ===== RENDER DAILY =====
+        function renderDaily(date) {
+            const tbody = document.getElementById('attendanceTableBody');
+            if (!tbody) return;
+            
+            if (staffMembers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="text-center py-4 text-gray-400 text-xs">No staff members found</td></tr>`;
+                return;
+            }
+            
+            const todayRecords = attendanceRecords.filter(r => r.date === date);
+            
+            tbody.innerHTML = '';
+            staffMembers.forEach(staff => {
+                const record = todayRecords.find(r => r.staffId === staff.id);
+                const status = record ? record.status : 'Present';
+                const statusInfo = statusColors[status] || statusColors['Present'];
+                
+                const tr = document.createElement('tr');
+                tr.className = 'table-row-hover';
+                tr.innerHTML = `
+                    <td class="py-2 flex items-center gap-2">
+                        <img src="${staff.avatar}" class="w-7 h-7 rounded-full" alt="${escapeHtml(staff.name)}">
+                        <div>
+                            <div class="font-medium text-gray-700 dark:text-gray-300 text-sm">${escapeHtml(staff.name)}</div>
+                            <div class="text-[10px] text-gray-400 dark:text-gray-500">${escapeHtml(staff.department || 'General')}</div>
+                        </div>
+                    </td>
+                    <td class="py-2 text-right">
+                        <select class="attendance-select status-select text-xs" data-id="${staff.id}">
+                            ${statuses.map(s => `<option value="${s}" ${s === status ? 'selected' : ''}>${s}</option>`).join('')}
+                        </select>
+                        <span class="ml-1 inline-block w-2 h-2 rounded-full ${statusInfo.dot}"></span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            document.querySelectorAll('.status-select').forEach(sel => {
+                sel.addEventListener('change', function() {
+                    const dot = this.parentElement.querySelector('.rounded-full');
+                    const status = this.value;
+                    const statusInfo = statusColors[status] || statusColors['Present'];
+                    if (dot) {
+                        dot.className = `ml-1 inline-block w-2 h-2 rounded-full ${statusInfo.dot}`;
+                    }
+                    this.style.borderColor = '#f59e0b';
+                    setTimeout(() => { this.style.borderColor = ''; }, 1000);
+                });
+            });
+        }
+        
+        // ===== UPDATE STATS & CHART =====
+        function updateStatsAndChart(date) {
+            const todayRecords = attendanceRecords.filter(r => r.date === date);
+            const total = staffMembers.length;
+            
+            let present = 0, absent = 0, leave = 0, weekend = 0;
+            
+            staffMembers.forEach(staff => {
+                const record = todayRecords.find(r => r.staffId === staff.id);
+                const status = record ? record.status : 'Present';
+                if (status === 'Present') present++;
+                else if (status === 'Absent') absent++;
+                else if (status === 'Leave') leave++;
+                else if (status === 'Weekend') weekend++;
+            });
+            
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statPresent').textContent = present;
+            document.getElementById('statAbsent').textContent = absent;
+            document.getElementById('statLeave').textContent = leave;
+            document.getElementById('statWeekend').textContent = weekend;
+            
+            const pct = (v) => total ? Math.round((v / total) * 100) : 0;
+            document.getElementById('legendPresent').textContent = pct(present) + '%';
+            document.getElementById('legendAbsent').textContent = pct(absent) + '%';
+            document.getElementById('legendLeave').textContent = pct(leave) + '%';
+            document.getElementById('legendWeekend').textContent = pct(weekend) + '%';
+            
+            const ctx = document.getElementById('doughnutChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Present', 'Absent', 'Leave', 'Weekend'],
+                    datasets: [{
+                        data: [present || 1, absent || 0, leave || 0, weekend || 0],
+                        backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#f97316'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '70%',
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? Math.round((context.parsed / total) * 100) : 0;
+                                    return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // ===== RENDER MONTHLY =====
+        async function renderMonthly() {
+            const head = document.getElementById('monthlyHeader');
+            const body = document.getElementById('monthlyBody');
+            const searchTerm = document.getElementById('employeeSearch').value.toLowerCase();
+            
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+            
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('currentMonthLabel').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            const monthAttendance = await loadMonthAttendance(currentYear, currentMonth);
+            
+            // Build header with day names
+            let headerHtml = `<th class="sticky left-0 bg-white dark:bg-gray-800 z-20 py-2 px-2 text-left font-medium text-[10px] uppercase tracking-wider" style="min-width:120px;">Staff</th>`;
+            
+            let weekCounter = 0;
+            days.forEach((day, index) => {
+                const dateObj = new Date(currentYear, currentMonth, day);
+                const dayName = dayNames[dateObj.getDay()];
+                const isWeekend = weekendDays.includes(dateObj.getDay()); // Friday & Saturday
+                const isFirstDayOfWeek = dateObj.getDay() === 0 || index === 0; // Sunday or first day
+                
+                // Add week separator before Sunday (except first week)
+                if (isFirstDayOfWeek && index > 0) {
+                    headerHtml += `<th class="week-gap-left"></th>`;
+                }
+                
+                headerHtml += `<th class="py-1 px-0.5 text-center ${isWeekend ? 'weekend-marker' : ''}">
+                    <div class="day-header ${isWeekend ? 'weekend-day' : ''}">${day}</div>
+                    <div class="day-header ${isWeekend ? 'weekend-day' : ''}" style="font-size:7px;">${dayName}</div>
+                </th>`;
+                
+                // Add small gap after Saturday
+                if (dateObj.getDay() === 6) {
+                    headerHtml += `<th class="week-gap-right"></th>`;
+                }
+            });
+            
+            headerHtml += `<th class="py-1 text-center font-medium text-[10px]">P</th>
+                          <th class="py-1 text-center font-medium text-[10px]">A</th>
+                          <th class="py-1 text-center font-medium text-[10px]">L</th>
+                          <th class="py-1 text-center font-medium text-[10px]">W</th>
+                          <th class="py-1 text-center font-medium text-[10px]">%</th>`;
+            head.innerHTML = headerHtml;
+            
+            const filtered = staffMembers.filter(s => 
+                s.name.toLowerCase().includes(searchTerm) ||
+                (s.department && s.department.toLowerCase().includes(searchTerm))
+            );
+            document.getElementById('monthlyCount').textContent = filtered.length;
+            
+            body.innerHTML = '';
+            
+            filtered.forEach(staff => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30';
+                
+                const statusMap = {};
+                monthAttendance.forEach(r => {
+                    if (r.staffId === staff.id) {
+                        const day = parseInt(r.date.split('-')[2]);
+                        statusMap[day] = r.status;
+                    }
+                });
+                
+                let present = 0, absent = 0, leave = 0, weekend = 0;
+                
+                let rowHtml = `
+                    <td class="sticky left-0 bg-white dark:bg-gray-800 z-10 py-1.5 px-2">
+                        <div class="flex items-center gap-1">
+                            <img src="${staff.avatar}" class="w-5 h-5 rounded-full">
+                            <span class="staff-name-cell">${escapeHtml(staff.name)}</span>
+                        </div>
+                    </td>
+                `;
+                
+                days.forEach((day, index) => {
+                    const dateObj = new Date(currentYear, currentMonth, day);
+                    const isFirstDayOfWeek = dateObj.getDay() === 0 || index === 0;
+                    
+                    if (isFirstDayOfWeek && index > 0) {
+                        rowHtml += `<td class="week-gap-left"></td>`;
+                    }
+                    
+                    const status = statusMap[day] || null;
+                    const short = status ? statusShort[status] : '';
+                    const cellClass = status ? statusColors[status]?.cell || '' : 'empty';
+                    
+                    if (status === 'Present') present++;
+                    else if (status === 'Absent') absent++;
+                    else if (status === 'Leave') leave++;
+                    else if (status === 'Weekend') weekend++;
+                    
+                    rowHtml += `<td class="text-center py-1">
+                        <span class="attendance-cell ${cellClass}" title="${status || 'No record'}">${short || '—'}</span>
+                    </td>`;
+                    
+                    if (dateObj.getDay() === 6) {
+                        rowHtml += `<td class="week-gap-right"></td>`;
+                    }
+                });
+                
+                const totalDays = daysInMonth;
+                const pct = totalDays > 0 ? Math.round((present / totalDays) * 100) : 0;
+                
+                rowHtml += `
+                    <td class="monthly-summary-cell text-emerald-600 dark:text-emerald-400">${present}</td>
+                    <td class="monthly-summary-cell text-rose-500 dark:text-rose-400">${absent}</td>
+                    <td class="monthly-summary-cell text-amber-500 dark:text-amber-400">${leave}</td>
+                    <td class="monthly-summary-cell text-orange-500 dark:text-orange-400">${weekend}</td>
+                    <td class="monthly-summary-cell font-medium text-primary dark:text-accent">${pct}%</td>
+                `;
+                
+                tr.innerHTML = rowHtml;
+                body.appendChild(tr);
+            });
+        }
+        
+        // ===== NAVIGATE MONTH =====
+        function navigateMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            document.getElementById('monthFilter').value = currentMonth;
+            document.getElementById('yearFilter').value = currentYear;
+            renderMonthly();
+        }
+        
+        // ===== SET CURRENT DATE =====
+        function setCurrentDate() {
+            const now = new Date();
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+            
+            const dateInput = document.getElementById('attendanceDate');
+            const today = now.toISOString().split('T')[0];
+            dateInput.value = today;
+            selectedDate = today;
+            
+            document.getElementById('monthFilter').value = currentMonth;
+            document.getElementById('yearFilter').value = currentYear;
+        }
+        
+        // ===== LOAD DATE =====
+        async function loadDateData(date) {
+            await loadAttendance(date);
+            renderDaily(date);
+            updateStatsAndChart(date);
+        }
+        
+        // ===== INIT =====
+        async function init() {
+            await loadStaff();
+            
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            document.getElementById('attendanceDate').value = today;
+            selectedDate = today;
+            
+            await loadAttendance(today);
+            renderDaily(today);
+            updateStatsAndChart(today);
+            
+            setCurrentDate();
+            await renderMonthly();
+            
+            // ===== EVENT LISTENERS =====
+            document.getElementById('saveAttendanceBtn')?.addEventListener('click', saveAttendance);
+            
+            document.getElementById('loadAttendanceBtn')?.addEventListener('click', async () => {
+                const date = document.getElementById('attendanceDate').value;
+                if (date) {
+                    await loadDateData(date);
+                    showToast(`Loaded attendance for ${date}`, 'success');
+                }
+            });
+            
+            document.getElementById('attendanceDate')?.addEventListener('change', async (e) => {
+                const date = e.target.value;
+                if (date) {
+                    selectedDate = date;
+                    await loadDateData(date);
+                }
+            });
+            
+            document.getElementById('monthFilter')?.addEventListener('change', async () => {
+                currentMonth = parseInt(document.getElementById('monthFilter').value);
+                await renderMonthly();
+            });
+            
+            document.getElementById('yearFilter')?.addEventListener('change', async () => {
+                currentYear = parseInt(document.getElementById('yearFilter').value);
+                await renderMonthly();
+            });
+            
+            document.getElementById('employeeSearch')?.addEventListener('input', renderMonthly);
+            document.getElementById('prevMonthBtn')?.addEventListener('click', () => navigateMonth(-1));
+            document.getElementById('nextMonthBtn')?.addEventListener('click', () => navigateMonth(1));
+            document.getElementById('refreshMonthlyBtn')?.addEventListener('click', renderMonthly);
+            
+            document.getElementById('refreshBtn')?.addEventListener('click', async () => {
+                await loadStaff();
+                const date = document.getElementById('attendanceDate').value || selectedDate;
+                await loadAttendance(date);
+                renderDaily(date);
+                updateStatsAndChart(date);
+                await renderMonthly();
+                showToast('Refreshed!', 'success');
+            });
+            
+            document.getElementById('darkModeToggle')?.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                document.body.classList.toggle('dark');
+            });
+            
+            document.getElementById('footerYear').textContent = new Date().getFullYear();
+            
+            const logoutModal = document.getElementById('logoutModal');
+            document.getElementById('logoutLink')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                logoutModal?.classList.remove('hidden');
+            });
+            document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => {
+                logoutModal?.classList.add('hidden');
+            });
+            document.getElementById('confirmLogoutBtn')?.addEventListener('click', async () => {
+                logoutModal?.classList.add('hidden');
+                await logout();
+            });
+            
+           
+        }
+        
+        init();
     </script>
 </body>
 </html>

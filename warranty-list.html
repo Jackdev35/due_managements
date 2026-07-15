@@ -1023,11 +1023,34 @@
             }
         }
         
-        function getSupplierName(supplierId) {
-            if (!supplierId) return 'Unknown';
-            if (supplierMap.has(supplierId)) {
-                return supplierMap.get(supplierId);
+        // ✅ FIX: Get supplier name from multiple possible field names
+        function getSupplierName(warranty) {
+            // First check if supplierName already exists in warranty
+            if (warranty.supplierName && warranty.supplierName !== 'Unknown') {
+                return warranty.supplierName;
             }
+            
+            // Check all possible supplier ID field names
+            const possibleIdFields = ['supplierId', 'supplier_id', 'supplier', 'vendorId', 'vendor_id', 'vendor'];
+            
+            for (const field of possibleIdFields) {
+                const id = warranty[field];
+                if (id && supplierMap.has(id)) {
+                    const name = supplierMap.get(id);
+                    // Cache the name back to warranty for future use
+                    warranty.supplierName = name;
+                    return name;
+                }
+            }
+            
+            // If still not found, try to find by supplier name in warranty
+            const nameFields = ['supplierName', 'supplier_name', 'vendorName', 'vendor_name'];
+            for (const field of nameFields) {
+                if (warranty[field] && warranty[field] !== 'Unknown') {
+                    return warranty[field];
+                }
+            }
+            
             return 'Unknown';
         }
         
@@ -1046,8 +1069,8 @@
                 
                 snapshot.forEach(docSnap => {
                     const w = { id: docSnap.id, ...docSnap.data() };
-                    // Get supplier name from map
-                    w.supplierName = getSupplierName(w.supplierId);
+                    // Get supplier name from multiple sources
+                    w.supplierName = getSupplierName(w);
                     warranties.push(w);
                 });
                 
@@ -1341,8 +1364,8 @@
             // Status badge
             const statusBadgeHtml = getStatusBadge(warranty.status);
             
-            // ✅ FIX: Ensure supplier name is shown correctly
-            const supplierDisplay = warranty.supplierName || getSupplierName(warranty.supplierId) || 'Unknown';
+            // ✅ FIX: Get supplier name properly
+            const supplierDisplay = warranty.supplierName || getSupplierName(warranty) || 'Unknown';
             
             detailsContent.innerHTML = `
                 <div class="details-grid">

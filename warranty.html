@@ -138,6 +138,15 @@
             background: #374151;
         }
         
+        .btn-warning {
+            background: #dd6b20;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #c05621;
+            box-shadow: 0 4px 12px rgba(221, 107, 32, 0.3);
+        }
+        
         .search-wrapper {
             position: relative;
             width: 100%;
@@ -163,7 +172,7 @@
         }
         .search-wrapper input:focus {
             border-color: #0f3b3a;
-            box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.1);
+            box-shadow: 0 0 0 3px rgba(15,  59, 58, 0.1);
         }
         .dark .search-wrapper input {
             background: #1f2937;
@@ -467,6 +476,57 @@
         .dark .clickable-row:hover td {
             background-color: rgba(30, 107, 104, 0.1);
         }
+
+        /* Fix ID Button */
+        .fix-id-btn {
+            background: #dd6b20;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .fix-id-btn:hover {
+            background: #c05621;
+            transform: scale(1.05);
+        }
+        .fix-id-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .supplier-id-badge {
+            background: #e5e7eb;
+            color: #1f2937;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-family: monospace;
+            display: inline-block;
+        }
+        .dark .supplier-id-badge {
+            background: #374151;
+            color: #e5e7eb;
+        }
+        .has-id {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .dark .has-id {
+            background: #064e3b;
+            color: #34d399;
+        }
+        .no-id {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .dark .no-id {
+            background: #450a0a;
+            color: #f87171;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
@@ -605,6 +665,27 @@
                     </div>
                 </div>
                 
+                <!-- Action Bar: Fix All IDs Button -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-3 mb-4 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-amber-100 dark:bg-amber-900/30 p-2 rounded-lg">
+                            <i class="fas fa-id-card text-amber-600 dark:text-amber-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-semibold text-gray-800 dark:text-white">Supplier ID Management</h4>
+                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Generate unique IDs for all suppliers</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button id="generateAllIdsBtn" class="btn-modern btn-warning">
+                            <i class="fas fa-magic"></i> Generate All IDs
+                        </button>
+                        <button id="fixMissingIdsBtn" class="btn-modern btn-primary">
+                            <i class="fas fa-sync-alt"></i> Fix Missing IDs
+                        </button>
+                    </div>
+                </div>
+                
                 <!-- Supplier Section - Full Width -->
                 <div class="full-width-section mb-4">
                     <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
@@ -635,11 +716,12 @@
                                 <thead>
                                     <tr>
                                         <th style="width:40px;">S.L</th>
+                                        <th>Supplier ID</th>
                                         <th>Name</th>
                                         <th>Contact</th>
                                         <th>Phone</th>
                                         <th>Address</th>
-                                        <th class="text-center" style="width:80px;">Actions</th>
+                                        <th class="text-center" style="width:90px;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="suppliersTableBody"></tbody>
@@ -856,10 +938,10 @@
         const showToast = (msg, type='success') => {
             const c = document.getElementById('toastContainer');
             const t = document.createElement('div');
-            t.className = `px-3 py-2 rounded-lg shadow text-xs ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
-            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-1 text-xs"></i>${msg}`;
+            t.className = `px-3 py-2 rounded-lg shadow text-xs ${type === 'success' ? 'bg-green-500 text-white' : type === 'error' ? 'bg-red-500 text-white' : 'bg-amber-500 text-white'}`;
+            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-1 text-xs"></i>${msg}`;
             c.appendChild(t);
-            setTimeout(() => t.remove(), 2500);
+            setTimeout(() => t.remove(), 3000);
         };
         
         const escapeHtml = str => !str ? '' : str.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
@@ -868,6 +950,155 @@
         let allSuppliers = [];
         let currentPage = 1;
         let perPage = 20;
+        let isGenerating = false;
+        
+        // ==================== GENERATE UNIQUE SUPPLIER ID ====================
+        function generateUniqueSupplierId(name) {
+            // নাম থেকে prefix তৈরি করুন (প্রথম 3 অক্ষর বড় হাতে)
+            const prefix = name.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, '');
+            // র্যান্ডম 4 অক্ষর
+            const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+            // টাইমস্ট্যাম্পের শেষ 4 ডিজিট
+            const timestamp = Date.now().toString().slice(-4);
+            // ইউনিক আইডি তৈরি করুন
+            return `SUP-${prefix}-${random}${timestamp}`;
+        }
+        
+        // ==================== GENERATE ALL SUPPLIER IDs ====================
+        async function generateAllSupplierIds() {
+            if (isGenerating) return;
+            isGenerating = true;
+            
+            const btn = document.getElementById('generateAllIdsBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            
+            try {
+                const snap = await getDocs(collection(db, 'suppliers'));
+                let updated = 0;
+                let skipped = 0;
+                let errors = [];
+                
+                for (const docSnap of snap.docs) {
+                    const data = docSnap.data();
+                    const docId = docSnap.id;
+                    const name = data.name || 'Unknown';
+                    
+                    // চেক করুন supplierId ফিল্ড আছে কিনা
+                    if (!data.supplierId || data.supplierId === '' || data.supplierId === null || data.supplierId === undefined) {
+                        // নতুন ইউনিক আইডি তৈরি করুন
+                        const newId = generateUniqueSupplierId(name);
+                        
+                        // চেক করুন এই আইডি অন্য কোনো সাপ্লায়ারে আছে কিনা (ডুপ্লিকেট চেক)
+                        let isDuplicate = false;
+                        for (const s of allSuppliers) {
+                            if (s.supplierId === newId && s.id !== docId) {
+                                isDuplicate = true;
+                                break;
+                            }
+                        }
+                        
+                        // ডুপ্লিকেট হলে নতুন করে আইডি তৈরি করুন
+                        let finalId = newId;
+                        if (isDuplicate) {
+                            finalId = generateUniqueSupplierId(name + Date.now().toString().slice(-3));
+                        }
+                        
+                        await updateDoc(doc(db, 'suppliers', docId), {
+                            supplierId: finalId,
+                            supplierUniqueId: finalId,
+                            idGeneratedAt: new Date().toISOString()
+                        });
+                        updated++;
+                        console.log(`✅ Generated ID for ${name}: ${finalId}`);
+                    } else {
+                        skipped++;
+                        console.log(`⏭️ ${name} already has ID: ${data.supplierId}`);
+                    }
+                }
+                
+                showToast(`✅ ${updated} suppliers updated with unique IDs! (${skipped} already had IDs)`, 'success');
+                await loadSuppliers();
+                
+            } catch (error) {
+                console.error('Error generating IDs:', error);
+                showToast('❌ Error: ' + error.message, 'error');
+            } finally {
+                isGenerating = false;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-magic"></i> Generate All IDs';
+            }
+        }
+        
+        // ==================== FIX MISSING SUPPLIER IDs ====================
+        async function fixMissingSupplierIds() {
+            if (isGenerating) return;
+            isGenerating = true;
+            
+            const btn = document.getElementById('fixMissingIdsBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fixing...';
+            
+            try {
+                const snap = await getDocs(collection(db, 'suppliers'));
+                let updated = 0;
+                let errors = [];
+                
+                for (const docSnap of snap.docs) {
+                    const data = docSnap.data();
+                    const docId = docSnap.id;
+                    const name = data.name || 'Unknown';
+                    
+                    // শুধু মিসিং আইডি গুলো ফিক্স করুন
+                    if (!data.supplierId || data.supplierId === '' || data.supplierId === null || data.supplierId === undefined) {
+                        const newId = generateUniqueSupplierId(name);
+                        
+                        // ডুপ্লিকেট চেক
+                        let isDuplicate = false;
+                        const allIds = await getAllSupplierIds();
+                        if (allIds.includes(newId)) {
+                            // নতুন আইডি তৈরি করুন
+                            const newId2 = generateUniqueSupplierId(name + Date.now().toString().slice(-3));
+                            await updateDoc(doc(db, 'suppliers', docId), {
+                                supplierId: newId2,
+                                supplierUniqueId: newId2,
+                                idGeneratedAt: new Date().toISOString()
+                            });
+                        } else {
+                            await updateDoc(doc(db, 'suppliers', docId), {
+                                supplierId: newId,
+                                supplierUniqueId: newId,
+                                idGeneratedAt: new Date().toISOString()
+                            });
+                        }
+                        updated++;
+                        console.log(`✅ Fixed ID for ${name}`);
+                    }
+                }
+                
+                showToast(`✅ ${updated} missing IDs fixed!`, 'success');
+                await loadSuppliers();
+                
+            } catch (error) {
+                console.error('Error fixing IDs:', error);
+                showToast('❌ Error: ' + error.message, 'error');
+            } finally {
+                isGenerating = false;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> Fix Missing IDs';
+            }
+        }
+        
+        // ==================== GET ALL SUPPLIER IDs ====================
+        async function getAllSupplierIds() {
+            const ids = [];
+            const snap = await getDocs(collection(db, 'suppliers'));
+            snap.forEach(doc => {
+                const data = doc.data();
+                if (data.supplierId) ids.push(data.supplierId);
+            });
+            return ids;
+        }
         
         function setupModalCloseOnOutside(modalId, closeBtnId) {
             const modal = document.getElementById(modalId);
@@ -943,7 +1174,8 @@
                 filteredSuppliers = allSuppliers.filter(s => 
                     s.name.toLowerCase().includes(searchTerm) ||
                     (s.contactPerson && s.contactPerson.toLowerCase().includes(searchTerm)) ||
-                    (s.phone && s.phone.includes(searchTerm))
+                    (s.phone && s.phone.includes(searchTerm)) ||
+                    (s.supplierId && s.supplierId.toLowerCase().includes(searchTerm))
                 );
             }
             
@@ -953,16 +1185,24 @@
             const pageItems = filteredSuppliers.slice(startIndex, endIndex);
             
             if (pageItems.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-gray-400 text-xs">No suppliers found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-gray-400 text-xs">No suppliers found</td></tr>';
                 renderPagination(totalItems);
                 return;
             }
             
             tbody.innerHTML = pageItems.map((s, idx) => {
                 const serial = startIndex + idx + 1;
+                const hasId = s.supplierId && s.supplierId !== '';
+                const idBadgeClass = hasId ? 'has-id' : 'no-id';
+                const idText = hasId ? s.supplierId : 'No ID';
+                
                 return `
                 <tr class="table-row-hover border-b clickable-row" data-id="${s.id}" data-type="supplier">
                     <td class="px-2 py-2 text-xs text-center">${serial}</td>
+                    <td class="px-2 py-2 text-xs">
+                        <span class="supplier-id-badge ${idBadgeClass}">${escapeHtml(idText)}</span>
+                        ${!hasId ? `<button class="fix-id-btn ml-1 generate-single-id" data-id="${s.id}" data-name="${escapeHtml(s.name)}">Generate</button>` : ''}
+                    </td>
                     <td class="px-2 py-2 text-xs font-medium">${escapeHtml(s.name)}</td>
                     <td class="px-2 py-2 text-xs">${escapeHtml(s.contactPerson||'-')}</td>
                     <td class="px-2 py-2 text-xs">${escapeHtml(s.phone)}</td>
@@ -997,14 +1237,50 @@
                 document.body.classList.add('modal-open');
             }));
             
+            // Single ID generate button
+            document.querySelectorAll('.generate-single-id').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id;
+                    const name = btn.dataset.name;
+                    await generateSingleSupplierId(id, name);
+                });
+            });
+            
             renderPagination(totalItems);
+        }
+        
+        // ==================== GENERATE SINGLE SUPPLIER ID ====================
+        async function generateSingleSupplierId(supplierId, name) {
+            try {
+                const newId = generateUniqueSupplierId(name);
+                
+                // ডুপ্লিকেট চেক
+                const allIds = await getAllSupplierIds();
+                let finalId = newId;
+                if (allIds.includes(newId)) {
+                    finalId = generateUniqueSupplierId(name + Date.now().toString().slice(-3));
+                }
+                
+                await updateDoc(doc(db, 'suppliers', supplierId), {
+                    supplierId: finalId,
+                    supplierUniqueId: finalId,
+                    idGeneratedAt: new Date().toISOString()
+                });
+                
+                showToast(`✅ Generated ID: ${finalId} for ${name}`, 'success');
+                await loadSuppliers();
+            } catch (error) {
+                console.error('Error generating ID:', error);
+                showToast('❌ Error: ' + error.message, 'error');
+            }
         }
         
         // Load Suppliers
         async function loadSuppliers() {
             const tbody = document.getElementById('suppliersTableBody');
             if(!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-gray-400 text-xs">Loading...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-gray-400 text-xs">Loading...</td></tr>';
             try {
                 const snap = await getDocs(collection(db,'suppliers'));
                 allSuppliers = [];
@@ -1014,7 +1290,7 @@
                 currentPage = 1;
                 renderSupplierTable();
             } catch(e) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-red-400 text-xs">Error loading data</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-red-400 text-xs">Error loading data</td></tr>';
             }
         }
         
@@ -1128,8 +1404,9 @@
         // Save Supplier
         async function saveSupplier() {
             const id = document.getElementById('supplierId').value;
+            const name = document.getElementById('supplierName').value.trim();
             const data = {
-                name: document.getElementById('supplierName').value.trim(),
+                name: name,
                 contactPerson: document.getElementById('supplierContact').value.trim(),
                 phone: document.getElementById('supplierPhone').value.trim(),
                 address: document.getElementById('supplierAddress').value,
@@ -1139,13 +1416,20 @@
                 showToast('Name & Phone are required', 'error');
                 return;
             }
-            if(id) {
-                await updateDoc(doc(db, 'suppliers', id), data);
-            } else {
+            
+            // নতুন সাপ্লায়ারের জন্য ইউনিক আইডি তৈরি করুন
+            if(!id) {
+                const newId = generateUniqueSupplierId(name);
+                data.supplierId = newId;
+                data.supplierUniqueId = newId;
                 data.createdAt = new Date().toISOString();
                 await addDoc(collection(db, 'suppliers'), data);
+                showToast('Supplier added with ID: ' + newId);
+            } else {
+                await updateDoc(doc(db, 'suppliers', id), data);
+                showToast('Supplier updated');
             }
-            showToast(id ? 'Supplier updated' : 'Supplier added');
+            
             document.getElementById('supplierModal').classList.add('hidden');
             document.body.classList.remove('modal-open');
             loadSuppliers();
@@ -1214,6 +1498,7 @@
             let html = '';
             if (type === 'Supplier') {
                 html = `
+                    <div><span class="font-semibold text-gray-600 dark:text-gray-300">ID:</span> <span class="supplier-id-badge has-id">${escapeHtml(data.supplierId || 'No ID')}</span></div>
                     <div><span class="font-semibold text-gray-600 dark:text-gray-300">Name:</span> ${escapeHtml(data.name)}</div>
                     <div><span class="font-semibold text-gray-600 dark:text-gray-300">Contact:</span> ${escapeHtml(data.contactPerson || '-')}</div>
                     <div><span class="font-semibold text-gray-600 dark:text-gray-300">Phone:</span> ${escapeHtml(data.phone)}</div>
@@ -1238,7 +1523,6 @@
                 return;
             }
             
-            // Helper to escape CSV fields
             const escapeCSV = (str) => {
                 if (str === null || str === undefined) return '""';
                 const string = String(str);
@@ -1248,25 +1532,21 @@
                 return string;
             };
             
-            // Define CSV headers
-            const headers = ['SL', 'Name', 'Contact Person', 'Phone', 'Address'];
-            
-            // Create CSV rows
+            const headers = ['SL', 'Supplier ID', 'Name', 'Contact Person', 'Phone', 'Address'];
             const rows = allSuppliers.map((supplier, index) => [
                 index + 1,
+                escapeCSV(supplier.supplierId || ''),
                 escapeCSV(supplier.name || ''),
                 escapeCSV(supplier.contactPerson || ''),
                 escapeCSV(supplier.phone || ''),
                 escapeCSV(supplier.address || '')
             ]);
             
-            // Combine headers and rows
             const csvContent = [
                 headers.join(','),
                 ...rows.map(row => row.join(','))
             ].join('\n');
             
-            // Add BOM for UTF-8 (helps Excel recognize UTF-8)
             const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
@@ -1281,6 +1561,9 @@
         }
         
         // ==================== EVENT LISTENERS ====================
+        document.getElementById('generateAllIdsBtn')?.addEventListener('click', generateAllSupplierIds);
+        document.getElementById('fixMissingIdsBtn')?.addEventListener('click', fixMissingSupplierIds);
+        
         document.getElementById('addCourierBtn')?.addEventListener('click', () => openCourierModal());
         document.getElementById('saveCourierBtn')?.addEventListener('click', saveCourierRecord);
         document.getElementById('cancelCourierBtn')?.addEventListener('click', () => {
@@ -1329,7 +1612,6 @@
             }
         });
         
-        // Export Button - Now with full functionality
         document.getElementById('exportSupplierBtn')?.addEventListener('click', exportSuppliersToCSV);
         
         document.getElementById('refreshBtn')?.addEventListener('click', () => {

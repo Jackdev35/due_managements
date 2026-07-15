@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#0f3b3a">
+    <title>Warranty Analyzer | JackDev Due Managements</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0f3b3a',
+                        'primary-light': '#1e6b68',
+                        'primary-dark': '#092c2b',
+                        accent: '#d4af37',
+                        danger: '#e53e3e',
+                        success: '#2c7a4d',
+                        warning: '#dd6b20',
+                        info: '#3182ce',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        * { transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; }
+        
+        .stat-card {
+            transition: all 0.2s ease;
+            background: white;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #e5e7eb;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 22px -12px rgba(0,0,0,0.12);
+        }
+        .dark .stat-card {
+            background: #1f2937;
+            border-color: #374151;
+        }
+        .stat-card .icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+        .stat-card .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+        }
+        .stat-card .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .dark .stat-card .stat-label { color: #9ca3af; }
+        
+        .icon-bg-blue { background: #dbeafe; color: #2563eb; }
+        .dark .icon-bg-blue { background: #1e3a5f; color: #60a5fa; }
+        .icon-bg-green { background: #d1fae5; color: #059669; }
+        .dark .icon-bg-green { background: #064e3b; color: #34d399; }
+        .icon-bg-red { background: #fee2e2; color: #dc2626; }
+        .dark .icon-bg-red { background: #450a0a; color: #f87171; }
+        .icon-bg-purple { background: #ede9fe; color: #7c3aed; }
+        .dark .icon-bg-purple { background: #2e1065; color: #a78bfa; }
+        
+        .analyzer-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .analyzer-table th {
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .dark .analyzer-table th {
+            background: #1f2937;
+            color: #9ca3af;
+            border-bottom-color: #374151;
+        }
+        .analyzer-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+        }
+        .dark .analyzer-table td { border-bottom-color: #374151; }
+        .analyzer-table tr:hover { background-color: rgba(15, 59, 58, 0.04); }
+        .dark .analyzer-table tr:hover { background-color: rgba(30, 107, 104, 0.08); }
+        
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .badge-valid { background: #d1fae5; color: #065f46; }
+        .dark .badge-valid { background: #064e3b; color: #34d399; }
+        .badge-broken { background: #fee2e2; color: #991b1b; }
+        .dark .badge-broken { background: #450a0a; color: #f87171; }
+        
+        .btn-modern {
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-modern:active { transform: scale(0.95); }
+        .btn-primary { background: #0f3b3a; color: white; }
+        .btn-primary:hover { background: #092c2b; box-shadow: 0 4px 12px rgba(15, 59, 58, 0.3); }
+        .btn-success { background: #2c7a4d; color: white; }
+        .btn-success:hover { background: #1e5f3a; box-shadow: 0 4px 12px rgba(44, 122, 77, 0.3); }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
+        .btn-outline { background: transparent; border: 1px solid #e5e7eb; color: #6b7280; }
+        .btn-outline:hover { background: #f3f4f6; }
+        .dark .btn-outline { border-color: #374151; color: #9ca3af; }
+        .dark .btn-outline:hover { background: #374151; }
+        .btn-info { background: #3182ce; color: white; }
+        .btn-info:hover { background: #2563eb; box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3); }
+        
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 180px;
+            max-width: 300px;
+        }
+        .search-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 12px;
+        }
+        .search-wrapper input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            font-size: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .search-wrapper input:focus {
+            border-color: #0f3b3a;
+            box-shadow: 0 0 0 3px rgba(15, 59, 58, 0.1);
+        }
+        .dark .search-wrapper input {
+            background: #1f2937;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+        .dark .search-wrapper input:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+        
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            animation: slideUp 0.3s ease-out;
+            min-width: 200px;
+            max-width: 400px;
+        }
+        .toast-success { background: #2c7a4d; color: white; }
+        .toast-error { background: #dc2626; color: white; }
+        .toast-info { background: #3182ce; color: white; }
+        .toast-warning { background: #d97706; color: white; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .spinner-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .spinner-overlay.active {
+            display: flex;
+        }
+        .spinner-box {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 360px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .dark .spinner-box { background: #1f2937; }
+        .spinner-box .spinner { 
+            width: 48px; 
+            height: 48px; 
+            border: 4px solid #e5e7eb; 
+            border-top-color: #0f3b3a; 
+            border-radius: 50%; 
+            animation: spin 0.8s linear infinite; 
+            margin: 0 auto 16px;
+        }
+        .dark .spinner-box .spinner { border-color: #374151; border-top-color: #d4af37; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner-box .progress-text { font-size: 13px; color: #6b7280; }
+        .dark .spinner-box .progress-text { color: #9ca3af; }
+        .spinner-box .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+        .dark .spinner-box .progress-bar { background: #374151; }
+        .spinner-box .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0f3b3a, #d4af37);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .table-scroll {
+            max-height: 550px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+        .table-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .table-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .table-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark .table-scroll::-webkit-scrollbar-track { background: #1e293b; }
+        .dark .table-scroll::-webkit-scrollbar-thumb { background: #475569; }
+        
+        .truncate-text {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        .copy-btn {
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(15, 59, 58, 0.08);
+            transition: all 0.2s;
+        }
+        .copy-btn:hover { background: rgba(15, 59, 58, 0.18); }
+        .dark .copy-btn { background: rgba(255,255,255,0.08); }
+        .dark .copy-btn:hover { background: rgba(255,255,255,0.18); }
+        
+        /* Sidebar styles */
+        .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
+        .nav-active {
+            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
+            border-left: 3px solid #d4af37;
+        }
+        .dark .nav-active {
+            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
+        }
+        .submenu-modern { max-height:0; overflow:hidden; transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
+        .submenu-modern.open { max-height:280px; }
+        .has-submenu > a .chevron-icon { transition: transform 0.2s ease; }
+        .has-submenu.open > a .chevron-icon { transform: rotate(180deg); }
+        .sidebar-fixed { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+        .sidebar-header-fixed { flex-shrink:0; position:sticky; top:0; background:inherit; z-index:10; }
+        #sidebarOverlay { animation: fadeIn 0.2s ease-out; }
+        .sidebar-open { overflow:hidden; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        
+        .result-count {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .dark .result-count { color: #9ca3af; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+
+<div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out border-r border-white/5 sidebar-fixed">
+        <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                        <i class="fas fa-chart-line text-slate-900 text-sm"></i>
+                    </div>
+                    <div class="leading-tight">
+                        <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
+                        <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
+                    </div>
+                </div>
+                <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+        </div>
+        <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
+            <nav class="space-y-1.5">
+                <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                    <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
+                    <span class="text-sm font-medium">Dashboard</span>
+                </a>
+                <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-150">
+                    <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
+                    <span class="text-sm font-medium">Customers</span>
+                </a>
+                <div class="has-submenu" id="dueSubmenu">
+                    <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                        <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
+                        <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                    </a>
+                    <div class="submenu-modern pl-9 mt-1 space-y-1">
+                        <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a>
+                        <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span></a>
+                        <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a>
+                    </div>
+                </div>
+                <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                    <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span>
+                </a>
+                <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                    <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
+                </a>
+                <div class="has-submenu open" id="warrantySubmenu">
+                    <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-white bg-white/5 transition">
+                        <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm text-accent"></i></div><span class="text-sm font-medium">Warranty</span></div>
+                        <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
+                    </a>
+                    <div class="submenu-modern open pl-9 mt-1 space-y-1">
+                        <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span></a>
+                        <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span></a>
+                        <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span></a>
+                        <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition"><i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span></a>
+                        <a href="warranty-analyzer.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition"><i class="fas fa-search text-[10px] w-4"></i><span>Warranty Analyzer</span></a>
+                    </div>
+                </div>
+                <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                    <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
+                </a>
+                <a href="expenses.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                    <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Expenses</span>
+                </a>
+                <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
+                    <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
+                </a>
+            </nav>
+            <div class="pt-4 mt-2 border-t border-white/10">
+                <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition-all duration-150">
+                    <i class="fas fa-sign-out-alt text-sm w-5"></i>
+                    <span class="text-sm font-medium">Logout</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 md:ml-64 min-h-screen w-full">
+        
+        <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+            <div class="px-3 py-2.5 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg">
+                        <i class="fas fa-bars text-lg"></i>
+                    </button>
+                    <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white">
+                        <i class="fas fa-search text-primary mr-2"></i>Warranty Analyzer
+                    </h2>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fas fa-sync-alt text-sm"></i>
+                    </button>
+                    <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fas fa-moon dark:hidden text-sm"></i>
+                        <i class="fas fa-sun hidden dark:inline-block text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-3 md:p-4">
+
+            <!-- Page Description -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 mb-4">
+                <div class="flex items-start gap-3">
+                    <div class="bg-primary/10 p-2 rounded-lg">
+                        <i class="fas fa-shield-alt text-primary text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-800 dark:text-white">Warranty Reference Analyzer</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            Scan all warranty records to detect broken supplier references. 
+                            This tool <strong>does not modify</strong> any data — it's read-only analysis.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div class="flex flex-wrap gap-2">
+                    <button id="scanBtn" class="btn-modern btn-primary">
+                        <i class="fas fa-play"></i> Scan Now
+                    </button>
+                    <button id="refreshDataBtn" class="btn-modern btn-outline">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search by Supplier ID, Warranty ID...">
+                    </div>
+                    <button id="exportCsvBtn" class="btn-modern btn-success">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4" id="summaryCards">
+                <div class="stat-card">
+                    <div class="icon-wrapper icon-bg-blue">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="stat-value" id="totalWarranty">0</div>
+                    <div class="stat-label">Total Warranty</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon-wrapper icon-bg-green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value" id="validCount">0</div>
+                    <div class="stat-label">Valid Supplier IDs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon-wrapper icon-bg-red">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-value" id="brokenCount">0</div>
+                    <div class="stat-label">Broken Supplier IDs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon-wrapper icon-bg-purple">
+                        <i class="fas fa-hashtag"></i>
+                    </div>
+                    <div class="stat-value" id="uniqueBrokenCount">0</div>
+                    <div class="stat-label">Unique Broken IDs</div>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-800 dark:text-white">
+                            <i class="fas fa-list text-primary mr-2"></i>Warranty Analysis Results
+                        </h3>
+                        <span class="result-count" id="resultCount">0 records</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="copyBrokenIdsBtn" class="btn-modern btn-outline text-xs">
+                            <i class="fas fa-copy"></i> Copy Broken IDs
+                        </button>
+                    </div>
+                </div>
+                <div class="table-scroll">
+                    <table class="analyzer-table min-w-[800px]" id="resultTable">
+                        <thead>
+                            <tr>
+                                <th style="width:30px;">#</th>
+                                <th>Supplier ID</th>
+                                <th style="width:70px;">Times Used</th>
+                                <th>Warranty ID</th>
+                                <th>Document ID</th>
+                                <th style="width:90px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="6" class="text-center py-10 text-gray-400">
+                                    <i class="fas fa-search text-2xl mb-2 block opacity-40"></i>
+                                    <p class="text-sm">Click <strong>"Scan Now"</strong> to analyze warranty records</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+            <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                    &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span> 
+                    <span class="text-gray-300 dark:border-gray-600">|</span> 
+                    <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                    <span class="text-gray-300 dark:border-gray-600">|</span> 
+                    <span class="text-gray-400 dark:text-gray-500">Due Management System v2.0</span>
+                </p>
+            </div>
+        </footer>
+    </main>
+</div>
+
+<!-- Loading Spinner -->
+<div id="loadingSpinner" class="spinner-overlay">
+    <div class="spinner-box">
+        <div class="spinner"></div>
+        <p id="loadingText" class="progress-text">Scanning warranties...</p>
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <p id="progressDetail" class="text-xs text-gray-400 mt-2">0 / 0</p>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Logout Modal -->
+<div id="logoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] hidden p-3">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl modal-animate">
+        <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+            <i class="fas fa-sign-out-alt text-orange-500 text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Are you sure you want to logout?</p>
+        <div class="flex gap-3 justify-center">
+            <button id="cancelLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-100 dark:bg-gray-700 btn-active">Cancel</button>
+            <button id="confirmLogoutBtn" class="px-5 py-2.5 text-sm font-medium rounded-xl bg-red-500 text-white btn-active">Logout</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================================ -->
+
+<script type="module">
+    // ──────────────────────────────────────────────────────────────
+    // 1. FIREBASE CONFIGURATION & IMPORTS
+    // ──────────────────────────────────────────────────────────────
+    import { checkAuthState, logout } from './js/auth.js';
+    import { db, collection, getDocs, query, orderBy } from './js/firebase.js';
+    
+    checkAuthState(true);
+
+    // ──────────────────────────────────────────────────────────────
+    // 2. DOM REFERENCES
+    // ──────────────────────────────────────────────────────────────
+    const $ = (id) => document.getElementById(id);
+    const scanBtn = $('scanBtn');
+    const refreshDataBtn = $('refreshDataBtn');
+    const searchInput = $('searchInput');
+    const exportCsvBtn = $('exportCsvBtn');
+    const copyBrokenIdsBtn = $('copyBrokenIdsBtn');
+    const tableBody = $('tableBody');
+    const resultCount = $('resultCount');
+    const loadingSpinner = $('loadingSpinner');
+    const loadingText = $('loadingText');
+    const progressFill = $('progressFill');
+    const progressDetail = $('progressDetail');
+    const toastContainer = $('toastContainer');
+
+    // ──────────────────────────────────────────────────────────────
+    // 3. STATE
+    // ──────────────────────────────────────────────────────────────
+    let analysisData = []; // Array of { supplierId, timesUsed, warrantyId, docId, status }
+    let allSuppliers = new Map(); // supplierId -> supplierName
+    let isScanning = false;
+
+    // ──────────────────────────────────────────────────────────────
+    // 4. UTILITY FUNCTIONS
+    // ──────────────────────────────────────────────────────────────
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+    }
+
+    function truncate(str, len = 30) {
+        if (!str) return '';
+        return str.length > len ? str.substring(0, len) + '…' : str;
+    }
+
+    function formatTime(ms) {
+        if (ms < 1000) return ms + 'ms';
+        return (ms / 1000).toFixed(1) + 's';
+    }
+
+    function updateSummary(total, valid, broken, uniqueBroken) {
+        $('totalWarranty').textContent = total;
+        $('validCount').textContent = valid;
+        $('brokenCount').textContent = broken;
+        $('uniqueBrokenCount').textContent = uniqueBroken;
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Copied to clipboard!', 'success');
+        }).catch(() => {
+            // Fallback
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('Copied to clipboard!', 'success');
+        });
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 5. TOAST HELPER (for window usage)
+    // ──────────────────────────────────────────────────────────────
+    window.showToast = showToast;
+
+    // ──────────────────────────────────────────────────────────────
+    // 6. SIDEBAR & NAVIGATION
+    // ──────────────────────────────────────────────────────────────
+    const sidebar = $('sidebar');
+    const menuToggle = $('menuToggle');
+    const closeSidebarBtn = $('closeSidebarBtn');
+
+    function openSidebar() {
+        sidebar.classList.remove('-translate-x-full');
+        document.body.classList.add('sidebar-open');
+        if (!document.getElementById('sidebarOverlay')) {
+            const overlay = document.createElement('div');
+            overlay.id = 'sidebarOverlay';
+            overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
+            overlay.addEventListener('click', closeSidebar);
+            document.body.appendChild(overlay);
+        }
+    }
+
+    function closeSidebar() {
+        sidebar.classList.add('-translate-x-full');
+        document.body.classList.remove('sidebar-open');
+        document.getElementById('sidebarOverlay')?.remove();
+    }
+
+    menuToggle?.addEventListener('click', openSidebar);
+    closeSidebarBtn?.addEventListener('click', closeSidebar);
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+            sidebar.classList.remove('-translate-x-full');
+            document.getElementById('sidebarOverlay')?.remove();
+            document.body.classList.remove('sidebar-open');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+        }
+    });
+
+    if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
+    else sidebar.classList.add('-translate-x-full');
+
+    // Submenu toggles
+    document.querySelectorAll('.has-submenu > a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const parent = link.closest('.has-submenu');
+            parent.classList.toggle('open');
+            parent.querySelector('.submenu-modern')?.classList.toggle('open');
+        });
+    });
+
+    // ──────────────────────────────────────────────────────────────
+    // 7. DARK MODE
+    // ──────────────────────────────────────────────────────────────
+    $('darkModeToggle')?.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        document.body.classList.toggle('dark');
+    });
+
+    // ──────────────────────────────────────────────────────────────
+    // 8. LOAD SUPPLIERS
+    // ──────────────────────────────────────────────────────────────
+    async function loadSuppliers() {
+        try {
+            const snap = await getDocs(collection(db, 'suppliers'));
+            allSuppliers.clear();
+            snap.forEach(doc => {
+                const data = doc.data();
+                allSuppliers.set(doc.id, data.name || 'Unknown');
+            });
+            return allSuppliers.size;
+        } catch (error) {
+            console.error('Error loading suppliers:', error);
+            showToast('Failed to load suppliers: ' + error.message, 'error');
+            return 0;
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 9. SCAN WARRANTY RECORDS
+    // ──────────────────────────────────────────────────────────────
+    async function scanWarranties() {
+        if (isScanning) return;
+        isScanning = true;
+        scanBtn.disabled = true;
+        scanBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
+
+        // Show loading
+        loadingSpinner.classList.add('active');
+        loadingText.textContent = 'Loading suppliers...';
+        progressFill.style.width = '0%';
+        progressDetail.textContent = '0 / 0';
+
+        try {
+            // Step 1: Load suppliers
+            const supplierCount = await loadSuppliers();
+            loadingText.textContent = `Loaded ${supplierCount} suppliers. Loading warranties...`;
+            progressFill.style.width = '10%';
+
+            // Step 2: Load all warranties
+            const warrantiesSnap = await getDocs(collection(db, 'warranties'));
+            const total = warrantiesSnap.size;
+            const warrantyMap = new Map(); // supplierId -> { count, warranties: [{warrantyId, docId}] }
+
+            let processed = 0;
+            for (const docSnap of warrantiesSnap.docs) {
+                const data = docSnap.data();
+                const supplierId = data.supplierId || data.supplier_id || data.supplier;
+                const warrantyId = data.warrantyId || data.id || docSnap.id.slice(0, 12);
+
+                if (supplierId) {
+                    if (!warrantyMap.has(supplierId)) {
+                        warrantyMap.set(supplierId, { count: 0, warranties: [] });
+                    }
+                    const entry = warrantyMap.get(supplierId);
+                    entry.count++;
+                    entry.warranties.push({
+                        warrantyId: warrantyId,
+                        docId: docSnap.id
+                    });
+                }
+
+                processed++;
+                const progress = 10 + (processed / total) * 80;
+                progressFill.style.width = progress + '%';
+                progressDetail.textContent = `${processed} / ${total}`;
+                loadingText.textContent = `Scanning warranties... ${processed}/${total}`;
+
+                // Yield to UI
+                if (processed % 20 === 0) {
+                    await new Promise(r => setTimeout(r, 0));
+                }
+            }
+
+            // Step 3: Build analysis data
+            loadingText.textContent = 'Building analysis report...';
+            progressFill.style.width = '95%';
+            progressDetail.textContent = 'Finalizing...';
+
+            analysisData = [];
+            let validCount = 0;
+            let brokenCount = 0;
+            const brokenIds = new Set();
+
+            for (const [supplierId, entry] of warrantyMap) {
+                const isValid = allSuppliers.has(supplierId);
+                if (isValid) validCount++;
+                else {
+                    brokenCount++;
+                    brokenIds.add(supplierId);
+                }
+
+                // Add each warranty entry
+                for (const w of entry.warranties) {
+                    analysisData.push({
+                        supplierId: supplierId,
+                        timesUsed: entry.count,
+                        warrantyId: w.warrantyId,
+                        docId: w.docId,
+                        status: isValid ? 'valid' : 'broken'
+                    });
+                }
+            }
+
+            // Sort: broken first, then valid
+            analysisData.sort((a, b) => {
+                if (a.status === 'broken' && b.status === 'valid') return -1;
+                if (a.status === 'valid' && b.status === 'broken') return 1;
+                return a.supplierId.localeCompare(b.supplierId);
+            });
+
+            progressFill.style.width = '100%';
+            loadingText.textContent = '✅ Analysis complete!';
+            progressDetail.textContent = `${analysisData.length} records found`;
+
+            // Update summary
+            const uniqueBroken = brokenIds.size;
+            updateSummary(analysisData.length, validCount, brokenCount, uniqueBroken);
+
+            // Render table
+            renderTable(analysisData);
+
+            showToast(`✅ Analysis complete! Found ${brokenCount} broken references.`, 'success');
+
+        } catch (error) {
+            console.error('Scan error:', error);
+            showToast('❌ Scan failed: ' + error.message, 'error');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-8 text-red-400">
+                        <i class="fas fa-exclamation-circle text-2xl mb-2 block"></i>
+                        <p class="text-sm">Error: ${escapeHtml(error.message)}</p>
+                    </td>
+                </tr>
+            `;
+        } finally {
+            loadingSpinner.classList.remove('active');
+            isScanning = false;
+            scanBtn.disabled = false;
+            scanBtn.innerHTML = '<i class="fas fa-play"></i> Scan Now';
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 10. RENDER TABLE
+    // ──────────────────────────────────────────────────────────────
+    function renderTable(data, searchTerm = '') {
+        if (!data || data.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-10 text-gray-400">
+                        <i class="fas fa-inbox text-2xl mb-2 block opacity-40"></i>
+                        <p class="text-sm">No data to display. Click "Scan Now" to analyze.</p>
+                    </td>
+                </tr>
+            `;
+            resultCount.textContent = '0 records';
+            return;
+        }
+
+        let filtered = data;
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase().trim();
+            filtered = data.filter(item =>
+                item.supplierId.toLowerCase().includes(term) ||
+                item.warrantyId.toLowerCase().includes(term) ||
+                item.docId.toLowerCase().includes(term)
+            );
+        }
+
+        resultCount.textContent = `${filtered.length} records`;
+
+        if (filtered.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-8 text-gray-400">
+                        <i class="fas fa-search text-xl mb-2 block opacity-40"></i>
+                        <p class="text-sm">No results found for "${escapeHtml(searchTerm)}"</p>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        let html = '';
+        filtered.forEach((item, index) => {
+            const isBroken = item.status === 'broken';
+            const statusBadge = isBroken
+                ? `<span class="badge-status badge-broken"><i class="fas fa-times-circle"></i> Broken</span>`
+                : `<span class="badge-status badge-valid"><i class="fas fa-check-circle"></i> Valid</span>`;
+
+            html += `
+                <tr>
+                    <td class="text-center text-gray-400">${index + 1}</td>
+                    <td>
+                        <code class="text-xs font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">${escapeHtml(item.supplierId)}</code>
+                        <button class="copy-btn ml-1" onclick="copySupplierId('${escapeHtml(item.supplierId)}')" title="Copy Supplier ID">
+                            <i class="fas fa-copy text-[10px] text-gray-400 hover:text-primary"></i>
+                        </button>
+                    </td>
+                    <td class="text-center">${item.timesUsed}</td>
+                    <td><code class="text-xs font-mono">${escapeHtml(item.warrantyId)}</code></td>
+                    <td><code class="text-xs font-mono text-gray-500">${escapeHtml(truncate(item.docId, 20))}</code></td>
+                    <td>${statusBadge}</td>
+                </tr>
+            `;
+        });
+
+        tableBody.innerHTML = html;
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 11. EXPORT CSV
+    // ──────────────────────────────────────────────────────────────
+    function exportCSV() {
+        if (!analysisData || analysisData.length === 0) {
+            showToast('No data to export. Please scan first.', 'warning');
+            return;
+        }
+
+        const headers = ['Supplier ID', 'Times Used', 'Warranty ID', 'Document ID', 'Status'];
+        const rows = analysisData.map(item => [
+            item.supplierId,
+            item.timesUsed,
+            item.warrantyId,
+            item.docId,
+            item.status
+        ]);
+
+        let csv = '\uFEFF' + headers.join(',') + '\n';
+        rows.forEach(row => {
+            csv += row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',') + '\n';
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `warranty_analysis_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast('✅ CSV exported successfully!', 'success');
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 12. COPY BROKEN SUPPLIER IDs
+    // ──────────────────────────────────────────────────────────────
+    function copyBrokenIds() {
+        const brokenIds = new Set();
+        analysisData.forEach(item => {
+            if (item.status === 'broken') brokenIds.add(item.supplierId);
+        });
+
+        if (brokenIds.size === 0) {
+            showToast('No broken supplier IDs found.', 'info');
+            return;
+        }
+
+        const text = Array.from(brokenIds).join('\n');
+        copyToClipboard(text);
+        showToast(`✅ Copied ${brokenIds.size} broken supplier IDs!`, 'success');
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // 13. GLOBAL FUNCTIONS (for inline onclick)
+    // ──────────────────────────────────────────────────────────────
+    window.copySupplierId = function(id) {
+        copyToClipboard(id);
+    };
+
+    // ──────────────────────────────────────────────────────────────
+    // 14. EVENT LISTENERS
+    // ──────────────────────────────────────────────────────────────
+    scanBtn?.addEventListener('click', scanWarranties);
+    refreshDataBtn?.addEventListener('click', () => {
+        loadSuppliers().then(() => {
+            showToast('✅ Suppliers reloaded!', 'success');
+        });
+    });
+    exportCsvBtn?.addEventListener('click', exportCSV);
+    copyBrokenIdsBtn?.addEventListener('click', copyBrokenIds);
+
+    searchInput?.addEventListener('input', (e) => {
+        renderTable(analysisData, e.target.value);
+    });
+
+    $('refreshBtn')?.addEventListener('click', () => {
+        loadSuppliers();
+        showToast('Refreshed!', 'success');
+    });
+
+    // ──────────────────────────────────────────────────────────────
+    // 15. LOGOUT
+    // ──────────────────────────────────────────────────────────────
+    const logoutModal = $('logoutModal');
+    const logoutLink = $('logoutLink');
+    const cancelLogoutBtn = $('cancelLogoutBtn');
+    const confirmLogoutBtn = $('confirmLogoutBtn');
+
+    logoutLink?.addEventListener('click', (e) => {
+        e.preventDefault();
+        logoutModal.classList.remove('hidden');
+    });
+
+    cancelLogoutBtn?.addEventListener('click', () => {
+        logoutModal.classList.add('hidden');
+    });
+
+    confirmLogoutBtn?.addEventListener('click', async () => {
+        logoutModal.classList.add('hidden');
+        await logout();
+    });
+
+    // ──────────────────────────────────────────────────────────────
+    // 16. FOOTER YEAR
+    // ──────────────────────────────────────────────────────────────
+    $('footerYear').textContent = new Date().getFullYear();
+
+    // ──────────────────────────────────────────────────────────────
+    // 17. AUTO-LOAD SUPPLIERS ON INIT
+    // ──────────────────────────────────────────────────────────────
+    await loadSuppliers();
+    console.log('🔄 Warranty Analyzer ready. Total suppliers loaded:', allSuppliers.size);
+
+</script>
+</body>
+</html>

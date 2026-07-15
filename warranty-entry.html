@@ -172,11 +172,6 @@
             background-color: rgba(212, 175, 55, 0.1);
             transform: scale(1.05);
         }
-        .edit-warranty.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
 
         /* pagination styles */
         .pagination-btn {
@@ -375,7 +370,7 @@
     
     <div class="flex min-h-screen">
         
-        <!-- Sidebar - Professional Design -->
+        <!-- Sidebar -->
         <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-out overflow-y-hidden border-r border-white/5">
             <div class="flex flex-col h-full">
                 <div class="px-5 py-5 border-b border-white/10 flex items-center justify-between sticky top-0 bg-inherit z-10">
@@ -1191,12 +1186,21 @@
                 supplierNameMap.clear();
                 snap.forEach(docSnap => {
                     const data = docSnap.data();
+                    const docId = docSnap.id;
+                    const supplierId = data.supplierId || data.supplierUniqueId || docId;
+                    const name = data.name || 'Unknown';
+                    
+                    // ✅ ডকুমেন্ট ID এবং supplierId উভয় দিয়ে ম্যাপ তৈরি করুন
+                    supplierNameMap.set(docId, name);
+                    supplierNameMap.set(supplierId, name);
+                    supplierNameMap.set(name.toLowerCase().trim(), name);
+                    
                     allSuppliers.push({
-                        id: docSnap.id,
-                        name: data.name || 'Unknown',
+                        id: docId,
+                        supplierId: supplierId,
+                        name: name,
                         contact: data.phone || data.email || ''
                     });
-                    supplierNameMap.set(docSnap.id, data.name || 'Unknown');
                 });
                 allSuppliers.sort((a, b) => a.name.localeCompare(b.name));
                 
@@ -1217,6 +1221,76 @@
             const d = String(now.getDate()).padStart(2,'0');
             const r = Math.floor(Math.random()*10000).toString().padStart(4,'0');
             return `WAR-${y}${m}${d}/${r}`;
+        }
+        
+        // ===== RENDER TABLE =====
+        function renderEntriesTable(entries) {
+            const tbody = document.getElementById('warrantyEntriesBody');
+            if (!tbody) return;
+            if (entries.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No warranty entries found</p></td>';
+                return;
+            }
+            tbody.innerHTML = '';
+            entries.forEach(entry => {
+                let statusClass, statusText, statusIcon;
+                if (entry.status === 'pending') {
+                    statusClass = 'status-pending'; statusText = 'Pending'; statusIcon = 'fa-clock';
+                } else if (entry.status === 'dispatched') {
+                    statusClass = 'status-dispatched'; statusText = 'Dispatched'; statusIcon = 'fa-shipping-fast';
+                } else {
+                    statusClass = 'status-received'; statusText = 'Received'; statusIcon = 'fa-check-circle';
+                }
+                const qty = entry.quantity || 1;
+                const productDisplay = qty > 1 ? `${entry.productName} (x${qty})` : entry.productName;
+                
+                const row = tbody.insertRow();
+                row.className = 'table-row-hover transition-colors cursor-pointer';
+                row.setAttribute('data-entry', JSON.stringify(entry));
+                row.innerHTML = `
+                    <td class="px-3 py-2.5 text-xs font-mono font-semibold">${escapeHtml(entry.warrantyId || entry.id.slice(0,12))}</td>
+                    <td class="px-3 py-2.5 text-sm whitespace-nowrap">${escapeHtml(entry.warrantyDate || 'N/A')}</td>
+                    <td class="px-3 py-2.5 text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(entry.supplierName)}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(productDisplay)}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.customerName || '-')}</td>
+                    <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.customerPhone || '-')}</td>
+                    <td class="px-3 py-2.5 text-center"><span class="status-badge ${statusClass}"><i class="fas ${statusIcon} text-[10px]"></i> ${statusText}</span></td>
+                    <td class="px-3 py-2.5 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button class="view-details text-blue-500 hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-entry='${JSON.stringify(entry)}' title="View Details"><i class="fas fa-eye text-sm"></i></button>
+                            <button class="edit-warranty text-accent hover:text-amber-600 p-1.5 rounded-lg transition-colors" data-id="${entry.id}" data-entry='${JSON.stringify(entry)}' title="Edit"><i class="fas fa-edit text-sm"></i></button>
+                            <button class="delete-warranty text-red-500 hover:text-red-700 p-1.5 rounded-lg transition-colors" data-id="${entry.id}" data-product="${escapeHtml(entry.productName)}" title="Delete"><i class="fas fa-trash-alt text-sm"></i></button>
+                        </div>
+                    </td>
+                `;
+            });
+            
+            // Event Listeners
+            document.querySelectorAll('#warrantyEntriesBody tr').forEach(row => {
+                row.addEventListener('click', (e) => {
+                    if (e.target.closest('button')) return;
+                    const data = row.dataset.entry;
+                    if (data) showDetailsModal(JSON.parse(data));
+                });
+            });
+            document.querySelectorAll('.view-details').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showDetailsModal(JSON.parse(btn.dataset.entry));
+                });
+            });
+            document.querySelectorAll('.edit-warranty').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openEditModal(JSON.parse(btn.dataset.entry));
+                });
+            });
+            document.querySelectorAll('.delete-warranty').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showDeleteConfirmation(btn.dataset.id, btn.dataset.product);
+                });
+            });
         }
         
         // ===== PAGINATION HELPERS =====
@@ -1279,77 +1353,6 @@
             const paginated = getPaginatedEntries(allEntries, currentPage, perPage);
             renderEntriesTable(paginated);
             renderPagination(allEntries.length, currentPage, perPage);
-        }
-        
-        // ===== RENDER TABLE =====
-        function renderEntriesTable(entries) {
-            const tbody = document.getElementById('warrantyEntriesBody');
-            if (!tbody) return;
-            if (entries.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No warranty entries found</p></td>';
-                return;
-            }
-            tbody.innerHTML = '';
-            entries.forEach(entry => {
-                let statusClass, statusText, statusIcon;
-                if (entry.status === 'pending') {
-                    statusClass = 'status-pending'; statusText = 'Pending'; statusIcon = 'fa-clock';
-                } else if (entry.status === 'dispatched') {
-                    statusClass = 'status-dispatched'; statusText = 'Dispatched'; statusIcon = 'fa-shipping-fast';
-                } else {
-                    statusClass = 'status-received'; statusText = 'Received'; statusIcon = 'fa-check-circle';
-                }
-                const qty = entry.quantity || 1;
-                const productDisplay = qty > 1 ? `${entry.productName} (x${qty})` : entry.productName;
-                const isPending = entry.status === 'pending';
-                const row = tbody.insertRow();
-                row.className = 'table-row-hover transition-colors cursor-pointer';
-                row.setAttribute('data-entry', JSON.stringify(entry));
-                row.innerHTML = `
-                    <td class="px-3 py-2.5 text-xs font-mono font-semibold">${escapeHtml(entry.warrantyId || entry.id.slice(0,12))}</td>
-                    <td class="px-3 py-2.5 text-sm whitespace-nowrap">${escapeHtml(entry.warrantyDate || 'N/A')}</td>
-                    <td class="px-3 py-2.5 text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(entry.supplierName)}</td>
-                    <td class="px-3 py-2.5 text-sm">${escapeHtml(productDisplay)}</td>
-                    <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.customerName || '-')}</td>
-                    <td class="px-3 py-2.5 text-sm">${escapeHtml(entry.customerPhone || '-')}</td>
-                    <td class="px-3 py-2.5 text-center"><span class="status-badge ${statusClass}"><i class="fas ${statusIcon} text-[10px]"></i> ${statusText}</span></td>
-                    <td class="px-3 py-2.5 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button class="view-details text-blue-500 hover:text-blue-700 p-1.5 rounded-lg transition-colors" data-entry='${JSON.stringify(entry)}' title="View Details"><i class="fas fa-eye text-sm"></i></button>
-                            ${isPending ? `<button class="edit-warranty text-accent hover:text-amber-600 p-1.5 rounded-lg transition-colors" data-id="${entry.id}" data-entry='${JSON.stringify(entry)}' title="Edit"><i class="fas fa-edit text-sm"></i></button>` 
-                            : `<button class="edit-warranty disabled opacity-40 cursor-not-allowed p-1.5 rounded-lg" disabled><i class="fas fa-edit text-sm text-gray-400"></i></button>`}
-                            ${isPending ? `<button class="delete-warranty text-red-500 hover:text-red-700 p-1.5 rounded-lg transition-colors" data-id="${entry.id}" data-product="${escapeHtml(entry.productName)}" title="Delete"><i class="fas fa-trash-alt text-sm"></i></button>`
-                            : `<button class="delete-warranty disabled opacity-40 cursor-not-allowed p-1.5 rounded-lg" disabled><i class="fas fa-trash-alt text-sm text-gray-400"></i></button>`}
-                        </div>
-                    </td>
-                `;
-            });
-            
-            document.querySelectorAll('#warrantyEntriesBody tr').forEach(row => {
-                row.addEventListener('click', (e) => {
-                    if (e.target.closest('button')) return;
-                    const data = row.dataset.entry;
-                    if (data) showDetailsModal(JSON.parse(data));
-                });
-            });
-            document.querySelectorAll('.view-details').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    showDetailsModal(JSON.parse(btn.dataset.entry));
-                });
-            });
-            document.querySelectorAll('.edit-warranty:not(.disabled)').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    openEditModal(JSON.parse(btn.dataset.entry));
-                });
-            });
-            document.querySelectorAll('.delete-warranty:not(.disabled)').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    showDeleteConfirmation(btn.dataset.id, btn.dataset.product);
-                });
-            });
         }
         
         // ===== MODALS =====
@@ -1462,21 +1465,32 @@
             const tbody = document.getElementById('warrantyEntriesBody');
             tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading entries...</p></td>';
             try {
+                if (allSuppliers.length === 0) {
+                    await loadSuppliers();
+                }
+                
                 const snap = await getDocs(query(collection(db, 'warranties'), orderBy('createdAt', 'desc')));
                 const entries = [];
+                
                 for (const docSnap of snap.docs) {
                     const w = { id: docSnap.id, ...docSnap.data() };
-                    if (w.supplierId) {
-                        const sup = await getDoc(doc(db, 'suppliers', w.supplierId));
-                        w.supplierName = sup.exists() ? sup.data().name : 'Unknown';
-                    } else w.supplierName = 'Unknown';
+                    
+                    // নাম সেট করার লজিক
+                    if (w.supplierName && w.supplierName !== 'Unknown' && w.supplierName !== undefined) {
+                        // ইতিমধ্যেই নাম আছে
+                    } else if (w.supplierId && supplierNameMap.has(w.supplierId)) {
+                        w.supplierName = supplierNameMap.get(w.supplierId);
+                    } else {
+                        w.supplierName = 'Unknown';
+                    }
+                    
                     entries.push(w);
                 }
+                
                 allEntries = entries;
                 currentPage = 1;
                 renderTablePage();
             } catch (e) {
-                console.error(e);
                 tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data.</td></tr>';
                 showToast('Error loading entries', 'error');
             }
@@ -1493,13 +1507,22 @@
             const customerName = document.getElementById('customerName').value.trim();
             const customerPhone = document.getElementById('customerPhone').value.trim();
             const problemDescription = document.getElementById('warrantyProblem').value;
+            
             if (!supplierId || !warrantyDate || !productName) {
-                showToast('Please fill required fields', 'error'); return;
+                showToast('Please fill required fields', 'error');
+                return;
             }
+            
+            const supplierName = supplierNameMap.get(supplierId) || 'Unknown';
+            
             try {
                 const warrantyId = generateWarrantyId();
                 await addDoc(collection(db, 'warranties'), {
-                    supplierId, warrantyDate, productName, quantity,
+                    supplierId, 
+                    supplierName,
+                    warrantyDate, 
+                    productName, 
+                    quantity,
                     serialNumber: serialNumber || null,
                     customerName: customerName || null,
                     customerPhone: customerPhone || null,
@@ -1518,14 +1541,19 @@
                 document.getElementById('selectedSupplierId').value = '';
                 document.getElementById('supplierSearchInput').value = '';
                 await loadWarrantyEntries();
-            } catch (e) { showToast('Submit error: ' + e.message, 'error'); }
+            } catch (e) {
+                showToast('Submit error: ' + e.message, 'error');
+            }
         }
         document.getElementById('warrantyForm')?.addEventListener('submit', submitWarranty);
         document.getElementById('warrantyDate').valueAsDate = new Date();
         
         // ===== EXPORT CSV =====
         function exportCSV() {
-            if (!allEntries.length) { showToast('No data to export', 'error'); return; }
+            if (!allEntries.length) {
+                showToast('No data to export', 'error');
+                return;
+            }
             let rows = ['\uFEFF"ID","Date","Supplier","Product","Quantity","Serial No","Customer","Phone","Status","Problem"'];
             allEntries.forEach(entry => {
                 const qty = entry.quantity || 1;
@@ -1537,7 +1565,10 @@
             const a = document.createElement('a');
             a.href = url;
             a.download = `warranty_entries_${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
             showToast('Exported!', 'success');
         }
         document.getElementById('exportEntriesBtn')?.addEventListener('click', exportCSV);
@@ -1564,13 +1595,21 @@
         
         // ===== LOGOUT =====
         const logoutModal = document.getElementById('logoutModal');
-        document.getElementById('logoutLink')?.addEventListener('click', (e) => { e.preventDefault(); logoutModal?.classList.remove('hidden'); });
-        document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => logoutModal?.classList.add('hidden'));
+        document.getElementById('logoutLink')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutModal?.classList.remove('hidden');
+        });
+        document.getElementById('cancelLogoutBtn')?.addEventListener('click', () => {
+            logoutModal?.classList.add('hidden');
+        });
         document.getElementById('confirmLogoutBtn')?.addEventListener('click', async () => {
             logoutModal?.classList.add('hidden');
             const { logout } = await import('./js/auth.js');
             await logout();
         });
+        
+        // ===== FOOTER YEAR =====
+        document.getElementById('footerYear').textContent = new Date().getFullYear();
         
         // ===== INIT =====
         await loadSuppliers();
