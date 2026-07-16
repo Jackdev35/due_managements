@@ -147,14 +147,6 @@
             background: inherit;
             z-index: 10;
         }
-        .sidebar-nav-fixed {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .sidebar-nav-fixed::-webkit-scrollbar { display: none; }
         
         .status-badge-upcoming {
             background: #fef3c7;
@@ -251,7 +243,7 @@
                                 <i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span>
                             </a>
                             <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs transition">
-                            <i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span>
+                                <i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span>
                             </a>
                             <a href="follow-up.html" class="nav-active flex items-center gap-2.5 px-3 py-2 rounded-lg text-white bg-primary/20 text-xs transition">
                                 <i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span>
@@ -495,6 +487,7 @@
         let customerDataMap = new Map();
         let allCustomerIds = new Set();
         let unsubscribeCustomers = null;
+        let isLoading = false;
 
         // ─── UTILITIES ───
         function showToast(message, type = 'success') { 
@@ -536,7 +529,11 @@
                         allCustomerIds.add(id);
                     });
                     
-                    refreshFollowUps();
+                    if (allFollowUps.length > 0) {
+                        refreshFollowUps();
+                    } else {
+                        loadFollowUps();
+                    }
                 },
                 (error) => {
                     showToast('Error loading customers', 'error');
@@ -565,6 +562,7 @@
         }
 
         function getDaysDifference(dateStr) {
+            if (!dateStr) return 0;
             const today = new Date(); today.setHours(0, 0, 0, 0);
             const targetDate = new Date(dateStr); targetDate.setHours(0, 0, 0, 0);
             const diffTime = targetDate - today;
@@ -575,7 +573,10 @@
             const today = new Date();
             let startDate = null, endDate = null;
             switch(filterType) {
-                case 'today': startDate = today.toISOString().split('T')[0]; endDate = today.toISOString().split('T')[0]; break;
+                case 'today': 
+                    startDate = today.toISOString().split('T')[0]; 
+                    endDate = today.toISOString().split('T')[0]; 
+                    break;
                 case 'week':
                     const firstDayOfWeek = new Date(today);
                     const dayOfWeek = today.getDay();
@@ -597,6 +598,9 @@
 
         // ─── LOAD FOLLOW UPS ───
         async function loadFollowUps() {
+            if (isLoading) return;
+            isLoading = true;
+            
             const tbody = document.getElementById('followUpTableBody');
             tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-pulse text-primary text-lg"></i><p class="text-xs mt-2">Loading follow ups...</p></td>';
             
@@ -616,7 +620,6 @@
                 const dueEntriesSnap = await getDocs(query(collection(db, 'transactions'), where('type', '==', 'due')));
                 const followUps = [];
                 const today = getTodayDate();
-                const processedCustomers = new Set();
                 
                 // First pass: Collect all unique customers from due entries
                 const uniqueCustomerIds = new Set();
@@ -677,11 +680,11 @@
                             daysDiff: daysDiff,
                             currentRemarks: latestDue.remarks || '',
                             nextRemarks: latestDue.nextRemarks || '',
-                            dueBalance: dueBalance
+                            dueBalance: dueBalance,
+                            hasDueEntry: true
                         });
                     } else {
                         // Customer has no due entry but exists in system
-                        // Create a default entry
                         const followUpDate = today;
                         const daysDiff = getDaysDifference(followUpDate);
                         const priority = calculatePriority(daysDiff);
@@ -697,7 +700,8 @@
                             daysDiff: daysDiff,
                             currentRemarks: '',
                             nextRemarks: '',
-                            dueBalance: dueBalance
+                            dueBalance: dueBalance,
+                            hasDueEntry: false
                         });
                     }
                 }
@@ -707,13 +711,18 @@
                 
                 allFollowUps = followUps;
                 
-                showToast(`✅ Found ${allFollowUps.length} customers with follow up data`, 'success');
-                
                 applyFilters();
+                updateStats(allFollowUps);
+                
+                if (allFollowUps.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-2 opacity-40 block"></i><p class="text-xs">No follow up records found</p></td>';
+                }
                 
             } catch (error) {
                 tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-red-500">Error loading data. Please refresh.</td></tr>';
                 showToast('Error loading follow ups', 'error');
+            } finally {
+                isLoading = false;
             }
         }
 
@@ -750,19 +759,22 @@
             if (currentQuickFilter === 'upcoming') {
                 filtered = filtered.filter(f => {
                     const daysDiff = getDaysDifference(f.expectedDate);
-                    return daysDiff >= 0 && daysDiff <= 5;
+                    return daysDiff >= 0 && daysDiff <= 5 && f.dueBalance > 0;
                 });
             } else if (currentQuickFilter === 'overdue') {
                 filtered = filtered.filter(f => {
                     const daysDiff = getDaysDifference(f.expectedDate);
-                    return daysDiff < 0;
+                    return daysDiff < 0 && f.dueBalance > 0;
                 });
             } else if (currentQuickFilter === 'cleared') {
                 filtered = filtered.filter(f => f.dueBalance <= 0);
             } else if (currentQuickFilter !== 'all') {
                 const dateRange = getDateRangeFromFilter(currentQuickFilter);
                 if (dateRange) {
-                    filtered = filtered.filter(f => f.expectedDate >= dateRange.startDate && f.expectedDate <= dateRange.endDate);
+                    filtered = filtered.filter(f => {
+                        const date = f.expectedDate || f.date || '';
+                        return date >= dateRange.startDate && date <= dateRange.endDate;
+                    });
                 }
             }
             
@@ -771,7 +783,6 @@
                 filtered = filtered.filter(f => f.customerName.toLowerCase().includes(searchTerm));
             }
             renderTable(filtered);
-            updateStats(allFollowUps);
         }
 
         // ─── RENDER TABLE ───
@@ -819,6 +830,7 @@
                 row.setAttribute('data-next-remarks', followUp.nextRemarks);
                 row.setAttribute('data-due-balance', followUp.dueBalance || 0);
                 row.setAttribute('data-customer-id', followUp.customerId);
+                row.setAttribute('data-has-due', followUp.hasDueEntry);
                 
                 row.innerHTML = `
                     <td class="px-3 py-2.5 text-xs text-center font-medium">${sl++}</td>
@@ -833,7 +845,7 @@
                     <td class="px-3 py-2.5 text-sm ${dateStatus}">${followUp.expectedDate}</td>
                     <td class="px-3 py-2.5">${statusBadge}</td>
                     <td class="px-3 py-2.5 text-center">
-                        ${!isCleared ? `<button class="update-followup text-primary hover:text-primary-dark p-1.5 rounded-lg transition-colors" data-id="${followUp.id}" data-customer="${escapeHtml(followUp.customerName)}" data-date="${followUp.expectedDate}" data-remarks="${escapeHtml(followUp.currentRemarks)}" data-next-remarks="${escapeHtml(followUp.nextRemarks)}" title="Update Follow Up"><i class="fas fa-edit text-sm"></i></button>` : `<span class="text-gray-400 text-xs">-</span>`}
+                        ${!isCleared && followUp.hasDueEntry ? `<button class="update-followup text-primary hover:text-primary-dark p-1.5 rounded-lg transition-colors" data-id="${followUp.id}" data-customer="${escapeHtml(followUp.customerName)}" data-date="${followUp.expectedDate}" data-remarks="${escapeHtml(followUp.currentRemarks)}" data-next-remarks="${escapeHtml(followUp.nextRemarks)}" title="Update Follow Up"><i class="fas fa-edit text-sm"></i></button>` : `<span class="text-gray-400 text-xs">${isCleared ? 'Cleared' : '-'}</span>`}
                     </td>
                 `;
             }
@@ -910,7 +922,7 @@
                     pending++;
                 }
                 
-                if (daysDiff >= 0 && daysDiff <= 5) upcoming++;
+                if (daysDiff >= 0 && daysDiff <= 5 && !isCleared) upcoming++;
                 
                 const dateParts = f.expectedDate.split('-');
                 if (dateParts.length === 3) {
@@ -942,7 +954,9 @@
                 showToast('Follow up updated successfully!', 'success');
                 document.getElementById('updateModal').classList.add('hidden');
                 await loadFollowUps();
-            } catch (error) { showToast('Error updating follow up', 'error'); }
+            } catch (error) { 
+                showToast('Error updating follow up', 'error'); 
+            }
         }
 
         // ─── EXPORT CSV ───
@@ -952,12 +966,12 @@
             if (currentQuickFilter === 'upcoming') {
                 exportData = exportData.filter(f => {
                     const daysDiff = getDaysDifference(f.expectedDate);
-                    return daysDiff >= 0 && daysDiff <= 5;
+                    return daysDiff >= 0 && daysDiff <= 5 && f.dueBalance > 0;
                 });
             } else if (currentQuickFilter === 'overdue') {
                 exportData = exportData.filter(f => {
                     const daysDiff = getDaysDifference(f.expectedDate);
-                    return daysDiff < 0;
+                    return daysDiff < 0 && f.dueBalance > 0;
                 });
             } else if (currentQuickFilter === 'cleared') {
                 exportData = exportData.filter(f => f.dueBalance <= 0);

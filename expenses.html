@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#0f3b3a">
-    <title>Expenses | JackDev Due Managements</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes" />
+    <meta name="theme-color" content="#0f3b3a" />
+    <title>Expenses · JackDev Due Managements</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -23,7 +22,7 @@
                         warning: '#dd6b20',
                         info: '#3182ce',
                     },
-                    fontFamily: { 'sans': ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'] },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'Segoe UI', 'sans-serif'] },
                 }
             }
         }
@@ -32,26 +31,26 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
         * { transition: background-color 0.2s, border-color 0.2s; }
         body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fb; }
-        
+
         .sidebar-nav-fixed { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:none; -ms-overflow-style:none; }
         .sidebar-nav-fixed::-webkit-scrollbar { display:none; }
         .sidebar-fixed { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
         .sidebar-header-fixed { flex-shrink:0; position:sticky; top:0; background:inherit; z-index:10; }
-        
-        .nav-active { 
-            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%); 
+
+        .nav-active {
+            background: linear-gradient(95deg, rgba(15,59,58,0.2) 0%, rgba(30,107,104,0.08) 100%);
             border-left: 3px solid #d4af37;
             color: white !important;
         }
-        .dark .nav-active { 
-            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%); 
+        .dark .nav-active {
+            background: linear-gradient(95deg, rgba(30,107,104,0.25) 0%, rgba(212,175,55,0.05) 100%);
         }
-        
+
         .submenu-modern { max-height:0; overflow:hidden; transition:max-height 0.28s ease; }
         .submenu-modern.open { max-height:350px; }
         .has-submenu>a .chevron-icon { transition:transform 0.2s; }
         .has-submenu.open>a .chevron-icon { transform:rotate(180deg); }
-        
+
         .tab-btn {
             padding: 10px 24px;
             border-radius: 12px;
@@ -98,495 +97,500 @@
             overflow-y: auto;
         }
 
-        @keyframes modalSlideUp { 
-            from { opacity:0; transform:translateY(20px) scale(0.96); } 
-            to { opacity:1; transform:translateY(0) scale(1); } 
+        @keyframes modalSlideUp {
+            from { opacity:0; transform:translateY(20px) scale(0.96); }
+            to { opacity:1; transform:translateY(0) scale(1); }
         }
         .modal-animate { animation:modalSlideUp 0.2s ease-out forwards; }
+
+        .quick-card {
+            transition: all 0.25s;
+        }
+        .quick-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -12px rgba(0,0,0,0.15);
+        }
+
+        .activity-row:hover {
+            background: rgba(15,59,58,0.04);
+        }
+        .dark .activity-row:hover {
+            background: rgba(255,255,255,0.04);
+        }
+        .badge-salary {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .dark .badge-salary {
+            background: #064e3b;
+            color: #86efac;
+        }
+        .badge-expense {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .dark .badge-expense {
+            background: #450a0a;
+            color: #f87171;
+        }
+        .badge-office {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .dark .badge-office {
+            background: #451a03;
+            color: #fbbf24;
+        }
+        .badge-other {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        .dark .badge-other {
+            background: #1e1b4b;
+            color: #818cf8;
+        }
+
+        .summary-box {
+            border-left: 4px solid #d4af37;
+        }
+        .dark .summary-box {
+            border-left-color: #d4af37;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
 
-    <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out border-r border-white/5 sidebar-fixed">
-            <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
-                            <i class="fas fa-chart-line text-slate-900 text-sm"></i>
-                        </div>
-                        <div class="leading-tight">
-                            <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
-                            <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
-                        </div>
+<div class="flex min-h-screen">
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full w-[270px] md:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out border-r border-white/5 sidebar-fixed">
+        <div class="sidebar-header-fixed px-5 py-5 border-b border-white/10 bg-inherit">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-amber-600 flex items-center justify-center shadow-md">
+                        <i class="fas fa-chart-line text-slate-900 text-sm"></i>
                     </div>
-                    <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
-                        <i class="fas fa-times text-sm"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
-                <nav class="space-y-1.5">
-                    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div>
-                        <span class="text-sm font-medium">Dashboard</span>
-                    </a>
-                    <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div>
-                        <span class="text-sm font-medium">Customers</span>
-                    </a>
-                    <div class="has-submenu" id="dueSubmenu">
-                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div>
-                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
-                        </a>
-                        <div class="submenu-modern pl-9 mt-1 space-y-1">
-                            <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a>
-                            <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span></a>
-                            <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a>
-                        </div>
-                    </div>
-                    <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span>
-                    </a>
-                    <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span>
-                    </a>
-                    <div class="has-submenu" id="warrantySubmenu">
-                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                            <div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div>
-                            <i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i>
-                        </a>
-                        <div class="submenu-modern pl-9 mt-1 space-y-1">
-                            <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span></a>
-                            <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span></a>
-                            <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span></a>
-                            <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span></a>
-                        </div>
-                    </div>
-                    <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span>
-                    </a>
-                    <a href="expenses.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150">
-                        <div class="w-6 text-center"><i class="fas fa-money-bill-wave text-sm text-accent"></i></div>
-                        <span class="text-sm font-medium">Expenses</span>
-                    </a>
-                    <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition">
-                        <div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span>
-                    </a>
-                </nav>
-                <div class="pt-4 mt-2 border-t border-white/10">
-                    <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition">
-                        <i class="fas fa-sign-out-alt text-sm w-5"></i>
-                        <span class="text-sm font-medium">Logout</span>
-                    </a>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 md:ml-64 min-h-screen w-full">
-            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-                <div class="px-3 py-2.5 flex justify-between items-center">
-                    <div class="flex items-center gap-2">
-                        <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg"><i class="fas fa-bars text-lg"></i></button>
-                        <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-money-bill-wave text-primary mr-2"></i>Expenses</h2>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt text-sm"></i></button>
-                        <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-moon dark:hidden text-sm"></i><i class="fas fa-sun hidden dark:inline-block text-sm"></i></button>
+                    <div class="leading-tight">
+                        <h1 class="text-white font-bold text-sm tracking-wide">Jack<span class="text-accent">Dev</span></h1>
+                        <p class="text-[9px] text-slate-400 uppercase tracking-wider">Due Management</p>
                     </div>
                 </div>
-            </header>
-
-            <div class="p-3 md:p-4">
-                <!-- Tab Navigation -->
-                <div class="flex flex-wrap gap-2 mb-6 bg-white dark:bg-gray-800 p-2 rounded-xl border shadow-sm">
-                    <a href="expenses.html" class="tab-btn active">
-                        <i class="fas fa-home"></i> Overview
-                    </a>
-                    <a href="expenses-staff.html" class="tab-btn">
-                        <i class="fas fa-users"></i> Staff Salaries
-                    </a>
-                    <a href="expenses-office.html" class="tab-btn">
-                        <i class="fas fa-building"></i> Office Expenses
-                    </a>
-                    <a href="expenses-attendance.html" class="tab-btn">
-                        <i class="fas fa-clipboard-check"></i> Attendance
-                    </a>
-                    
-                    <a href="expenses-summary.html" class="tab-btn">
-                        <i class="fas fa-chart-bar"></i> Summary
-                    </a>
-                </div>
-
-                <!-- Overview Content -->
-                <div>
-                    <!-- Stats Cards -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
-                            <div class="bg-blue-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-coins text-blue-600 text-sm"></i></div>
-                            <p class="text-gray-500 text-[9px] font-semibold uppercase">Total Expenses</p>
-                            <p class="text-lg font-bold" id="totalExpenses">৳0</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
-                            <div class="bg-green-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-calendar-check text-green-600 text-sm"></i></div>
-                            <p class="text-gray-500 text-[9px] font-semibold uppercase">This Month</p>
-                            <p class="text-lg font-bold" id="monthlyExpenses">৳0</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
-                            <div class="bg-purple-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-users text-purple-600 text-sm"></i></div>
-                            <p class="text-gray-500 text-[9px] font-semibold uppercase">Total Staff</p>
-                            <p class="text-lg font-bold" id="totalStaff">0</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
-                            <div class="bg-red-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-exclamation-triangle text-red-600 text-sm"></i></div>
-                            <p class="text-gray-500 text-[9px] font-semibold uppercase">Salary Due</p>
-                            <p class="text-lg font-bold text-red-600" id="salaryDue">৳0</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
-                            <div class="bg-amber-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-building text-amber-600 text-sm"></i></div>
-                            <p class="text-gray-500 text-[9px] font-semibold uppercase">Office Expenses</p>
-                            <p class="text-lg font-bold text-amber-600" id="officeExpenses">৳0</p>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card">
-                            <div class="bg-teal-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-hand-holding-usd text-teal-600 text-sm"></i></div>
-                            <p class="text-gray-500 text-[9px] font-semibold uppercase">Staff Paid</p>
-                            <p class="text-lg font-bold text-teal-600" id="staffPaid">৳0</p>
-                        </div>
-                    </div>
-
-                    <!-- Quick Action Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <a href="expenses-staff.html" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-6 hover:shadow-md transition-all group">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition">
-                                    <i class="fas fa-user-plus text-primary text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-800 dark:text-white">Staff Management</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Add, manage & pay salaries</p>
-                                </div>
-                                <i class="fas fa-arrow-right ml-auto text-gray-400 group-hover:text-primary transition"></i>
-                            </div>
-                        </a>
-                        <a href="expenses-office.html" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-6 hover:shadow-md transition-all group">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center group-hover:bg-amber-200 transition">
-                                    <i class="fas fa-plus-circle text-amber-600 text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-800 dark:text-white">Office Expenses</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Track bills & other expenses</p>
-                                </div>
-                                <i class="fas fa-arrow-right ml-auto text-gray-400 group-hover:text-primary transition"></i>
-                            </div>
-                        </a>
-                        <a href="expenses-summary.html" class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-6 hover:shadow-md transition-all group">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center group-hover:bg-green-200 transition">
-                                    <i class="fas fa-chart-pie text-green-600 text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-800 dark:text-white">Summary & Reports</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">View expense distribution</p>
-                                </div>
-                                <i class="fas fa-arrow-right ml-auto text-gray-400 group-hover:text-primary transition"></i>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Recent Activity -->
-                    <div class="mt-4 bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
-                        <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
-                            <h3 class="text-sm font-semibold"><i class="fas fa-clock text-primary mr-2"></i>Recent Activity</h3>
-                        </div>
-                        <div class="p-4 max-h-[300px] overflow-y-auto">
-                            <div id="recentActivityContent">
-                                <div class="text-center py-8 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
-                <div class="max-w-7xl mx-auto px-4 py-3 text-center">
-                    <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
-                        &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span>
-                        <span class="text-gray-300 dark:border-gray-600">|</span>
-                        <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
-                    </p>
-                </div>
-            </footer>
-        </main>
-    </div>
-
-    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
-    <div id="logoutModal" class="modal-overlay hidden">
-        <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 text-center modal-animate max-w-sm">
-            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                <i class="fas fa-sign-out-alt text-orange-500 text-xl"></i>
-            </div>
-            <h3 class="font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Are you sure you want to logout?</p>
-            <div class="flex gap-3 justify-center">
-                <button id="cancelLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition">Cancel</button>
-                <button id="confirmLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-red-500 text-white hover:bg-red-600 transition">Logout</button>
+                <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white bg-white/5 p-1.5 rounded-lg transition">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
             </div>
         </div>
-    </div>
-
-    <script type="module">
-        import { checkAuthState, logout } from './js/auth.js';
-        import { db, collection, getDocs, query, orderBy } from './js/firebase.js';
-        checkAuthState();
-
-        // ==================== STATE ====================
-        let allStaff = [];
-        let allExpenses = [];
-
-        // ==================== UTILITIES ====================
-        function showToast(msg, type = 'success') {
-            const c = document.getElementById('toastContainer');
-            const t = document.createElement('div');
-            t.className = `px-4 py-2 rounded-lg shadow text-sm ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
-            t.innerText = msg;
-            c.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        }
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
-        }
-
-        // ==================== LOAD DATA ====================
-        async function loadStaff() {
-            try {
-                const q = query(collection(db, 'staff'), orderBy('createdAt', 'desc'));
-                const snap = await getDocs(q);
-                allStaff = [];
-                snap.forEach(d => {
-                    const data = d.data();
-                    const paid = data.paidAmount || 0;
-                    const salary = data.salary || 0;
-                    allStaff.push({
-                        id: d.id,
-                        name: data.name || 'Unknown',
-                        phone: data.phone || '',
-                        position: data.position || '',
-                        salary: salary,
-                        paidAmount: paid,
-                        dueAmount: salary - paid,
-                        joinDate: data.joinDate || '',
-                        status: data.status || 'active',
-                        salaryHistory: data.salaryHistory || []
-                    });
-                });
-                updateStats();
-            } catch (error) {
-                console.error('Error loading staff:', error);
-            }
-        }
-
-        async function loadExpenses() {
-            try {
-                const q = query(collection(db, 'expenses'), orderBy('date', 'desc'));
-                const snap = await getDocs(q);
-                allExpenses = [];
-                snap.forEach(d => {
-                    const data = d.data();
-                    allExpenses.push({
-                        id: d.id,
-                        category: data.category || 'other',
-                        customCategory: data.customCategory || '',
-                        amount: data.amount || 0,
-                        date: data.date || '',
-                        description: data.description || '',
-                        createdAt: data.createdAt || ''
-                    });
-                });
-                updateStats();
-                updateRecentActivity();
-            } catch (error) {
-                console.error('Error loading expenses:', error);
-            }
-        }
-
-        // ==================== UPDATE STATS ====================
-        function updateStats() {
-            const totalExp = allExpenses.reduce((sum, e) => sum + e.amount, 0);
-            const totalSalaryPaid = allStaff.reduce((sum, s) => sum + s.paidAmount, 0);
-            const totalSalaryDue = allStaff.reduce((sum, s) => sum + s.dueAmount, 0);
-            const total = totalExp + totalSalaryPaid;
-
-            const month = new Date().toISOString().slice(0, 7);
-            const monthly = allExpenses.filter(e => e.date.startsWith(month)).reduce((sum, e) => sum + e.amount, 0) +
-                allStaff.filter(s => s.salaryHistory?.some(h => h.month === month)).reduce((sum, s) => {
-                    const m = s.salaryHistory?.filter(h => h.month === month);
-                    return sum + (m ? m.reduce((acc, cur) => acc + cur.amount, 0) : 0);
-                }, 0);
-
-            const officeExp = allExpenses.reduce((sum, e) => sum + e.amount, 0);
-
-            document.getElementById('totalExpenses').textContent = `৳${total.toFixed(2)}`;
-            document.getElementById('monthlyExpenses').textContent = `৳${monthly.toFixed(2)}`;
-            document.getElementById('totalStaff').textContent = allStaff.length;
-            document.getElementById('salaryDue').textContent = `৳${totalSalaryDue.toFixed(2)}`;
-            document.getElementById('officeExpenses').textContent = `৳${officeExp.toFixed(2)}`;
-            document.getElementById('staffPaid').textContent = `৳${totalSalaryPaid.toFixed(2)}`;
-        }
-
-        // ==================== RECENT ACTIVITY ====================
-        function updateRecentActivity() {
-            const defaultCategories = {
-                rent: '🏢 Office Rent',
-                electricity: '⚡ Electricity Bill',
-                staff: '👨‍💼 Staff Salary',
-                other: '📋 Other Expenses'
-            };
-
-            const recent = [];
-
-            // Staff salary payments
-            allStaff.forEach(s => {
-                if (s.salaryHistory?.length) {
-                    s.salaryHistory.slice(-2).forEach(h => {
-                        recent.push({
-                            date: h.paidDate || 'N/A',
-                            type: '💰 Salary Paid',
-                            name: s.name,
-                            description: `Salary payment for ${s.name} (${h.month})`,
-                            amount: h.amount,
-                            isSalary: true
-                        });
-                    });
-                }
-            });
-
-            // Office expenses
-            allExpenses.slice(0, 10).forEach(e => {
-                const cat = e.customCategory || defaultCategories[e.category] || e.category;
-                recent.push({
-                    date: e.date,
-                    type: cat,
-                    name: e.description || 'Office Expense',
-                    description: `${cat}${e.description ? ': ' + e.description : ''}`,
-                    amount: e.amount,
-                    isSalary: false
-                });
-            });
-
-            recent.sort((a, b) => b.date.localeCompare(a.date));
-            const recentData = recent.slice(0, 15);
-
-            const container = document.getElementById('recentActivityContent');
-            if (recentData.length === 0) {
-                container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">No recent activity</div>';
-            } else {
-                container.innerHTML = recentData.map(r => `
-                    <div class="flex justify-between items-center py-2 border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700/30 px-2 rounded-lg transition">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs text-gray-500">${r.date}</span>
-                                <span class="text-sm font-medium">${r.type}</span>
-                            </div>
-                            <div class="text-xs text-gray-500 truncate">${escapeHtml(r.description)}</div>
-                        </div>
-                        <span class="text-sm font-bold ${r.isSalary ? 'text-green-600' : 'text-red-600'} ml-2">${r.isSalary ? '+' : '-'} ৳${r.amount.toFixed(2)}</span>
+        <div class="sidebar-nav-fixed px-3 py-3 space-y-1">
+            <nav class="space-y-1.5">
+                <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-tachometer-alt text-sm"></i></div><span class="text-sm font-medium">Dashboard</span></a>
+                <a href="customers.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-users text-sm"></i></div><span class="text-sm font-medium">Customers</span></a>
+                <div class="has-submenu" id="dueSubmenu">
+                    <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-plus-circle text-sm"></i></div><span class="text-sm font-medium">Due Entry</span></div><i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i></a>
+                    <div class="submenu-modern pl-9 mt-1 space-y-1">
+                        <a href="due-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-file-invoice text-[10px] w-4"></i><span>New Due Entry</span></a>
+                        <a href="due-reports.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-chart-bar text-[10px] w-4"></i><span>Due Reports</span></a>
+                        <a href="follow-up.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-bell text-[10px] w-4"></i><span>Follow-ups</span></a>
                     </div>
-                `).join('');
-            }
-        }
+                </div>
+                <a href="collection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-hand-holding-usd text-sm"></i></div><span class="text-sm font-medium">Collection</span></a>
+                <a href="ledger.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-book-open text-sm"></i></div><span class="text-sm font-medium">Ledger</span></a>
+                <div class="has-submenu" id="warrantySubmenu">
+                    <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="flex items-center gap-3"><div class="w-6 text-center"><i class="fas fa-shield-alt text-sm"></i></div><span class="text-sm font-medium">Warranty</span></div><i class="fas fa-chevron-down chevron-icon text-[10px] text-slate-400"></i></a>
+                    <div class="submenu-modern pl-9 mt-1 space-y-1">
+                        <a href="warranty.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-truck text-[10px] w-4"></i><span>Suppliers</span></a>
+                        <a href="warranty-entry.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-plus-circle text-[10px] w-4"></i><span>Warranty Entry</span></a>
+                        <a href="currier-dispatch.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-shipping-fast text-[10px] w-4"></i><span>Currier Dispatch</span></a>
+                        <a href="warranty-list.html" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 text-xs"><i class="fas fa-list text-[10px] w-4"></i><span>Warranty List</span></a>
+                    </div>
+                </div>
+                <a href="customer-warranty.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-clipboard-list text-sm"></i></div><span class="text-sm font-medium">Customer Warranty</span></a>
+                <a href="expenses.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150"><div class="w-6 text-center"><i class="fas fa-money-bill-wave text-sm text-accent"></i></div><span class="text-sm font-medium">Expenses</span></a>
+                <a href="backup.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition"><div class="w-6 text-center"><i class="fas fa-database text-sm"></i></div><span class="text-sm font-medium">Backup & Restore</span></a>
+            </nav>
+            <div class="pt-4 mt-2 border-t border-white/10">
+                <a href="#" id="logoutLink" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-red-500/20 transition"><i class="fas fa-sign-out-alt text-sm w-5"></i><span class="text-sm font-medium">Logout</span></a>
+            </div>
+        </div>
+    </aside>
 
-        // ==================== SIDEBAR ====================
-        const sidebar = document.getElementById('sidebar');
-        const menuToggle = document.getElementById('menuToggle');
-        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 md:ml-64 min-h-screen w-full">
+        <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+            <div class="px-3 py-2.5 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <button id="menuToggle" class="md:hidden text-gray-600 dark:text-gray-300 hover:text-primary p-1.5 -ml-1 rounded-lg"><i class="fas fa-bars text-lg"></i></button>
+                    <h2 class="text-sm md:text-base font-semibold text-gray-800 dark:text-white"><i class="fas fa-money-bill-wave text-primary mr-2"></i>Expenses</h2>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button id="refreshBtn" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-sync-alt text-sm"></i></button>
+                    <button id="darkModeToggle" class="p-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-moon dark:hidden text-sm"></i><i class="fas fa-sun hidden dark:inline-block text-sm"></i></button>
+                </div>
+            </div>
+        </header>
 
-        function openSidebar() {
-            sidebar.classList.remove('-translate-x-full');
-            // Add overlay for mobile
-            if (window.innerWidth < 768) {
-                const overlay = document.createElement('div');
-                overlay.id = 'sidebarOverlay';
-                overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
-                overlay.onclick = closeSidebar;
-                document.body.appendChild(overlay);
-            }
-        }
+        <div class="p-3 md:p-4">
+            <!-- Tabs -->
+            <div class="flex flex-wrap gap-2 mb-6 bg-white dark:bg-gray-800 p-2 rounded-xl border shadow-sm">
+                <a href="expenses.html" class="tab-btn active"><i class="fas fa-home"></i> Overview</a>
+                <a href="expenses-staff.html" class="tab-btn"><i class="fas fa-users"></i> Staff Salaries</a>
+                <a href="expenses-office.html" class="tab-btn"><i class="fas fa-building"></i> Office Expenses</a>
+                <a href="expenses-attendance.html" class="tab-btn"><i class="fas fa-clipboard-check"></i> Attendance</a>
+                <a href="expenses-summary.html" class="tab-btn"><i class="fas fa-chart-bar"></i> Summary</a>
+            </div>
 
-        function closeSidebar() {
-            sidebar.classList.add('-translate-x-full');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (overlay) overlay.remove();
-        }
+            <!-- Quick Action Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+                <a href="expenses.html" class="quick-card bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-4 flex items-center gap-3 hover:border-primary/40">
+                    <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><i class="fas fa-home text-primary"></i></div>
+                    <div><p class="text-xs text-gray-500">Overview</p><p class="text-sm font-semibold">Dashboard</p></div>
+                </a>
+                <a href="expenses-staff.html" class="quick-card bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-4 flex items-center gap-3 hover:border-primary/40">
+                    <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center"><i class="fas fa-user-cog text-blue-600 dark:text-blue-300"></i></div>
+                    <div><p class="text-xs text-gray-500">Staff</p><p class="text-sm font-semibold">Salaries</p></div>
+                </a>
+                <a href="expenses-office.html" class="quick-card bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-4 flex items-center gap-3 hover:border-primary/40">
+                    <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center"><i class="fas fa-building text-amber-600 dark:text-amber-300"></i></div>
+                    <div><p class="text-xs text-gray-500">Office</p><p class="text-sm font-semibold">Expenses</p></div>
+                </a>
+                <a href="expenses-attendance.html" class="quick-card bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-4 flex items-center gap-3 hover:border-primary/40">
+                    <div class="w-10 h-10 rounded-lg bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center"><i class="fas fa-clipboard-check text-teal-600 dark:text-teal-300"></i></div>
+                    <div><p class="text-xs text-gray-500">Attendance</p><p class="text-sm font-semibold">Tracker</p></div>
+                </a>
+                <a href="expenses-summary.html" class="quick-card bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-4 flex items-center gap-3 hover:border-primary/40">
+                    <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center"><i class="fas fa-chart-pie text-purple-600 dark:text-purple-300"></i></div>
+                    <div><p class="text-xs text-gray-500">Summary</p><p class="text-sm font-semibold">Reports</p></div>
+                </a>
+            </div>
 
-        menuToggle.addEventListener('click', openSidebar);
-        closeSidebarBtn.addEventListener('click', closeSidebar);
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card"><div class="bg-blue-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-coins text-blue-600 text-sm"></i></div><p class="text-gray-500 text-[9px] font-semibold uppercase">Total Expenses</p><p class="text-lg font-bold" id="totalExpenses">৳0</p></div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card"><div class="bg-green-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-calendar-check text-green-600 text-sm"></i></div><p class="text-gray-500 text-[9px] font-semibold uppercase">This Month</p><p class="text-lg font-bold" id="monthlyExpenses">৳0</p></div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card"><div class="bg-purple-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-users text-purple-600 text-sm"></i></div><p class="text-gray-500 text-[9px] font-semibold uppercase">Total Staff</p><p class="text-lg font-bold" id="totalStaff">0</p></div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card"><div class="bg-red-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-exclamation-triangle text-red-600 text-sm"></i></div><p class="text-gray-500 text-[9px] font-semibold uppercase">Salary Due</p><p class="text-lg font-bold text-red-600" id="salaryDue">৳0</p></div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card"><div class="bg-amber-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-building text-amber-600 text-sm"></i></div><p class="text-gray-500 text-[9px] font-semibold uppercase">Office Expenses</p><p class="text-lg font-bold text-amber-600" id="officeExpenses">৳0</p></div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-3 border shadow-sm stat-card"><div class="bg-teal-100 w-8 h-8 rounded-lg flex items-center justify-center mb-1"><i class="fas fa-hand-holding-usd text-teal-600 text-sm"></i></div><p class="text-gray-500 text-[9px] font-semibold uppercase">Staff Paid</p><p class="text-lg font-bold text-teal-600" id="staffPaid">৳0</p></div>
+            </div>
 
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768) {
-                sidebar.classList.remove('-translate-x-full');
-                const overlay = document.getElementById('sidebarOverlay');
-                if (overlay) overlay.remove();
-            } else {
-                sidebar.classList.add('-translate-x-full');
+            <!-- New Summary Section: Top Categories & Quick Stats -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
+                <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-4 summary-box">
+                    <h3 class="text-sm font-semibold text-gray-800 dark:text-white mb-2"><i class="fas fa-chart-simple text-primary mr-2"></i>Expense Breakdown</h3>
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div class="flex justify-between items-center border-b border-gray-100 dark:border-gray-700 py-1.5">
+                            <span class="text-gray-600 dark:text-gray-400">💰 Staff Salaries (Paid)</span>
+                            <span class="font-semibold text-green-600 dark:text-green-400" id="summaryStaffPaid">৳0</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-100 dark:border-gray-700 py-1.5">
+                            <span class="text-gray-600 dark:text-gray-400">🏢 Office Expenses</span>
+                            <span class="font-semibold text-amber-600 dark:text-amber-400" id="summaryOfficeExp">৳0</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-100 dark:border-gray-700 py-1.5">
+                            <span class="text-gray-600 dark:text-gray-400">📋 Other Expenses</span>
+                            <span class="font-semibold text-blue-600 dark:text-blue-400" id="summaryOtherExp">৳0</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-100 dark:border-gray-700 py-1.5">
+                            <span class="text-gray-600 dark:text-gray-400">📊 Total Staff</span>
+                            <span class="font-semibold text-purple-600 dark:text-purple-400" id="summaryTotalStaff">0</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5">
+                            <span class="text-gray-600 dark:text-gray-400">⚠️ Salary Due</span>
+                            <span class="font-semibold text-red-600 dark:text-red-400" id="summarySalaryDue">৳0</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1.5">
+                            <span class="text-gray-600 dark:text-gray-400">✅ Total Paid</span>
+                            <span class="font-semibold text-teal-600 dark:text-teal-400" id="summaryTotalPaid">৳0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-4 flex flex-col justify-center items-center text-center">
+                    <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                        <i class="fas fa-wallet text-2xl text-primary"></i>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Total Expenses</p>
+                    <p class="text-2xl font-bold text-primary dark:text-accent" id="summaryTotalExpenses">৳0</p>
+                    <p class="text-xs text-gray-400 mt-1">including all staff payments</p>
+                </div>
+            </div>
+
+            <!-- Recent Activity Table -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+                <div class="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b flex items-center justify-between">
+                    <h3 class="text-sm font-semibold"><i class="fas fa-clock text-primary mr-2"></i>Recent Activity</h3>
+                    <span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">latest 15 entries</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 dark:bg-gray-700/30 text-xs text-gray-500 uppercase tracking-wider border-b dark:border-gray-700">
+                            <tr>
+                                <th class="py-2.5 px-3 text-left font-semibold">SL</th>
+                                <th class="py-2.5 px-3 text-left font-semibold">Date</th>
+                                <th class="py-2.5 px-3 text-left font-semibold">Type</th>
+                                <th class="py-2.5 px-3 text-left font-semibold">Description</th>
+                                <th class="py-2.5 px-3 text-right font-semibold">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentActivityTable">
+                            <tr><td colspan="5" class="text-center py-6 text-gray-400 text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-6 border-t border-gray-200 dark:border-gray-700">
+            <div class="max-w-7xl mx-auto px-4 py-3 text-center">
+                <p class="text-[11px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
+                    &copy; <span id="footerYear">2026</span> <span class="text-gray-600 dark:text-gray-300 font-semibold">Jack<span class="text-accent">Dev</span></span>
+                    <span class="text-gray-300 dark:border-gray-600">|</span>
+                    <span class="text-gray-400 dark:text-gray-500">All Rights Reserved</span>
+                </p>
+            </div>
+        </footer>
+    </main>
+</div>
+
+<!-- Toast & Logout Modal -->
+<div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+<div id="logoutModal" class="modal-overlay hidden">
+    <div class="modal-content bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 text-center modal-animate max-w-sm">
+        <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center"><i class="fas fa-sign-out-alt text-orange-500 text-xl"></i></div>
+        <h3 class="font-semibold text-gray-800 dark:text-white mb-2">Logout?</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Are you sure you want to logout?</p>
+        <div class="flex gap-3 justify-center">
+            <button id="cancelLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition">Cancel</button>
+            <button id="confirmLogoutBtn" class="px-5 py-2 text-sm font-medium rounded-lg bg-red-500 text-white hover:bg-red-600 transition">Logout</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { checkAuthState, logout } from './js/auth.js';
+    import { db, collection, getDocs, query, orderBy, doc, getDoc } from './js/firebase.js';
+    checkAuthState();
+
+    // ========== STATE ==========
+    let allStaff = [];
+    let allExpenses = [];
+
+    // ========== TOAST ==========
+    function showToast(msg, type = 'success') {
+        const c = document.getElementById('toastContainer');
+        const t = document.createElement('div');
+        t.className = `px-4 py-2 rounded-lg shadow text-sm ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+        t.innerText = msg;
+        c.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+    }
+
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m])); }
+
+    function formatCurrency(amount) {
+        return '৳' + amount.toFixed(2);
+    }
+
+    // ========== LOAD STAFF ==========
+    async function loadStaff() {
+        try {
+            const q = query(collection(db, 'staff'), orderBy('createdAt', 'desc'));
+            const snap = await getDocs(q);
+            allStaff = [];
+            snap.forEach(d => {
+                const data = d.data();
+                const paid = data.paidAmount || 0;
+                const salary = data.salary || 0;
+                allStaff.push({
+                    id: d.id,
+                    name: data.name || 'Unknown',
+                    phone: data.phone || '',
+                    position: data.position || '',
+                    salary: salary,
+                    paidAmount: paid,
+                    dueAmount: salary - paid,
+                    joinDate: data.joinDate || '',
+                    status: data.status || 'active',
+                    salaryHistory: data.salaryHistory || [],
+                });
+            });
+            updateStats();
+            updateSummary();
+        } catch (error) { console.error('Error loading staff:', error); }
+    }
+
+    // ========== LOAD EXPENSES ==========
+    async function loadExpenses() {
+        try {
+            const q = query(collection(db, 'expenses'), orderBy('date', 'desc'));
+            const snap = await getDocs(q);
+            allExpenses = [];
+            snap.forEach(d => {
+                const data = d.data();
+                allExpenses.push({
+                    id: d.id,
+                    category: data.category || 'other',
+                    customCategory: data.customCategory || '',
+                    amount: data.amount || 0,
+                    date: data.date || '',
+                    description: data.description || '',
+                    createdAt: data.createdAt || ''
+                });
+            });
+            updateStats();
+            updateSummary();
+            updateRecentActivityTable();
+        } catch (error) { console.error('Error loading expenses:', error); }
+    }
+
+    // ========== UPDATE STATS ==========
+    function updateStats() {
+        const totalExp = allExpenses.reduce((sum, e) => sum + e.amount, 0);
+        const totalSalaryPaid = allStaff.reduce((sum, s) => sum + s.paidAmount, 0);
+        const totalSalaryDue = allStaff.reduce((sum, s) => sum + s.dueAmount, 0);
+        const total = totalExp + totalSalaryPaid;
+        const month = new Date().toISOString().slice(0, 7);
+        const monthly = allExpenses.filter(e => e.date.startsWith(month)).reduce((sum, e) => sum + e.amount, 0) +
+            allStaff.filter(s => s.salaryHistory?.some(h => h.month === month)).reduce((sum, s) => {
+                const m = s.salaryHistory?.filter(h => h.month === month);
+                return sum + (m ? m.reduce((acc, cur) => acc + cur.amount, 0) : 0);
+            }, 0);
+        const officeExp = allExpenses.reduce((sum, e) => sum + e.amount, 0);
+        document.getElementById('totalExpenses').textContent = formatCurrency(total);
+        document.getElementById('monthlyExpenses').textContent = formatCurrency(monthly);
+        document.getElementById('totalStaff').textContent = allStaff.length;
+        document.getElementById('salaryDue').textContent = formatCurrency(totalSalaryDue);
+        document.getElementById('officeExpenses').textContent = formatCurrency(officeExp);
+        document.getElementById('staffPaid').textContent = formatCurrency(totalSalaryPaid);
+    }
+
+    // ========== UPDATE SUMMARY ==========
+    function updateSummary() {
+        const totalSalaryPaid = allStaff.reduce((sum, s) => sum + s.paidAmount, 0);
+        const totalSalaryDue = allStaff.reduce((sum, s) => sum + s.dueAmount, 0);
+        const officeExp = allExpenses.reduce((sum, e) => sum + e.amount, 0);
+        const otherExp = allExpenses.filter(e => e.category === 'other' || e.category === 'misc').reduce((sum, e) => sum + e.amount, 0);
+        const total = officeExp + totalSalaryPaid;
+
+        document.getElementById('summaryStaffPaid').textContent = formatCurrency(totalSalaryPaid);
+        document.getElementById('summaryOfficeExp').textContent = formatCurrency(officeExp);
+        document.getElementById('summaryOtherExp').textContent = formatCurrency(otherExp);
+        document.getElementById('summaryTotalStaff').textContent = allStaff.length;
+        document.getElementById('summarySalaryDue').textContent = formatCurrency(totalSalaryDue);
+        document.getElementById('summaryTotalPaid').textContent = formatCurrency(totalSalaryPaid);
+        document.getElementById('summaryTotalExpenses').textContent = formatCurrency(total);
+    }
+
+    // ========== RECENT ACTIVITY TABLE ==========
+    function updateRecentActivityTable() {
+        const defaultCategories = { rent: '🏢 Office Rent', electricity: '⚡ Electricity Bill', staff: '👨‍💼 Staff Salary', other: '📋 Other Expenses' };
+        const recent = [];
+
+        allStaff.forEach(s => {
+            if (s.salaryHistory?.length) {
+                s.salaryHistory.slice(-3).forEach(h => {
+                    recent.push({
+                        date: h.paidDate || 'N/A',
+                        type: '💰 Salary Payment',
+                        description: `${s.name} (${h.month})`,
+                        amount: h.amount,
+                        isSalary: true,
+                        badge: 'salary'
+                    });
+                });
             }
         });
 
-        // Initialize sidebar state
-        if (window.innerWidth >= 768) {
-            sidebar.classList.remove('-translate-x-full');
-        } else {
-            sidebar.classList.add('-translate-x-full');
-        }
-
-        // ==================== SUBMENU TOGGLE ====================
-        document.querySelectorAll('.has-submenu').forEach(m => {
-            const a = m.querySelector('a');
-            a?.addEventListener('click', (e) => {
-                e.preventDefault();
-                m.classList.toggle('open');
-                m.querySelector('.submenu-modern')?.classList.toggle('open');
+        allExpenses.slice(0, 15).forEach(e => {
+            const cat = e.customCategory || defaultCategories[e.category] || e.category;
+            let badge = 'expense';
+            if (e.category === 'rent' || e.category === 'electricity' || e.category === 'office') badge = 'office';
+            else if (e.category === 'staff') badge = 'salary';
+            else badge = 'other';
+            
+            recent.push({
+                date: e.date,
+                type: cat,
+                description: e.description || cat,
+                amount: e.amount,
+                isSalary: false,
+                badge: badge
             });
         });
 
-        // ==================== DARK MODE ====================
-        document.getElementById('darkModeToggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            document.body.classList.toggle('dark');
-        });
+        recent.sort((a, b) => b.date.localeCompare(a.date));
+        const recentData = recent.slice(0, 15);
 
-        // ==================== LOGOUT ====================
-        document.getElementById('logoutLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('logoutModal').classList.remove('hidden');
-        });
+        const tbody = document.getElementById('recentActivityTable');
+        if (!recentData.length) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400 text-sm">No recent activity</td></tr>`;
+            return;
+        }
 
-        document.getElementById('cancelLogoutBtn').addEventListener('click', () => {
-            document.getElementById('logoutModal').classList.add('hidden');
-        });
+        const badgeClasses = {
+            salary: 'badge-salary',
+            expense: 'badge-expense',
+            office: 'badge-office',
+            other: 'badge-other'
+        };
 
-        document.getElementById('confirmLogoutBtn').addEventListener('click', async () => {
-            document.getElementById('logoutModal').classList.add('hidden');
-            await logout();
-        });
+        tbody.innerHTML = recentData.map((r, index) => `
+            <tr class="activity-row border-b dark:border-gray-700/50 last:border-0">
+                <td class="py-2.5 px-3 text-gray-400 text-xs">${index + 1}</td>
+                <td class="py-2.5 px-3 text-gray-600 dark:text-gray-300 text-xs">${r.date}</td>
+                <td class="py-2.5 px-3">
+                    <span class="text-xs px-2 py-1 rounded-full ${badgeClasses[r.badge] || 'badge-other'}">${r.type}</span>
+                </td>
+                <td class="py-2.5 px-3 text-gray-600 dark:text-gray-300 text-sm">${escapeHtml(r.description)}</td>
+                <td class="py-2.5 px-3 text-right font-semibold ${r.isSalary ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
+                    ${r.isSalary ? '+' : '-'} ${formatCurrency(r.amount)}
+                </td>
+            </tr>
+        `).join('');
+    }
 
-        // ==================== REFRESH ====================
-        document.getElementById('refreshBtn').addEventListener('click', () => {
-            loadStaff();
-            loadExpenses();
-            showToast('Refreshed');
-        });
+    // ========== SIDEBAR / DARK / LOGOUT ==========
+    const sidebar = document.getElementById('sidebar');
+    document.getElementById('menuToggle').addEventListener('click', () => {
+        sidebar.classList.toggle('-translate-x-full');
+        if (!sidebar.classList.contains('-translate-x-full') && window.innerWidth < 768) {
+            const overlay = document.createElement('div');
+            overlay.id = 'sidebarOverlay';
+            overlay.className = 'fixed inset-0 bg-black/50 z-40 md:hidden';
+            overlay.onclick = () => { sidebar.classList.add('-translate-x-full'); overlay.remove(); };
+            document.body.appendChild(overlay);
+        } else {
+            document.getElementById('sidebarOverlay')?.remove();
+        }
+    });
+    document.getElementById('closeSidebarBtn')?.addEventListener('click', () => {
+        sidebar.classList.add('-translate-x-full');
+        document.getElementById('sidebarOverlay')?.remove();
+    });
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay')?.remove(); }
+        else { sidebar.classList.add('-translate-x-full'); }
+    });
+    if (window.innerWidth >= 768) sidebar.classList.remove('-translate-x-full');
+    else sidebar.classList.add('-translate-x-full');
 
-        // ==================== INIT ====================
-        document.getElementById('footerYear').textContent = new Date().getFullYear();
-        await loadStaff();
-        await loadExpenses();
-    </script>
+    document.querySelectorAll('.has-submenu').forEach(m => {
+        const a = m.querySelector('a');
+        a?.addEventListener('click', (e) => { e.preventDefault(); m.classList.toggle('open'); m.querySelector('.submenu-modern')?.classList.toggle('open'); });
+    });
+
+    document.getElementById('darkModeToggle').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        document.body.classList.toggle('dark');
+    });
+
+    document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('logoutModal').classList.remove('hidden'); });
+    document.getElementById('cancelLogoutBtn').addEventListener('click', () => { document.getElementById('logoutModal').classList.add('hidden'); });
+    document.getElementById('confirmLogoutBtn').addEventListener('click', async () => { document.getElementById('logoutModal').classList.add('hidden'); await logout(); });
+
+    document.getElementById('refreshBtn').addEventListener('click', () => { loadStaff(); loadExpenses(); showToast('Refreshed'); });
+
+    // ========== INIT ==========
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+    await loadStaff();
+    await loadExpenses();
+</script>
 </body>
 </html>

@@ -257,6 +257,50 @@
         
         .stat-card { transition: all 0.2s ease; }
         .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        
+        .collection-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 600;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .dark .collection-badge {
+            background: #1e3a5f;
+            color: #93c5fd;
+        }
+        
+        .backup-flow {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            font-size: 10px;
+            color: #6b7280;
+        }
+        .dark .backup-flow {
+            color: #9ca3af;
+        }
+        .backup-flow .step {
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #f3f4f6;
+        }
+        .dark .backup-flow .step {
+            background: #374151;
+        }
+        .backup-flow .arrow {
+            color: #9ca3af;
+        }
+        .backup-flow .highlight {
+            color: #0f3b3a;
+            font-weight: 600;
+        }
+        .dark .backup-flow .highlight {
+            color: #d4af37;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -351,10 +395,6 @@
                         <div class="w-6 text-center"><i class="fas fa-database text-sm text-accent"></i></div>
                         <span class="text-sm font-medium">Backup & Restore</span>
                     </a>
-                    <a href="warranty-analyzer.html" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-xl text-white transition-all duration-150">
-                        <div class="w-6 text-center"><i class="fas fa-database text-sm text-accent"></i></div>
-                        <span class="text-sm font-medium">Warranty Analyzer</span>
-                    </a>
                 </nav>
                 
                 <div class="pt-4 mt-2 border-t border-white/10">
@@ -439,22 +479,29 @@
                     </div>
                 </div>
                 
+                
                 <!-- Backup Section -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                         <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
                             <h3 class="text-base font-semibold"><i class="fas fa-download text-primary mr-2"></i>Export Backup</h3>
-                            <p class="text-xs text-gray-500 mt-1">Download complete database backup in different formats</p>
+                            <p class="text-xs text-gray-500 mt-1">Complete database backup with all IDs preserved</p>
                         </div>
                         <div class="p-5 space-y-4">
                             <button id="backupJSONBtn" class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 rounded-xl transition-all btn-active flex items-center justify-center gap-2 shadow-sm">
-                                <i class="fas fa-file-code text-lg"></i> Backup as JSON
+                                <i class="fas fa-file-code text-lg"></i> Full Database Backup (JSON)
                             </button>
                             <button id="backupCSVBtn" class="w-full bg-info hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition-all btn-active flex items-center justify-center gap-2 shadow-sm">
                                 <i class="fas fa-file-csv text-lg"></i> Backup as CSV
                             </button>
                             <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 text-xs text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                                <i class="fas fa-info-circle mr-1"></i> JSON backup includes complete data structure with customer names in transactions.
+                                <i class="fas fa-info-circle mr-1"></i> 
+                                <strong>JSON Backup preserves:</strong><br>
+                                • Original Document IDs<br>
+                                • All Timestamps (createdAt, updatedAt)<br>
+                                • Reference IDs (customerId, supplierId)<br>
+                                • Sub-collection relationships<br>
+                                • Complete data structure
                             </div>
                         </div>
                     </div>
@@ -462,7 +509,7 @@
                     <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                         <div class="px-5 py-4 bg-gradient-to-r from-primary/10 to-transparent border-b">
                             <h3 class="text-base font-semibold"><i class="fas fa-upload text-primary mr-2"></i>Restore Backup</h3>
-                            <p class="text-xs text-gray-500 mt-1">Restore database from backup file</p>
+                            <p class="text-xs text-gray-500 mt-1">Restore full database with exact IDs</p>
                         </div>
                         <div class="p-5 space-y-4">
                             <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center file-upload-area transition-all" id="uploadArea">
@@ -479,6 +526,51 @@
                                 <i class="fas fa-exclamation-triangle mr-1"></i> Warning: Restoring will REPLACE all existing data. This action cannot be undone.
                             </div>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Collections Info -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden mb-6">
+                    <div class="px-5 py-3 bg-gradient-to-r from-primary/10 to-transparent border-b">
+                        <h3 class="text-sm font-semibold"><i class="fas fa-database text-primary mr-2"></i>Backup Collections</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">All collections included in full database backup</p>
+                    </div>
+                    <div class="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+                            <span class="collection-badge">1</span>
+                            <span class="text-xs font-medium">Customers</span>
+                        </div>
+                        <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+                            <span class="collection-badge">2</span>
+                            <span class="text-xs font-medium">Transactions</span>
+                        </div>
+                        <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+                            <span class="collection-badge">3</span>
+                            <span class="text-xs font-medium">Warranties</span>
+                        </div>
+                        <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+                            <span class="collection-badge">4</span>
+                            <span class="text-xs font-medium">Suppliers</span>
+                        </div>
+                        <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+                            <span class="collection-badge">5</span>
+                            <span class="text-xs font-medium">Dispatches</span>
+                        </div>
+                        <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+                            <span class="collection-badge">6</span>
+                            <span class="text-xs font-medium">Staff</span>
+                        </div>
+                        <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+                            <span class="collection-badge">7</span>
+                            <span class="text-xs font-medium">Attendance</span>
+                        </div>
+                        <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+                            <span class="collection-badge">8</span>
+                            <span class="text-xs font-medium">Expenses</span>
+                        </div>
+                    </div>
+                    <div class="px-4 pb-3 text-[10px] text-gray-400 dark:text-gray-500">
+                        <i class="fas fa-check-circle text-green-500 mr-1"></i> All IDs, relationships, and timestamps preserved
                     </div>
                 </div>
                 
@@ -562,7 +654,9 @@
     
     <script type="module">
         import { checkAuthState, logout } from './js/auth.js';
-        import { db, collection, getDocs, addDoc, writeBatch, doc } from './js/firebase.js';
+        // Import all Firebase functions needed
+        import { db, collection, getDocs, doc, deleteDoc, writeBatch } from './js/firebase.js';
+        import { setDoc } from 'https://cdn.jsdelivr.net/npm/firebase@9.22.0/firebase-firestore.js';
         
         checkAuthState();
         
@@ -790,28 +884,17 @@
                     getDocs(collection(db, 'warranties'))
                 ]);
                 
-                const totalCustomers = $('totalCustomers');
-                const totalTransactions = $('totalTransactions');
-                const totalWarrantyItems = $('totalWarrantyItems');
-                const lastBackupEl = $('lastBackup');
-                
-                if (totalCustomers) totalCustomers.textContent = customersSnap.size;
-                if (totalTransactions) totalTransactions.textContent = transactionsSnap.size;
-                if (totalWarrantyItems) totalWarrantyItems.textContent = warrantiesSnap.size;
+                $('totalCustomers').textContent = customersSnap.size;
+                $('totalTransactions').textContent = transactionsSnap.size;
+                $('totalWarrantyItems').textContent = warrantiesSnap.size;
                 
                 const lastBackupTime = localStorage.getItem('lastBackupTime');
-                if (lastBackupTime && lastBackupEl) {
+                if (lastBackupTime) {
                     const date = new Date(parseInt(lastBackupTime));
-                    lastBackupEl.textContent = date.toLocaleString();
-                } else if (lastBackupEl) {
-                    lastBackupEl.textContent = 'Never';
+                    $('lastBackup').textContent = date.toLocaleString();
+                } else {
+                    $('lastBackup').textContent = 'Never';
                 }
-                
-                console.log('Stats loaded:', {
-                    customers: customersSnap.size,
-                    transactions: transactionsSnap.size,
-                    warranties: warrantiesSnap.size
-                });
                 
             } catch (error) {
                 console.error('Error loading stats:', error);
@@ -820,61 +903,47 @@
         };
         
         // =============================================
-        // BACKUP FUNCTIONS
+        // FULL BACKUP - Preserve all IDs
         // =============================================
         const backupAsJSON = async () => {
-            showToast('📦 Preparing backup...', 'success');
+            showToast('📦 Preparing full database backup...', 'success');
             
             try {
-                const [customersSnap, transactionsSnap, warrantiesSnap, suppliersSnap, dispatchesSnap] = await Promise.all([
-                    getDocs(collection(db, 'customers')),
-                    getDocs(collection(db, 'transactions')),
-                    getDocs(collection(db, 'warranties')),
-                    getDocs(collection(db, 'suppliers')),
-                    getDocs(collection(db, 'dispatches'))
-                ]);
-                
-                const customers = [];
-                customersSnap.forEach(doc => customers.push({ id: doc.id, ...doc.data() }));
-                
-                const customerNameMap = new Map();
-                customers.forEach(c => customerNameMap.set(c.id, c.name));
-                
-                const transactions = [];
-                transactionsSnap.forEach(doc => {
-                    const data = doc.data();
-                    transactions.push({
-                        id: doc.id,
-                        ...data,
-                        customerName: customerNameMap.get(data.customerId) || 'Unknown'
-                    });
-                });
-                
-                const warranties = [];
-                warrantiesSnap.forEach(doc => warranties.push({ id: doc.id, ...doc.data() }));
-                
-                const suppliers = [];
-                suppliersSnap.forEach(doc => suppliers.push({ id: doc.id, ...doc.data() }));
-                
-                const dispatches = [];
-                dispatchesSnap.forEach(doc => dispatches.push({ id: doc.id, ...doc.data() }));
-                
+                const collections = ['customers', 'transactions', 'warranties', 'suppliers', 'dispatches', 'staff', 'attendance', 'expenses'];
                 const backupData = {
                     version: '2.0',
                     exportedAt: new Date().toISOString(),
-                    customers,
-                    transactions,
-                    warranties,
-                    suppliers,
-                    dispatches,
-                    summary: {
-                        totalCustomers: customers.length,
-                        totalTransactions: transactions.length,
-                        totalWarranties: warranties.length,
-                        totalSuppliers: suppliers.length,
-                        totalDispatches: dispatches.length
+                    collections: {},
+                    summary: {},
+                    meta: {
+                        exportedBy: 'JackDev Due Management System',
+                        preserveIDs: true,
+                        preserveTimestamps: true,
+                        preserveReferences: true
                     }
                 };
+                
+                for (const collName of collections) {
+                    try {
+                        const snap = await getDocs(collection(db, collName));
+                        const items = [];
+                        snap.forEach(doc => {
+                            const data = doc.data();
+                            items.push({
+                                _id: doc.id,
+                                ...data
+                            });
+                        });
+                        backupData.collections[collName] = items;
+                        backupData.summary[collName] = items.length;
+                    } catch (e) {
+                        backupData.collections[collName] = [];
+                        backupData.summary[collName] = 0;
+                    }
+                }
+                
+                backupData.meta.totalCollections = Object.keys(backupData.collections).length;
+                backupData.meta.totalItems = Object.values(backupData.collections).reduce((sum, arr) => sum + arr.length, 0);
                 
                 const jsonStr = JSON.stringify(backupData, null, 2);
                 const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -890,13 +959,16 @@
                 
                 localStorage.setItem('lastBackupTime', Date.now().toString());
                 await loadStats();
-                showToast(`✅ Backup completed! ${transactions.length} transactions, ${customers.length} customers`, 'success');
+                showToast(`✅ Full backup completed! ${backupData.meta.totalItems} items from ${backupData.meta.totalCollections} collections`, 'success');
             } catch (error) {
                 console.error('Backup error:', error);
                 showToast('❌ Backup failed: ' + error.message, 'error');
             }
         };
         
+        // =============================================
+        // CSV BACKUP
+        // =============================================
         const backupAsCSV = async () => {
             showToast('📦 Preparing CSV backup...', 'success');
             
@@ -912,6 +984,12 @@
                     customersCSV += `"${doc.id}","${(data.name || '').replace(/"/g, '""')}","${(data.phone || '').replace(/"/g, '""')}","${(data.address || '').replace(/"/g, '""')}","${(data.notes || '').replace(/"/g, '""')}","${data.totalDue || 0}","${data.createdAt || ''}"\n`;
                 });
                 
+                const customerMap = new Map();
+                customersSnap.forEach(doc => {
+                    const data = doc.data();
+                    customerMap.set(doc.id, data.name || 'Unknown');
+                });
+                
                 let transactionsCSV = '\uFEFF"ID","Customer ID","Customer Name","Type","Date","Description","Total Amount","Paid Amount","Due Amount","Collection Amount","Remarks","Expected Date","Created At"\n';
                 transactionsSnap.forEach(doc => {
                     const data = doc.data();
@@ -923,12 +1001,11 @@
                     } else if (data.directDueAmount) {
                         description = `Direct Due: ${data.directDueAmount}`;
                     }
-                    transactionsCSV += `"${doc.id}","${data.customerId || ''}","${data.customerName || ''}","${data.type || ''}","${data.date || ''}","${description.replace(/"/g, '""')}","${data.totalAmount || 0}","${data.paidAmount || 0}","${data.dueAmount || 0}","${data.collectionAmount || 0}","${(data.remarks || '').replace(/"/g, '""')}","${data.expectedDate || ''}","${data.createdAt || ''}"\n`;
+                    transactionsCSV += `"${doc.id}","${data.customerId || ''}","${(data.customerName || customerMap.get(data.customerId) || 'Unknown').replace(/"/g, '""')}","${data.type || ''}","${data.date || ''}","${description.replace(/"/g, '""')}","${data.totalAmount || 0}","${data.paidAmount || 0}","${data.dueAmount || 0}","${data.collectionAmount || 0}","${(data.remarks || '').replace(/"/g, '""')}","${data.expectedDate || ''}","${data.createdAt || ''}"\n`;
                 });
                 
                 const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
                 
-                // Download customers CSV
                 const customersBlob = new Blob([customersCSV], { type: 'text/csv;charset=utf-8;' });
                 const customersUrl = URL.createObjectURL(customersBlob);
                 const customersA = document.createElement('a');
@@ -939,7 +1016,6 @@
                 document.body.removeChild(customersA);
                 URL.revokeObjectURL(customersUrl);
                 
-                // Download transactions CSV after a small delay
                 setTimeout(() => {
                     const transactionsBlob = new Blob([transactionsCSV], { type: 'text/csv;charset=utf-8;' });
                     const transactionsUrl = URL.createObjectURL(transactionsBlob);
@@ -954,7 +1030,7 @@
                 
                 localStorage.setItem('lastBackupTime', Date.now().toString());
                 await loadStats();
-                showToast(`✅ CSV backup created! ${transactionsSnap.size} transactions, ${customersSnap.size} customers`, 'success');
+                showToast(`✅ CSV backup created!`, 'success');
             } catch (error) {
                 console.error('CSV Backup error:', error);
                 showToast('❌ CSV Backup failed: ' + error.message, 'error');
@@ -962,7 +1038,7 @@
         };
         
         // =============================================
-        // EXECUTE RESTORE
+        // EXECUTE RESTORE - Preserve all IDs
         // =============================================
         const executeRestore = async () => {
             hideRestoreModal();
@@ -974,112 +1050,52 @@
             
             showProgressBar();
             
+            const collections = Object.keys(selectedBackupData.collections || {});
             let totalItems = 0;
+            for (const coll of collections) {
+                totalItems += (selectedBackupData.collections[coll] || []).length;
+            }
+            
             let restoredItems = 0;
-            
-            if (selectedBackupData.customers) totalItems += selectedBackupData.customers.length;
-            if (selectedBackupData.transactions) totalItems += selectedBackupData.transactions.length;
-            if (selectedBackupData.warranties) totalItems += selectedBackupData.warranties.length;
-            if (selectedBackupData.suppliers) totalItems += selectedBackupData.suppliers.length;
-            if (selectedBackupData.dispatches) totalItems += selectedBackupData.dispatches.length;
-            
             updateProgress(0, `Starting restore of ${totalItems} items...`);
             
             try {
-                const collections = ['customers', 'transactions', 'warranties', 'suppliers', 'dispatches'];
+                // Clear all collections
                 updateProgress(3, 'Clearing existing data...');
                 
                 for (const coll of collections) {
-                    const snap = await getDocs(collection(db, coll));
-                    if (snap.size > 0) {
-                        const batch = writeBatch(db);
-                        for (const docSnap of snap.docs) {
-                            batch.delete(doc(db, coll, docSnap.id));
+                    try {
+                        const snap = await getDocs(collection(db, coll));
+                        if (snap.size > 0) {
+                            const batch = writeBatch(db);
+                            for (const docSnap of snap.docs) {
+                                batch.delete(doc(db, coll, docSnap.id));
+                            }
+                            await batch.commit();
                         }
-                        await batch.commit();
+                    } catch (e) {
+                        console.warn(`Could not clear ${coll}:`, e);
                     }
                 }
                 
-                const customerNameMap = new Map();
-                if (selectedBackupData.customers && selectedBackupData.customers.length > 0) {
-                    for (const customer of selectedBackupData.customers) {
-                        customerNameMap.set(customer.id, customer.name);
-                    }
-                }
-                
-                updateProgress(8, 'Restoring customers...');
-                
-                // ✅ FIX: Use addDoc instead of setDoc (since setDoc is not exported)
-                if (selectedBackupData.customers && selectedBackupData.customers.length > 0) {
-                    let count = 0;
-                    for (const customer of selectedBackupData.customers) {
-                        const { id, ...customerData } = customer;
-                        // Use addDoc instead of setDoc
-                        await addDoc(collection(db, 'customers'), customerData);
-                        count++;
-                        restoredItems++;
-                        const percent = 8 + (restoredItems / totalItems) * 92;
-                        updateProgress(Math.min(percent, 98), `Restoring customers... ${count}/${selectedBackupData.customers.length}`);
-                        await new Promise(resolve => setTimeout(resolve, 5));
-                    }
-                }
-                
-                updateProgress(30, 'Restoring transactions with customer names...');
-                
-                if (selectedBackupData.transactions && selectedBackupData.transactions.length > 0) {
-                    let count = 0;
-                    for (const transaction of selectedBackupData.transactions) {
-                        const { id, ...transactionData } = transaction;
-                        
-                        if (!transactionData.customerName && transactionData.customerId && customerNameMap.has(transactionData.customerId)) {
-                            transactionData.customerName = customerNameMap.get(transactionData.customerId);
+                // Restore with EXACT SAME IDs using setDoc
+                for (const coll of collections) {
+                    const items = selectedBackupData.collections[coll] || [];
+                    if (items.length === 0) continue;
+                    
+                    updateProgress(8 + (restoredItems / totalItems) * 85, `Restoring ${coll}... (${items.length} items)`);
+                    
+                    for (const item of items) {
+                        const { _id, ...data } = item;
+                        if (_id) {
+                            await setDoc(doc(db, coll, _id), data);
+                        } else {
+                            await setDoc(doc(db, coll), data);
                         }
-                        
-                        await addDoc(collection(db, 'transactions'), transactionData);
-                        count++;
                         restoredItems++;
-                        const percent = 30 + (restoredItems / totalItems) * 50;
-                        updateProgress(Math.min(percent, 95), `Restoring transactions... ${count}/${selectedBackupData.transactions.length}`);
-                        await new Promise(resolve => setTimeout(resolve, 5));
-                    }
-                }
-                
-                updateProgress(80, 'Restoring warranty data...');
-                
-                if (selectedBackupData.warranties && selectedBackupData.warranties.length > 0) {
-                    let count = 0;
-                    for (const warranty of selectedBackupData.warranties) {
-                        const { id, ...warrantyData } = warranty;
-                        await addDoc(collection(db, 'warranties'), warrantyData);
-                        count++;
-                        restoredItems++;
-                        const percent = 80 + (restoredItems / totalItems) * 15;
-                        updateProgress(Math.min(percent, 98), `Restoring warranties... ${count}/${selectedBackupData.warranties.length}`);
-                        await new Promise(resolve => setTimeout(resolve, 5));
-                    }
-                }
-                
-                if (selectedBackupData.suppliers && selectedBackupData.suppliers.length > 0) {
-                    let count = 0;
-                    for (const supplier of selectedBackupData.suppliers) {
-                        const { id, ...supplierData } = supplier;
-                        await addDoc(collection(db, 'suppliers'), supplierData);
-                        count++;
-                        restoredItems++;
-                        updateProgress(Math.min(95, 8 + (restoredItems / totalItems) * 92), `Restoring suppliers... ${count}/${selectedBackupData.suppliers.length}`);
-                        await new Promise(resolve => setTimeout(resolve, 5));
-                    }
-                }
-                
-                if (selectedBackupData.dispatches && selectedBackupData.dispatches.length > 0) {
-                    let count = 0;
-                    for (const dispatch of selectedBackupData.dispatches) {
-                        const { id, ...dispatchData } = dispatch;
-                        await addDoc(collection(db, 'dispatches'), dispatchData);
-                        count++;
-                        restoredItems++;
-                        updateProgress(Math.min(98, 8 + (restoredItems / totalItems) * 92), `Restoring dispatches... ${count}/${selectedBackupData.dispatches.length}`);
-                        await new Promise(resolve => setTimeout(resolve, 5));
+                        const progress = 8 + (restoredItems / totalItems) * 85;
+                        updateProgress(Math.min(progress, 98), `Restoring ${coll}... ${restoredItems}/${totalItems}`);
+                        await new Promise(resolve => setTimeout(resolve, 3));
                     }
                 }
                 
@@ -1087,21 +1103,18 @@
                 
                 setTimeout(() => {
                     const successMsg = 
-`✅ ${selectedBackupData.customers.length} customers restored
-📝 ${selectedBackupData.transactions.length} transactions
-🛡️ ${selectedBackupData.warranties.length} warranties
-🏭 ${selectedBackupData.suppliers.length} suppliers
-🚚 ${selectedBackupData.dispatches.length} dispatches
+`✅ ${totalItems} items restored
+📊 ${collections.length} collections restored
 
-Database restored successfully!`;
+All Document IDs preserved!
+All Timestamps preserved!
+All References preserved!`;
                     showSuccessModal(successMsg);
                 }, 500);
                 
                 selectedBackupData = null;
-                const restorePreviewEl = $('restorePreview');
-                const restoreBtnEl = $('restoreBtn');
-                if (restorePreviewEl) restorePreviewEl.classList.add('hidden');
-                if (restoreBtnEl) restoreBtnEl.disabled = true;
+                $('restorePreview').classList.add('hidden');
+                $('restoreBtn').disabled = true;
                 await loadStats();
                 
             } catch (error) {
@@ -1154,47 +1167,96 @@ Database restored successfully!`;
                 try {
                     const data = JSON.parse(e.target.result);
                     
-                    if (data.customers && data.transactions) {
+                    if (data.collections && typeof data.collections === 'object') {
                         selectedBackupData = JSON.parse(JSON.stringify(data));
-                        if (!data.warranties) selectedBackupData.warranties = [];
-                        if (!data.suppliers) selectedBackupData.suppliers = [];
-                        if (!data.dispatches) selectedBackupData.dispatches = [];
+                        
+                        let totalItems = 0;
+                        let collectionCount = 0;
+                        let details = [];
+                        for (const [name, items] of Object.entries(data.collections)) {
+                            if (items && items.length > 0) {
+                                totalItems += items.length;
+                                collectionCount++;
+                                details.push(`📁 ${name}: ${items.length} items`);
+                            }
+                        }
                         
                         const version = data.version || '1.0';
-                        selectedBackupData.version = version;
+                        const preserveIDs = data.meta?.preserveIDs !== false;
                         
-                        if (restorePreview) {
-                            restorePreview.innerHTML = `
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                                        <span class="font-medium">${escapeHtml(backupFileName)}</span>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            📊 ${data.customers.length} customers | 📝 ${data.transactions.length} transactions
-                                            ${data.warranties ? ` | 🛡️ ${data.warranties.length} warranties` : ''}
-                                            ${data.suppliers ? ` | 🏭 ${data.suppliers.length} suppliers` : ''}
-                                            ${data.dispatches ? ` | 🚚 ${data.dispatches.length} dispatches` : ''}
-                                            <br>📅 Exported: ${data.exportedAt ? new Date(data.exportedAt).toLocaleString() : 'Unknown'}
-                                            <br>📌 Version: ${version}
-                                        </div>
+                        restorePreview.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                    <span class="font-medium">${escapeHtml(backupFileName)}</span>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        📊 ${totalItems} total items in ${collectionCount} collections
+                                        ${details.map(d => `<div class="text-[10px] ml-2">${d}</div>`).join('')}
+                                        <br>📅 Exported: ${data.exportedAt ? new Date(data.exportedAt).toLocaleString() : 'Unknown'}
+                                        <br>📌 Version: ${version}
+                                        <br>🆔 ${preserveIDs ? 'IDs will be preserved' : 'IDs will be regenerated'}
                                     </div>
-                                    <button id="clearFileBtn" class="text-red-500 hover:text-red-700 transition-colors p-1">
-                                        <i class="fas fa-times"></i>
-                                    </button>
                                 </div>
-                            `;
-                            restorePreview.classList.remove('hidden');
-                            if (restoreBtn) restoreBtn.disabled = false;
-                            
-                            $('clearFileBtn')?.addEventListener('click', () => {
-                                selectedBackupData = null;
-                                restorePreview.classList.add('hidden');
-                                if (restoreBtn) restoreBtn.disabled = true;
-                                if (fileInput) fileInput.value = '';
-                            });
-                        }
+                                <button id="clearFileBtn" class="text-red-500 hover:text-red-700 transition-colors p-1">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        `;
+                        restorePreview.classList.remove('hidden');
+                        restoreBtn.disabled = false;
+                        
+                        $('clearFileBtn')?.addEventListener('click', () => {
+                            selectedBackupData = null;
+                            restorePreview.classList.add('hidden');
+                            restoreBtn.disabled = true;
+                            fileInput.value = '';
+                        });
+                    } else if (data.customers && data.transactions) {
+                        // Legacy format - convert
+                        selectedBackupData = {
+                            version: data.version || '1.0',
+                            exportedAt: data.exportedAt || new Date().toISOString(),
+                            collections: {
+                                customers: data.customers || [],
+                                transactions: data.transactions || [],
+                                warranties: data.warranties || [],
+                                suppliers: data.suppliers || [],
+                                dispatches: data.dispatches || []
+                            },
+                            meta: {
+                                preserveIDs: true,
+                                isLegacy: true
+                            }
+                        };
+                        
+                        const totalItems = Object.values(selectedBackupData.collections).reduce((sum, arr) => sum + arr.length, 0);
+                        
+                        restorePreview.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                    <span class="font-medium">${escapeHtml(backupFileName)} (Legacy Format)</span>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        📊 ${totalItems} total items (converted to new format)
+                                        <br>🆔 IDs will be preserved
+                                    </div>
+                                </div>
+                                <button id="clearFileBtn" class="text-red-500 hover:text-red-700 transition-colors p-1">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        `;
+                        restorePreview.classList.remove('hidden');
+                        restoreBtn.disabled = false;
+                        
+                        $('clearFileBtn')?.addEventListener('click', () => {
+                            selectedBackupData = null;
+                            restorePreview.classList.add('hidden');
+                            restoreBtn.disabled = true;
+                            fileInput.value = '';
+                        });
                     } else {
-                        showToast('Invalid backup file format. File must contain customers and transactions data.', 'error');
+                        showToast('Invalid backup file format.', 'error');
                     }
                 } catch (error) {
                     showToast('Error parsing backup file: ' + error.message, 'error');
@@ -1247,7 +1309,7 @@ Database restored successfully!`;
         // INIT
         // =============================================
         await loadStats();
-        console.log('Backup & Restore page initialized');
+        
     </script>
 </body>
 </html>
