@@ -690,9 +690,7 @@
                             <button id="viewAllBtn" class="text-[11px] font-medium text-primary hover:text-primary-dark transition flex items-center gap-1">Full Ledger <i class="fas fa-arrow-right text-[9px]"></i></button>
                         </div>
                         <div id="recentTransactionsList" class="divide-y divide-gray-100 dark:divide-gray-700 activity-scroll">
-                            <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
-                            <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
-                            <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
+                            <!-- Dynamic content will be loaded here -->
                         </div>
                     </div>
 
@@ -704,8 +702,7 @@
                                 <span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">latest</span>
                             </div>
                             <div id="recentCollectionList" class="divide-y divide-gray-100 dark:divide-gray-700 activity-scroll">
-                                <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
-                                <div class="flex justify-between items-center p-3"><div class="flex gap-3"><div class="w-8 h-8 rounded-full skeleton"></div><div><div class="skeleton skeleton-text w-32"></div><div class="skeleton skeleton-text w-20 mt-1"></div></div></div><div class="skeleton skeleton-text w-24"></div></div>
+                                <!-- Dynamic content will be loaded here -->
                             </div>
                         </div>
 
@@ -894,6 +891,7 @@
                 const snap = await getDocs(collection(db, 'customers'));
                 customerNameMap.clear();
                 snap.forEach(d => customerNameMap.set(d.id, d.data().name));
+                console.log('✅ Customer names loaded:', customerNameMap.size);
             } catch (e) {
                 console.error('Error loading customer names:', e);
             }
@@ -912,19 +910,38 @@
             try {
                 if (customerNameMap.size === 0) await loadCustomerNames();
 
-                // ✅ FIX: Load ALL transactions (no limit) for accurate total due entry
+                // Load ALL transactions
                 const transactionsSnap = await getDocs(collection(db, 'transactions'));
                 allTransactions = [];
                 transactionsSnap.forEach(d => {
-                    allTransactions.push({ id: d.id, ...d.data() });
+                    const data = d.data();
+                    allTransactions.push({ 
+                        id: d.id, 
+                        ...data,
+                        // Ensure consistent field names
+                        customerId: data.customerId || data.customerID || '',
+                        customerName: data.customerName || '',
+                        date: data.date || data.transactionDate || new Date().toISOString().split('T')[0],
+                        type: data.type || 'due',
+                        amount: data.amount || data.dueAmount || data.collectionAmount || data.totalAmount || 0
+                    });
                 });
+
+                // Sort by date descending (newest first)
+                allTransactions.sort((a, b) => {
+                    if (a.date > b.date) return -1;
+                    if (a.date < b.date) return 1;
+                    return 0;
+                });
+
+                console.log('📊 Total transactions loaded:', allTransactions.length);
 
                 // Calculate stats
                 let totalDueFromCustomers = 0;
                 let totalCollections = 0;
                 let totalDueEntry = 0;
 
-                // ✅ FIX: Get Total Due from CUSTOMERS collection (not transactions)
+                // Get Total Due from CUSTOMERS collection
                 const customersSnap = await getDocs(collection(db, 'customers'));
                 customersSnap.forEach(d => {
                     totalDueFromCustomers += (d.data().totalDue || 0);
@@ -933,9 +950,9 @@
                 // Get total collections and total due entry from transactions
                 allTransactions.forEach(t => {
                     if (t.type === 'collection') {
-                        totalCollections += (t.collectionAmount || 0);
+                        totalCollections += (t.collectionAmount || t.amount || 0);
                     } else if (t.type === 'due') {
-                        totalDueEntry += (t.dueAmount || t.totalAmount || 0);
+                        totalDueEntry += (t.dueAmount || t.totalAmount || t.amount || 0);
                     }
                 });
 
@@ -954,7 +971,7 @@
                 const today = new Date().toISOString().split('T')[0];
                 let todayCollection = 0;
                 allTransactions.forEach(t => {
-                    if (t.type === 'collection' && t.date === today) todayCollection += (t.collectionAmount || 0);
+                    if (t.type === 'collection' && t.date === today) todayCollection += (t.collectionAmount || t.amount || 0);
                 });
                 document.getElementById('todayCollection').textContent = '৳' + todayCollection.toFixed(2);
 
@@ -976,6 +993,11 @@
         // ─── Recent Transactions ───
         async function loadRecentTransactions() {
             const container = document.getElementById('recentTransactionsList');
+            
+            if (!container) {
+                console.error('Recent transactions container not found');
+                return;
+            }
 
             if (allTransactions.length === 0) {
                 container.innerHTML = `<div class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-3xl mb-2 opacity-40"></i><p class="text-xs">No transactions yet</p></div>`;
@@ -984,29 +1006,51 @@
 
             let html = '';
             const recent = allTransactions.slice(0, 8);
+            
             for (const t of recent) {
-                const name = t.customerName || getCustomerName(t.customerId);
-                const isDue = t.type === 'due';
-                const amount = isDue ? (t.dueAmount || t.totalAmount || 0) : (t.collectionAmount || 0);
-                const badge = isDue ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-600' : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600';
-                const icon = isDue ? 'fa-plus-circle' : 'fa-hand-holding-usd';
-                const label = isDue ? 'Due: ' : 'Paid: ';
-                const cls = isDue ? 'text-rose-600' : 'text-emerald-600';
+                try {
+                    // Try to get customer name
+                    let name = t.customerName || 'Unknown';
+                    if (t.customerId && customerNameMap.has(t.customerId)) {
+                        name = customerNameMap.get(t.customerId);
+                    }
+                    
+                    const isDue = t.type === 'due';
+                    const amount = isDue ? (t.dueAmount || t.totalAmount || t.amount || 0) : (t.collectionAmount || t.amount || 0);
+                    const badge = isDue ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-600' : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600';
+                    const icon = isDue ? 'fa-plus-circle' : 'fa-hand-holding-usd';
+                    const label = isDue ? 'Due: ' : 'Paid: ';
+                    const cls = isDue ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400';
+                    const dateDisplay = t.date || 'N/A';
 
-                html += `<div class="flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition">
-                            <div class="flex gap-3">
-                                <div class="w-8 h-8 rounded-full ${badge} flex items-center justify-center"><i class="fas ${icon} text-xs"></i></div>
-                                <div><p class="text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(name)}</p><p class="text-[10px] text-gray-400">${t.date || 'N/A'}</p></div>
-                            </div>
-                            <p class="font-semibold text-sm ${cls}">${label} ৳${amount.toFixed(2)}</p>
-                        </div>`;
+                    html += `<div class="flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition">
+                                <div class="flex gap-3">
+                                    <div class="w-8 h-8 rounded-full ${badge} flex items-center justify-center"><i class="fas ${icon} text-xs"></i></div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(name)}</p>
+                                        <p class="text-[10px] text-gray-400">${dateDisplay}</p>
+                                    </div>
+                                </div>
+                                <p class="font-semibold text-sm ${cls}">${label} ৳${amount.toFixed(2)}</p>
+                            </div>`;
+                } catch (error) {
+                    console.error('Error rendering transaction:', error);
+                }
             }
+            
             container.innerHTML = html;
+            console.log('✅ Recent transactions rendered:', recent.length);
         }
 
         // ─── Recent Collection ───
         async function loadRecentCollection() {
             const container = document.getElementById('recentCollectionList');
+            
+            if (!container) {
+                console.error('Recent collection container not found');
+                return;
+            }
+
             const collections = allTransactions.filter(t => t.type === 'collection').slice(0, 8);
 
             if (collections.length === 0) {
@@ -1016,16 +1060,32 @@
 
             let html = '';
             for (const t of collections) {
-                const name = t.customerName || getCustomerName(t.customerId);
-                html += `<div class="flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition">
-                            <div class="flex gap-3">
-                                <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center"><i class="fas fa-hand-holding-usd text-xs"></i></div>
-                                <div><p class="text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(name)}</p><p class="text-[10px] text-gray-400">${t.date || 'N/A'}</p></div>
-                            </div>
-                            <p class="font-semibold text-sm text-emerald-600">+ ৳${(t.collectionAmount || 0).toFixed(2)}</p>
-                        </div>`;
+                try {
+                    let name = t.customerName || 'Unknown';
+                    if (t.customerId && customerNameMap.has(t.customerId)) {
+                        name = customerNameMap.get(t.customerId);
+                    }
+                    
+                    const amount = t.collectionAmount || t.amount || 0;
+                    const dateDisplay = t.date || 'N/A';
+
+                    html += `<div class="flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition">
+                                <div class="flex gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center"><i class="fas fa-hand-holding-usd text-xs"></i></div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-800 dark:text-white">${escapeHtml(name)}</p>
+                                        <p class="text-[10px] text-gray-400">${dateDisplay}</p>
+                                    </div>
+                                </div>
+                                <p class="font-semibold text-sm text-emerald-600 dark:text-emerald-400">+ ৳${amount.toFixed(2)}</p>
+                            </div>`;
+                } catch (error) {
+                    console.error('Error rendering collection:', error);
+                }
             }
+            
             container.innerHTML = html;
+            console.log('✅ Recent collections rendered:', collections.length);
         }
 
         // ─── Collection Ratio ───
@@ -1034,8 +1094,8 @@
                 let due = 0,
                     collected = 0;
                 allTransactions.forEach(t => {
-                    if (t.type === 'due') due += (t.dueAmount || t.totalAmount || 0);
-                    else if (t.type === 'collection') collected += (t.collectionAmount || 0);
+                    if (t.type === 'due') due += (t.dueAmount || t.totalAmount || t.amount || 0);
+                    else if (t.type === 'collection') collected += (t.collectionAmount || t.amount || 0);
                 });
 
                 document.getElementById('ratioTotalDue').textContent = '৳' + due.toFixed(2);
@@ -1069,6 +1129,8 @@
         // ─── Notifications ───
         function updateNotifications() {
             const list = document.getElementById('notificationList');
+            if (!list) return;
+            
             const recent = allTransactions.slice(0, 10);
             const count = recent.length;
 
@@ -1086,9 +1148,13 @@
             } else {
                 const displayItems = recent.slice(0, 6);
                 for (const t of displayItems) {
-                    const name = t.customerName || getCustomerName(t.customerId);
+                    let name = t.customerName || 'Unknown';
+                    if (t.customerId && customerNameMap.has(t.customerId)) {
+                        name = customerNameMap.get(t.customerId);
+                    }
+                    
                     const isDue = t.type === 'due';
-                    const amount = isDue ? (t.dueAmount || t.totalAmount || 0) : (t.collectionAmount || 0);
+                    const amount = isDue ? (t.dueAmount || t.totalAmount || t.amount || 0) : (t.collectionAmount || t.amount || 0);
                     const icon = isDue ? 'fa-plus-circle' : 'fa-hand-holding-usd';
                     const iconClass = isDue ? 'due' : 'collection';
                     const borderClass = isDue ? 'notif-border-due' : 'notif-border-collection';
@@ -1206,6 +1272,7 @@
         console.log('✅ Dashboard loaded. Auto-refresh is DISABLED.');
         console.log('💡 Click the refresh button (⟳) to manually update data.');
         console.log('✅ Total Due is now fetched from customers collection for accuracy.');
+        console.log('📊 Recent Activity and Recent Collection are now fully dynamic.');
     </script>
 </body>
 </html>
